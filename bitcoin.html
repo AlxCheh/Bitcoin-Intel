@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BITCOIN INTEL</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --btc:      #F7931A;
+  --btc-low:  rgba(247,147,26,0.08);
+  --btc-mid:  rgba(247,147,26,0.18);
+  --bg:       #06080B;
+  --bg2:      #0C0F14;
+  --bg3:      #111520;
+  --line:     #1A1F2A;
+  --line2:    #242A38;
+  --txt:      #D4DCE8;
+  --dim:      #4A5568;
+  --dim2:     #2D3748;
+  --grn:      #22C55E;
+  --red:      #EF4444;
+  --blue:     #3B82F6;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'IBM Plex Sans', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { font-size: 14px; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
+
+/* ══════════════════════════════════
+   HEADER
+══════════════════════════════════ */
+header {
+  position: sticky; top: 0; z-index: 200;
+  height: 48px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--txt);
+  text-transform: uppercase;
+}
+
+.logo-btc {
+  width: 24px; height: 24px;
+  background: var(--btc);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #000; font-weight: 900; line-height: 1;
+  font-family: var(--mono);
+}
+
+.header-sep { color: var(--line2); margin: 0 2px; }
+
+.header-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header-live {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--grn);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:0.3; }
+}
+
+/* ══════════════════════════════════
+   NAV
+══════════════════════════════════ */
+.nav {
+  display: flex;
+  overflow-x: auto;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.nav-btn {
+  flex-shrink: 0;
+  padding: 0 18px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.nav-btn:hover { color: var(--txt); }
+.nav-btn.active {
+  color: var(--btc);
+  border-bottom-color: var(--btc);
+}
+
+/* ══════════════════════════════════
+   SECTIONS
+══════════════════════════════════ */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ══════════════════════════════════
+   PAGE LAYOUT
+══════════════════════════════════ */
+.page { padding: 0 0 80px; max-width: 720px; margin: 0 auto; }
+
+/* ══════════════════════════════════
+   SECTION HEADER ROW
+══════════════════════════════════ */
+.sh {
+  display: flex; align-items: center;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.sh-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.sh-title span { color: var(--btc); }
+.sh-right {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+}
+
+/* ══════════════════════════════════
+   TICKER STRIP
+══════════════════════════════════ */
+.ticker {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ticker::-webkit-scrollbar { display: none; }
+.ticker-item {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-right: 1px solid var(--line);
+  min-width: 120px;
+}
+.ticker-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.ticker-val {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--btc);
+}
+.ticker-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════
+   HASH TERMINAL
+══════════════════════════════════ */
+.terminal {
+  margin: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 12px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--line);
+}
+.t-dot { width: 8px; height: 8px; border-radius: 50%; }
+.terminal-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  margin-left: 4px;
+  letter-spacing: 0.08em;
+}
+.terminal-body {
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.9;
+}
+.t-row { display: flex; gap: 8px; }
+.t-key { color: var(--dim); min-width: 90px; flex-shrink: 0; }
+.t-val { color: var(--txt); word-break: break-all; }
+.t-val.btc { color: var(--btc); }
+.t-val.grn { color: var(--grn); }
+.t-val.anim { font-size: 10px; }
+
+/* ══════════════════════════════════
+   DATA TABLE
+══════════════════════════════════ */
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.dtable th {
+  padding: 8px 16px;
+  text-align: left;
+  color: var(--dim);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.dtable td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--txt);
+  vertical-align: top;
+}
+.dtable tr:last-child td { border-bottom: none; }
+.dtable tr:hover td { background: var(--bg3); }
+.td-btc { color: var(--btc) !important; font-weight: 700; }
+.td-dim { color: var(--dim) !important; font-size: 10px; }
+.td-grn { color: var(--grn) !important; }
+.td-blue { color: var(--blue) !important; }
+.badge {
+  display: inline-block;
+  background: var(--btc-low);
+  color: var(--btc);
+  border: 1px solid rgba(247,147,26,0.25);
+  font-size: 9px;
+  padding: 1px 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════
+   PANEL
+══════════════════════════════════ */
+.panel {
+  margin: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg3);
+}
+.panel-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.panel-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--btc);
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(247,147,26,0.3);
+  padding: 1px 6px;
+}
+.panel-body { padding: 14px; }
+.panel-body p {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.75;
+  font-family: var(--sans);
+}
+.panel-body p + p { margin-top: 10px; }
+.panel-body strong { color: var(--txt); font-weight: 600; }
+
+/* ══════════════════════════════════
+   ACCORDION
+══════════════════════════════════ */
+.acc-item {
+  border-bottom: 1px solid var(--line);
+}
+.acc-item:last-child { border-bottom: none; }
+.acc-head {
+  display: flex; align-items: center;
+  padding: 13px 16px;
+  cursor: pointer;
+  gap: 10px;
+  transition: background 0.15s;
+}
+.acc-head:hover { background: var(--bg3); }
+.acc-icon {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--btc);
+  width: 20px;
+  text-align: center;
+}
+.acc-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--txt);
+  flex: 1;
+}
+.acc-arrow {
+  font-size: 10px;
+  color: var(--dim);
+  transition: transform 0.25s;
+}
+.acc-body {
+  display: none;
+  padding: 0 16px 16px 46px;
+  border-top: 1px solid var(--line);
+  background: var(--bg2);
+}
+.acc-body.open { display: block; }
+.acc-body p {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.75;
+  margin-top: 12px;
+}
+.acc-body p strong { color: var(--txt); font-weight: 600; }
+
+/* ══════════════════════════════════
+   CODE BLOCK
+══════════════════════════════════ */
+.code {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.9;
+  overflow-x: auto;
+  margin-top: 12px;
+}
+.c-cmt  { color: var(--dim2); }
+.c-key  { color: #60A5FA; }
+.c-val  { color: var(--btc); }
+.c-str  { color: var(--grn); }
+.c-op   { color: #A78BFA; }
+
+/* ══════════════════════════════════
+   CHART PANEL
+══════════════════════════════════ */
+.chart-panel {
+  margin: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.chart-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.chart-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.chart-meta {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+}
+.chart-inner { padding: 14px 12px 8px; }
+
+/* ══════════════════════════════════
+   DIFF BAR
+══════════════════════════════════ */
+.diff-wrap { padding: 14px 16px; }
+.diff-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+.diff-num {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--btc);
+  line-height: 1;
+}
+.diff-unit {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  margin-left: 4px;
+}
+.diff-pct {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--grn);
+}
+.bar-track {
+  height: 3px;
+  background: var(--line2);
+  width: 100%;
+}
+.bar-fill {
+  height: 3px;
+  background: var(--btc);
+  transition: width 1.2s cubic-bezier(.25,.46,.45,.94);
+  width: 0%;
+}
+.bar-labels {
+  display: flex; justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+}
+
+/* ══════════════════════════════════
+   HALVING BLOCK
+══════════════════════════════════ */
+.halving-block {
+  margin: 12px 16px;
+  border: 1px solid rgba(247,147,26,0.25);
+  background: linear-gradient(135deg, rgba(247,147,26,0.04) 0%, var(--bg2) 60%);
+  padding: 20px 18px;
+  display: flex; align-items: center; gap: 16px;
+}
+.halving-icon {
+  font-size: 28px;
+  line-height: 1;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(247,147,26,0.3)); }
+  50%      { filter: drop-shadow(0 0 16px rgba(247,147,26,0.8)); }
+}
+.halving-info {}
+.halving-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.halving-val {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--btc);
+  line-height: 1;
+}
+.halving-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 4px;
+}
+
+/* ══════════════════════════════════
+   UTXO FLOW
+══════════════════════════════════ */
+.utxo-diagram { padding: 0 16px 14px; }
+.utxo-section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 0 6px;
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+}
+.utxo-section-label:first-child { border-top: none; margin-top: 0; }
+.utxo-row-item {
+  display: flex; align-items: center; gap: 8px;
+  margin: 5px 0;
+}
+.utxo-box {
+  flex: 1;
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  background: var(--bg3);
+}
+.utxo-addr {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
+.utxo-amt {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--btc);
+  margin-top: 2px;
+}
+.utxo-amt.grn { color: var(--grn); }
+.utxo-arrow-sym {
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.utxo-fee-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════
+   PILLS
+══════════════════════════════════ */
+.pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  border: 1px solid var(--line2);
+  padding: 3px 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════
+   HOME HERO
+══════════════════════════════════ */
+.hero-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.hero-btc {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--btc);
+  line-height: 1;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+.hero-text {}
+.hero-title {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--txt);
+  line-height: 1.3;
+}
+.hero-desc {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════
+   METRIC ROW
+══════════════════════════════════ */
+.metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.metric-cell {
+  padding: 12px 16px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.metric-cell:nth-child(2n) { border-right: none; }
+.metric-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.metric-val {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--btc);
+  line-height: 1;
+}
+.metric-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 3px;
+}
+
+/* ══════════════════════════════════
+   SPACER
+══════════════════════════════════ */
+.sp12 { height: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo">
+    <div class="logo-btc">₿</div>
+    <span class="header-sep">/</span>
+    BITCOIN INTEL
+  </div>
+  <div class="header-live">
+    <div class="live-dot"></div>
+    LIVE
+  </div>
+</header>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('home',this)">ОБЗОР</button>
+  <button class="nav-btn" onclick="showTab('basics',this)">ОСНОВЫ</button>
+  <button class="nav-btn" onclick="showTab('history',this)">ИСТОРИЯ</button>
+  <button class="nav-btn" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
+  <button class="nav-btn" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME
+══════════════════════════════════════ -->
+<section class="section active" id="tab-home">
+  <div class="page">
+
+    <div class="hero-row">
+      <div class="hero-btc">₿</div>
+      <div class="hero-text">
+        <div class="hero-title">Bitcoin<br>Intelligence</div>
+        <div class="hero-desc">Обучающий ресурс · Основы, история, технологии и аналитика</div>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metric-row">
+      <div class="metric-cell">
+        <div class="metric-label">Лимит эмиссии</div>
+        <div class="metric-val">21M</div>
+        <div class="metric-sub">BTC навсегда</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Награда / блок</div>
+        <div class="metric-val">3.125</div>
+        <div class="metric-sub">BTC · 4-й халвинг</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Блоков в сутки</div>
+        <div class="metric-val">~144</div>
+        <div class="metric-sub">каждые 10 мин</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Uptime</div>
+        <div class="metric-val">99.99%</div>
+        <div class="metric-sub">с января 2009</div>
+      </div>
+    </div>
+
+    <!-- TERMINAL -->
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="t-dot" style="background:#EF4444"></div>
+        <div class="t-dot" style="background:#F59E0B"></div>
+        <div class="t-dot" style="background:#22C55E"></div>
+        <span class="terminal-title">MINING_SIM — BLOCK #850001</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-row"><span class="t-key">status</span><span class="t-val grn">MINING...</span></div>
+        <div class="t-row"><span class="t-key">target</span><span class="t-val dim" style="color:var(--dim);font-size:10px">0000000000000000000...</span></div>
+        <div class="t-row"><span class="t-key">nonce</span><span class="t-val btc" id="nonce-display">0</span></div>
+        <div class="t-row"><span class="t-key">hash</span><span class="t-val anim" id="hash-display" style="color:var(--dim);font-size:10px">computing...</span></div>
+      </div>
+    </div>
+
+    <!-- WHAT IS BTC -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Что такое Bitcoin</span>
+        <span class="panel-tag">ОБЗОР</span>
+      </div>
+      <div class="panel-body">
+        <p>Bitcoin — первая в мире децентрализованная цифровая валюта, созданная в 2009 году под псевдонимом <strong>Сатоши Накамото</strong>. Работает без банков, правительств и посредников.</p>
+        <p>Сеть поддерживается тысячами независимых нодов по всему миру. Никто не может заблокировать транзакцию, заморозить счёт или изменить историю.</p>
+      </div>
+    </div>
+
+    <div class="pills">
+      <span class="pill">Децентрализованный</span>
+      <span class="pill">Открытый код</span>
+      <span class="pill">Дефляционный</span>
+      <span class="pill">Peer-to-peer</span>
+      <span class="pill">Без цензуры</span>
+      <span class="pill">24/7/365</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     BASICS
+══════════════════════════════════════ -->
+<section class="section" id="tab-basics">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">📖 Основы <span>Bitcoin</span></span>
+    </div>
+
+    <!-- BLOCKCHAIN -->
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Блокчейн</span>
+        <span class="panel-tag">СТРУКТУРА</span>
+      </div>
+      <div class="panel-body">
+        <p>Блокчейн — публичная база данных всех транзакций. Это книга учёта, в которую все могут заглянуть, но никто не может изменить прошлое.</p>
+        <p>Каждый блок содержит транзакции, временну́ю метку и хэш предыдущего блока. Изменить один блок — значит пересчитать всю последующую цепочку.</p>
+      </div>
+      <div class="code" style="margin:0;border:none;border-top:1px solid var(--line)">
+        <div><span class="c-cmt">// Структура блока</span></div>
+        <div><span class="c-key">Block</span> <span class="c-val">#850001</span> {</div>
+        <div>&nbsp; <span class="c-key">prev_hash</span>  <span class="c-str">"0000000000abc4f2..."</span></div>
+        <div>&nbsp; <span class="c-key">merkle_root</span> <span class="c-str">"d4e5f6a2..."</span></div>
+        <div>&nbsp; <span class="c-key">timestamp</span>  <span class="c-val">2024-04-20 14:32:07</span></div>
+        <div>&nbsp; <span class="c-key">nonce</span>      <span class="c-val">3,942,891</span></div>
+        <div>&nbsp; <span class="c-key">tx_count</span>   <span class="c-val">2,834</span></div>
+        <div>}</div>
+      </div>
+    </div>
+
+    <!-- KEYS -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ключи и адреса</span>
+        <span class="panel-tag">КРИПТОГРАФИЯ</span>
+      </div>
+      <div class="panel-body">
+        <p><strong>Приватный ключ</strong> — секретное 256-битное число. Тот, кто знает ключ, контролирует монеты.</p>
+        <p><strong>Публичный ключ</strong> генерируется из приватного через эллиптические кривые. Обратная операция вычислительно невозможна.</p>
+        <p><strong>Адрес</strong> — хэш публичного ключа. Его даёшь другим для получения платежей.</p>
+      </div>
+      <div class="code" style="margin:0;border:none;border-top:1px solid var(--line)">
+        <div><span class="c-cmt">// Цепочка генерации</span></div>
+        <div><span class="c-key">privKey</span> <span class="c-op">→ SECP256k1 →</span> <span class="c-key">pubKey</span></div>
+        <div><span class="c-key">pubKey</span>  <span class="c-op">→ SHA256 + RIPEMD160 →</span> <span class="c-key">addr</span></div>
+        <div style="margin-top:6px"><span class="c-val">"1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf"</span></div>
+      </div>
+    </div>
+
+    <!-- UTXO -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Модель UTXO</span>
+        <span class="panel-tag">ТРАНЗАКЦИИ</span>
+      </div>
+      <div class="panel-body">
+        <p>Bitcoin не хранит «баланс». Вместо этого — <strong>UTXO</strong> (Unspent Transaction Outputs): набор «монеток», адресованных твоему ключу. При трате ты уничтожаешь старые UTXO и создаёшь новые.</p>
+      </div>
+      <div class="utxo-diagram">
+        <div class="utxo-section-label">Входы — тратим</div>
+        <div class="utxo-row-item">
+          <div class="utxo-box">
+            <div class="utxo-addr">tx001:0 · Alice</div>
+            <div class="utxo-amt">1.5 BTC</div>
+          </div>
+          <div class="utxo-arrow-sym">→</div>
+          <div class="utxo-box" style="border-color:rgba(247,147,26,0.3);background:var(--btc-low)">
+            <div class="utxo-addr">Транзакция</div>
+            <div class="utxo-amt" style="font-size:10px;color:var(--dim)">Alice → Bob</div>
+          </div>
+        </div>
+        <div class="utxo-section-label">Выходы — создаём</div>
+        <div class="utxo-row-item">
+          <div class="utxo-box" style="border-color:rgba(34,197,94,0.25)">
+            <div class="utxo-addr">Bob</div>
+            <div class="utxo-amt grn">0.8 BTC</div>
+          </div>
+        </div>
+        <div class="utxo-row-item" style="margin-top:5px">
+          <div class="utxo-box">
+            <div class="utxo-addr">Alice · сдача</div>
+            <div class="utxo-amt">0.6999 BTC</div>
+          </div>
+        </div>
+        <div class="utxo-fee-note">Комиссия майнеру: 0.0001 BTC · разница входов и выходов</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     HISTORY
+══════════════════════════════════════ -->
+<section class="section" id="tab-history">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">📜 История <span>BTC</span></span>
+    </div>
+
+    <div class="halving-block">
+      <div class="halving-icon">₿</div>
+      <div class="halving-info">
+        <div class="halving-label">Текущая награда майнера</div>
+        <div class="halving-val">3.125 <span style="font-size:13px;color:var(--dim)">BTC/блок</span></div>
+        <div class="halving-sub">Следующий халвинг ~2028 → 1.5625 BTC</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Таблица халвингов</span>
+        <span class="panel-tag">ЭМИССИЯ</span>
+      </div>
+      <table class="dtable">
+        <thead>
+          <tr>
+            <th>Год</th>
+            <th>Блок</th>
+            <th>Награда</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2009</td><td class="td-dim">#0</td><td class="td-btc">50 BTC</td><td class="td-dim">Genesis</td></tr>
+          <tr><td>2012</td><td class="td-dim">#210 000</td><td class="td-btc">25 BTC</td><td class="td-dim">1-й</td></tr>
+          <tr><td>2016</td><td class="td-dim">#420 000</td><td class="td-btc">12.5 BTC</td><td class="td-dim">2-й</td></tr>
+          <tr><td>2020</td><td class="td-dim">#630 000</td><td class="td-btc">6.25 BTC</td><td class="td-dim">3-й</td></tr>
+          <tr><td>2024</td><td class="td-dim">#840 000</td><td class="td-btc">3.125 BTC</td><td><span class="badge">ТЕКУЩИЙ</span></td></tr>
+          <tr><td class="td-dim">~2028</td><td class="td-dim">#1 050 000</td><td class="td-dim">1.5625 BTC</td><td class="td-dim">5-й</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ключевые события</span>
+        <span class="panel-tag">ХРОНОЛОГИЯ</span>
+      </div>
+      <table class="dtable">
+        <thead>
+          <tr><th>Год</th><th>Событие</th><th>Значение</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-btc">2008</td>
+            <td><strong style="font-size:12px">Белая книга</strong><br><span class="td-dim" style="font-size:11px">Накамото публикует Bitcoin Whitepaper</span></td>
+            <td class="td-dim" style="font-size:11px">Концепция P2P-денег</td>
+          </tr>
+          <tr>
+            <td class="td-btc">2009</td>
+            <td><strong style="font-size:12px">Генезис-блок</strong><br><span class="td-dim" style="font-size:11px">3 января — запуск сети</span></td>
+            <td class="td-dim" style="font-size:11px">Блок #0</td>
+          </tr>
+          <tr>
+            <td class="td-btc">2010</td>
+            <td><strong style="font-size:12px">Pizza Day</strong><br><span class="td-dim" style="font-size:11px">10 000 BTC за 2 пиццы</span></td>
+            <td class="td-dim" style="font-size:11px">Первая покупка</td>
+          </tr>
+          <tr>
+            <td class="td-btc">2017</td>
+            <td><strong style="font-size:12px">ATH $20K</strong><br><span class="td-dim" style="font-size:11px">Первый массовый бум</span></td>
+            <td class="td-grn" style="font-size:11px">$20 000</td>
+          </tr>
+          <tr>
+            <td class="td-btc">2021</td>
+            <td><strong style="font-size:12px">ATH $69K</strong><br><span class="td-dim" style="font-size:11px">Институциональный спрос</span></td>
+            <td class="td-grn" style="font-size:11px">$69 000</td>
+          </tr>
+          <tr>
+            <td class="td-btc">2024</td>
+            <td><strong style="font-size:12px">Спот ETF + 4-й халвинг</strong><br><span class="td-dim" style="font-size:11px">SEC одобряет ETF. BTC > $100K</span></td>
+            <td class="td-grn" style="font-size:11px">$100 000+</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TECH
+══════════════════════════════════════ -->
+<section class="section" id="tab-tech">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">⚙️ Технологии <span>Bitcoin</span></span>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Технические компоненты</span>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">⛏</span>
+          <span class="acc-label">Proof-of-Work</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body open">
+          <p>Чтобы добавить блок, майнер находит <strong>nonce</strong> — число, при котором SHA-256 хэш начинается с нужного количества нулей. Это чистый перебор: миллиарды хэшей в секунду.</p>
+          <p>Сеть автоматически регулирует сложность каждые <strong>2016 блоков (~2 недели)</strong>, чтобы среднее время блока оставалось 10 минут независимо от мощности майнеров.</p>
+          <div class="code">
+            <div><span class="c-cmt">// Упрощённый PoW</span></div>
+            <div><span class="c-key">while</span> <span class="c-val">True</span>:</div>
+            <div>&nbsp; hash = <span class="c-str">SHA256</span>(block + nonce)</div>
+            <div>&nbsp; <span class="c-key">if</span> hash.startswith(<span class="c-str">"0000"</span>):</div>
+            <div>&nbsp; &nbsp; <span class="c-op">return</span> nonce <span class="c-cmt">// Найдено!</span></div>
+            <div>&nbsp; nonce <span class="c-op">+=</span> <span class="c-val">1</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🪙</span>
+          <span class="acc-label">Модель UTXO</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin не хранит балансы. Существуют <strong>UTXO</strong> — неизрасходованные выходы транзакций. Твой баланс — сумма всех UTXO на твоих адресах.</p>
+          <p>При трате уничтожаешь старые UTXO и создаёшь новые. Разница уходит майнеру как комиссия. Транзакции можно проверять параллельно — это делает Bitcoin эффективнее Ethereum на базовом уровне.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🔐</span>
+          <span class="acc-label">SECP256k1 криптография</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin использует <strong>эллиптические кривые</strong>: y² = x³ + 7. Приватный ключ — случайное 256-битное число. Публичный ключ — точка на кривой.</p>
+          <p>Умножение точки — односторонняя функция: из приватного легко получить публичный, но не наоборот. Подпись транзакции доказывает владение без раскрытия ключа.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">📜</span>
+          <span class="acc-label">Скрипты Bitcoin</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Каждый UTXO заперт <strong>скриптом блокировки</strong>. Транзакция предоставляет скрипт разблокировки. Это стэковый язык программирования.</p>
+          <div class="code">
+            <div><span class="c-cmt">// P2PKH — стандартный адрес 1...</span></div>
+            <div><span class="c-key">Lock:</span>   OP_DUP OP_HASH160 <span class="c-str">&lt;pubKeyHash&gt;</span></div>
+            <div>&nbsp; &nbsp; &nbsp; &nbsp; OP_EQUALVERIFY OP_CHECKSIG</div>
+            <div><span class="c-key">Unlock:</span> <span class="c-str">&lt;sig&gt;</span> <span class="c-str">&lt;pubKey&gt;</span></div>
+          </div>
+          <p style="margin-top:10px">Типы: <strong>P2PKH</strong> (1...) · <strong>P2SH</strong> (3..., мультисиг) · <strong>SegWit</strong> (bc1...) · <strong>Taproot</strong> (bc1p..., приватность)</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">⚡</span>
+          <span class="acc-label">Lightning Network</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Основная цепь обрабатывает ~7 транзакций в секунду. <strong>Lightning</strong> — второй уровень: платёжные каналы вне блокчейна.</p>
+          <p>Открываешь канал (1 on-chain транзакция) → тысячи мгновенных платежей → закрываешь (1 on-chain). Комиссии — доли цента. Скорость — мгновенно.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ANALYTICS
+══════════════════════════════════════ -->
+<section class="section" id="tab-analytics">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">📊 Аналитика <span>сети</span></span>
+    </div>
+
+    <!-- DIFFICULTY -->
+    <div class="chart-panel" style="margin-top:12px">
+      <div class="chart-head">
+        <span class="chart-title">Сложность сети</span>
+        <span class="chart-meta">HASHRATE</span>
+      </div>
+      <div class="diff-wrap">
+        <div class="diff-top">
+          <div>
+            <span class="diff-num">~88T</span>
+            <span class="diff-unit">TH</span>
+          </div>
+          <div class="diff-pct">▲ +2.1% 2w</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="diffBar"></div>
+        </div>
+        <div class="bar-labels">
+          <span>MIN</span><span>ТЕКУЩИЙ УРОВЕНЬ</span><span>MAX</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICE CHART -->
+    <div class="chart-panel">
+      <div class="chart-head">
+        <span class="chart-title">Цена BTC / USD</span>
+        <span class="chart-meta">LOG · 2010–2025</span>
+      </div>
+      <div class="chart-inner">
+        <canvas id="priceChart" height="190"></canvas>
+      </div>
+    </div>
+
+    <!-- HASHRATE CHART -->
+    <div class="chart-panel">
+      <div class="chart-head">
+        <span class="chart-title">Хешрейт сети</span>
+        <span class="chart-meta">EH/s · 2016–2025</span>
+      </div>
+      <div class="chart-inner">
+        <canvas id="hashrateChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- SUPPLY CHART -->
+    <div class="chart-panel">
+      <div class="chart-head">
+        <span class="chart-title">Эмиссия Bitcoin</span>
+        <span class="chart-meta">BTC В ОБРАЩЕНИИ (МЛН)</span>
+      </div>
+      <div class="chart-inner">
+        <canvas id="supplyChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- NETWORK METRICS TABLE -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Метрики сети</span>
+        <span class="panel-tag">ON-CHAIN</span>
+      </div>
+      <table class="dtable">
+        <thead>
+          <tr><th>Метрика</th><th>Значение</th><th>Примечание</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Добыто BTC</td><td class="td-btc">~19.7M</td><td class="td-dim">из 21 000 000</td></tr>
+          <tr><td>Осталось добыть</td><td class="td-btc">~1.3M</td><td class="td-dim">~6.2% лимита</td></tr>
+          <tr><td>Полных нодов</td><td class="td-btc">~17K</td><td class="td-dim">по всему миру</td></tr>
+          <tr><td>Uptime сети</td><td class="td-grn">99.99%</td><td class="td-dim">с 2009 года</td></tr>
+          <tr><td>Размер блока</td><td class="td-btc">~1.5 MB</td><td class="td-dim">SegWit</td></tr>
+          <tr><td>Транзакций/сек</td><td class="td-btc">~7 TPS</td><td class="td-dim">базовый уровень</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// ── TABS ──
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'analytics') initCharts();
+}
+
+// ── ACCORDION ──
+function toggleAcc(head) {
+  const body = head.nextElementSibling;
+  const arrow = head.querySelector('.acc-arrow');
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.acc-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.acc-arrow').forEach(a => a.style.transform = '');
+  if (!isOpen) {
+    body.classList.add('open');
+    arrow.style.transform = 'rotate(180deg)';
+  }
+}
+
+// ── HASH ANIMATION ──
+const HEX = '0123456789abcdef';
+let nonce = 0;
+function rh(n) { return Array.from({length:n}, () => HEX[Math.floor(Math.random()*16)]).join(''); }
+
+setInterval(() => {
+  const hEl = document.getElementById('hash-display');
+  const nEl = document.getElementById('nonce-display');
+  if (!hEl) return;
+  nonce++;
+  nEl.textContent = nonce.toLocaleString();
+  if (nonce % 47 === 0) {
+    hEl.innerHTML = '<span style="color:var(--grn)">00000000</span>' + rh(56);
+    hEl.style.color = 'var(--grn)';
+    setTimeout(() => { hEl.style.color = ''; nonce = 0; }, 900);
+  } else {
+    hEl.textContent = rh(64);
+    hEl.style.color = 'var(--dim)';
+  }
+}, 110);
+
+// ── CHARTS ──
+let chartsInited = false;
+function initCharts() {
+  if (chartsInited) return;
+  chartsInited = true;
+  setTimeout(() => { document.getElementById('diffBar').style.width = '87%'; }, 400);
+
+  const grid  = 'rgba(26,31,42,1)';
+  const tick  = '#4A5568';
+  const font  = "'IBM Plex Mono', monospace";
+  const opts  = (log) => ({
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0C0F14',
+        borderColor: '#1A1F2A',
+        borderWidth: 1,
+        titleColor: tick,
+        bodyColor: '#F7931A',
+        titleFont: { family: font, size: 10 },
+        bodyFont:  { family: font, size: 11 }
+      }
+    },
+    scales: {
+      x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 10 } } },
+      y: {
+        type: log ? 'logarithmic' : 'linear',
+        grid: { color: grid },
+        ticks: { color: tick, font: { family: font, size: 10 } }
+      }
+    }
+  });
+
+  // Price
+  const po = opts(true);
+  po.plugins.tooltip.callbacks = { label: c => ' $' + c.raw.toLocaleString() };
+  po.scales.y.ticks.callback = v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'K' : '$' + v;
+  new Chart(document.getElementById('priceChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
+      datasets: [{
+        data: [0.08,2,5,100,320,430,950,14000,3500,7000,29000,47000,16500,42000,65000,95000],
+        borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.06)',
+        borderWidth: 1.5, pointRadius: 2, fill: true, tension: 0.35,
+        pointBackgroundColor: '#F7931A'
+      }]
+    },
+    options: po
+  });
+
+  // Hashrate
+  const ho = opts(false);
+  ho.scales.y.ticks.callback = v => v + ' EH';
+  new Chart(document.getElementById('hashrateChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
+      datasets: [{
+        data: [2,8,40,65,120,180,240,380,580,720],
+        backgroundColor: 'rgba(247,147,26,0.65)',
+        borderColor: '#F7931A', borderWidth: 1, borderRadius: 1
+      }]
+    },
+    options: ho
+  });
+
+  // Supply
+  const so = opts(false);
+  so.plugins.legend = { display: true, labels: { color: tick, font: { family: font, size: 10 }, boxWidth: 10 } };
+  so.scales.y.ticks.callback = v => v + 'M';
+  so.scales.y.min = 0; so.scales.y.max = 22;
+  new Chart(document.getElementById('supplyChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['2009','2012','2016','2020','2024','2028','2032','2140'],
+      datasets: [
+        {
+          label: 'Добыто',
+          data: [0,10.5,15.75,18.37,19.7,20.34,20.67,21],
+          borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.06)',
+          borderWidth: 1.5, fill: true, tension: 0.35, pointRadius: 3,
+          pointBackgroundColor: '#F7931A'
+        },
+        {
+          label: 'Лимит 21M',
+          data: [21,21,21,21,21,21,21,21],
+          borderColor: 'rgba(74,85,104,0.5)', borderDash: [4,4],
+          borderWidth: 1, pointRadius: 0, fill: false
+        }
+      ]
+    },
+    options: so
+  });
+}
+</script>
+</body>
+</html>

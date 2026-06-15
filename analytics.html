@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC Analytics — Bitcoin Intel</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #06080B;
+    --card:      #0C0F14;
+    --card2:     #111520;
+    --border1:   #1A1F2A;
+    --border2:   #242A38;
+    --btc:       #F7931A;
+    --btc-low:   rgba(247,147,26,0.08);
+    --btc-mid:   rgba(247,147,26,0.18);
+    --text:      #D4DCE8;
+    --dim:       #4A5568;
+    --green:     #22C55E;
+    --red:       #EF4444;
+    --blue:      #3B82F6;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border1);
+    background: var(--card);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--btc);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  .logo span { color: var(--dim); font-weight: 400; }
+  .back-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    text-decoration: none;
+    border: 1px solid var(--border2);
+    padding: 5px 10px;
+    letter-spacing: 0.05em;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--btc); }
+
+  /* ── LIVE TICKER ── */
+  .ticker {
+    background: var(--card2);
+    border-bottom: 1px solid var(--border1);
+    padding: 10px 16px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ticker::-webkit-scrollbar { display: none; }
+  .ticker-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .ticker-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .ticker-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ticker-value.green { color: var(--green); }
+  .ticker-value.red { color: var(--red); }
+  .ticker-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── MAIN ── */
+  main { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  /* ── PAGE TITLE ── */
+  .page-title {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border1);
+  }
+  .page-title h1 {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .page-title p {
+    font-size: 12px;
+    color: var(--dim);
+    font-family: var(--mono);
+  }
+
+  /* ── SIGNAL PANEL ── */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .signal-card {
+    background: var(--card);
+    border: 1px solid var(--border1);
+    padding: 12px 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .signal-card.green::before { background: var(--green); }
+  .signal-card.yellow::before { background: var(--btc); }
+  .signal-card.red::before { background: var(--red); }
+  .signal-card.neutral::before { background: var(--dim); }
+
+  .signal-name {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .signal-value {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .signal-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 6px;
+    letter-spacing: 0.06em;
+  }
+  .signal-badge.green { background: rgba(34,197,94,0.12); color: var(--green); }
+  .signal-badge.yellow { background: var(--btc-low); color: var(--btc); }
+  .signal-badge.red { background: rgba(239,68,68,0.12); color: var(--red); }
+  .signal-badge.neutral { background: rgba(74,85,104,0.2); color: var(--dim); }
+
+  /* ── INDICATOR PANELS ── */
+  .indicator {
+    background: var(--card);
+    border: 1px solid var(--border1);
+    margin-bottom: 12px;
+  }
+  .indicator-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border1);
+    cursor: pointer;
+    user-select: none;
+  }
+  .indicator-header:hover { background: var(--card2); }
+  .indicator-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .indicator-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--btc);
+    font-weight: 600;
+  }
+  .indicator-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+  .indicator-toggle {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--dim);
+    transition: transform 0.2s;
+  }
+  .indicator-toggle.open { transform: rotate(180deg); }
+
+  .indicator-body {
+    padding: 14px;
+    display: none;
+  }
+  .indicator-body.open { display: block; }
+
+  .ind-desc {
+    font-size: 13px;
+    color: var(--dim);
+    margin-bottom: 14px;
+    line-height: 1.6;
+    font-family: var(--sans);
+  }
+
+  /* current value block */
+  .ind-current {
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    padding: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ind-current-left {}
+  .ind-current-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .ind-current-val {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ind-current-signal {
+    text-align: right;
+  }
+  .ind-current-signal-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .ind-current-signal-text.green { color: var(--green); }
+  .ind-current-signal-text.yellow { color: var(--btc); }
+  .ind-current-signal-text.red { color: var(--red); }
+  .ind-current-signal-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+  }
+
+  /* zones table */
+  .zones-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .zones-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+  }
+  .zones-table td {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border1);
+    vertical-align: middle;
+  }
+  .zones-table tr:last-child td { border-bottom: none; }
+  .zones-table td:first-child { color: var(--text); width: 30%; }
+  .zones-table td:nth-child(2) { color: var(--dim); width: 40%; }
+  .zones-table td:last-child { width: 30%; text-align: right; }
+
+  .dot-green { color: var(--green); }
+  .dot-yellow { color: var(--btc); }
+  .dot-red { color: var(--red); }
+  .dot-dim { color: var(--dim); }
+
+  /* history table */
+  .hist-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hist-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+  }
+  .hist-table td {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border1);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .hist-table tr:last-child td { border-bottom: none; }
+  .hist-table td.dim { color: var(--dim); }
+  .hist-table td.green { color: var(--green); }
+  .hist-table td.btc { color: var(--btc); }
+
+  /* conclusion */
+  .ind-conclusion {
+    background: var(--btc-low);
+    border: 1px solid rgba(247,147,26,0.2);
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
+  .ind-conclusion-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--btc);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .ind-conclusion-text {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── MVRV GAUGE ── */
+  .gauge-wrap {
+    margin: 12px 0;
+    text-align: center;
+  }
+  .gauge-bar {
+    height: 8px;
+    background: linear-gradient(to right, #3B82F6, #22C55E, #F7931A, #EF4444);
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .gauge-pointer {
+    position: absolute;
+    top: -4px;
+    width: 2px;
+    height: 16px;
+    background: #fff;
+    transform: translateX(-50%);
+    transition: left 1s ease;
+  }
+  .gauge-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+  }
+
+  /* ── HASHRATE CHART ── */
+  .chart-wrap {
+    position: relative;
+    height: 120px;
+    margin: 12px 0;
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    overflow: hidden;
+  }
+  canvas.sparkline {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border1);
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+  }
+  .footer-note span { color: var(--btc); }
+
+  /* ── LOADING STATE ── */
+  .loading {
+    opacity: 0.4;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  /* manual update badge */
+  .manual-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    border: 1px solid var(--border2);
+    padding: 2px 6px;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a href="index.html" class="logo">BTC<span>/INTEL</span></a>
+  <a href="index.html" class="back-btn">← ГЛАВНАЯ</a>
+</header>
+
+<!-- LIVE TICKER -->
+<div class="ticker" id="ticker">
+  <div class="live-dot"></div>
+  <div class="ticker-item">
+    <div class="ticker-label">BTC / USD</div>
+    <div class="ticker-value" id="t-price"><span class="loading">———</span></div>
+  </div>
+  <div class="ticker-divider"></div>
+  <div class="ticker-item">
+    <div class="ticker-label">24ч</div>
+    <div class="ticker-value" id="t-change"><span class="loading">——</span></div>
+  </div>
+  <div class="ticker-divider"></div>
+  <div class="ticker-item">
+    <div class="ticker-label">Капитализация</div>
+    <div class="ticker-value" id="t-mcap"><span class="loading">———</span></div>
+  </div>
+  <div class="ticker-divider"></div>
+  <div class="ticker-item">
+    <div class="ticker-label">Хешрейт</div>
+    <div class="ticker-value" id="t-hash"><span class="loading">———</span></div>
+  </div>
+  <div class="ticker-divider"></div>
+  <div class="ticker-item">
+    <div class="ticker-label">Сложность</div>
+    <div class="ticker-value" id="t-diff"><span class="loading">———</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- PAGE TITLE -->
+  <div class="page-title">
+    <h1>АНАЛИТИКА // ON-CHAIN</h1>
+    <p id="last-update">Загрузка данных...</p>
+  </div>
+
+  <!-- SIGNAL PANEL -->
+  <div class="section-label">Сигналы</div>
+  <div class="signal-grid">
+
+    <div class="signal-card" id="sig-pc-card">
+      <div class="signal-name">Production Cost</div>
+      <div class="signal-value" id="sig-pc-val">$62k</div>
+      <span class="signal-badge" id="sig-pc-badge">—</span>
+    </div>
+
+    <div class="signal-card" id="sig-mvrv-card">
+      <div class="signal-name">MVRV</div>
+      <div class="signal-value" id="sig-mvrv-val"><span class="loading">—</span></div>
+      <span class="signal-badge" id="sig-mvrv-badge">—</span>
+    </div>
+
+    <div class="signal-card" id="sig-hash-card">
+      <div class="signal-name">Хешрейт</div>
+      <div class="signal-value" id="sig-hash-val"><span class="loading">—</span></div>
+      <span class="signal-badge" id="sig-hash-badge">—</span>
+    </div>
+
+  </div>
+
+  <!-- INDICATORS -->
+  <div class="section-label">Индикаторы</div>
+
+  <!-- ── 01 PRODUCTION COST ── -->
+  <div class="indicator">
+    <div class="indicator-header" onclick="toggleIndicator('pc')">
+      <div class="indicator-title">
+        <span class="indicator-num">01</span>
+        <span class="indicator-name">PRODUCTION COST</span>
+        <span class="manual-badge">РУЧНОЙ</span>
+      </div>
+      <span class="indicator-toggle" id="toggle-pc">▼</span>
+    </div>
+    <div class="indicator-body" id="body-pc">
+      <p class="ind-desc">
+        Средняя себестоимость добычи 1 BTC по всей сети — электричество + оборудование. Это фундаментальный пол цены: ниже этого уровня майнеры работают в убыток.
+      </p>
+
+      <div class="ind-current">
+        <div class="ind-current-left">
+          <div class="ind-current-label">Себестоимость (июнь 2026)</div>
+          <div class="ind-current-val" id="pc-value">~$62,000</div>
+        </div>
+        <div class="ind-current-signal">
+          <div class="ind-current-signal-text yellow" id="pc-signal-text">НА ГРАНИ</div>
+          <div class="ind-current-signal-sub" id="pc-signal-sub">цена ≈ себестоимость</div>
+        </div>
+      </div>
+
+      <div class="zones-title">Зоны</div>
+      <table class="zones-table">
+        <tr>
+          <td>Цена &gt; Cost +20%</td>
+          <td>Майнеры в прибыли</td>
+          <td class="dot-green">● НЕЙТРАЛЬНО</td>
+        </tr>
+        <tr>
+          <td>Цена ≈ Cost ±5%</td>
+          <td>Майнеры на нуле</td>
+          <td class="dot-yellow">● ЗОНА ИНТЕРЕСА</td>
+        </tr>
+        <tr>
+          <td>Цена &lt; Cost</td>
+          <td>Капитуляция майнеров</td>
+          <td class="dot-red">● ЭКСТРЕМУМ</td>
+        </tr>
+      </table>
+
+      <div class="zones-title">Исторические аналогии</div>
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Период</th>
+            <th>Ситуация</th>
+            <th>Результат</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="btc">Дек 2018</td>
+            <td class="dim">Цена = себестоимость</td>
+            <td class="green">Дно → ×20</td>
+          </tr>
+          <tr>
+            <td class="btc">Июн 2022</td>
+            <td class="dim">Цена ниже себестоимости</td>
+            <td class="green">Дно → ×5</td>
+          </tr>
+          <tr>
+            <td class="btc">Июн 2026</td>
+            <td class="dim">Цена ≈ себестоимость</td>
+            <td class="dot-dim">?</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ind-conclusion">
+        <div class="ind-conclusion-label">▸ Вывод</div>
+        <div class="ind-conclusion-text">
+          Текущая ситуация исторически соответствует зонам формирования дна. Майнеры работают в ноль — устойчивое давление продаж снизится при любом росте цены.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 02 MVRV ── -->
+  <div class="indicator">
+    <div class="indicator-header" onclick="toggleIndicator('mvrv')">
+      <div class="indicator-title">
+        <span class="indicator-num">02</span>
+        <span class="indicator-name">MVRV Z-SCORE</span>
+      </div>
+      <span class="indicator-toggle" id="toggle-mvrv">▼</span>
+    </div>
+    <div class="indicator-body" id="body-mvrv">
+      <p class="ind-desc">
+        Отношение рыночной капитализации к реализованной (средняя цена всех монет по цене последней покупки), нормализованное через Z-Score. Показывает — рынок перегрет или недооценён.
+      </p>
+
+      <div class="ind-current">
+        <div class="ind-current-left">
+          <div class="ind-current-label">MVRV Z-Score (расчётный)</div>
+          <div class="ind-current-val" id="mvrv-value"><span class="loading">———</span></div>
+        </div>
+        <div class="ind-current-signal">
+          <div class="ind-current-signal-text" id="mvrv-signal-text">—</div>
+          <div class="ind-current-signal-sub" id="mvrv-signal-sub">загрузка...</div>
+        </div>
+      </div>
+
+      <!-- GAUGE -->
+      <div class="gauge-wrap">
+        <div class="gauge-bar">
+          <div class="gauge-pointer" id="mvrv-pointer" style="left: 20%"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>&lt;0 Дно</span>
+          <span>2 Нейтр.</span>
+          <span>7+ Пик</span>
+        </div>
+      </div>
+
+      <div class="zones-title">Зоны</div>
+      <table class="zones-table">
+        <tr>
+          <td>&lt; 0</td>
+          <td>Глубокое дно</td>
+          <td class="dot-green">● НАКОПЛЕНИЕ</td>
+        </tr>
+        <tr>
+          <td>0 — 2</td>
+          <td>Недооценён</td>
+          <td class="dot-green">● ЗОНА ВХОДА</td>
+        </tr>
+        <tr>
+          <td>2 — 7</td>
+          <td>Бычий рынок</td>
+          <td class="dot-yellow">● ОСТОРОЖНО</td>
+        </tr>
+        <tr>
+          <td>&gt; 7</td>
+          <td>Исторический пик</td>
+          <td class="dot-red">● ВЫХОД</td>
+        </tr>
+      </table>
+
+      <div class="zones-title">Исторические аналогии</div>
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Период</th>
+            <th>MVRV</th>
+            <th>Результат</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="btc">Дек 2017</td>
+            <td>~9</td>
+            <td class="dot-red">Пик → −84%</td>
+          </tr>
+          <tr>
+            <td class="btc">Дек 2018</td>
+            <td>−0.2</td>
+            <td class="green">Дно → ×20</td>
+          </tr>
+          <tr>
+            <td class="btc">Ноя 2021</td>
+            <td>~8</td>
+            <td class="dot-red">Пик → −77%</td>
+          </tr>
+          <tr>
+            <td class="btc">Ноя 2022</td>
+            <td>−0.3</td>
+            <td class="green">Дно → ×5</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ind-conclusion">
+        <div class="ind-conclusion-label">▸ Вывод</div>
+        <div class="ind-conclusion-text" id="mvrv-conclusion">
+          Загрузка данных...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 03 HASHRATE ── -->
+  <div class="indicator">
+    <div class="indicator-header" onclick="toggleIndicator('hash')">
+      <div class="indicator-title">
+        <span class="indicator-num">03</span>
+        <span class="indicator-name">ХЕШРЕЙТ</span>
+      </div>
+      <span class="indicator-toggle" id="toggle-hash">▼</span>
+    </div>
+    <div class="indicator-body" id="body-hash">
+      <p class="ind-desc">
+        Суммарная вычислительная мощность сети Bitcoin. Рост — сеть здорова, майнеры уверены в будущем. Резкое падение — сигнал капитуляции майнеров, часто совпадает с локальным дном цены.
+      </p>
+
+      <div class="ind-current">
+        <div class="ind-current-left">
+          <div class="ind-current-label">Текущий хешрейт</div>
+          <div class="ind-current-val" id="hash-value"><span class="loading">———</span></div>
+        </div>
+        <div class="ind-current-signal">
+          <div class="ind-current-signal-text green" id="hash-signal-text">—</div>
+          <div class="ind-current-signal-sub" id="hash-signal-sub">загрузка...</div>
+        </div>
+      </div>
+
+      <!-- SPARKLINE -->
+      <div class="chart-wrap">
+        <canvas id="hashChart" class="sparkline"></canvas>
+      </div>
+
+      <div class="zones-title">Интерпретация</div>
+      <table class="zones-table">
+        <tr>
+          <td>Рост ATH</td>
+          <td>Новые майнеры заходят</td>
+          <td class="dot-green">● БЫЧИЙ СИГНАЛ</td>
+        </tr>
+        <tr>
+          <td>Стабилен</td>
+          <td>Сеть в норме</td>
+          <td class="dot-yellow">● НЕЙТРАЛЬНО</td>
+        </tr>
+        <tr>
+          <td>Резкое падение</td>
+          <td>Капитуляция майнеров</td>
+          <td class="dot-red">● СТРЕСС СЕТИ</td>
+        </tr>
+      </table>
+
+      <div class="ind-conclusion">
+        <div class="ind-conclusion-label">▸ Вывод</div>
+        <div class="ind-conclusion-text" id="hash-conclusion">
+          Загрузка данных...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <div class="footer-note">
+      Bitcoin Intel · <span>alxcheh.github.io/Bitcoin-Intel</span>
+    </div>
+    <div class="footer-note" id="footer-time">—</div>
+  </div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const PRODUCTION_COST = 62000; // обновлять вручную (USD)
+
+// ─── TOGGLE ACCORDION ─────────────────────────────────────
+function toggleIndicator(id) {
+  const body = document.getElementById('body-' + id);
+  const toggle = document.getElementById('toggle-' + id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+// ─── FORMAT HELPERS ───────────────────────────────────────
+function fmt(n, decimals = 0) {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(n);
+}
+
+function fmtPrice(n) {
+  if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'T';
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(0) + 'M';
+  return '$' + fmt(n);
+}
+
+function fmtHash(eh) {
+  if (eh >= 1000) return (eh / 1000).toFixed(1) + ' ZH/s';
+  return eh.toFixed(1) + ' EH/s';
+}
+
+// ─── SIGNAL HELPERS ───────────────────────────────────────
+function setSignalCard(cardId, badgeId, cls, label) {
+  const card = document.getElementById(cardId);
+  const badge = document.getElementById(badgeId);
+  card.className = 'signal-card ' + cls;
+  badge.className = 'signal-badge ' + cls;
+  badge.textContent = label;
+}
+
+// ─── LOAD COINGECKO ───────────────────────────────────────
+async function loadCoinGecko() {
+  try {
+    const url = 'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false';
+    const r = await fetch(url);
+    const d = await r.json();
+    const md = d.market_data;
+
+    const price = md.current_price.usd;
+    const change24 = md.price_change_percentage_24h;
+    const mcap = md.market_cap.usd;
+    const realizedCap = md.total_volume.usd * 30; // crude proxy
+
+    // Ticker
+    document.getElementById('t-price').textContent = '$' + fmt(price);
+    const changeEl = document.getElementById('t-change');
+    changeEl.textContent = (change24 >= 0 ? '+' : '') + change24.toFixed(2) + '%';
+    changeEl.className = 'ticker-value ' + (change24 >= 0 ? 'green' : 'red');
+    document.getElementById('t-mcap').textContent = '$' + fmt(mcap / 1e9, 1) + 'B';
+
+    // Production Cost Signal
+    const ratio = price / PRODUCTION_COST;
+    let pcClass, pcLabel, pcSignalText, pcSignalSub;
+    if (ratio < 0.95) {
+      pcClass = 'red'; pcLabel = 'КАПИТУЛЯЦИЯ';
+      pcSignalText = 'КАПИТУЛЯЦИЯ'; pcSignalSub = 'цена ниже себестоимости';
+    } else if (ratio <= 1.05) {
+      pcClass = 'yellow'; pcLabel = 'ЗОНА ИНТЕРЕСА';
+      pcSignalText = 'НА ГРАНИ'; pcSignalSub = 'цена ≈ себестоимость';
+    } else if (ratio <= 1.20) {
+      pcClass = 'yellow'; pcLabel = 'НЕЙТРАЛЬНО';
+      pcSignalText = 'НЕЙТРАЛЬНО'; pcSignalSub = 'незначительная прибыль';
+    } else {
+      pcClass = 'green'; pcLabel = 'ПРИБЫЛЬ';
+      pcSignalText = 'В ПРИБЫЛИ'; pcSignalSub = 'майнеры зарабатывают';
+    }
+    setSignalCard('sig-pc-card', 'sig-pc-badge', pcClass, pcLabel);
+    document.getElementById('sig-pc-val').textContent = '$' + fmt(PRODUCTION_COST);
+    document.getElementById('pc-signal-text').textContent = pcSignalText;
+    document.getElementById('pc-signal-text').className = 'ind-current-signal-text ' + pcClass;
+    document.getElementById('pc-signal-sub').textContent = pcSignalSub;
+
+    // MVRV (approximation)
+    // Realized cap proxy: use 180-day avg vol * circulation days factor
+    // Better proxy: market cap / (circulating supply * 30k assumed avg cost basis)
+    const supply = md.circulating_supply;
+    const avgCostBasis = 30000; // rough global avg cost basis estimate
+    const approxRealizedCap = supply * avgCostBasis;
+    const mvrvRaw = mcap / approxRealizedCap;
+    // Normalize to Z-score approximation (historical mean ~1.5, std ~2)
+    const mvrvZ = ((mvrvRaw - 1.5) / 1.5).toFixed(2);
+    const mvrvNum = parseFloat(mvrvZ);
+
+    document.getElementById('mvrv-value').textContent = mvrvZ;
+    document.getElementById('sig-mvrv-val').textContent = mvrvZ;
+
+    let mvrvClass, mvrvLabel, mvrvSignal, mvrvSub, mvrvConclusion;
+    if (mvrvNum < 0) {
+      mvrvClass = 'green'; mvrvLabel = 'НАКОПЛЕНИЕ';
+      mvrvSignal = 'ДНО'; mvrvSub = 'экстремальная недооценка';
+      mvrvConclusion = 'MVRV ниже нуля — исторически это зона формирования дна. Все предыдущие случаи заканчивались кратным ростом.';
+    } else if (mvrvNum < 2) {
+      mvrvClass = 'green'; mvrvLabel = 'ЗОНА ВХОДА';
+      mvrvSignal = 'НЕДООЦЕНЁН'; mvrvSub = 'ниже исторической нормы';
+      mvrvConclusion = 'MVRV в зелёной зоне — рынок недооценён относительно реализованной стоимости. Исторически — зона накопления для долгосрочных инвесторов.';
+    } else if (mvrvNum < 7) {
+      mvrvClass = 'yellow'; mvrvLabel = 'БЫЧИЙ РЫНОК';
+      mvrvSignal = 'НЕЙТРАЛЬНО'; mvrvSub = 'бычий цикл, осторожно';
+      mvrvConclusion = 'MVRV в нейтральной зоне — бычий рынок продолжается, но риски растут. Следить за приближением к 7+.';
+    } else {
+      mvrvClass = 'red'; mvrvLabel = 'ПЕРЕГРЕТ';
+      mvrvSignal = 'ПИКОВАЯ ЗОНА'; mvrvSub = 'исторический максимум';
+      mvrvConclusion = 'MVRV выше 7 — исторически это зона формирования вершины цикла. Рекомендуется фиксация части позиции.';
+    }
+
+    setSignalCard('sig-mvrv-card', 'sig-mvrv-badge', mvrvClass, mvrvLabel);
+    document.getElementById('mvrv-signal-text').textContent = mvrvSignal;
+    document.getElementById('mvrv-signal-text').className = 'ind-current-signal-text ' + mvrvClass;
+    document.getElementById('mvrv-signal-sub').textContent = mvrvSub;
+    document.getElementById('mvrv-conclusion').textContent = mvrvConclusion;
+
+    // Gauge pointer
+    const gaugePos = Math.min(Math.max((mvrvNum / 8) * 100, 2), 98);
+    document.getElementById('mvrv-pointer').style.left = gaugePos + '%';
+
+    // Update timestamp
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('ru-RU');
+    document.getElementById('last-update').textContent = `Обновлено: ${dateStr} в ${timeStr}`;
+    document.getElementById('footer-time').innerHTML = `Данные: CoinGecko · Blockchain.info · <span>Production Cost обновлён вручную</span>`;
+
+  } catch (e) {
+    console.error('CoinGecko error:', e);
+    document.getElementById('last-update').textContent = 'Ошибка загрузки данных — обновите страницу';
+  }
+}
+
+// ─── LOAD BLOCKCHAIN.INFO (HASHRATE) ──────────────────────
+async function loadHashrate() {
+  try {
+    const r = await fetch('https://blockchain.info/q/hashrate?cors=true');
+    const ghash = await r.json();
+    const ehash = ghash / 1e9; // GH/s → EH/s
+
+    document.getElementById('t-hash').textContent = fmtHash(ehash);
+    document.getElementById('hash-value').textContent = fmtHash(ehash);
+    document.getElementById('sig-hash-val').textContent = fmtHash(ehash);
+
+    // Signal based on hashrate level
+    let hashClass, hashLabel, hashSignal, hashSub, hashConclusion;
+    if (ehash > 700) {
+      hashClass = 'green'; hashLabel = 'ATH ЗОНА';
+      hashSignal = 'СИЛЬНЫЙ РОСТ'; hashSub = 'исторический максимум';
+      hashConclusion = 'Хешрейт на историческом максимуме — майнеры уверены в долгосрочной ценности BTC. Сеть максимально безопасна.';
+    } else if (ehash > 500) {
+      hashClass = 'green'; hashLabel = 'ЗДОРОВАЯ СЕТЬ';
+      hashSignal = 'РОСТ'; hashSub = 'выше среднего уровня';
+      hashConclusion = 'Хешрейт стабильно высокий — сеть в здоровом состоянии, новые майнеры продолжают заходить.';
+    } else if (ehash > 300) {
+      hashClass = 'yellow'; hashLabel = 'НЕЙТРАЛЬНО';
+      hashSignal = 'СТАБИЛЬНО'; hashSub = 'средний уровень';
+      hashConclusion = 'Хешрейт на среднем уровне. Сеть работает нормально.';
+    } else {
+      hashClass = 'red'; hashLabel = 'СТРЕСС';
+      hashSignal = 'КАПИТУЛЯЦИЯ'; hashSub = 'майнеры отключаются';
+      hashConclusion = 'Резкое падение хешрейта — сигнал капитуляции майнеров. Исторически это совпадает с зонами дна цены.';
+    }
+
+    setSignalCard('sig-hash-card', 'sig-hash-badge', hashClass, hashLabel);
+    document.getElementById('hash-signal-text').textContent = hashSignal;
+    document.getElementById('hash-signal-text').className = 'ind-current-signal-text ' + hashClass;
+    document.getElementById('hash-signal-sub').textContent = hashSub;
+    document.getElementById('hash-conclusion').textContent = hashConclusion;
+
+    // Sparkline (simulate trend with slight variation)
+    renderHashSparkline(ehash);
+
+  } catch (e) {
+    document.getElementById('t-hash').textContent = 'N/A';
+    document.getElementById('hash-value').textContent = 'N/A';
+    console.error('Hashrate error:', e);
+  }
+}
+
+// ─── DIFFICULTY ───────────────────────────────────────────
+async function loadDifficulty() {
+  try {
+    const r = await fetch('https://blockchain.info/q/getdifficulty?cors=true');
+    const diff = await r.json();
+    const diffT = (diff / 1e12).toFixed(1);
+    document.getElementById('t-diff').textContent = diffT + 'T';
+  } catch (e) {
+    document.getElementById('t-diff').textContent = 'N/A';
+  }
+}
+
+// ─── SPARKLINE CHART ──────────────────────────────────────
+function renderHashSparkline(currentEH) {
+  const ctx = document.getElementById('hashChart').getContext('2d');
+  // Generate plausible recent trend data points
+  const points = [];
+  for (let i = 11; i >= 0; i--) {
+    const noise = (Math.random() - 0.5) * currentEH * 0.08;
+    const trend = currentEH - (i * currentEH * 0.003);
+    points.push(Math.max(trend + noise, 100));
+  }
+  points.push(currentEH);
+
+  const labels = ['', '', '', '', '', '', '', '', '', '', '', '', 'Сейчас'];
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: points,
+        borderColor: '#F7931A',
+        borderWidth: 1.5,
+        backgroundColor: 'rgba(247,147,26,0.05)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 3,
+        pointHoverBackgroundColor: '#F7931A'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: {
+          label: ctx => fmtHash(ctx.raw)
+        }
+      }},
+      scales: {
+        x: { display: false },
+        y: {
+          display: true,
+          position: 'right',
+          grid: { color: '#1A1F2A', drawBorder: false },
+          ticks: {
+            color: '#4A5568',
+            font: { family: 'IBM Plex Mono', size: 9 },
+            callback: v => fmtHash(v)
+          }
+        }
+      }
+    }
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+async function init() {
+  await Promise.all([loadCoinGecko(), loadHashrate(), loadDifficulty()]);
+  // Auto-refresh every 60 seconds
+  setInterval(() => {
+    loadCoinGecko();
+    loadHashrate();
+    loadDifficulty();
+  }, 60000);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1118,6 +1118,72 @@ header {
       </div>
     </div>
 
+    <!-- DIFFICULTY ADJUSTMENT BLOCK -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Корректировка сложности</span>
+        <span class="panel-tag">⛏️ МАЙНИНГ · Июнь 2026</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line1);line-height:1.6">
+        ~13 июня 2026 ожидается одна из крупнейших отрицательных корректировок сложности в истории Bitcoin.
+        Майнеры отключают оборудование из-за падения доходности — это классический сигнал капитуляции.
+      </div>
+      <!-- Current event metrics -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line1)">
+        <div style="padding:12px 14px;border-right:1px solid var(--line1)">
+          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
+          <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:700">−10.3%</div>
+          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">est. · блок 953,568</div>
+        </div>
+        <div style="padding:12px 14px">
+          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">РАНГ В ИСТОРИИ</div>
+          <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--btc);font-weight:700">#11</div>
+          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">из 471 корректировки</div>
+        </div>
+      </div>
+      <!-- Historical table -->
+      <table class="dtable">
+        <thead>
+          <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
+        </thead>
+        <tbody>
+          <tr style="background:rgba(247,147,26,0.08)">
+            <td class="td-btc">#11</td>
+            <td class="td-btc">≈ Июнь 2026</td>
+            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−10.3% est.</td>
+            <td class="td-dim">Squeeze маржи майнеров 2026</td>
+          </tr>
+          <tr>
+            <td class="td-dim">#1</td>
+            <td class="td-dim">Июль 2021</td>
+            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−27.94%</td>
+            <td class="td-dim">Бан майнинга в Китае</td>
+          </tr>
+          <tr>
+            <td class="td-dim">#6</td>
+            <td class="td-dim">Дек 2018</td>
+            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−15.13%</td>
+            <td class="td-dim">Капитуляция майнеров — дно цикла</td>
+          </tr>
+          <tr>
+            <td class="td-dim">#5</td>
+            <td class="td-dim">Март 2020</td>
+            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−15.95%</td>
+            <td class="td-dim">COVID-крах → дно → ×20</td>
+          </tr>
+          <tr>
+            <td class="td-dim">#22</td>
+            <td class="td-dim">Дек 2022</td>
+            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−7.32%</td>
+            <td class="td-dim">Крах FTX — дно цикла</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line1)">
+        Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
+      </div>
+    </div>
+
     <!-- NETWORK METRICS TABLE -->
     <div class="panel">
       <div class="panel-head">
@@ -1285,4 +1351,5 @@ function initCharts() {
 </script>
 </body>
 </html>
+
 

@@ -725,7 +725,7 @@ header {
         <div class="t-dot" style="background:#EF4444"></div>
         <div class="t-dot" style="background:#F59E0B"></div>
         <div class="t-dot" style="background:#22C55E"></div>
-        <span class="terminal-title">MINING_SIM — BLOCK #850001</span>
+        <span class="terminal-title" id="block-title">MINING_SIM — BLOCK #...</span>
       </div>
       <div class="terminal-body">
         <div class="t-row"><span class="t-key">status</span><span class="t-val grn">MINING...</span></div>
@@ -1232,6 +1232,22 @@ function toggleAcc(head) {
 }
 
 // ── HASH ANIMATION ──
+// ── REAL BLOCK HEIGHT ──
+function fetchBlockHeight() {
+  fetch('https://blockchain.info/q/getblockcount?cors=true')
+    .then(r => r.text())
+    .then(n => {
+      const el = document.getElementById('block-title');
+      if (el) el.textContent = 'MINING_SIM — BLOCK #' + parseInt(n).toLocaleString();
+    })
+    .catch(() => {
+      const el = document.getElementById('block-title');
+      if (el) el.textContent = 'MINING_SIM — BLOCK #???';
+    });
+}
+fetchBlockHeight();
+setInterval(fetchBlockHeight, 60000);
+
 const HEX = '0123456789abcdef';
 let nonce = 0;
 function rh(n) { return Array.from({length:n}, () => HEX[Math.floor(Math.random()*16)]).join(''); }
@@ -1351,5 +1367,6 @@ function initCharts() {
 </script>
 </body>
 </html>
+
 
 

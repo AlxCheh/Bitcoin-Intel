@@ -397,6 +397,28 @@ header {
   color: var(--dim);
 }
 
+.pool-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--btc);
+  border: 1px solid var(--btc);
+  vertical-align: middle;
+  cursor: pointer;
+}
+.pool-badge:active { background: var(--btc-low); }
+.psum-note {
+  padding: 9px 14px;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--dim);
+  border-top: 1px solid var(--line);
+}
+
 /* ══════════════════════════════════
    DATA TABLE
 ══════════════════════════════════ */
@@ -1571,7 +1593,7 @@ function renderBlocks(blocks) {
       const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
       const known = POOLS[normPool(pool)];
       const poolCell = known
-        ? '<span class="blk-pool clickable" onclick="openPool(\'' + normPool(pool) + '\')">' + pool + '</span>'
+        ? '<span class="blk-pool">' + pool + '<span class="pool-badge" onclick="openPool(\'' + normPool(pool) + '\')">INFO</span></span>'
         : '<span class="blk-pool">' + pool + '</span>';
       return '<div class="blk-row">'
         + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
@@ -1613,7 +1635,7 @@ function renderPoolSummary() {
         const known = POOLS[key];
         const pct = (r.n * 10) + '%';
         const nameCell = known
-          ? '<span class="psum-name clickable" onclick="openPool(\'' + key + '\')">' + r.name + ' →</span>'
+          ? '<span class="psum-name">' + r.name + '<span class="pool-badge" onclick="openPool(\'' + key + '\')">INFO</span></span>'
           : '<span class="psum-name">' + r.name + '</span>';
         return '<div class="psum-row">'
           + nameCell
@@ -1621,6 +1643,7 @@ function renderPoolSummary() {
           + '<span class="psum-bar-wrap"><span class="psum-bar" style="width:' + pct + '"></span><span class="psum-pct">' + pct + '</span></span>'
           + '</div>';
       }).join('')
+    + '<div class="psum-note">«Доля» — срез по последним 10 блокам (краткосрочно, колеблется), не общая доля хешрейта сети. Долгосрочную долю смотри в карточке пула по кнопке INFO.</div>'
     + '</div>';
 }
 

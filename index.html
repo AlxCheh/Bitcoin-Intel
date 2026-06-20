@@ -248,6 +248,35 @@ header {
 .t-val.grn { color: var(--grn); }
 .t-val.anim { font-size: 10px; }
 
+.blk-head {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 0.7fr 0.9fr;
+  gap: 6px;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg3);
+}
+.blk-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 0.7fr 0.9fr;
+  gap: 6px;
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+.blk-row:last-child { border-bottom: none; }
+.blk-h { color: var(--btc); font-weight: 500; }
+.blk-pool { color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.blk-tx { color: var(--dim); }
+.blk-age { color: var(--dim); }
+.blk-loading { display: block; color: var(--dim); padding: 14px 12px; }
+
 /* ══════════════════════════════════
    DATA TABLE
 ══════════════════════════════════ */
@@ -725,13 +754,18 @@ header {
         <div class="t-dot" style="background:#EF4444"></div>
         <div class="t-dot" style="background:#F59E0B"></div>
         <div class="t-dot" style="background:#22C55E"></div>
-        <span class="terminal-title" id="block-title">MINING_SIM — BLOCK #...</span>
+        <span class="terminal-title" id="block-title">LATEST_BLOCKS — загрузка...</span>
       </div>
-      <div class="terminal-body">
-        <div class="t-row"><span class="t-key">status</span><span class="t-val grn">MINING...</span></div>
-        <div class="t-row"><span class="t-key">target</span><span class="t-val dim" style="color:var(--dim);font-size:10px">0000000000000000000...</span></div>
-        <div class="t-row"><span class="t-key">nonce</span><span class="t-val btc" id="nonce-display">0</span></div>
-        <div class="t-row"><span class="t-key">hash</span><span class="t-val anim" id="hash-display" style="color:var(--dim);font-size:10px">computing...</span></div>
+      <div class="terminal-body" style="padding:0">
+        <div class="blk-head">
+          <span>HEIGHT</span>
+          <span>POOL</span>
+          <span>TX</span>
+          <span>AGE</span>
+        </div>
+        <div id="blocks-list">
+          <div class="blk-row blk-loading">computing...</div>
+        </div>
       </div>
     </div>
 
@@ -1231,42 +1265,46 @@ function toggleAcc(head) {
   }
 }
 
-// ── HASH ANIMATION ──
-// ── REAL BLOCK HEIGHT ──
-function fetchBlockHeight() {
-  fetch('https://blockchain.info/q/getblockcount?cors=true')
-    .then(r => r.text())
-    .then(n => {
-      const el = document.getElementById('block-title');
-      if (el) el.textContent = 'MINING_SIM — BLOCK #' + parseInt(n).toLocaleString();
-    })
+// ── LATEST BLOCKS ──
+function timeAgo(ts) {
+  const s = Math.floor(Date.now()/1000 - ts);
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s/60) + 'm';
+  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+}
+
+function renderBlocks(blocks) {
+  const list = document.getElementById('blocks-list');
+  const title = document.getElementById('block-title');
+  if (!list) return;
+  if (title && blocks[0]) {
+    title.textContent = 'LATEST_BLOCKS — TIP #' + blocks[0].height.toLocaleString();
+  }
+  list.innerHTML = blocks.slice(0, 5).map(b => {
+    const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
+    const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
+    return '<div class="blk-row">'
+      + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
+      + '<span class="blk-pool">' + pool + '</span>'
+      + '<span class="blk-tx">' + tx + '</span>'
+      + '<span class="blk-age">' + timeAgo(b.timestamp) + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+function fetchBlocks() {
+  fetch('https://mempool.space/api/v1/blocks')
+    .then(r => r.json())
+    .then(renderBlocks)
     .catch(() => {
-      const el = document.getElementById('block-title');
-      if (el) el.textContent = 'MINING_SIM — BLOCK #???';
+      const list = document.getElementById('blocks-list');
+      const title = document.getElementById('block-title');
+      if (title) title.textContent = 'LATEST_BLOCKS — offline';
+      if (list) list.innerHTML = '<div class="blk-row blk-loading">данные недоступны</div>';
     });
 }
-fetchBlockHeight();
-setInterval(fetchBlockHeight, 60000);
-
-const HEX = '0123456789abcdef';
-let nonce = 0;
-function rh(n) { return Array.from({length:n}, () => HEX[Math.floor(Math.random()*16)]).join(''); }
-
-setInterval(() => {
-  const hEl = document.getElementById('hash-display');
-  const nEl = document.getElementById('nonce-display');
-  if (!hEl) return;
-  nonce++;
-  nEl.textContent = nonce.toLocaleString();
-  if (nonce % 47 === 0) {
-    hEl.innerHTML = '<span style="color:var(--grn)">00000000</span>' + rh(56);
-    hEl.style.color = 'var(--grn)';
-    setTimeout(() => { hEl.style.color = ''; nonce = 0; }, 900);
-  } else {
-    hEl.textContent = rh(64);
-    hEl.style.color = 'var(--dim)';
-  }
-}, 110);
+fetchBlocks();
+setInterval(fetchBlocks, 60000);
 
 // ── CHARTS ──
 let chartsInited = false;

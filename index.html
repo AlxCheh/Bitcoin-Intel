@@ -165,24 +165,23 @@ header {
 }
 .cbar-btn {
   flex: 1;
-  padding: 9px 4px;
-  padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px));
+  padding: 14px 4px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   background: transparent;
   border: none;
+  border-top: 2px solid transparent;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  transition: color 0.15s;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  transition: color 0.15s, border-color 0.15s;
 }
-.cbar-ic { font-size: 16px; line-height: 1; filter: grayscale(0.6) opacity(0.7); transition: filter 0.15s; }
-.cbar-btn.active { color: var(--btc); }
-.cbar-btn.active .cbar-ic { filter: drop-shadow(0 0 5px rgba(247,147,26,0.5)); }
+.cbar-btn.active {
+  color: var(--btc);
+  border-top-color: var(--btc);
+}
 
 /* ══════════════════════════════════
    SECTIONS
@@ -868,9 +867,9 @@ header {
 <nav class="subnav" id="subnav"></nav>
 
 <div class="clusterbar">
-  <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')"><span class="cbar-ic">🟠</span>LIVE</button>
-  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')"><span class="cbar-ic">📘</span>ЗНАНИЕ</button>
-  <button class="cbar-btn" id="cbar-context" onclick="selectCluster('context')"><span class="cbar-ic">📜</span>КОНТЕКСТ</button>
+  <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
+  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">KNOWLEDGE</button>
+  <button class="cbar-btn" id="cbar-context" onclick="selectCluster('context')">CONTEXT</button>
 </div>
 
 <!-- ══════════════════════════════════════

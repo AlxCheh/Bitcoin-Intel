@@ -955,6 +955,79 @@ header {
   font-size: 9px;
   color: var(--dim);
 }
+
+/* ══ DASHBOARD ══ */
+.dash-cycle {
+  margin: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--grn);
+  padding: 16px;
+}
+.dash-cycle-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 10px; }
+.dash-cycle-phase { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--grn); letter-spacing: 0.04em; margin-bottom: 6px; }
+.dash-cycle.warn .dash-cycle-phase { color: var(--yel); }
+.dash-cycle.danger .dash-cycle-phase { color: var(--red); }
+.dash-cycle-sub { font-family: var(--sans); font-size: 11px; color: var(--dim); line-height: 1.4; margin-bottom: 14px; }
+.dash-cycle-track { display: flex; gap: 2px; margin-bottom: 6px; }
+.dct-seg { height: 4px; flex: 1; background: var(--line2); }
+.dct-seg.done { background: var(--grn); }
+.dct-seg.current { background: var(--grn); position: relative; }
+.dct-seg.current::after {
+  content: ''; position: absolute; right: -1px; top: -3px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--grn); box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+.dash-cycle-labels {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); font-size: 7px; color: var(--dim2); letter-spacing: 0.06em; margin-top: 8px;
+}
+.dct-active { color: var(--grn); }
+
+.dash-metrics {
+  display: flex; gap: 1px; margin: 0 16px 12px;
+  background: var(--line);
+}
+.dash-m-cell { flex: 1; background: var(--bg2); padding: 12px 10px; text-align: center; }
+.dash-m-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
+.dash-m-val.dash-m-up { color: var(--grn); }
+.dash-m-val.dash-m-warn { color: var(--yel); }
+.dash-m-val.dash-m-neg { color: var(--red); }
+.dash-m-lbl { font-family: var(--mono); font-size: 7px; letter-spacing: 0.08em; color: var(--dim); }
+
+.dash-signal {
+  margin: 0 16px 12px;
+  background: var(--bg2); border: 1px solid var(--line);
+  border-left: 3px solid var(--grn); padding: 12px 14px;
+}
+.dash-signal.neg { border-left-color: var(--red); }
+.dash-signal.neu { border-left-color: var(--dim); }
+.dash-signal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em; color: var(--dim); margin-bottom: 7px;
+}
+.dash-signal-dir { color: var(--grn); }
+.dash-signal.neg .dash-signal-dir { color: var(--red); }
+.dash-signal.neu .dash-signal-dir { color: var(--dim); }
+.dash-signal-title { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--txt); line-height: 1.35; margin-bottom: 8px; }
+.dash-signal-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.dash-summary { margin: 0 16px 16px; }
+.dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
+.dash-sum-bar { display: flex; height: 6px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
+.dsb-pos { background: var(--grn); }
+.dsb-neg { background: var(--red); }
+.dsb-neu { background: var(--dim2); }
+.dash-sum-counts { display: flex; gap: 12px; font-family: var(--mono); font-size: 9px; }
+.dsc-pos { color: var(--grn); }
+.dsc-neg { color: var(--red); }
+.dsc-neu { color: var(--dim); }
+.dash-sum-link {
+  margin-top: 10px; display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.06em; color: var(--dim);
+  padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer;
+}
+.dash-sum-link:hover { color: var(--btc); }
 </style>
 </head>
 <body>
@@ -994,78 +1067,59 @@ header {
 <section class="section active" id="tab-home">
   <div class="page">
 
-    <div class="hero-row">
-      <div class="hero-btc">₿</div>
-      <div class="hero-text">
-        <div class="hero-title">Bitcoin<br>Intelligence</div>
-        <div class="hero-desc">Обучающий ресурс · Основы, история, технологии и аналитика</div>
+    <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
+    <div class="dash-cycle">
+      <div class="dash-cycle-label">ФАЗА ЦИКЛА · BITCOIN 2026</div>
+      <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
+      <div class="dash-cycle-sub" id="dash-phase-sub">Цена у себестоимости добычи. Исторически — зона долгосрочных покупок перед ростом.</div>
+      <div class="dash-cycle-track">
+        <div class="dct-seg done"></div>
+        <div class="dct-seg current"></div>
+        <div class="dct-seg"></div>
+        <div class="dct-seg"></div>
+      </div>
+      <div class="dash-cycle-labels">
+        <span>ДНО</span>
+        <span class="dct-active">▲ НАКОПЛЕНИЕ</span>
+        <span>РОСТ</span>
+        <span>ЭЙФОРИЯ</span>
       </div>
     </div>
 
-    <!-- METRICS -->
-    <div class="metric-row">
-      <div class="metric-cell">
-        <div class="metric-label">Лимит эмиссии</div>
-        <div class="metric-val">21M</div>
-        <div class="metric-sub">BTC навсегда</div>
+    <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
+    <div class="dash-metrics">
+      <div class="dash-m-cell">
+        <div class="dash-m-val" id="dash-price">$63.2K</div>
+        <div class="dash-m-lbl">ЦЕНА BTC</div>
       </div>
-      <div class="metric-cell">
-        <div class="metric-label">Награда / блок</div>
-        <div class="metric-val">3.125</div>
-        <div class="metric-sub">BTC · 4-й халвинг</div>
+      <div class="dash-m-cell">
+        <div class="dash-m-val dash-m-warn">$61.8K</div>
+        <div class="dash-m-lbl">PROD. COST</div>
       </div>
-      <div class="metric-cell">
-        <div class="metric-label">Блоков в сутки</div>
-        <div class="metric-val">~144</div>
-        <div class="metric-sub">каждые 10 мин</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-label">Uptime</div>
-        <div class="metric-val">99.99%</div>
-        <div class="metric-sub">с января 2009</div>
+      <div class="dash-m-cell">
+        <div class="dash-m-val dash-m-up">+2.3%</div>
+        <div class="dash-m-lbl">РАЗРЫВ</div>
       </div>
     </div>
 
-    <!-- TERMINAL -->
-    <div class="terminal">
-      <div class="terminal-bar">
-        <div class="t-dot" style="background:#EF4444"></div>
-        <div class="t-dot" style="background:#F59E0B"></div>
-        <div class="t-dot" style="background:#22C55E"></div>
-        <span class="terminal-title" id="block-title">LATEST_BLOCKS — загрузка...</span>
+    <!-- ══ БЛОК 3: СИГНАЛ ДНЯ ══ -->
+    <div class="dash-signal" id="dash-signal-card">
+      <div class="dash-signal-head">
+        <span class="dash-signal-cat" id="dash-sig-cat">📰 НАРРАТИВ · ПОСЛЕДНИЙ СИГНАЛ</span>
+        <span class="dash-signal-dir" id="dash-sig-dir">🟢 ПОЗИТИВ</span>
       </div>
-      <div class="terminal-body" style="padding:0">
-        <div class="blk-head">
-          <span>HEIGHT</span>
-          <span>POOL</span>
-          <span>TX</span>
-          <span>AGE</span>
-        </div>
-        <div id="blocks-list">
-          <div class="blk-row blk-loading">computing...</div>
-        </div>
-      </div>
+      <div class="dash-signal-title" id="dash-sig-title">BlackRock: ETF втягивают биткоинеров в традфин — «Великая конвергенция»</div>
+      <div class="dash-signal-chips" id="dash-sig-chips"></div>
     </div>
 
-    <!-- WHAT IS BTC -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Что такое Bitcoin</span>
-        <span class="panel-tag">ОБЗОР</span>
+    <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
+    <div class="dash-summary">
+      <div class="dash-sum-label" id="dash-sum-label">ОБЩИЙ ФОН</div>
+      <div class="dash-sum-bar" id="dash-sum-bar"></div>
+      <div class="dash-sum-counts" id="dash-sum-counts"></div>
+      <div class="dash-sum-link" onclick="showTab('market', null)">
+        ВСЕ СИГНАЛЫ → РЫНОК <span>→</span>
       </div>
-      <div class="panel-body">
-        <p>Bitcoin — первая в мире децентрализованная цифровая валюта, созданная в 2009 году под псевдонимом <strong>Сатоши Накамото</strong>. Работает без банков, правительств и посредников.</p>
-        <p>Сеть поддерживается тысячами независимых нодов по всему миру. Никто не может заблокировать транзакцию, заморозить счёт или изменить историю.</p>
-      </div>
-    </div>
-
-    <div class="pills">
-      <span class="pill">Децентрализованный</span>
-      <span class="pill">Открытый код</span>
-      <span class="pill">Дефляционный</span>
-      <span class="pill">Peer-to-peer</span>
-      <span class="pill">Без цензуры</span>
-      <span class="pill">24/7/365</span>
     </div>
 
   </div>
@@ -1646,6 +1700,38 @@ function renderSignals() {
   }).join('');
 }
 
+function renderDashboard() {
+  if (!window.SIGNALS || !SIGNALS.length) return;
+
+  // Блок 3: последний сигнал
+  const last = SIGNALS[SIGNALS.length - 1];
+  const card = document.getElementById('dash-signal-card');
+  const dirMap = { pos: { icon: '🟢', label: 'ПОЗИТИВ', cls: 'pos' }, neg: { icon: '🔴', label: 'НЕГАТИВ', cls: 'neg' }, neu: { icon: '⚪', label: 'НЕЙТРАЛ', cls: 'neu' } };
+  if (card && last) {
+    const d = dirMap[last.dir] || dirMap.neu;
+    card.className = 'dash-signal ' + d.cls;
+    document.getElementById('dash-sig-cat').textContent = last.catLabel + ' · ПОСЛЕДНИЙ СИГНАЛ';
+    document.getElementById('dash-sig-dir').textContent = d.icon + ' ' + d.label;
+    document.getElementById('dash-sig-title').textContent = last.signal;
+    const chips = last.data || [];
+    document.getElementById('dash-sig-chips').innerHTML = chips.map(c => '<span class="sig-chip">' + c + '</span>').join('');
+  }
+
+  // Блок 4: сводка
+  const counts = { pos: 0, neg: 0, neu: 0 };
+  SIGNALS.forEach(s => counts[s.dir]++);
+  const total = SIGNALS.length;
+  document.getElementById('dash-sum-label').textContent = 'ОБЩИЙ ФОН · ' + total + ' СИГНАЛ' + (total === 1 ? '' : total < 5 ? 'А' : 'ОВ');
+  document.getElementById('dash-sum-bar').innerHTML =
+    '<div class="dsb-pos" style="flex:' + counts.pos + '"></div>' +
+    '<div class="dsb-neg" style="flex:' + counts.neg + '"></div>' +
+    '<div class="dsb-neu" style="flex:' + (counts.neu||0.1) + '"></div>';
+  document.getElementById('dash-sum-counts').innerHTML =
+    '<span class="dsc-pos">🟢 ' + counts.pos + ' позитив</span>' +
+    '<span class="dsc-neg">🔴 ' + counts.neg + ' негатив</span>' +
+    '<span class="dsc-neu">⚪ ' + counts.neu + ' нейтрал</span>';
+}
+
 function setSigFilter(c) {
   sigFilter = c;
   renderSignals();
@@ -1724,6 +1810,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
 
+  if (id === 'home') renderDashboard();
   if (id === 'analytics') initCharts();
   if (id === 'market') renderSignals();
   if (id === 'pools') {

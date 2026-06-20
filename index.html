@@ -140,6 +140,40 @@ header {
   border-bottom-color: var(--btc);
 }
 
+.nav-cluster { position: relative; flex-shrink: 0; }
+.cluster-menu {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 50;
+  min-width: 160px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  border-top: none;
+}
+.cluster-menu.open { display: block; }
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 11px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:hover { color: var(--txt); background: var(--bg2); }
+.menu-item.active { color: var(--btc); }
+
 /* ══════════════════════════════════
    SECTIONS
 ══════════════════════════════════ */
@@ -747,12 +781,27 @@ header {
 
 <!-- ══ NAV ══ -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showTab('home',this)">ОБЗОР</button>
-  <button class="nav-btn" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
-  <button class="nav-btn" id="nav-pools" onclick="showTab('pools',this)">ПУЛЫ</button>
-  <button class="nav-btn" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
-  <button class="nav-btn" onclick="showTab('history',this)">ИСТОРИЯ</button>
-  <button class="nav-btn" onclick="showTab('basics',this)">ОСНОВЫ</button>
+  <div class="nav-cluster">
+    <button class="nav-btn cluster-btn active" onclick="toggleCluster('live',this)">🟠 LIVE ▾</button>
+    <div class="cluster-menu" id="menu-live">
+      <button class="menu-item active" onclick="showTab('home',this)">ОБЗОР</button>
+      <button class="menu-item" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
+      <button class="menu-item" onclick="showTab('pools',this)">ПУЛЫ</button>
+    </div>
+  </div>
+  <div class="nav-cluster">
+    <button class="nav-btn cluster-btn" onclick="toggleCluster('knowledge',this)">📘 ЗНАНИЕ ▾</button>
+    <div class="cluster-menu" id="menu-knowledge">
+      <button class="menu-item" onclick="showTab('basics',this)">ОСНОВЫ</button>
+      <button class="menu-item" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
+    </div>
+  </div>
+  <div class="nav-cluster">
+    <button class="nav-btn cluster-btn" onclick="toggleCluster('context',this)">📜 КОНТЕКСТ ▾</button>
+    <div class="cluster-menu" id="menu-context">
+      <button class="menu-item" onclick="showTab('history',this)">ИСТОРИЯ</button>
+    </div>
+  </div>
 </nav>
 
 <!-- ══════════════════════════════════════
@@ -1298,11 +1347,42 @@ header {
 
 <script>
 // ── TABS ──
+const TAB_CLUSTER = {
+  home: 'live', analytics: 'live', pools: 'live',
+  basics: 'knowledge', tech: 'knowledge',
+  history: 'context'
+};
+
+function toggleCluster(cluster, btn) {
+  const menu = document.getElementById('menu-' + cluster);
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+
 function showTab(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cluster-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
+
   document.getElementById('tab-' + id).classList.add('active');
-  btn.classList.add('active');
+  if (btn && btn.classList.contains('menu-item')) btn.classList.add('active');
+
+  // активировать родительский кластер
+  const cluster = TAB_CLUSTER[id];
+  if (cluster) {
+    const clusterBtn = document.querySelector('#menu-' + cluster).previousElementSibling;
+    if (clusterBtn) clusterBtn.classList.add('active');
+    // если кнопка не передана (программный вызов) — подсветить нужный menu-item
+    if (!btn || !btn.classList.contains('menu-item')) {
+      const items = document.querySelectorAll('#menu-' + cluster + ' .menu-item');
+      items.forEach(it => {
+        if (it.getAttribute('onclick').indexOf("'" + id + "'") !== -1) it.classList.add('active');
+      });
+    }
+  }
+
   if (id === 'analytics') initCharts();
   if (id === 'pools') {
     const wrap = document.getElementById('pool-detail');
@@ -1311,6 +1391,13 @@ function showTab(id, btn) {
     }
   }
 }
+
+// закрытие меню по клику вне навигации
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav')) {
+    document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
+  }
+});
 
 // ── ACCORDION ──
 function toggleAcc(head) {
@@ -1401,7 +1488,7 @@ function openPool(key) {
   const wrap = document.getElementById('pool-detail');
   if (!p || !wrap) return;
   wrap.innerHTML =
-    '<div class="pool-back" onclick="showTab(\'home\', document.querySelector(\'.nav-btn\'))">← К БЛОКАМ</div>'
+    '<div class="pool-back" onclick="showTab(\'home\', null)">← К БЛОКАМ</div>'
     + '<div class="panel" style="margin-top:8px">'
     + '<div class="panel-head"><span class="panel-title">' + p.name + '</span><span class="panel-tag">⛏️ ПУЛ · ' + p.country + '</span></div>'
     + '<div class="pool-stats">'
@@ -1414,7 +1501,7 @@ function openPool(key) {
     + '<p style="margin-top:10px"><strong>История.</strong> ' + p.history + '</p>'
     + '<p style="margin-top:10px"><strong>Особенности.</strong> ' + p.notes + '</p></div>'
     + '</div>';
-  showTab('pools', document.getElementById('nav-pools'));
+  showTab('pools', null);
   window.scrollTo(0, 0);
 }
 

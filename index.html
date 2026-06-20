@@ -882,6 +882,10 @@ header {
   transition: 0.15s;
 }
 .sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }
+.sig-fbtn.sm { padding: 4px 8px; font-size: 9px; opacity: 0.7; }
+.sig-fbtn.sm.active { opacity: 1; }
+.sig-fbtn.lg { padding: 7px 14px; font-size: 11px; }
+.sig-fsep { width: 1px; background: var(--line2); margin: 0 4px; align-self: stretch; }
 
 .sig-card {
   background: var(--bg2);
@@ -1571,18 +1575,25 @@ function renderSignals() {
     + '<div class="sig-sum-cell neu"><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
     + '</div>';
 
-  // фильтры по категориям (динамически из данных)
+  // фильтры по категориям (динамически из данных) — большие кнопки
   const cats = {};
   SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
-  let fhtml = '<button class="sig-fbtn' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
+  let fhtml = '<button class="sig-fbtn lg' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
   Object.keys(cats).forEach(c => {
-    fhtml += '<button class="sig-fbtn' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
+    fhtml += '<button class="sig-fbtn lg' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
   });
+  // разрыв
+  fhtml += '<div class="sig-fsep"></div>';
+  // маленькие кнопки направлений
+  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'pos' ? ' active' : '') + '" onclick="setSigFilter(\'pos\')">🟢 ПОЗИТИВ</button>';
+  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'neg' ? ' active' : '') + '" onclick="setSigFilter(\'neg\')">🔴 НЕГАТИВ</button>';
+  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'neu' ? ' active' : '') + '" onclick="setSigFilter(\'neu\')">⚪ НЕЙТРАЛ</button>';
   filWrap.innerHTML = fhtml;
 
-  // лента (новые сверху), с фильтром
+  // лента (новые сверху), с фильтром (по категории или по направлению)
+  const dirKeys = ['pos', 'neg', 'neu'];
   const items = SIGNALS
-    .filter(s => sigFilter === 'all' || s.cat === sigFilter)
+    .filter(s => sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : s.cat === sigFilter))
     .slice().sort((a, b) => b.date.localeCompare(a.date));
 
   feed.innerHTML = items.map(s => {
@@ -1994,6 +2005,7 @@ function initCharts() {
 </script>
 </body>
 </html>
+
 
 
 

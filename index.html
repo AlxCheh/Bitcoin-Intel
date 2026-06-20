@@ -854,38 +854,46 @@ header {
 .sig-sum-cell {
   flex: 1;
   background: var(--bg2);
-  padding: 12px 8px;
+  padding: 7px 8px;
   text-align: center;
   font-family: var(--mono);
+  cursor: pointer;
+  transition: 0.15s;
 }
-.sig-sum-n { font-size: 20px; font-weight: 600; }
-.sig-sum-l { font-size: 9px; letter-spacing: 0.08em; color: var(--dim); margin-top: 3px; }
+.sig-sum-cell:hover { background: var(--bg3); }
+.sig-sum-cell.active { background: var(--bg3); border-bottom: 2px solid var(--btc); }
+.sig-sum-n { font-size: 13px; font-weight: 600; }
+.sig-sum-l { font-size: 8px; letter-spacing: 0.08em; color: var(--dim); margin-top: 2px; }
 .sig-sum-cell.neg .sig-sum-n { color: var(--red); }
 .sig-sum-cell.pos .sig-sum-n { color: var(--grn); }
 .sig-sum-cell.neu .sig-sum-n { color: var(--dim); }
+.sig-sum-cell.neg.active { border-bottom-color: var(--red); }
+.sig-sum-cell.pos.active { border-bottom-color: var(--grn); }
+
+.sig-divider {
+  height: 1px;
+  background: var(--line2);
+  margin: 10px 0;
+}
 
 .sig-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 12px 0;
+  padding: 0 0 12px;
 }
 .sig-fbtn {
-  padding: 6px 12px;
+  padding: 7px 14px;
   background: var(--bg3);
   border: 1px solid var(--line);
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.05em;
   cursor: pointer;
   transition: 0.15s;
 }
 .sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }
-.sig-fbtn.sm { padding: 4px 8px; font-size: 9px; opacity: 0.7; }
-.sig-fbtn.sm.active { opacity: 1; }
-.sig-fbtn.lg { padding: 7px 14px; font-size: 11px; }
-.sig-fsep { width: 1px; background: var(--line2); margin: 0 4px; align-self: stretch; }
 
 .sig-card {
   background: var(--bg2);
@@ -1568,26 +1576,22 @@ function renderSignals() {
   // сводка по направлению
   const counts = { neg: 0, pos: 0, neu: 0 };
   SIGNALS.forEach(s => counts[s.dir]++);
+  const activeSum = ['pos','neg','neu'].includes(sigFilter) ? sigFilter : '';
   sumWrap.innerHTML =
     '<div class="sig-summary">'
-    + '<div class="sig-sum-cell neg"><div class="sig-sum-n">' + counts.neg + '</div><div class="sig-sum-l">🔴 НЕГАТИВ</div></div>'
-    + '<div class="sig-sum-cell pos"><div class="sig-sum-n">' + counts.pos + '</div><div class="sig-sum-l">🟢 ПОЗИТИВ</div></div>'
-    + '<div class="sig-sum-cell neu"><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
+    + '<div class="sig-sum-cell neg' + (activeSum==='neg'?' active':'') + '" onclick="setSigFilter(\'neg\')""><div class="sig-sum-n">' + counts.neg + '</div><div class="sig-sum-l">🔴 НЕГАТИВ</div></div>'
+    + '<div class="sig-sum-cell pos' + (activeSum==='pos'?' active':'') + '" onclick="setSigFilter(\'pos\')""><div class="sig-sum-n">' + counts.pos + '</div><div class="sig-sum-l">🟢 ПОЗИТИВ</div></div>'
+    + '<div class="sig-sum-cell neu' + (activeSum==='neu'?' active':'') + '" onclick="setSigFilter(\'neu\')""><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
     + '</div>';
 
-  // фильтры по категориям (динамически из данных) — большие кнопки
+  // разрыв + большие кнопки категорий
   const cats = {};
   SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
-  let fhtml = '<button class="sig-fbtn lg' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
+  let fhtml = '<div class="sig-divider"></div>';
+  fhtml += '<button class="sig-fbtn' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
   Object.keys(cats).forEach(c => {
-    fhtml += '<button class="sig-fbtn lg' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
+    fhtml += '<button class="sig-fbtn' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
   });
-  // разрыв
-  fhtml += '<div class="sig-fsep"></div>';
-  // маленькие кнопки направлений
-  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'pos' ? ' active' : '') + '" onclick="setSigFilter(\'pos\')">🟢 ПОЗИТИВ</button>';
-  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'neg' ? ' active' : '') + '" onclick="setSigFilter(\'neg\')">🔴 НЕГАТИВ</button>';
-  fhtml += '<button class="sig-fbtn sm' + (sigFilter === 'neu' ? ' active' : '') + '" onclick="setSigFilter(\'neu\')">⚪ НЕЙТРАЛ</button>';
   filWrap.innerHTML = fhtml;
 
   // лента (новые сверху), с фильтром (по категории или по направлению)

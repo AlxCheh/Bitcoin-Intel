@@ -349,6 +349,54 @@ header {
   color: var(--btc);
 }
 
+.psum-head {
+  display: grid;
+  grid-template-columns: 1.6fr 0.6fr 1.2fr;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--line);
+}
+.psum-row {
+  display: grid;
+  grid-template-columns: 1.6fr 0.6fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+  padding: 11px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  border-bottom: 1px solid var(--line);
+}
+.psum-row:last-child { border-bottom: none; }
+.psum-name { color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.psum-name.clickable { color: var(--btc); cursor: pointer; }
+.psum-name.clickable:active { opacity: 0.6; }
+.psum-n { color: var(--txt); }
+.psum-bar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 14px;
+  background: var(--line);
+}
+.psum-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: var(--btc-mid);
+  border-left: 2px solid var(--btc);
+}
+.psum-pct {
+  position: relative;
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--dim);
+}
+
 /* ══════════════════════════════════
    DATA TABLE
 ══════════════════════════════════ */
@@ -1328,6 +1376,7 @@ header {
 ══════════════════════════════════════ -->
 <section class="section" id="tab-pools">
   <div class="page">
+    <div id="pool-summary"></div>
     <div id="pool-detail"></div>
   </div>
 </section>
@@ -1369,9 +1418,11 @@ function showTab(id, btn) {
 
   if (id === 'analytics') initCharts();
   if (id === 'pools') {
-    const wrap = document.getElementById('pool-detail');
-    if (wrap && !wrap.innerHTML.trim()) {
-      wrap.innerHTML = '<div class="pool-empty">Нажми на имя пула в таблице блоков<br>на вкладке ОБЗОР, чтобы увидеть детали.</div>';
+    const detail = document.getElementById('pool-detail');
+    // если не открыта конкретная карточка — показываем сводку
+    if (!detail || !detail.innerHTML.trim()) {
+      renderPoolSummary();
+      if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
 }
@@ -1463,9 +1514,11 @@ function normPool(name) {
 function openPool(key) {
   const p = POOLS[key];
   const wrap = document.getElementById('pool-detail');
+  const summary = document.getElementById('pool-summary');
   if (!p || !wrap) return;
+  if (summary) summary.style.display = 'none';
   wrap.innerHTML =
-    '<div class="pool-back" onclick="showTab(\'home\', null)">← К БЛОКАМ</div>'
+    '<div class="pool-back" onclick="closePool()">← К ПУЛАМ</div>'
     + '<div class="panel" style="margin-top:8px">'
     + '<div class="panel-head"><span class="panel-title">' + p.name + '</span><span class="panel-tag">⛏️ ПУЛ · ' + p.country + '</span></div>'
     + '<div class="pool-stats">'
@@ -1482,6 +1535,15 @@ function openPool(key) {
   window.scrollTo(0, 0);
 }
 
+function closePool() {
+  const wrap = document.getElementById('pool-detail');
+  const summary = document.getElementById('pool-summary');
+  if (wrap) wrap.innerHTML = '';
+  if (summary) summary.style.display = '';
+  renderPoolSummary();
+  window.scrollTo(0, 0);
+}
+
 function statCell(label, val) {
   return '<div class="pool-stat"><div class="pool-stat-label">' + label
     + '</div><div class="pool-stat-val">' + val + '</div></div>';
@@ -1495,27 +1557,71 @@ function timeAgo(ts) {
   return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
 }
 
+let LATEST_BLOCKS = [];
 function renderBlocks(blocks) {
+  LATEST_BLOCKS = blocks;
   const list = document.getElementById('blocks-list');
   const title = document.getElementById('block-title');
-  if (!list) return;
   if (title && blocks[0]) {
     title.textContent = 'LATEST_BLOCKS — TIP #' + blocks[0].height.toLocaleString();
   }
-  list.innerHTML = blocks.slice(0, 5).map(b => {
-    const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
-    const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
-    const known = POOLS[normPool(pool)];
-    const poolCell = known
-      ? '<span class="blk-pool clickable" onclick="openPool(\'' + normPool(pool) + '\')">' + pool + '</span>'
-      : '<span class="blk-pool">' + pool + '</span>';
-    return '<div class="blk-row">'
-      + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
-      + poolCell
-      + '<span class="blk-tx">' + tx + '</span>'
-      + '<span class="blk-age">' + timeAgo(b.timestamp) + '</span>'
-      + '</div>';
-  }).join('');
+  if (list) {
+    list.innerHTML = blocks.slice(0, 5).map(b => {
+      const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
+      const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
+      const known = POOLS[normPool(pool)];
+      const poolCell = known
+        ? '<span class="blk-pool clickable" onclick="openPool(\'' + normPool(pool) + '\')">' + pool + '</span>'
+        : '<span class="blk-pool">' + pool + '</span>';
+      return '<div class="blk-row">'
+        + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
+        + poolCell
+        + '<span class="blk-tx">' + tx + '</span>'
+        + '<span class="blk-age">' + timeAgo(b.timestamp) + '</span>'
+        + '</div>';
+    }).join('');
+  }
+  // обновить сводку пулов, если вкладка ПУЛЫ открыта без выбранного пула
+  const detail = document.getElementById('pool-detail');
+  if (detail && !detail.innerHTML.trim()) renderPoolSummary();
+}
+
+function renderPoolSummary() {
+  const wrap = document.getElementById('pool-summary');
+  if (!wrap) return;
+  if (!LATEST_BLOCKS.length) {
+    wrap.innerHTML = '<div class="pool-empty">Загрузка данных о блоках...</div>';
+    return;
+  }
+  const last10 = LATEST_BLOCKS.slice(0, 10);
+  const counts = {};
+  last10.forEach(b => {
+    const name = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
+    if (!counts[name]) counts[name] = { name: name, n: 0 };
+    counts[name].n++;
+  });
+  const rows = Object.values(counts).sort((a, b) => b.n - a.n);
+  const heights = last10.map(b => b.height);
+  const range = '#' + Math.min(...heights).toLocaleString() + ' – #' + Math.max(...heights).toLocaleString();
+
+  wrap.innerHTML =
+    '<div class="panel">'
+    + '<div class="panel-head"><span class="panel-title">Пулы последних 10 блоков</span><span class="panel-tag">⛏️ LIVE · ' + range + '</span></div>'
+    + '<div class="psum-head"><span>ПУЛ</span><span>БЛОКОВ</span><span>ДОЛЯ</span></div>'
+    + rows.map(r => {
+        const key = normPool(r.name);
+        const known = POOLS[key];
+        const pct = (r.n * 10) + '%';
+        const nameCell = known
+          ? '<span class="psum-name clickable" onclick="openPool(\'' + key + '\')">' + r.name + ' →</span>'
+          : '<span class="psum-name">' + r.name + '</span>';
+        return '<div class="psum-row">'
+          + nameCell
+          + '<span class="psum-n">' + r.n + '</span>'
+          + '<span class="psum-bar-wrap"><span class="psum-bar" style="width:' + pct + '"></span><span class="psum-pct">' + pct + '</span></span>'
+          + '</div>';
+      }).join('')
+    + '</div>';
 }
 
 function fetchBlocks() {

@@ -1122,6 +1122,27 @@ header {
       </div>
     </div>
 
+    <!-- ══ БЛОК 5: ПОСЛЕДНИЕ БЛОКИ ══ -->
+    <div class="terminal" style="margin:0 16px 16px">
+      <div class="terminal-bar">
+        <div class="t-dot" style="background:#EF4444"></div>
+        <div class="t-dot" style="background:#F59E0B"></div>
+        <div class="t-dot" style="background:#22C55E"></div>
+        <span class="terminal-title" id="block-title">LATEST_BLOCKS — загрузка...</span>
+      </div>
+      <div class="terminal-body" style="padding:0">
+        <div class="blk-head">
+          <span>HEIGHT</span>
+          <span>POOL</span>
+          <span>TX</span>
+          <span>AGE</span>
+        </div>
+        <div id="blocks-list">
+          <div class="blk-row blk-loading">computing...</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1810,7 +1831,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
 
-  if (id === 'home') renderDashboard();
+  if (id === 'home') { renderDashboard(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
   if (id === 'analytics') initCharts();
   if (id === 'market') renderSignals();
   if (id === 'pools') {
@@ -1964,7 +1985,7 @@ function renderBlocks(blocks) {
     title.textContent = 'LATEST_BLOCKS — TIP #' + blocks[0].height.toLocaleString();
   }
   if (list) {
-    list.innerHTML = blocks.slice(0, 5).map(b => {
+    list.innerHTML = blocks.slice(0, 10).map(b => {
       const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
       const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
       const known = POOLS[normPool(pool)];

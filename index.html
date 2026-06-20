@@ -121,6 +121,7 @@ header {
 .crumb-cluster { color: var(--btc); font-weight: 600; letter-spacing: 0.05em; }
 .crumb-sep { color: var(--dim); }
 .crumb-tab { color: var(--txt); }
+.crumb-sub { color: var(--dim); }
 
 .subnav {
   display: flex;
@@ -970,6 +971,8 @@ header {
   <span class="crumb-cluster" id="crumb-cluster">LIVE</span>
   <span class="crumb-sep">/</span>
   <span class="crumb-tab" id="crumb-tab">Обзор</span>
+  <span class="crumb-sep crumb-sub-sep" id="crumb-sub-sep" style="display:none">/</span>
+  <span class="crumb-sub" id="crumb-sub" style="display:none"></span>
 </div>
 <nav class="subnav" id="subnav"></nav>
 
@@ -1623,13 +1626,13 @@ function setSigFilter(c) {
 
 // ── TABS ──
 const TAB_META = {
-  home:      { cluster: 'LIVE',     tab: 'Обзор' },
-  analytics: { cluster: 'LIVE',     tab: 'Аналитика' },
-  pools:     { cluster: 'LIVE',     tab: 'Пулы' },
-  market:    { cluster: 'LIVE',     tab: 'Рынок' },
-  basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы' },
-  tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии' },
-  history:   { cluster: 'КОНТЕКСТ', tab: 'История' }
+  home:      { cluster: 'LIVE',     tab: 'Обзор',       sub: '' },
+  analytics: { cluster: 'LIVE',     tab: 'Аналитика',   sub: 'Метрики сети' },
+  pools:     { cluster: 'LIVE',     tab: 'Пулы',        sub: 'Майнинг-пулы' },
+  market:    { cluster: 'LIVE',     tab: 'Рынок',       sub: 'База сигналов' },
+  basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
+  tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
+  history:   { cluster: 'КОНТЕКСТ', tab: 'История',     sub: 'Хронология BTC' }
 };
 
 const CLUSTERS = {
@@ -1682,6 +1685,16 @@ function showTab(id, btn, keepCluster) {
   if (meta) {
     document.getElementById('crumb-cluster').textContent = meta.cluster;
     document.getElementById('crumb-tab').textContent = meta.tab;
+    const subEl = document.getElementById('crumb-sub');
+    const sepEl = document.getElementById('crumb-sub-sep');
+    if (meta.sub) {
+      subEl.textContent = meta.sub;
+      subEl.style.display = '';
+      sepEl.style.display = '';
+    } else {
+      subEl.style.display = 'none';
+      sepEl.style.display = 'none';
+    }
   }
 
   if (id === 'analytics') initCharts();

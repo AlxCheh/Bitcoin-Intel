@@ -108,8 +108,23 @@ header {
 /* ══════════════════════════════════
    NAV
 ══════════════════════════════════ */
+.nav-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.crumb-cluster { color: var(--btc); font-weight: 600; letter-spacing: 0.05em; }
+.crumb-sep { color: var(--dim); }
+.crumb-tab { color: var(--txt); }
+
 .nav {
   display: flex;
+  align-items: center;
   overflow-x: auto;
   background: var(--bg2);
   border-bottom: 1px solid var(--line);
@@ -117,9 +132,22 @@ header {
 }
 .nav::-webkit-scrollbar { display: none; }
 
+.group-tag {
+  flex-shrink: 0;
+  align-self: center;
+  margin: 0 4px 0 12px;
+  padding: 2px 7px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  border: 1px solid var(--line2);
+}
+.group-tag:first-child { margin-left: 8px; }
+
 .nav-btn {
   flex-shrink: 0;
-  padding: 0 18px;
+  padding: 0 14px;
   height: 40px;
   background: transparent;
   border: none;
@@ -139,40 +167,6 @@ header {
   color: var(--btc);
   border-bottom-color: var(--btc);
 }
-
-.nav-cluster { position: relative; flex-shrink: 0; }
-.cluster-menu {
-  display: none;
-  position: absolute;
-  top: 40px;
-  left: 0;
-  z-index: 50;
-  min-width: 160px;
-  background: var(--bg3);
-  border: 1px solid var(--line);
-  border-top: none;
-}
-.cluster-menu.open { display: block; }
-.menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 11px 18px;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--line);
-  color: var(--dim);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-.menu-item:last-child { border-bottom: none; }
-.menu-item:hover { color: var(--txt); background: var(--bg2); }
-.menu-item.active { color: var(--btc); }
 
 /* ══════════════════════════════════
    SECTIONS
@@ -780,28 +774,21 @@ header {
 </header>
 
 <!-- ══ NAV ══ -->
+<div class="nav-crumb">
+  <span class="crumb-cluster" id="crumb-cluster">LIVE</span>
+  <span class="crumb-sep">/</span>
+  <span class="crumb-tab" id="crumb-tab">Обзор</span>
+</div>
 <nav class="nav">
-  <div class="nav-cluster">
-    <button class="nav-btn cluster-btn active" onclick="toggleCluster('live',this)">🟠 LIVE ▾</button>
-    <div class="cluster-menu" id="menu-live">
-      <button class="menu-item active" onclick="showTab('home',this)">ОБЗОР</button>
-      <button class="menu-item" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
-      <button class="menu-item" onclick="showTab('pools',this)">ПУЛЫ</button>
-    </div>
-  </div>
-  <div class="nav-cluster">
-    <button class="nav-btn cluster-btn" onclick="toggleCluster('knowledge',this)">📘 ЗНАНИЕ ▾</button>
-    <div class="cluster-menu" id="menu-knowledge">
-      <button class="menu-item" onclick="showTab('basics',this)">ОСНОВЫ</button>
-      <button class="menu-item" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
-    </div>
-  </div>
-  <div class="nav-cluster">
-    <button class="nav-btn cluster-btn" onclick="toggleCluster('context',this)">📜 КОНТЕКСТ ▾</button>
-    <div class="cluster-menu" id="menu-context">
-      <button class="menu-item" onclick="showTab('history',this)">ИСТОРИЯ</button>
-    </div>
-  </div>
+  <span class="group-tag">🟠 LIVE</span>
+  <button class="nav-btn active" onclick="showTab('home',this)">ОБЗОР</button>
+  <button class="nav-btn" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
+  <button class="nav-btn" onclick="showTab('pools',this)">ПУЛЫ</button>
+  <span class="group-tag">📘 ЗНАНИЕ</span>
+  <button class="nav-btn" onclick="showTab('basics',this)">ОСНОВЫ</button>
+  <button class="nav-btn" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
+  <span class="group-tag">📜 КОНТЕКСТ</span>
+  <button class="nav-btn" onclick="showTab('history',this)">ИСТОРИЯ</button>
 </nav>
 
 <!-- ══════════════════════════════════════
@@ -1347,40 +1334,37 @@ header {
 
 <script>
 // ── TABS ──
-const TAB_CLUSTER = {
-  home: 'live', analytics: 'live', pools: 'live',
-  basics: 'knowledge', tech: 'knowledge',
-  history: 'context'
+const TAB_META = {
+  home:      { cluster: 'LIVE',     tab: 'Обзор' },
+  analytics: { cluster: 'LIVE',     tab: 'Аналитика' },
+  pools:     { cluster: 'LIVE',     tab: 'Пулы' },
+  basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы' },
+  tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии' },
+  history:   { cluster: 'КОНТЕКСТ', tab: 'История' }
 };
-
-function toggleCluster(cluster, btn) {
-  const menu = document.getElementById('menu-' + cluster);
-  const isOpen = menu.classList.contains('open');
-  document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
-  if (!isOpen) menu.classList.add('open');
-}
 
 function showTab(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.cluster-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
   document.getElementById('tab-' + id).classList.add('active');
-  if (btn && btn.classList.contains('menu-item')) btn.classList.add('active');
 
-  // активировать родительский кластер
-  const cluster = TAB_CLUSTER[id];
-  if (cluster) {
-    const clusterBtn = document.querySelector('#menu-' + cluster).previousElementSibling;
-    if (clusterBtn) clusterBtn.classList.add('active');
-    // если кнопка не передана (программный вызов) — подсветить нужный menu-item
-    if (!btn || !btn.classList.contains('menu-item')) {
-      const items = document.querySelectorAll('#menu-' + cluster + ' .menu-item');
-      items.forEach(it => {
-        if (it.getAttribute('onclick').indexOf("'" + id + "'") !== -1) it.classList.add('active');
-      });
-    }
+  // подсветка кнопки: переданная или найденная по onclick
+  if (btn && btn.classList.contains('nav-btn')) {
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + id + "'") !== -1) {
+        b.classList.add('active');
+      }
+    });
+  }
+
+  // обновить крошки
+  const meta = TAB_META[id];
+  if (meta) {
+    document.getElementById('crumb-cluster').textContent = meta.cluster;
+    document.getElementById('crumb-tab').textContent = meta.tab;
   }
 
   if (id === 'analytics') initCharts();
@@ -1391,13 +1375,6 @@ function showTab(id, btn) {
     }
   }
 }
-
-// закрытие меню по клику вне навигации
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.nav')) {
-    document.querySelectorAll('.cluster-menu').forEach(m => m.classList.remove('open'));
-  }
-});
 
 // ── ACCORDION ──
 function toggleAcc(head) {

@@ -122,7 +122,7 @@ header {
 .crumb-sep { color: var(--dim); }
 .crumb-tab { color: var(--txt); }
 
-.nav {
+.subnav {
   display: flex;
   align-items: center;
   overflow-x: auto;
@@ -130,24 +130,11 @@ header {
   border-bottom: 1px solid var(--line);
   scrollbar-width: none;
 }
-.nav::-webkit-scrollbar { display: none; }
-
-.group-tag {
-  flex-shrink: 0;
-  align-self: center;
-  margin: 0 4px 0 12px;
-  padding: 2px 7px;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  color: var(--dim);
-  border: 1px solid var(--line2);
-}
-.group-tag:first-child { margin-left: 8px; }
+.subnav::-webkit-scrollbar { display: none; }
 
 .nav-btn {
   flex-shrink: 0;
-  padding: 0 14px;
+  padding: 0 16px;
   height: 40px;
   background: transparent;
   border: none;
@@ -167,6 +154,35 @@ header {
   color: var(--btc);
   border-bottom-color: var(--btc);
 }
+
+.clusterbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 100;
+  display: flex;
+  background: var(--bg3);
+  border-top: 1px solid var(--line2);
+}
+.cbar-btn {
+  flex: 1;
+  padding: 9px 4px;
+  padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+.cbar-ic { font-size: 16px; line-height: 1; filter: grayscale(0.6) opacity(0.7); transition: filter 0.15s; }
+.cbar-btn.active { color: var(--btc); }
+.cbar-btn.active .cbar-ic { filter: drop-shadow(0 0 5px rgba(247,147,26,0.5)); }
 
 /* ══════════════════════════════════
    SECTIONS
@@ -849,17 +865,13 @@ header {
   <span class="crumb-sep">/</span>
   <span class="crumb-tab" id="crumb-tab">Обзор</span>
 </div>
-<nav class="nav">
-  <span class="group-tag">🟠 LIVE</span>
-  <button class="nav-btn active" onclick="showTab('home',this)">ОБЗОР</button>
-  <button class="nav-btn" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
-  <button class="nav-btn" onclick="showTab('pools',this)">ПУЛЫ</button>
-  <span class="group-tag">📘 ЗНАНИЕ</span>
-  <button class="nav-btn" onclick="showTab('basics',this)">ОСНОВЫ</button>
-  <button class="nav-btn" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
-  <span class="group-tag">📜 КОНТЕКСТ</span>
-  <button class="nav-btn" onclick="showTab('history',this)">ИСТОРИЯ</button>
-</nav>
+<nav class="subnav" id="subnav"></nav>
+
+<div class="clusterbar">
+  <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')"><span class="cbar-ic">🟠</span>LIVE</button>
+  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')"><span class="cbar-ic">📘</span>ЗНАНИЕ</button>
+  <button class="cbar-btn" id="cbar-context" onclick="selectCluster('context')"><span class="cbar-ic">📜</span>КОНТЕКСТ</button>
+</div>
 
 <!-- ══════════════════════════════════════
      HOME
@@ -1414,24 +1426,52 @@ const TAB_META = {
   history:   { cluster: 'КОНТЕКСТ', tab: 'История' }
 };
 
-function showTab(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+const CLUSTERS = {
+  live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ']] },
+  knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ']] },
+  context:   { label: 'КОНТЕКСТ', tabs: [['history','ИСТОРИЯ']] }
+};
+const TAB_TO_CLUSTER = {
+  home:'live', analytics:'live', pools:'live',
+  basics:'knowledge', tech:'knowledge',
+  history:'context'
+};
 
+let activeCluster = 'live';
+
+// выбор кластера снизу: рендерит подвкладки и открывает первую вкладку
+function selectCluster(key) {
+  activeCluster = key;
+  document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('cbar-' + key).classList.add('active');
+  renderSubnav(key);
+  // открыть первую вкладку кластера
+  showTab(CLUSTERS[key].tabs[0][0], null, true);
+}
+
+// отрисовать подвкладки активного кластера, подсветить activeId
+function renderSubnav(key, activeId) {
+  const sub = document.getElementById('subnav');
+  sub.innerHTML = CLUSTERS[key].tabs.map(([id, label]) =>
+    '<button class="nav-btn' + (id === activeId ? ' active' : '') + '" onclick="showTab(\'' + id + '\', this)">' + label + '</button>'
+  ).join('');
+}
+
+function showTab(id, btn, keepCluster) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
 
-  // подсветка кнопки: переданная или найденная по onclick
-  if (btn && btn.classList.contains('nav-btn')) {
-    btn.classList.add('active');
-  } else {
-    document.querySelectorAll('.nav-btn').forEach(b => {
-      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + id + "'") !== -1) {
-        b.classList.add('active');
-      }
-    });
+  // синхронизировать кластер, если перешли на вкладку другого кластера (напр. клик по пулу)
+  const cluster = TAB_TO_CLUSTER[id];
+  if (cluster && cluster !== activeCluster) {
+    activeCluster = cluster;
+    document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('cbar-' + cluster).classList.add('active');
   }
+  // перерисовать подвкладки с подсветкой текущей
+  renderSubnav(activeCluster, id);
 
-  // обновить крошки
+  // крошки
   const meta = TAB_META[id];
   if (meta) {
     document.getElementById('crumb-cluster').textContent = meta.cluster;
@@ -1441,13 +1481,15 @@ function showTab(id, btn) {
   if (id === 'analytics') initCharts();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');
-    // если не открыта конкретная карточка — показываем сводку
     if (!detail || !detail.innerHTML.trim()) {
       renderPoolSummary();
       if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
 }
+
+// инициализация подвкладок при загрузке
+renderSubnav('live', 'home');
 
 // ── ACCORDION ──
 function toggleAcc(head) {

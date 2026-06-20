@@ -841,6 +841,101 @@ header {
    SPACER
 ══════════════════════════════════ */
 .sp12 { height: 12px; }
+
+/* ══════════════════════════════════
+   SIGNALS BASE
+══════════════════════════════════ */
+.sig-summary {
+  display: flex;
+  gap: 1px;
+  background: var(--line);
+  margin: 12px 0 0;
+}
+.sig-sum-cell {
+  flex: 1;
+  background: var(--bg2);
+  padding: 12px 8px;
+  text-align: center;
+  font-family: var(--mono);
+}
+.sig-sum-n { font-size: 20px; font-weight: 600; }
+.sig-sum-l { font-size: 9px; letter-spacing: 0.08em; color: var(--dim); margin-top: 3px; }
+.sig-sum-cell.neg .sig-sum-n { color: var(--red); }
+.sig-sum-cell.pos .sig-sum-n { color: var(--grn); }
+.sig-sum-cell.neu .sig-sum-n { color: var(--dim); }
+
+.sig-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+}
+.sig-fbtn {
+  padding: 6px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }
+
+.sig-card {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line2);
+  margin-bottom: 10px;
+  padding: 13px 15px;
+}
+.sig-card.neg { border-left-color: var(--red); }
+.sig-card.pos { border-left-color: var(--grn); }
+.sig-card.neu { border-left-color: var(--dim); }
+.sig-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+}
+.sig-cat { color: var(--btc); }
+.sig-dir { margin-left: auto; }
+.sig-signal {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--txt);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.sig-data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.sig-chip {
+  padding: 2px 8px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--txt);
+}
+.sig-body { font-family: var(--sans); font-size: 12px; line-height: 1.55; color: var(--txt); }
+.sig-body p { margin-bottom: 6px; }
+.sig-body .lbl { color: var(--dim); font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; }
+.sig-src {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+}
 </style>
 </head>
 <body>
@@ -1414,24 +1509,121 @@ header {
   </div>
 </section>
 
+<!-- ══════════════════════════════════════
+     MARKET — база сигналов
+══════════════════════════════════════ -->
+<section class="section" id="tab-market">
+  <div class="page">
+    <div class="sh"><span class="sh-title">База <span>сигналов</span></span><span class="sh-right">🏦 ИНСТИТУЦИОНАЛЫ</span></div>
+    <div id="sig-summary"></div>
+    <div id="sig-filters"></div>
+    <div id="sig-feed"></div>
+  </div>
+</section>
+
 <script>
+// ── SIGNALS BASE (единая база сигналов проекта) ──
+// Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
+const SIGNALS = [
+  {
+    date: '2026-06-18',
+    cat: 'macro', catLabel: '🏦 МАКРО',
+    dir: 'neg',
+    signal: 'STRC Сэйлора падает ниже номинала — дивидендная машина под давлением',
+    data: ['STRC ~$85', '−15% к $100', 'дивиденд 11,5%', 'BTC ~$63k'],
+    context: 'STRC (привилегированная акция Strategy, запуск июль 2025) ежемесячно подстраивает ставку, чтобы держать цену у $100. Раньше уходила ниже пара лишь на коротких всплесках волатильности BTC.',
+    caveat: 'Ниже $95 Strategy обязана поднять ставку на 0,5% (+~$53 млн/год). ATM-выпуск приостановлен → меньше покупок BTC. Дивиденды деньгами не гарантированы. Капитал ротируется в Strive SATA.',
+    source: 'CoinDesk, Unchained, Crypto Briefing (июнь 2026)'
+  },
+  {
+    date: '2026-06-18',
+    cat: 'narrative', catLabel: '📰 НАРРАТИВ',
+    dir: 'pos',
+    signal: 'BlackRock: ETF втягивают биткоинеров в традфин — «Великая конвергенция»',
+    data: ['IBIT $48 млрд', '765 936 BTC', '75% новичков в ETF', 'отток $96,65 млн'],
+    context: 'IBIT запущен в январе 2024, флагман BlackRock. Джей Джейкобс (глава ETF на акции, США) описывает слияние TradFi, DeFi и крипты термином «Great Convergence»: меньше «versus», больше «и».',
+    caveat: 'Поток двусторонний: крипто-инвесторы заходят в традиционные ETF. Но 18 июня — отток $96,65 млн из IBIT, вопрос удержания. Ближайший тест — уровень BTC $60 000.',
+    source: 'Cointelegraph, CoinMarketCap (июнь 2026)'
+  }
+];
+
+const DIR_META = {
+  neg: { icon: '🔴', label: 'НЕГАТИВ' },
+  pos: { icon: '🟢', label: 'ПОЗИТИВ' },
+  neu: { icon: '⚪', label: 'НЕЙТРАЛЬНО' }
+};
+
+let sigFilter = 'all';
+
+function renderSignals() {
+  const sumWrap = document.getElementById('sig-summary');
+  const filWrap = document.getElementById('sig-filters');
+  const feed = document.getElementById('sig-feed');
+  if (!feed) return;
+
+  // сводка по направлению
+  const counts = { neg: 0, pos: 0, neu: 0 };
+  SIGNALS.forEach(s => counts[s.dir]++);
+  sumWrap.innerHTML =
+    '<div class="sig-summary">'
+    + '<div class="sig-sum-cell neg"><div class="sig-sum-n">' + counts.neg + '</div><div class="sig-sum-l">🔴 НЕГАТИВ</div></div>'
+    + '<div class="sig-sum-cell pos"><div class="sig-sum-n">' + counts.pos + '</div><div class="sig-sum-l">🟢 ПОЗИТИВ</div></div>'
+    + '<div class="sig-sum-cell neu"><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
+    + '</div>';
+
+  // фильтры по категориям (динамически из данных)
+  const cats = {};
+  SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
+  let fhtml = '<button class="sig-fbtn' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
+  Object.keys(cats).forEach(c => {
+    fhtml += '<button class="sig-fbtn' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
+  });
+  filWrap.innerHTML = fhtml;
+
+  // лента (новые сверху), с фильтром
+  const items = SIGNALS
+    .filter(s => sigFilter === 'all' || s.cat === sigFilter)
+    .slice().sort((a, b) => b.date.localeCompare(a.date));
+
+  feed.innerHTML = items.map(s => {
+    const d = DIR_META[s.dir];
+    const chips = s.data.map(x => '<span class="sig-chip">' + x + '</span>').join('');
+    return '<div class="sig-card ' + s.dir + '">'
+      + '<div class="sig-top"><span class="sig-cat">' + s.catLabel + '</span><span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
+      + '<div class="sig-signal">' + s.signal + '</div>'
+      + '<div class="sig-data">' + chips + '</div>'
+      + '<div class="sig-body">'
+      + '<p><span class="lbl">КОНТЕКСТ.</span> ' + s.context + '</p>'
+      + '<p><span class="lbl">ОГОВОРКИ.</span> ' + s.caveat + '</p>'
+      + '</div>'
+      + '<div class="sig-src">ИСТОЧНИК: ' + s.source + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function setSigFilter(c) {
+  sigFilter = c;
+  renderSignals();
+}
+
 // ── TABS ──
 const TAB_META = {
   home:      { cluster: 'LIVE',     tab: 'Обзор' },
   analytics: { cluster: 'LIVE',     tab: 'Аналитика' },
   pools:     { cluster: 'LIVE',     tab: 'Пулы' },
+  market:    { cluster: 'LIVE',     tab: 'Рынок' },
   basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы' },
   tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии' },
   history:   { cluster: 'КОНТЕКСТ', tab: 'История' }
 };
 
 const CLUSTERS = {
-  live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ']] },
+  live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ'],['market','РЫНОК']] },
   knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ']] },
   context:   { label: 'КОНТЕКСТ', tabs: [['history','ИСТОРИЯ']] }
 };
 const TAB_TO_CLUSTER = {
-  home:'live', analytics:'live', pools:'live',
+  home:'live', analytics:'live', pools:'live', market:'live',
   basics:'knowledge', tech:'knowledge',
   history:'context'
 };
@@ -1478,6 +1670,7 @@ function showTab(id, btn, keepCluster) {
   }
 
   if (id === 'analytics') initCharts();
+  if (id === 'market') renderSignals();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');
     if (!detail || !detail.innerHTML.trim()) {

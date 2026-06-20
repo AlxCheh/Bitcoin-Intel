@@ -879,11 +879,16 @@ header {
 
 .sig-filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   padding: 0 0 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.sig-filters::-webkit-scrollbar { display: none; }
 .sig-fbtn {
+  flex-shrink: 0;
   padding: 7px 14px;
   background: var(--bg3);
   border: 1px solid var(--line);
@@ -892,6 +897,7 @@ header {
   font-size: 11px;
   letter-spacing: 0.05em;
   cursor: pointer;
+  white-space: nowrap;
   transition: 0.15s;
 }
 .sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }

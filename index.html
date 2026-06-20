@@ -276,6 +276,50 @@ header {
 .blk-tx { color: var(--dim); }
 .blk-age { color: var(--dim); }
 .blk-loading { display: block; color: var(--dim); padding: 14px 12px; }
+.blk-pool.clickable { cursor: pointer; color: var(--btc); text-decoration: none; }
+.blk-pool.clickable:active { opacity: 0.6; }
+
+.pool-back {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  margin: 12px 16px 0;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+}
+.pool-back:active { color: var(--btc); }
+.pool-empty {
+  margin: 40px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  text-align: center;
+  line-height: 1.8;
+}
+.pool-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  margin: 0 0 1px;
+}
+.pool-stat {
+  background: var(--bg2);
+  padding: 12px 14px;
+}
+.pool-stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin-bottom: 4px;
+}
+.pool-stat-val {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--btc);
+}
 
 /* ══════════════════════════════════
    DATA TABLE
@@ -705,6 +749,7 @@ header {
 <nav class="nav">
   <button class="nav-btn active" onclick="showTab('home',this)">ОБЗОР</button>
   <button class="nav-btn" onclick="showTab('analytics',this)">АНАЛИТИКА</button>
+  <button class="nav-btn" id="nav-pools" onclick="showTab('pools',this)">ПУЛЫ</button>
   <button class="nav-btn" onclick="showTab('tech',this)">ТЕХНОЛОГИИ</button>
   <button class="nav-btn" onclick="showTab('history',this)">ИСТОРИЯ</button>
   <button class="nav-btn" onclick="showTab('basics',this)">ОСНОВЫ</button>
@@ -1242,6 +1287,15 @@ header {
   </div>
 </section>
 
+<!-- ══════════════════════════════════════
+     POOLS
+══════════════════════════════════════ -->
+<section class="section" id="tab-pools">
+  <div class="page">
+    <div id="pool-detail"></div>
+  </div>
+</section>
+
 <script>
 // ── TABS ──
 function showTab(id, btn) {
@@ -1250,6 +1304,12 @@ function showTab(id, btn) {
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
   if (id === 'analytics') initCharts();
+  if (id === 'pools') {
+    const wrap = document.getElementById('pool-detail');
+    if (wrap && !wrap.innerHTML.trim()) {
+      wrap.innerHTML = '<div class="pool-empty">Нажми на имя пула в таблице блоков<br>на вкладке ОБЗОР, чтобы увидеть детали.</div>';
+    }
+  }
 }
 
 // ── ACCORDION ──
@@ -1263,6 +1323,104 @@ function toggleAcc(head) {
     body.classList.add('open');
     arrow.style.transform = 'rotate(180deg)';
   }
+}
+
+// ── POOLS DATABASE ──
+const POOLS = {
+  'foundryusa': {
+    name: 'Foundry USA', country: '🇺🇸 США', founded: '2019',
+    share: '~30–34%', fee: 'FPPS, по объёму', site: 'foundrydigital.com',
+    owner: 'Digital Currency Group (DCG)',
+    history: 'Запущен в 2019 как майнинговое подразделение DCG. Быстро стал крупнейшим пулом сети за счёт работы с публичными майнинговыми компаниями Северной Америки и хостинг-провайдерами.',
+    notes: 'Институциональный фокус, compliance-first. Обслуживает в первую очередь крупные публичные майнинговые фирмы, а не розничных майнеров. Тесная интеграция с энергорынками США (demand-response, ERCOT).'
+  },
+  'antpool': {
+    name: 'AntPool', country: '🇨🇳 Китай', founded: '2014',
+    share: '~14–19%', fee: '0% PPLNS / до 4% FPPS', site: 'antpool.com',
+    owner: 'Bitmain',
+    history: 'Создан Bitmain в 2014 году. Долгое время был крупнейшим пулом мира до возвышения Foundry.',
+    notes: 'Дефолтный пул для оборудования Antminer. Выигрывает от прямой связи с крупнейшим производителем ASIC. Широкая география серверов: Северная Америка, Европа, Азия.'
+  },
+  'viabtc': {
+    name: 'ViaBTC', country: '🇨🇳 Китай', founded: '2016',
+    share: '~10–11%', fee: '2% PPLNS / до 4% FPPS', site: 'viabtc.com',
+    owner: 'Независимый (изначально при поддержке Bitmain)',
+    history: 'Запущен в 2016, изначально поддерживался Bitmain, затем стал независимым оператором.',
+    notes: 'Особо силён в России и соседних регионах. Дружелюбный интерфейс для розничных майнеров, низкие пороги вывода. Поддерживает множество PoW-монет помимо BTC.'
+  },
+  'f2pool': {
+    name: 'F2Pool', country: '🇨🇳 Китай', founded: '2013',
+    share: '~10–11%', fee: 'FPPS / PPS+', site: 'f2pool.com',
+    owner: 'Независимый (Discus Fish)',
+    history: 'Один из старейших пулов, работает непрерывно с 2013 года. Известен также как «Discus Fish».',
+    notes: 'Ранний пионер merged-mining. Поддерживает широкий спектр PoW-сетей. Развитые инструменты мониторинга для индивидуальных и крупных майнеров.'
+  },
+  'spiderpool': {
+    name: 'SpiderPool', country: '🌏 Азия', founded: '2022',
+    share: '~10%', fee: 'PPLNS / FPPS', site: 'spiderpool.io',
+    owner: 'Независимый',
+    history: 'Относительно молодой пул, быстро вырос до топ-5 по хешрейту к 2026 году.',
+    notes: 'Привлекает майнеров низкими комиссиями. Один из подписантов перехода на Stratum V2.'
+  },
+  'marapool': {
+    name: 'MARA Pool', country: '🇺🇸 США', founded: '2021',
+    share: '~4–5%', fee: 'Собственный', site: 'mara.com',
+    owner: 'Marathon Digital Holdings',
+    history: 'Собственный пул публичной майнинговой компании Marathon (MARA), запущен в 2021.',
+    notes: 'Корпоративный пул — обслуживает в основном собственные мощности Marathon. Публичная компания на NASDAQ.'
+  },
+  'binancepool': {
+    name: 'Binance Pool', country: '🌍 Глобально', founded: '2020',
+    share: '~5%', fee: 'FPPS', site: 'binance.com',
+    owner: 'Binance',
+    history: 'Запущен биржей Binance в 2020 году как часть экосистемы.',
+    notes: 'Интегрирован с биржей Binance — удобно для вывода и торговли. Поддержка нескольких алгоритмов.'
+  },
+  'ocean': {
+    name: 'Ocean', country: '🌍 Глобально', founded: '2023',
+    share: '~1–2%', fee: 'TIDES', site: 'ocean.xyz',
+    owner: 'Независимый (при участии Jack Dorsey)',
+    history: 'Запущен в 2023, при поддержке Джека Дорси. Фокус на децентрализации.',
+    notes: 'Некастодиальные выплаты напрямую на адреса майнеров (модель TIDES). Идеологически ориентирован на децентрализацию выбора транзакций.'
+  },
+  'braiinspool': {
+    name: 'Braiins Pool', country: '🇨🇿 Чехия', founded: '2010',
+    share: '~1–2%', fee: 'FPPS', site: 'braiins.com',
+    owner: 'Braiins (ex-Slush Pool)',
+    history: 'Старейший майнинговый пул в мире — основан в 2010 как Slush Pool, переименован в Braiins.',
+    notes: 'Первопроходец пулового майнинга. Разработчик протокола Stratum V2, активно продвигает децентрализацию.'
+  }
+};
+
+function normPool(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function openPool(key) {
+  const p = POOLS[key];
+  const wrap = document.getElementById('pool-detail');
+  if (!p || !wrap) return;
+  wrap.innerHTML =
+    '<div class="pool-back" onclick="showTab(\'home\', document.querySelector(\'.nav-btn\'))">← К БЛОКАМ</div>'
+    + '<div class="panel" style="margin-top:8px">'
+    + '<div class="panel-head"><span class="panel-title">' + p.name + '</span><span class="panel-tag">⛏️ ПУЛ · ' + p.country + '</span></div>'
+    + '<div class="pool-stats">'
+    + statCell('ДОЛЯ ХЕШРЕЙТА', p.share)
+    + statCell('ОСНОВАН', p.founded)
+    + statCell('КОМИССИЯ', p.fee)
+    + statCell('САЙТ', p.site)
+    + '</div>'
+    + '<div class="panel-body"><p><strong>Владелец:</strong> ' + p.owner + '</p>'
+    + '<p style="margin-top:10px"><strong>История.</strong> ' + p.history + '</p>'
+    + '<p style="margin-top:10px"><strong>Особенности.</strong> ' + p.notes + '</p></div>'
+    + '</div>';
+  showTab('pools', document.getElementById('nav-pools'));
+  window.scrollTo(0, 0);
+}
+
+function statCell(label, val) {
+  return '<div class="pool-stat"><div class="pool-stat-label">' + label
+    + '</div><div class="pool-stat-val">' + val + '</div></div>';
 }
 
 // ── LATEST BLOCKS ──
@@ -1283,9 +1441,13 @@ function renderBlocks(blocks) {
   list.innerHTML = blocks.slice(0, 5).map(b => {
     const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
     const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
+    const known = POOLS[normPool(pool)];
+    const poolCell = known
+      ? '<span class="blk-pool clickable" onclick="openPool(\'' + normPool(pool) + '\')">' + pool + '</span>'
+      : '<span class="blk-pool">' + pool + '</span>';
     return '<div class="blk-row">'
       + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
-      + '<span class="blk-pool">' + pool + '</span>'
+      + poolCell
       + '<span class="blk-tx">' + tx + '</span>'
       + '<span class="blk-age">' + timeAgo(b.timestamp) + '</span>'
       + '</div>';

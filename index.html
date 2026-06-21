@@ -2837,9 +2837,30 @@ function initCharts() {
       meanLbl.textContent = 'AVG ' + fmtP(meanPrice);
       svg.appendChild(meanLbl);
 
-      // Price line — white, on top
-      const lineD = pts.map((pt, i) => (i === 0 ? `M${pt.x},${pt.y}` : `L${pt.x},${pt.y}`)).join(' ');
-      svg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: C.txt, 'stroke-width': '1.6', 'stroke-linejoin': 'round' }));
+      // Price line — coloured by zone (green above mean, red below)
+      (function drawColoredLine() {
+        const n = pts.length;
+        let seg = '', lastColor = null;
+        for (let i = 0; i < n; i++) {
+          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
+          const col = pts[i].y <= meanY ? C.grn : C.red;
+          if (i === 0) { seg = `M${x},${y}`; lastColor = col; continue; }
+          const py = pts[i-1].y, px2 = pts[i-1].x;
+          const crossedMean = (py <= meanY) !== (pts[i].y <= meanY);
+          if (crossedMean) {
+            // interpolate crossing
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px2 + t * (pts[i].x - px2)).toFixed(1);
+            seg += ` L${cx},${meanY.toFixed(1)}`;
+            svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+            seg = `M${cx},${meanY.toFixed(1)} L${x},${y}`;
+            lastColor = col;
+          } else {
+            seg += ` L${x},${y}`;
+          }
+        }
+        if (seg) svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      })();
 
       // Crosshair & end dot (will update on hover)
       const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });

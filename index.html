@@ -1835,7 +1835,7 @@ header {
 
     <!-- PRICE CHART -->
     <!-- TERMINAL PRICE CHART -->
-    <div id="terminal-price-chart" style="margin-bottom:12px;border-radius:3px;overflow:hidden;border:1px solid #1e1e1e;background:#0a0a0a;font-family:'IBM Plex Mono',monospace"></div>
+    <div id="terminal-price-chart" style="margin:12px 16px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
 
     <!-- HASHRATE CHART -->
     <div class="chart-panel">
@@ -2208,6 +2208,11 @@ function renderDashboard() {
     const gap = ((dashBtcPrice - dashProdCost) / dashProdCost * 100);
     gapEl.textContent = (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%';
     gapEl.className = 'dash-m-val ' + (gap < 0 ? 'dash-m-neg' : gap < 15 ? 'dash-m-warn' : 'dash-m-up');
+  }
+
+  // Обновляем Terminal price chart реальной ценой
+  if (dashBtcPrice && typeof window.terminalChartUpdate === 'function') {
+    window.terminalChartUpdate(dashBtcPrice);
   }
 
   if (!window.SIGNALS || !SIGNALS.length) return;
@@ -2620,7 +2625,15 @@ function initCharts() {
       p = Math.max(38000, Math.min(115000, p + (s - 0.48) * 3200 + (i < 60 ? 700 : i < 120 ? -300 : 100)));
       allData.push({ ts: now - i * DAY, price: Math.round(p), volume: Math.round((0.3 + Math.abs(s - 0.5) * 4) * 14000 + 3000) });
     }
-    allData[allData.length - 1].price = 104220;
+    allData[allData.length - 1].price = (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) ? Math.round(dashBtcPrice) : allData[allData.length - 1].price;
+
+    // Expose update hook so renderDashboard() can refresh the last point with the real price
+    window.terminalChartUpdate = function(realPrice) {
+      if (realPrice && realPrice > 0) {
+        allData[allData.length - 1].price = Math.round(realPrice);
+        render();
+      }
+    };
 
     // Formatters
     const fmtP = v => '$' + v.toLocaleString('en-US');

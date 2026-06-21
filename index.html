@@ -1057,13 +1057,6 @@ header {
 </header>
 
 <!-- ══ NAV ══ -->
-<div class="nav-crumb">
-  <span class="crumb-cluster" id="crumb-cluster">LIVE</span>
-  <span class="crumb-sep">/</span>
-  <span class="crumb-tab" id="crumb-tab">Обзор</span>
-  <span class="crumb-sep crumb-sub-sep" id="crumb-sub-sep" style="display:none">/</span>
-  <span class="crumb-sub" id="crumb-sub" style="display:none"></span>
-</div>
 <nav class="subnav" id="subnav"></nav>
 
 <div class="clusterbar">
@@ -1924,7 +1917,7 @@ header {
         <div style="height:3px;background:var(--line2);margin:0 14px 0">
           <div class="bar-fill" id="diffBar" style="width:0%"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:8px;color:var(--dim2);font-family:var(--mono)" id="diff-chart-labels"></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
     </div>
 
@@ -2826,7 +2819,7 @@ async function fetchDifficulty() {
       if (labelsEl) {
         const picks = [pts[0], pts[Math.floor(n / 2)], pts[n - 1]];
         labelsEl.innerHTML = picks.map(p =>
-          `<span>${new Date(p.ts).toLocaleDateString('ru-RU', { month: 'short', year: '2-digit' })}</span>`
+          `<span style="font-size:10px;color:#7A8BA0">${new Date(p.ts).toLocaleDateString('ru-RU', { month: 'short', year: '2-digit' })}</span>`
         ).join('');
       }
     }
@@ -2845,7 +2838,7 @@ function initCharts() {
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
 
   const grid  = 'rgba(26,31,42,1)';
-  const tick  = '#4A5568';
+  const tick  = '#7A8BA0';
   const font  = "'IBM Plex Mono', monospace";
   const opts  = (log) => ({
     responsive: true,
@@ -2862,11 +2855,11 @@ function initCharts() {
       }
     },
     scales: {
-      x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 10 } } },
+      x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 11 } } },
       y: {
         type: log ? 'logarithmic' : 'linear',
         grid: { color: grid },
-        ticks: { color: tick, font: { family: font, size: 10 } }
+        ticks: { color: tick, font: { family: font, size: 11 } }
       }
     }
   });
@@ -3146,10 +3139,10 @@ function initCharts() {
         const cell = div({}, {});
         const lbl = document.createElement('div');
         lbl.textContent = l;
-        Object.assign(lbl.style, { color: C.dim2, fontSize: '9px', letterSpacing: '0.14em', fontFamily: C.mono });
+        Object.assign(lbl.style, { color: C.dim, fontSize: '10px', letterSpacing: '0.12em', fontFamily: C.mono });
         const val = document.createElement('div');
         val.textContent = v;
-        Object.assign(val.style, { color: C.dim, fontSize: '12px', marginTop: '2px', fontFamily: C.mono });
+        Object.assign(val.style, { color: C.txt, fontSize: '13px', marginTop: '2px', fontFamily: C.mono });
         cell.appendChild(lbl); cell.appendChild(val); statsRow.appendChild(cell);
       });
       wrap.appendChild(statsRow);
@@ -3176,7 +3169,7 @@ function initCharts() {
       [0.15, 0.38, 0.62, 0.85].forEach(t => {
         const gy = PAD.t + t * (PH - PAD.t - 10);
         svg.appendChild(svgEl('line', { x1: 0, y1: gy, x2: W, y2: gy, stroke: C.line, 'stroke-width': '1' }));
-        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: C.dim2, 'font-size': '8.5', 'text-anchor': 'end', 'font-family': C.mono });
+        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: C.dim, 'font-size': '10', 'text-anchor': 'end', 'font-family': C.mono });
         txt.textContent = fmtP(Math.round(maxP - t * (maxP - minP)));
         svg.appendChild(txt);
       });
@@ -3329,7 +3322,7 @@ function initCharts() {
         const idx = Math.round((i / (xCount - 1)) * (data.length - 1));
         const sp = document.createElement('span');
         sp.textContent = fmtD(data[idx].ts, true).toUpperCase();
-        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim2, fontSize: '9px', letterSpacing: '0.07em', whiteSpace: 'nowrap', fontFamily: C.mono });
+        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim, fontSize: '10px', letterSpacing: '0.06em', whiteSpace: 'nowrap', fontFamily: C.mono });
         xAxis.appendChild(sp);
       });
       wrap.appendChild(xAxis);
@@ -3338,7 +3331,7 @@ function initCharts() {
       const statusBar = div({}, {
         background: C.bg2, borderTop: '1px solid ' + C.line,
         padding: '5px 16px', display: 'flex', justifyContent: 'space-between',
-        color: C.dim2, fontSize: '9px', letterSpacing: '0.1em',
+        color: C.dim, fontSize: '10px', letterSpacing: '0.1em',
       });
       const sl = document.createElement('span'); sl.textContent = 'BTC · BITCOIN NETWORK ANALYTICS';
       const sr = document.createElement('span'); sr.textContent = '● LIVE';

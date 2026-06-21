@@ -2634,37 +2634,61 @@ function initCharts() {
     ];
     let activePeriod = 2; // default 90D
 
-    // Build 1-year of realistic BTC data
-    const seedSeq = [0.52,0.47,0.53,0.44,0.56,0.48,0.51,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53];
-    const allData = [];
-    let p = 58000;
-    for (let i = 364; i >= 0; i--) {
-      const s = seedSeq[i % seedSeq.length];
-      p = Math.max(38000, Math.min(115000, p + (s - 0.48) * 3200 + (i < 60 ? 700 : i < 120 ? -300 : 100)));
-      allData.push({ ts: now - i * DAY, price: Math.round(p) });
-    }
-    // Last point: use real price if already loaded, otherwise fetch it now
-    if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
-      allData[allData.length - 1].price = Math.round(dashBtcPrice);
-    } else {
-      // Fetch real price independently (don't wait for fetchProdCost)
-      fetch('https://mempool.space/api/v1/prices')
-        .then(r => r.json())
-        .then(d => {
-          if (d && d.USD > 0) {
-            allData[allData.length - 1].price = Math.round(d.USD);
-            render();
-          }
-        }).catch(() => {});
-    }
+    // ── Real historical price data from mempool.space ──────────────────────
+    // allData is populated async; render() is called once data arrives.
+    // While loading, chart shows a skeleton state.
+    let allData = [];
+    let dataLoaded = false;
 
-    // Expose update hook so fetchProdCost() can refresh the last point
+    // Expose update hook so fetchProdCost() can sync the current price
     window.terminalChartUpdate = function(realPrice) {
-      if (realPrice && realPrice > 0) {
+      if (!dataLoaded || !realPrice || realPrice <= 0) return;
+      // Update the last point with the freshest live price
+      if (allData.length) {
         allData[allData.length - 1].price = Math.round(realPrice);
         render();
       }
     };
+
+    // Show loading state immediately
+    wrap.innerHTML = '<div style="padding:24px 16px;color:' + C.dim + ';font-family:' + C.mono + ';font-size:10px;letter-spacing:0.1em">ЗАГРУЗКА ДАННЫХ...</div>';
+
+    // Fetch full price history from mempool.space, then slice to 1Y
+    fetch('https://mempool.space/api/v1/historical-price?currency=USD')
+      .then(r => r.json())
+      .then(json => {
+        const raw = (json.prices || [])
+          .filter(p => p.time && p.USD > 0)
+          .sort((a, b) => a.time - b.time);
+
+        // Keep last 365 days worth of daily entries
+        const cutoff = Math.floor(Date.now() / 1000) - 365 * 86400;
+        const filtered = raw.filter(p => p.time >= cutoff);
+
+        // Deduplicate to one point per day (keep last entry per calendar day)
+        const byDay = {};
+        filtered.forEach(p => {
+          const day = new Date(p.time * 1000).toISOString().slice(0, 10);
+          byDay[day] = p;
+        });
+        const days = Object.keys(byDay).sort();
+        allData = days.map(d => ({
+          ts:    byDay[d].time * 1000,
+          price: Math.round(byDay[d].USD),
+        }));
+
+        // Sync last point with live price if already fetched
+        if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length) {
+          allData[allData.length - 1].price = Math.round(dashBtcPrice);
+        }
+
+        dataLoaded = true;
+        render();
+      })
+      .catch(() => {
+        // Fallback: try live price only, show error
+        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Не удалось загрузить данные mempool.space</div>';
+      });
 
     // Formatters
     const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');
@@ -2692,6 +2716,7 @@ function initCharts() {
     let hoverIdx = null;
 
     function render() {
+      if (!allData.length) return; // wait for API data
       wrap.innerHTML = '';
       const data = allData.slice(-PERIODS[activePeriod].days);
       const prices = data.map(d => d.price);

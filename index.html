@@ -2634,61 +2634,153 @@ function initCharts() {
     ];
     let activePeriod = 2; // default 90D
 
-    // ── Real historical price data from mempool.space ──────────────────────
-    // allData is populated async; render() is called once data arrives.
-    // While loading, chart shows a skeleton state.
+    // ── localStorage + incremental fetch ────────────────────────────────────
+    // Strategy:
+    //   1. Load cached data from localStorage (instant, no network)
+    //   2. Find the last cached date
+    //   3. Fetch only missing days from mempool.space (timestamp by timestamp)
+    //      — if cache is empty: fetch full history once
+    //      — if cache has today: no fetch at all
+    //   4. Merge, dedupe, trim to 365 days, save back to localStorage
+    //   5. render()
+
+    const LS_KEY = 'btc_price_history_v1';
     let allData = [];
     let dataLoaded = false;
 
-    // Expose update hook so fetchProdCost() can sync the current price
+    // Expose update hook so fetchProdCost() can sync the live price
     window.terminalChartUpdate = function(realPrice) {
-      if (!dataLoaded || !realPrice || realPrice <= 0) return;
-      // Update the last point with the freshest live price
-      if (allData.length) {
-        allData[allData.length - 1].price = Math.round(realPrice);
-        render();
-      }
+      if (!dataLoaded || !realPrice || realPrice <= 0 || !allData.length) return;
+      allData[allData.length - 1].price = Math.round(realPrice);
+      render();
     };
 
     // Show loading state immediately
     wrap.innerHTML = '<div style="padding:24px 16px;color:' + C.dim + ';font-family:' + C.mono + ';font-size:10px;letter-spacing:0.1em">ЗАГРУЗКА ДАННЫХ...</div>';
 
-    // Fetch full price history from mempool.space, then slice to 1Y
-    fetch('https://mempool.space/api/v1/historical-price?currency=USD')
-      .then(r => r.json())
-      .then(json => {
-        const raw = (json.prices || [])
-          .filter(p => p.time && p.USD > 0)
-          .sort((a, b) => a.time - b.time);
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    // Normalise raw mempool price array → {ts, price} deduplicated by day
+    function normalisePrices(rawArr) {
+      const byDay = {};
+      rawArr.forEach(p => {
+        if (!p.time || !p.USD || p.USD <= 0) return;
+        const day = new Date(p.time * 1000).toISOString().slice(0, 10);
+        // keep the last entry per day
+        if (!byDay[day] || p.time > byDay[day].time) byDay[day] = p;
+      });
+      return Object.keys(byDay).sort().map(d => ({
+        ts:    byDay[d].time * 1000,
+        price: Math.round(byDay[d].USD),
+        day:   d,
+      }));
+    }
 
-        // Keep last 365 days worth of daily entries
+    // Today's date string (UTC)
+    function todayStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    // Save to localStorage (trim to last 365 days before saving)
+    function saveCache(data) {
+      const cutoff = Date.now() - 366 * 86400000;
+      const trimmed = data.filter(d => d.ts >= cutoff);
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(trimmed));
+      } catch(e) {} // ignore quota errors
+    }
+
+    // Load from localStorage
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch(e) { return []; }
+    }
+
+    // Merge two arrays by day, keep newest price per day, sort ascending
+    function mergeData(existing, incoming) {
+      const byDay = {};
+      [...existing, ...incoming].forEach(p => {
+        const day = p.day || new Date(p.ts).toISOString().slice(0, 10);
+        if (!byDay[day] || p.ts > byDay[day].ts) byDay[day] = { ...p, day };
+      });
+      return Object.keys(byDay).sort().map(d => byDay[d]);
+    }
+
+    // ── Main load function ────────────────────────────────────────────────────
+    async function loadPriceData() {
+      // 1. Read cache
+      const cached = loadCache();
+      const today = todayStr();
+
+      // Find the last cached day
+      const lastCachedDay = cached.length
+        ? (cached[cached.length - 1].day || new Date(cached[cached.length - 1].ts).toISOString().slice(0, 10))
+        : null;
+
+      // 2. Decide what to fetch
+      let fetched = [];
+
+      if (!lastCachedDay) {
+        // Cache empty — fetch full history
+        wrap.innerHTML = '<div style="padding:24px 16px;color:' + C.dim + ';font-family:' + C.mono + ';font-size:10px;letter-spacing:0.1em">ПЕРВАЯ ЗАГРУЗКА...</div>';
+        const res = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
+        const json = await res.json();
         const cutoff = Math.floor(Date.now() / 1000) - 365 * 86400;
-        const filtered = raw.filter(p => p.time >= cutoff);
+        const raw = (json.prices || []).filter(p => p.time >= cutoff);
+        fetched = normalisePrices(raw);
 
-        // Deduplicate to one point per day (keep last entry per calendar day)
-        const byDay = {};
-        filtered.forEach(p => {
-          const day = new Date(p.time * 1000).toISOString().slice(0, 10);
-          byDay[day] = p;
-        });
-        const days = Object.keys(byDay).sort();
-        allData = days.map(d => ({
-          ts:    byDay[d].time * 1000,
-          price: Math.round(byDay[d].USD),
-        }));
-
-        // Sync last point with live price if already fetched
-        if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length) {
-          allData[allData.length - 1].price = Math.round(dashBtcPrice);
+      } else if (lastCachedDay < today) {
+        // Cache exists but missing some days — fetch only from last cached day
+        // mempool returns weekly data points; we fetch from lastCached timestamp
+        const fromTs = Math.floor(new Date(lastCachedDay).getTime() / 1000);
+        const res = await fetch('https://mempool.space/api/v1/historical-price?currency=USD&timestamp=' + Math.floor(Date.now() / 1000));
+        const json = await res.json();
+        // This returns one point; supplement with a full fetch if gap > 7 days
+        const gapDays = Math.floor((Date.now() - new Date(lastCachedDay).getTime()) / 86400000);
+        if (gapDays > 7) {
+          // Gap too large for single-point fetch — get full history and filter
+          const res2 = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
+          const json2 = await res2.json();
+          const raw2 = (json2.prices || []).filter(p => p.time > fromTs);
+          fetched = normalisePrices(raw2);
+        } else {
+          // Small gap — single point is enough for today
+          fetched = normalisePrices(json.prices || []);
         }
 
+      }
+      // else: lastCachedDay === today → nothing to fetch
+
+      // 3. Merge + save
+      const merged = mergeData(cached, fetched);
+      saveCache(merged);
+
+      // 4. Trim to 365 days for display
+      const cutoffTs = Date.now() - 366 * 86400000;
+      allData = merged.filter(d => d.ts >= cutoffTs);
+
+      // 5. Sync last point with live price
+      if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length) {
+        allData[allData.length - 1].price = Math.round(dashBtcPrice);
+      }
+
+      dataLoaded = true;
+      render();
+    }
+
+    loadPriceData().catch(() => {
+      // If network fails but cache exists — render from cache
+      const cached = loadCache();
+      if (cached.length) {
+        allData = cached;
         dataLoaded = true;
         render();
-      })
-      .catch(() => {
-        // Fallback: try live price only, show error
-        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Не удалось загрузить данные mempool.space</div>';
-      });
+      } else {
+        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Нет данных и нет соединения с mempool.space</div>';
+      }
+    });
 
     // Formatters
     const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');

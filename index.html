@@ -2334,9 +2334,9 @@ function showTab(id, btn, keepCluster) {
     }
   }
 
-  if (id === 'home') { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
   if (id === 'analytics') initCharts();
-  if (id === 'market') renderSignals();
+  if (id === 'market')    renderSignals();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');
     if (!detail || !detail.innerHTML.trim()) {
@@ -2344,6 +2344,11 @@ function showTab(id, btn, keepCluster) {
       if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
+  if (id === 'holders')   renderHolders();
+  if (id === 'emission')  renderEmission();
+  if (id === 'narrative') renderNarrative();
+  if (id === 'signals')   renderPresetSignals();
+  if (id === 'aholders')  renderAHolders();
 }
 
 // инициализация подвкладок при загрузке
@@ -2971,18 +2976,11 @@ function renderAHolders() {
 }
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──
-const _origShowTab = showTab;
-function showTab(id, btn, keepCluster) {
-  _origShowTab(id, btn, keepCluster);
-  if (id === 'holders')   renderHolders();
-  if (id === 'emission')  renderEmission();
-  if (id === 'narrative') renderNarrative();
-  if (id === 'signals')   renderPresetSignals();
-  if (id === 'aholders')  renderAHolders();
-}
+// Обработка встроена напрямую в showTab выше
 </script>
 </body>
 </html>
+
 
 
 

@@ -1089,15 +1089,15 @@ header {
     <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
     <div class="dash-metrics">
       <div class="dash-m-cell">
-        <div class="dash-m-val" id="dash-price">$63.2K</div>
+        <div class="dash-m-val" id="dash-price">—</div>
         <div class="dash-m-lbl">ЦЕНА BTC</div>
       </div>
       <div class="dash-m-cell">
-        <div class="dash-m-val dash-m-warn">$61.8K</div>
+        <div class="dash-m-val dash-m-warn" id="dash-cost">—</div>
         <div class="dash-m-lbl">PROD. COST</div>
       </div>
       <div class="dash-m-cell">
-        <div class="dash-m-val dash-m-up">+2.3%</div>
+        <div class="dash-m-val" id="dash-gap">—</div>
         <div class="dash-m-lbl">РАЗРЫВ</div>
       </div>
     </div>
@@ -1721,10 +1721,113 @@ function renderSignals() {
   }).join('');
 }
 
+// ── PRODUCTION COST & DASHBOARD ──
+// Параметры флота (Cambridge 2026)
+const FLEET_EFF   = 22;      // J/TH — средняя эффективность флота
+const ELEC_PRICE  = 0.065;   // $/kWh
+const OVERHEAD    = 0.15;    // 15% накладных расходов
+const BLOCK_REW   = 3.125;   // BTC/блок после халвинга 2024
+const BLOCKS_DAY  = 144;     // блоков в сутки
+
+let dashBtcPrice = null;
+let dashProdCost = null;
+
+async function fetchProdCost() {
+  try {
+    // 1. Хешрейт и цена BTC из mempool.space
+    const [statsRes, priceRes] = await Promise.all([
+      fetch('https://mempool.space/api/v1/mining/hashrate/3d'),
+      fetch('https://mempool.space/api/v1/prices')
+    ]);
+    const stats = await statsRes.json();
+    const prices = await priceRes.json();
+
+    // Текущий хешрейт в H/s (последнее значение)
+    const hrEntry = stats.hashrates[stats.hashrates.length - 1];
+    const hashrateHS = hrEntry ? hrEntry.avgHashrate : null;
+
+    // Цена BTC в USD
+    dashBtcPrice = prices.USD || null;
+
+    if (hashrateHS && dashBtcPrice) {
+      // Формула Production Cost:
+      // Cost = (HR [H/s] * Eff [J/TH] * 1e-12 * ElecPrice [$/Wh / 1000] * 3600 * 24 * (1+OH))
+      //        / (144 blocks/day * 3.125 BTC/block)
+      const wattsTotal   = hashrateHS * FLEET_EFF * 1e-12 * 1e12; // Watts = HR[EH/s]*1e18 * Eff[J/TH]*1e-12 → упрощаем
+      // HR в TH/s = hashrateHS / 1e12
+      const hrTHs        = hashrateHS / 1e12;
+      const powerWatts   = hrTHs * FLEET_EFF;              // Total Watts = TH/s * J/TH = W
+      const powerKWh_day = powerWatts * 24 / 1000;         // kWh/day
+      const elecCost_day = powerKWh_day * ELEC_PRICE;       // $/day
+      const totalCost    = elecCost_day * (1 + OVERHEAD);   // с накладными
+      const btcPerDay    = BLOCKS_DAY * BLOCK_REW;          // BTC/day
+      dashProdCost       = totalCost / btcPerDay;            // $/BTC
+    }
+  } catch(e) {
+    console.warn('ProdCost fetch error:', e);
+  }
+  renderDashboard();
+}
+
+function calcCyclePhase(price, prodCost) {
+  if (!price || !prodCost) return { phase: 'ЗАГРУЗКА...', sub: 'Получаем данные...', cls: '', seg: 0 };
+  const ratio = price / prodCost;
+  if (ratio < 1.0)  return { phase: 'ДНО',        sub: 'Цена ниже себестоимости. Экстремальная зона — исторически редкий момент.', cls: 'danger', seg: 0 };
+  if (ratio < 1.15) return { phase: 'НАКОПЛЕНИЕ', sub: 'Цена у себестоимости добычи. Исторически — зона долгосрочных покупок.', cls: '',       seg: 1 };
+  if (ratio < 2.0)  return { phase: 'РОСТ',        sub: 'Цена уверенно выше себестоимости. Майнеры в плюсе, сеть расширяется.', cls: 'warn',   seg: 2 };
+  return               { phase: 'ЭЙФОРИЯ',     sub: 'Цена более чем вдвое выше себестоимости. Исторически — зона осторожности.', cls: 'danger', seg: 3 };
+}
+
 function renderDashboard() {
+  // ── Блок 1: цикловой индикатор ──
+  const cycleBlock = document.querySelector('.dash-cycle');
+  const phaseEl    = document.getElementById('dash-phase');
+  const subEl      = document.getElementById('dash-phase-sub');
+  const trackSegs  = document.querySelectorAll('.dct-seg');
+  const labelsEl   = document.querySelectorAll('.dash-cycle-labels span');
+
+  if (phaseEl) {
+    const { phase, sub, cls, seg } = calcCyclePhase(dashBtcPrice, dashProdCost);
+    phaseEl.textContent = phase;
+    if (subEl) subEl.textContent = sub;
+    if (cycleBlock) {
+      cycleBlock.classList.remove('warn', 'danger');
+      if (cls) cycleBlock.classList.add(cls);
+    }
+    // Трек прогресса
+    trackSegs.forEach((s, i) => {
+      s.classList.remove('done', 'current');
+      if (i < seg) s.classList.add('done');
+      if (i === seg) s.classList.add('current');
+    });
+    // Метки фаз
+    const phaseNames = ['ДНО', 'НАКОПЛЕНИЕ', 'РОСТ', 'ЭЙФОРИЯ'];
+    labelsEl.forEach((el, i) => {
+      el.classList.remove('dct-active');
+      el.textContent = (i === seg ? '▲ ' : '') + phaseNames[i];
+      if (i === seg) el.classList.add('dct-active');
+    });
+  }
+
+  // ── Блок 2: метрики ──
+  const priceEl = document.getElementById('dash-price');
+  const costEl  = document.getElementById('dash-cost');
+  const gapEl   = document.getElementById('dash-gap');
+  if (priceEl && dashBtcPrice) {
+    priceEl.textContent = '$' + (dashBtcPrice >= 1000 ? (dashBtcPrice/1000).toFixed(1)+'K' : dashBtcPrice.toFixed(0));
+  }
+  if (costEl && dashProdCost) {
+    costEl.textContent = '$' + (dashProdCost/1000).toFixed(1) + 'K';
+  }
+  if (gapEl && dashBtcPrice && dashProdCost) {
+    const gap = ((dashBtcPrice - dashProdCost) / dashProdCost * 100);
+    gapEl.textContent = (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%';
+    gapEl.className = 'dash-m-val ' + (gap < 0 ? 'dash-m-neg' : gap < 15 ? 'dash-m-warn' : 'dash-m-up');
+  }
+
   if (!window.SIGNALS || !SIGNALS.length) return;
 
-  // Блок 3: последний сигнал
+  // ── Блок 3: последний сигнал ──
   const last = SIGNALS[SIGNALS.length - 1];
   const card = document.getElementById('dash-signal-card');
   const dirMap = { pos: { icon: '🟢', label: 'ПОЗИТИВ', cls: 'pos' }, neg: { icon: '🔴', label: 'НЕГАТИВ', cls: 'neg' }, neu: { icon: '⚪', label: 'НЕЙТРАЛ', cls: 'neu' } };
@@ -1734,11 +1837,10 @@ function renderDashboard() {
     document.getElementById('dash-sig-cat').textContent = last.catLabel + ' · ПОСЛЕДНИЙ СИГНАЛ';
     document.getElementById('dash-sig-dir').textContent = d.icon + ' ' + d.label;
     document.getElementById('dash-sig-title').textContent = last.signal;
-    const chips = last.data || [];
-    document.getElementById('dash-sig-chips').innerHTML = chips.map(c => '<span class="sig-chip">' + c + '</span>').join('');
+    document.getElementById('dash-sig-chips').innerHTML = (last.data||[]).map(c => '<span class="sig-chip">' + c + '</span>').join('');
   }
 
-  // Блок 4: сводка
+  // ── Блок 4: сводка ──
   const counts = { pos: 0, neg: 0, neu: 0 };
   SIGNALS.forEach(s => counts[s.dir]++);
   const total = SIGNALS.length;
@@ -1831,7 +1933,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
 
-  if (id === 'home') { renderDashboard(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
+  if (id === 'home') { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
   if (id === 'analytics') initCharts();
   if (id === 'market') renderSignals();
   if (id === 'pools') {
@@ -2057,6 +2159,8 @@ function fetchBlocks() {
 }
 fetchBlocks();
 setInterval(fetchBlocks, 60000);
+fetchProdCost();
+setInterval(fetchProdCost, 300000); // обновлять Production Cost каждые 5 минут
 
 // ── CHARTS ──
 let chartsInited = false;

@@ -2717,10 +2717,10 @@ function initCharts() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
       });
       // Left side
-      const tleft = div({}, { display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' });
+      const tleft = div({}, { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' });
       const ticker = document.createElement('span');
       ticker.textContent = 'BTC/USD';
-      Object.assign(ticker.style, { color: C.btc, fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.18em' });
+      Object.assign(ticker.style, { color: C.btc, fontSize: '14px', fontWeight: 'bold', letterSpacing: '0.18em' });
       const priceEl = document.createElement('span');
       priceEl.id = 'tc-price';
       priceEl.textContent = fmtP(last);
@@ -2772,13 +2772,19 @@ function initCharts() {
       const chartWrap = div({}, { position: 'relative' });
       const svg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${PH}`, preserveAspectRatio: 'none', style: 'display:block;cursor:crosshair' });
 
-      // Defs (gradient)
+      // ── Mean price for zone coloring ──
+      const meanPrice = Math.round(data.reduce((s, d) => s + d.price, 0) / data.length);
+      const meanY = PAD.t + (1 - (meanPrice - minP) / (maxP - minP || 1)) * (PH - PAD.t - 10);
+
+      // Defs — two gradients: green (above mean) and red (below mean)
       const defs = svgEl('defs');
-      const grad = svgEl('linearGradient', { id: 'tc-area', x1: '0', y1: '0', x2: '0', y2: '1' });
-      const s0 = svgEl('stop', { offset: '0%', 'stop-color': accent, 'stop-opacity': '0.18' });
-      const s1 = svgEl('stop', { offset: '70%', 'stop-color': accent, 'stop-opacity': '0.04' });
-      const s2 = svgEl('stop', { offset: '100%', 'stop-color': accent, 'stop-opacity': '0' });
-      grad.appendChild(s0); grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad); svg.appendChild(defs);
+      const gradG = svgEl('linearGradient', { id: 'tc-grn', x1: '0', y1: '0', x2: '0', y2: '1' });
+      gradG.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.grn, 'stop-opacity': '0.28' }));
+      gradG.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.grn, 'stop-opacity': '0.04' }));
+      const gradR = svgEl('linearGradient', { id: 'tc-red', x1: '0', y1: '0', x2: '0', y2: '1' });
+      gradR.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.red, 'stop-opacity': '0.04' }));
+      gradR.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.red, 'stop-opacity': '0.28' }));
+      defs.appendChild(gradG); defs.appendChild(gradR); svg.appendChild(defs);
 
       // Grid lines + Y labels
       [0.15, 0.38, 0.62, 0.85].forEach(t => {
@@ -2789,20 +2795,61 @@ function initCharts() {
         svg.appendChild(txt);
       });
 
-      // Area + line paths
+      // Build zone-split area paths (clipped at mean line)
+      function buildZoneArea(aboveFlag) {
+        let d = ''; let open = false;
+        const n = pts.length;
+        for (let i = 0; i < n; i++) {
+          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
+          const isAbove = pts[i].y <= meanY;
+          const match = aboveFlag ? isAbove : !isAbove;
+          if (i === 0) {
+            if (match) { d += `M${x},${meanY.toFixed(1)} L${x},${y}`; open = true; }
+            continue;
+          }
+          const px = pts[i-1].x, py = pts[i-1].y;
+          const wasAbove = py <= meanY;
+          const wasMatch = aboveFlag ? wasAbove : !wasAbove;
+          if (!wasMatch && match) {
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px + t * (pts[i].x - px)).toFixed(1);
+            d += ` M${cx},${meanY.toFixed(1)} L${x},${y}`; open = true;
+          } else if (wasMatch && !match) {
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px + t * (pts[i].x - px)).toFixed(1);
+            d += ` L${cx},${meanY.toFixed(1)} Z`; open = false;
+          } else if (match) {
+            d += ` L${x},${y}`;
+          }
+        }
+        if (open) d += ` L${pts[n-1].x.toFixed(1)},${meanY.toFixed(1)} Z`;
+        return d;
+      }
+
+      const aboveArea = buildZoneArea(true);
+      const belowArea = buildZoneArea(false);
+      svg.appendChild(svgEl('path', { d: aboveArea, fill: 'url(#tc-grn)' }));
+      svg.appendChild(svgEl('path', { d: belowArea, fill: 'url(#tc-red)' }));
+
+      // Mean line + label
+      svg.appendChild(svgEl('line', { x1: 0, y1: meanY, x2: W, y2: meanY, stroke: C.dim, 'stroke-width': '1', 'stroke-dasharray': '5,4', opacity: '0.6' }));
+      const meanLbl = svgEl('text', { x: 6, y: meanY - 4, fill: C.dim, 'font-size': '8', 'font-family': C.mono, opacity: '0.8' });
+      meanLbl.textContent = 'AVG ' + fmtP(meanPrice);
+      svg.appendChild(meanLbl);
+
+      // Price line — white, on top
       const lineD = pts.map((pt, i) => (i === 0 ? `M${pt.x},${pt.y}` : `L${pt.x},${pt.y}`)).join(' ');
-      const areaD = lineD + ` L${pts[pts.length-1].x},${PH} L0,${PH} Z`;
-      svg.appendChild(svgEl('path', { d: areaD, fill: 'url(#tc-area)' }));
-      svg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: accent, 'stroke-width': '1.6', 'stroke-linejoin': 'round' }));
+      svg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: C.txt, 'stroke-width': '1.6', 'stroke-linejoin': 'round' }));
 
       // Crosshair & end dot (will update on hover)
       const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
       const crossH   = svgEl('line', { x1: 0, y1: 0, x2: W, y2: 0, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
       const crossLblBg = svgEl('rect', { x: W-80, y: 0, width: 80, height: 18, fill: C.bg3, opacity: '0' });
       const crossLbl  = svgEl('text', { x: W-6, y: 0, fill: accent, 'font-size': '9', 'text-anchor': 'end', 'font-family': "'IBM Plex Mono', monospace", 'font-weight': 'bold', opacity: '0' });
-      const dotMain   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '3.5', fill: accent });
-      const dotRing   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '7', fill: 'none', stroke: accent, 'stroke-width': '1', opacity: '0.35' });
-      const lastDash  = svgEl('line', { x1: 0, y1: pts[pts.length-1].y, x2: W, y2: pts[pts.length-1].y, stroke: accent, 'stroke-width': '0.6', 'stroke-dasharray': '4,5', opacity: '0.4' });
+      const zoneAccent = last > meanPrice ? C.grn : C.red;
+      const dotMain   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '3.5', fill: zoneAccent });
+      const dotRing   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '7', fill: 'none', stroke: zoneAccent, 'stroke-width': '1', opacity: '0.35' });
+      const lastDash  = svgEl('line', { x1: 0, y1: pts[pts.length-1].y, x2: W, y2: pts[pts.length-1].y, stroke: zoneAccent, 'stroke-width': '0.6', 'stroke-dasharray': '4,5', opacity: '0.4' });
       svg.appendChild(lastDash); svg.appendChild(crossV); svg.appendChild(crossH); svg.appendChild(crossLblBg); svg.appendChild(crossLbl); svg.appendChild(dotMain); svg.appendChild(dotRing);
 
       // Tooltip div

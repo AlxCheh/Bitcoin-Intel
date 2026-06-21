@@ -1250,6 +1250,182 @@ header {
 </section>
 
 <!-- ══════════════════════════════════════
+     LIGHTNING
+══════════════════════════════════════ -->
+<section class="section" id="tab-lightning">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">⚡ Lightning <span>Network</span></span>
+    </div>
+
+    <!-- ЧТО ТАКОЕ LIGHTNING -->
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Что такое Lightning Network</span>
+        <span class="panel-tag">🔗 LAYER 2</span>
+      </div>
+      <div class="panel-body">
+        <p>Основная цепь Bitcoin обрабатывает ~7 транзакций в секунду. Весь мир использует ~50 000 в секунду (Visa). Разрыв в 7 000 раз нельзя закрыть, изменив сам блокчейн — это нарушит децентрализацию и безопасность.</p>
+        <p><strong>Lightning</strong> — второй уровень (Layer 2): платёжные каналы, которые работают поверх блокчейна, не записывая каждую транзакцию в цепочку. Два участника открывают канал одной on-chain транзакцией, совершают тысячи мгновенных платежей между собой, затем закрывают канал — итог фиксируется в блокчейне.</p>
+        <p>Результат: комиссии в доли цента, скорость — миллисекунды, пропускная способность — миллионы транзакций в секунду теоретически.</p>
+      </div>
+      <div class="code" style="margin:0;border:none;border-top:1px solid var(--line)">
+        <div><span class="c-cmt">// Жизненный цикл канала</span></div>
+        <div><span class="c-key">1.</span> Открытие   <span class="c-op">→</span> <span class="c-val">1 on-chain tx</span> · депозит в мультисиг</div>
+        <div><span class="c-key">2.</span> Платежи    <span class="c-op">→</span> <span class="c-val">∞ off-chain</span>  · мгновенно, ~0 комиссий</div>
+        <div><span class="c-key">3.</span> Закрытие   <span class="c-op">→</span> <span class="c-val">1 on-chain tx</span> · итоговые балансы</div>
+      </div>
+    </div>
+
+    <!-- КАК ЭТО РАБОТАЕТ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Как работает маршрутизация</span>
+        <span class="panel-tag">МЕХАНИКА</span>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🔗</span>
+          <span class="acc-label">Платёжные каналы</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body open">
+          <p>Канал — это мультисиг-кошелёк 2-of-2 в блокчейне. Оба участника вносят BTC. Каждый платёж — это подписанное состояние (commitment transaction), которое можно предъявить в сеть в любой момент.</p>
+          <p>Хитрость: стороны всегда держат актуальную подписанную транзакцию, но публикуют только финальную. Обман карается: если один попытается транслировать старое состояние — второй может забрать весь депозит через <strong>revocation key</strong>.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🌐</span>
+          <span class="acc-label">Сеть каналов и HTLC</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Не нужно открывать канал с каждым. Если Алиса → Боб → Кэрол, платёж маршрутизируется через Боба. Для защиты используются <strong>HTLC</strong> (Hash Time-Locked Contracts): Боб получает комиссию только если выполнит условие, иначе деньги возвращаются автоматически.</p>
+          <p>Маршрутизация onion-шифрованная (как Tor): Боб знает только предыдущий и следующий узел, не видит ни отправителя, ни получателя целиком.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">💧</span>
+          <span class="acc-label">Проблема ликвидности</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Канал имеет две стороны: <strong>исходящая</strong> ликвидность (сколько можешь отправить) и <strong>входящая</strong> (сколько можешь получить). Сумма обеих сторон равна депозиту канала.</p>
+          <p>Главная сложность Lightning: получить <strong>входящую ликвидность</strong>, то есть чтобы кто-то открыл канал к тебе или ты занял место на их стороне. Без входящей ликвидности принимать платежи нельзя.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- КАК ПОДКЛЮЧИТЬСЯ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Как подключиться к Lightning</span>
+        <span class="panel-tag">ПРАКТИКА</span>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">📱</span>
+          <span class="acc-label">Путь 1 — Кошелёк-кастодиан (просто, без узла)</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body open">
+          <p>Самый быстрый старт. Приложение само держит каналы — тебе нужен только кошелёк. <strong>Ключи хранит сервис</strong>, не ты. Подходит для небольших сумм и знакомства с сетью.</p>
+          <div class="code" style="margin-top:10px">
+            <div><span class="c-key">Strike</span>       <span class="c-cmt">// США/Европа, биржа + Lightning</span></div>
+            <div><span class="c-key">Wallet of Satoshi</span> <span class="c-cmt">// самый простой, iOS/Android</span></div>
+            <div><span class="c-key">CashApp</span>      <span class="c-cmt">// США, встроенный Lightning</span></div>
+            <div><span class="c-key">Muun</span>         <span class="c-cmt">// гибрид on-chain + LN</span></div>
+          </div>
+          <p style="margin-top:10px;color:var(--dim);font-size:11px">⚠️ Not your keys — not your coins. Держи только то, что готов потерять.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🔑</span>
+          <span class="acc-label">Путь 2 — Non-custodial кошелёк (твои ключи, без узла)</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Ключи хранишь ты, но управление каналами автоматизировано. Компромисс: суверенность без сложности запуска ноды. Каналы открывает автоматически встроенный LSP (Lightning Service Provider).</p>
+          <div class="code" style="margin-top:10px">
+            <div><span class="c-key">Phoenix</span>     <span class="c-cmt">// лучший баланс простоты и суверенности</span></div>
+            <div><span class="c-key">Breez</span>       <span class="c-cmt">// подкасты (Podcasting 2.0), POS</span></div>
+            <div><span class="c-key">Zeus</span>        <span class="c-cmt">// подключается к своей ноде или LSP</span></div>
+          </div>
+          <p style="margin-top:10px;color:var(--dim);font-size:11px">Phoenix (ACINQ) берёт комиссию ~0.4% за создание/изменение канала (splicing).</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🖥️</span>
+          <span class="acc-label">Путь 3 — Своя нода (полный контроль)</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Запускаешь собственный Bitcoin + Lightning узел. Полное самохранение: ты маршрутизатор, никаких LSP. Требуется: мини-ПК (Raspberry Pi 4 / NUC), 1–2 ТБ SSD, ~неделя на синхронизацию Bitcoin Core.</p>
+          <div class="code" style="margin-top:10px">
+            <div><span class="c-cmt">// Готовые сборки (проще всего)</span></div>
+            <div><span class="c-key">Umbrel</span>      <span class="c-cmt">// GUI, AppStore, популярен</span></div>
+            <div><span class="c-key">RaspiBlitz</span>  <span class="c-cmt">// open-source, более хардкорный</span></div>
+            <div><span class="c-key">Start9</span>      <span class="c-cmt">// упор на приватность</span></div>
+            <div style="margin-top:6px"><span class="c-cmt">// Реализации Lightning-ноды</span></div>
+            <div><span class="c-key">LND</span>         <span class="c-cmt">// Lightning Labs, самый популярный</span></div>
+            <div><span class="c-key">CLN</span>         <span class="c-cmt">// Core Lightning (Blockstream)</span></div>
+            <div><span class="c-key">Eclair</span>      <span class="c-cmt">// ACINQ, Java/Scala</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- СРАВНЕНИЕ ПУТЕЙ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Сравнение подходов</span>
+        <span class="panel-tag">ВЫБОР</span>
+      </div>
+      <div style="padding:12px 14px;overflow-x:auto">
+        <table class="dtable" style="min-width:420px">
+          <thead>
+            <tr>
+              <th>Параметр</th>
+              <th>Кастодиан</th>
+              <th>Non-custodial</th>
+              <th>Своя нода</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Сложность</td><td class="grn">Минимальная</td><td>Средняя</td><td style="color:var(--red)">Высокая</td></tr>
+            <tr><td>Ваши ключи</td><td style="color:var(--red)">Нет</td><td class="grn">Да</td><td class="grn">Да</td></tr>
+            <tr><td>Входящая ликвидность</td><td class="grn">Автоматически</td><td class="grn">Через LSP</td><td>Вручную</td></tr>
+            <tr><td>Приватность</td><td style="color:var(--red)">Нет (KYC)</td><td>Частичная</td><td class="grn">Максимальная</td></tr>
+            <tr><td>Стоимость</td><td class="grn">Бесплатно</td><td>~0.4% за канал</td><td>$100–300 железо</td></tr>
+            <tr><td>Подходит для</td><td>Знакомства</td><td>Ежедневного использования</td><td>Маршрутизации и суверенитета</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ОГОВОРКИ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ограничения и риски</span>
+        <span class="panel-tag">ОГОВОРКИ</span>
+      </div>
+      <div class="panel-body">
+        <p><strong>Нода должна быть онлайн.</strong> Для получения платежей узел должен быть доступен. Если нода падает — входящие платежи не проходят.</p>
+        <p><strong>Потеря данных канала</strong> опаснее, чем в on-chain. Если потерять state канала и переиздать старую транзакцию — контрагент может забрать весь депозит. Используй <strong>Static Channel Backups (SCB)</strong>.</p>
+        <p><strong>Максимальный размер платежа</strong> ограничен ликвидностью канала. Большие суммы (десятки BTC) через Lightning не провести — нужен on-chain.</p>
+        <p><strong>Экспериментальный статус.</strong> Lightning активно развивается. Splicing, taproot channels, Bolt 12 — стандарты ещё меняются. Держи небольшие суммы.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
      HISTORY
 ══════════════════════════════════════ -->
 <section class="section" id="tab-history">
@@ -1888,17 +2064,18 @@ const TAB_META = {
   market:    { cluster: 'LIVE',     tab: 'Рынок',       sub: 'База сигналов' },
   basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
   tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
+  lightning: { cluster: 'ЗНАНИЕ',   tab: 'Lightning',   sub: 'Layer 2 · Как подключиться' },
   history:   { cluster: 'КОНТЕКСТ', tab: 'История',     sub: 'Хронология BTC' }
 };
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ'],['market','РЫНОК']] },
-  knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ']] },
+  knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
   context:   { label: 'КОНТЕКСТ', tabs: [['history','ИСТОРИЯ']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
-  basics:'knowledge', tech:'knowledge',
+  basics:'knowledge', tech:'knowledge', lightning:'knowledge',
   history:'context'
 };
 

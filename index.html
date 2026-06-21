@@ -1865,6 +1865,7 @@ header {
         <span class="panel-title">Монетарная инфляция</span>
         <span class="panel-tag">СРАВНЕНИЕ</span>
       </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
       <table class="dtable">
         <thead>
           <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
@@ -1875,6 +1876,7 @@ header {
           <tr><td>Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
         </tbody>
       </table>
+      </div>
       <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line1)">
         Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
       </div>
@@ -2639,7 +2641,7 @@ function initCharts() {
     for (let i = 364; i >= 0; i--) {
       const s = seedSeq[i % seedSeq.length];
       p = Math.max(38000, Math.min(115000, p + (s - 0.48) * 3200 + (i < 60 ? 700 : i < 120 ? -300 : 100)));
-      allData.push({ ts: now - i * DAY, price: Math.round(p), volume: Math.round((0.3 + Math.abs(s - 0.5) * 4) * 14000 + 3000) });
+      allData.push({ ts: now - i * DAY, price: Math.round(p) });
     }
     // Last point: use real price if already loaded, otherwise fetch it now
     if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
@@ -2672,7 +2674,6 @@ function initCharts() {
         ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
         : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
-    const fmtV = v => (v / 1000).toFixed(1) + 'K';
 
     // SVG namespace helper
     const svgEl = (tag, attrs = {}) => {
@@ -2699,7 +2700,7 @@ function initCharts() {
       const chg = (last - first) / first * 100;
       const up = chg >= 0;
       const accent = up ? C.grn : C.red;
-      const W = 700, PH = 220, VH = 52;
+      const W = 700, PH = 220;
       const PAD = { t: 20, b: 0 };
       const range = maxP - minP || 1;
 
@@ -2709,7 +2710,6 @@ function initCharts() {
         x: (i / (data.length - 1)) * W,
         y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
       }));
-      const maxVol = Math.max(...data.map(d => d.volume));
 
       // ── TOP BAR ──
       const topBar = div({}, {
@@ -2756,7 +2756,7 @@ function initCharts() {
         background: C.bg, borderBottom: '1px solid ' + C.line,
         padding: '7px 16px', display: 'flex', gap: '24px', flexWrap: 'wrap',
       });
-      [['HIGH', fmtP(maxP)], ['LOW', fmtP(minP)], ['RANGE', fmtP(maxP - minP)], ['VOL', fmtV(data[data.length-1].volume)], ['OPEN', fmtP(first)]].forEach(([l, v]) => {
+      [['HIGH', fmtP(maxP)], ['LOW', fmtP(minP)], ['RANGE', fmtP(maxP - minP)], ['OPEN', fmtP(first)]].forEach(([l, v]) => {
         const cell = div({}, {});
         const lbl = document.createElement('div');
         lbl.textContent = l;
@@ -2889,10 +2889,7 @@ function initCharts() {
           <div style="color:" + C.dim + ";font-size:9px;letter-spacing:.1em;margin-bottom:5px">${fmtD(hd.ts).toUpperCase()}</div>
           <div style="color:" + C.txt + ";font-size:16px;font-weight:bold">${fmtP(hd.price)}</div>
           <div style="margin-top:6px;border-top:1px solid " + C.line + ";padding-top:6px">
-            <div style="display:flex;justify-content:space-between;gap:14px;margin-top:2px">
-              <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">VOL</span>
-              <span style="color:#999;font-size:10px">${fmtV(hd.volume)}</span>
-            </div>
+
             <div style="display:flex;justify-content:space-between;gap:14px;margin-top:3px">
               <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">CHG</span>
               <span style="color:${hChg>=0?'#00e676':'#ff4444'};font-size:10px">${(hChg>=0?'+':'') + hChg.toFixed(2)}%</span>
@@ -2916,18 +2913,7 @@ function initCharts() {
         hoverIdx = null;
       });
 
-      // ── VOLUME SVG ──
-      const volSvg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${VH}`, preserveAspectRatio: 'none', style: 'display:block;background:' + C.bg + ';border-top:1px solid ' + C.line });
-      const volLbl = svgEl('text', { x: 6, y: 13, fill: '#242424', 'font-size': '8', 'font-family': "'IBM Plex Mono', monospace", 'letter-spacing': '0.12em' });
-      volLbl.textContent = 'VOLUME'; volLbl.setAttribute('fill', C.dim2);
-      volSvg.appendChild(volLbl);
-      data.forEach((d, i) => {
-        const bH = (d.volume / maxVol) * (VH - 14);
-        const bX = (i / (data.length - 1)) * W;
-        const bW = Math.max(1, (W / data.length) * 0.65);
-        volSvg.appendChild(svgEl('rect', { x: bX - bW/2, y: VH - bH - 2, width: bW, height: bH, fill: accent, opacity: '0.22' }));
-      });
-      wrap.appendChild(volSvg);
+
 
       // ── X-AXIS ──
       const xAxis = div({}, { background: C.bg, borderTop: '1px solid ' + C.line, padding: '5px 0 8px', position: 'relative', height: '18px' });

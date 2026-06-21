@@ -1807,7 +1807,7 @@ header {
   <div class="page">
 
     <div class="sh">
-      <span class="sh-title">📊 Аналитика <span>сети</span></span>
+      <span class="sh-title">📊 Метрики <span>сети</span></span>
     </div>
 
     <!-- DIFFICULTY -->
@@ -2255,7 +2255,7 @@ function setSigFilter(c) {
 // ── TABS ──
 const TAB_META = {
   home:      { cluster: 'LIVE',     tab: 'Обзор',       sub: '' },
-  analytics: { cluster: 'LIVE',     tab: 'Аналитика',   sub: 'Метрики сети' },
+  analytics: { cluster: 'LIVE',     tab: 'Метрики',     sub: 'Метрики сети' },
   pools:     { cluster: 'LIVE',     tab: 'Пулы',        sub: 'Майнинг-пулы' },
   market:    { cluster: 'LIVE',     tab: 'Рынок',       sub: 'База сигналов' },
   basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
@@ -2271,7 +2271,7 @@ const TAB_META = {
 };
 
 const CLUSTERS = {
-  live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ'],['market','РЫНОК']] },
+  live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ'],['market','РЫНОК']] },
   knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
   macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }

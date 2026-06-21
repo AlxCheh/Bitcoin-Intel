@@ -1812,26 +1812,48 @@ header {
       <span class="sh-title">📊 Метрики <span>сети</span></span>
     </div>
 
-    <!-- DIFFICULTY -->
-    <div class="chart-panel" style="margin-top:12px">
+    <!-- DIFFICULTY — dynamic -->
+    <div class="chart-panel" style="margin-top:12px" id="diff-block">
       <div class="chart-head">
         <span class="chart-title">Сложность сети</span>
-        <span class="chart-meta">HASHRATE</span>
+        <span class="chart-meta" id="diff-next-label">СЛЕДУЮЩИЙ РЕТАРГЕТ</span>
       </div>
-      <div class="diff-wrap">
-        <div class="diff-top">
-          <div>
-            <span class="diff-num">~88T</span>
-            <span class="diff-unit">TH</span>
-          </div>
-          <div class="diff-pct">▲ +2.1% 2w</div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)">
+        <div style="padding:12px 14px;border-right:1px solid var(--line)">
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">СЛОЖНОСТЬ</div>
+          <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--btc)" id="diff-value">—</div>
+          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px" id="diff-unit-label">T</div>
+        </div>
+        <div style="padding:12px 14px;border-right:1px solid var(--line)">
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
+          <div style="font-size:20px;font-weight:700;font-family:var(--mono)" id="diff-change">—</div>
+          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px">ОТ ПРОШЛОГО РЕТАРГЕТА</div>
+        </div>
+        <div style="padding:12px 14px">
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">БЛОКОВ ОСТАЛОСЬ</div>
+          <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--txt)" id="diff-blocks">—</div>
+          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px" id="diff-eta">~—</div>
+        </div>
+      </div>
+      <!-- Progress bar to next retarget -->
+      <div style="padding:10px 14px 4px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em">ПРОГРЕСС ЭПОХИ</span>
+          <span style="font-size:9px;font-family:var(--mono);color:var(--btc)" id="diff-progress-pct">—%</span>
         </div>
         <div class="bar-track">
-          <div class="bar-fill" id="diffBar"></div>
+          <div class="bar-fill" id="diffBar" style="width:0%"></div>
         </div>
-        <div class="bar-labels">
-          <span>MIN</span><span>ТЕКУЩИЙ УРОВЕНЬ</span><span>MAX</span>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--dim);font-family:var(--mono)">
+          <span>СТАРТ ЭПОХИ</span><span>2016 БЛОКОВ</span>
         </div>
+      </div>
+      <!-- SVG chart of difficulty history -->
+      <div style="padding:10px 14px 6px;border-top:1px solid var(--line);margin-top:6px">
+        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:6px">ИСТОРИЯ · 1 ГОД</div>
+        <svg id="diff-chart" width="100%" viewBox="0 0 600 80" preserveAspectRatio="none" style="display:block"></svg>
+        <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:8px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
     </div>
 
@@ -2570,12 +2592,128 @@ setInterval(fetchBlocks, 60000);
 fetchProdCost();
 setInterval(fetchProdCost, 300000); // обновлять Production Cost каждые 5 минут
 
+// ── DIFFICULTY — live data ───────────────────────────────────────────────────
+async function fetchDifficulty() {
+  try {
+    const [adjRes, hrRes] = await Promise.all([
+      fetch('https://mempool.space/api/v1/difficulty-adjustment'),
+      fetch('https://mempool.space/api/v1/mining/hashrate/1y'),
+    ]);
+    const adj = await adjRes.json();
+    const hr  = await hrRes.json();
+
+    // ── Current difficulty ──
+    // adj fields: difficultyChange, progressPercent, remainingBlocks,
+    //             estimatedRetargetDate, previousRetarget, nextRetargetHeight
+    const diffRaw    = adj.nextRetargetHeight
+      ? null  // not directly in adj — derive from hashrate
+      : null;
+
+    // Current difficulty from last hashrate entry
+    const diffs = hr.difficulty || [];
+    const lastDiff = diffs.length ? diffs[diffs.length - 1] : null;
+    const curDiff  = lastDiff ? lastDiff.difficulty : null;
+
+    // Format difficulty: divide by 1T for display
+    function fmtDiff(d) {
+      if (!d) return '—';
+      const t = d / 1e12;
+      return t >= 100 ? Math.round(t) + 'T' : t.toFixed(1) + 'T';
+    }
+
+    // Update stats
+    const elVal  = document.getElementById('diff-value');
+    const elChg  = document.getElementById('diff-change');
+    const elBlks = document.getElementById('diff-blocks');
+    const elEta  = document.getElementById('diff-eta');
+    const elPct  = document.getElementById('diff-progress-pct');
+    const elBar  = document.getElementById('diffBar');
+    const elNext = document.getElementById('diff-next-label');
+
+    if (elVal && curDiff) {
+      const tVal = curDiff / 1e12;
+      elVal.textContent = tVal >= 100 ? Math.round(tVal) : tVal.toFixed(2);
+      document.getElementById('diff-unit-label').textContent = 'TRILLION (T)';
+    }
+
+    if (elChg && adj.difficultyChange !== undefined) {
+      const chg = adj.difficultyChange;
+      elChg.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+      elChg.style.color = chg >= 0 ? 'var(--grn)' : 'var(--red)';
+    }
+
+    if (elBlks && adj.remainingBlocks !== undefined) {
+      elBlks.textContent = adj.remainingBlocks.toLocaleString();
+    }
+
+    if (elEta && adj.estimatedRetargetDate) {
+      const eta = new Date(adj.estimatedRetargetDate * 1000);
+      elEta.textContent = '~' + eta.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    if (elPct && adj.progressPercent !== undefined) {
+      const pct = Math.min(100, Math.max(0, adj.progressPercent));
+      elPct.textContent = pct.toFixed(1) + '%';
+      setTimeout(() => { if (elBar) elBar.style.width = pct.toFixed(1) + '%'; }, 300);
+    }
+
+    if (elNext && adj.estimatedRetargetDate) {
+      const eta = new Date(adj.estimatedRetargetDate * 1000);
+      elNext.textContent = 'РЕТАРГЕТ ~' + eta.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).toUpperCase();
+    }
+
+    // ── SVG chart of difficulty history ──
+    const svg = document.getElementById('diff-chart');
+    const labelsEl = document.getElementById('diff-chart-labels');
+    if (svg && diffs.length > 1) {
+      const W = 600, H = 80, PAD = { t: 8, b: 4 };
+      const vals = diffs.map(d => d.difficulty);
+      const minD = Math.min(...vals), maxD = Math.max(...vals);
+      const range = maxD - minD || 1;
+      const n = diffs.length;
+
+      const pts = diffs.map((d, i) => ({
+        x: (i / (n - 1)) * W,
+        y: PAD.t + (1 - (d.difficulty - minD) / range) * (H - PAD.t - PAD.b),
+        ts: d.time * 1000,
+      }));
+
+      const lineD = pts.map((p, i) => (i === 0 ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}` : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`)).join(' ');
+      const areaD = lineD + ` L${pts[n-1].x},${H} L0,${H} Z`;
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="diff-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--btc)" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="var(--btc)" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="${areaD}" fill="url(#diff-grad)"/>
+        <path d="${lineD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="${pts[n-1].x.toFixed(1)}" cy="${pts[n-1].y.toFixed(1)}" r="3" fill="var(--btc)"/>
+      `;
+
+      // X-axis labels: first, middle, last
+      if (labelsEl) {
+        const picks = [pts[0], pts[Math.floor(n/2)], pts[n-1]];
+        labelsEl.innerHTML = picks.map(p =>
+          `<span>${new Date(p.ts).toLocaleDateString('ru-RU', { month: 'short', year: '2-digit' })}</span>`
+        ).join('');
+      }
+    }
+
+  } catch(e) {
+    console.warn('Difficulty fetch error:', e);
+  }
+}
+
 // ── CHARTS ──
 let chartsInited = false;
 function initCharts() {
   if (chartsInited) return;
   chartsInited = true;
-  setTimeout(() => { document.getElementById('diffBar').style.width = '87%'; }, 400);
+  fetchDifficulty();  // live difficulty data + chart
+  setInterval(fetchDifficulty, 300000); // refresh every 5 min
 
   const grid  = 'rgba(26,31,42,1)';
   const tick  = '#4A5568';

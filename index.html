@@ -2663,6 +2663,7 @@ function initCharts() {
     },
     options: so
   });
+}
 
 // ══════════════════════════════════════════════════════
 // MACRO — рендер вкладок из HOLDERS_DATA
@@ -2823,34 +2824,53 @@ async function analyzeSignal() {
   analysisResult = null;
   currentStepIdx = 0;
 
-  const knowledgeBase = `
-Ты — аналитик Bitcoin. Отвечаешь ТОЛЬКО по теме Bitcoin. Используй базу знаний ниже.
+  const snapshotText = HOLDERS_DATA.snapshots.map(s => {
+    const cats = Object.entries(s.categories)
+      .filter(([,v]) => v !== null)
+      .map(([k,v]) => k + ': ' + v.pct + '% · ' + v.btc.toLocaleString() + ' BTC')
+      .join(', ');
+    return s.date + ' [' + s.event + ']: ' + cats;
+  }).join('\n');
 
-СТРУКТУРА ВЛАДЕНИЯ (снэпшоты 2009–2024):
-${JSON.stringify(HOLDERS_DATA.snapshots, null, 1)}
+  const narrativeText = HOLDERS_DATA.narratives
+    .map(n => n.date + ' · ' + n.event + ' → ' + n.effect)
+    .join('\n');
 
-КЛЮЧЕВЫЕ СОБЫТИЯ:
-${JSON.stringify(HOLDERS_DATA.narratives, null, 1)}
+  const emissionText = HOLDERS_DATA.emission
+    .map(e => e.period + ': −' + e.drop_pct + '% за ' + e.years + ' лет')
+    .join(', ');
 
-ЭМИССИОННАЯ КРИВАЯ:
-${JSON.stringify(HOLDERS_DATA.emission, null, 1)}
+  const wavesText = HOLDERS_DATA.institutional_waves
+    .map(w => 'Волна ' + w.wave + ' (' + w.year + '): ' + w.label + ' — ' + w.note)
+    .join('\n');
 
-ИНСТИТУЦИОНАЛЬНЫЕ ВОЛНЫ:
-${JSON.stringify(HOLDERS_DATA.institutional_waves, null, 1)}
+  const crossText = CROSSLINKS.strong_pairs
+    .map(p => p.pair.join(' ↔ ') + ': ' + p.note)
+    .join('\n');
 
-ПЕРЕКРЁСТНЫЕ СВЯЗИ:
-${JSON.stringify(CROSSLINKS.strong_pairs, null, 1)}
-
-ПРИОРИТЕТЫ ПРИ КОНФЛИКТЕ: ${CROSSLINKS.priorities.join(' > ')}
-
-ФОРМАТ ОТВЕТА — строго JSON без markdown:
-{
-  "signal": "Краткое название сигнала",
-  "interpretation": "Что это означает прямо сейчас (2-3 предложения)",
-  "historical_analog": "Исторический аналог из базы знаний (2-3 предложения)",
-  "structural_cause": "Структурная причина из данных (2-3 предложения)",
-  "caveats": "Важные оговорки и риски (2-3 предложения)"
-}`;
+  const knowledgeBase = [
+    'Ты — аналитик Bitcoin. Отвечаешь ТОЛЬКО по теме Bitcoin.',
+    '',
+    'СТРУКТУРА ВЛАДЕНИЯ (снэпшоты 2009–2024):',
+    snapshotText,
+    '',
+    'КЛЮЧЕВЫЕ СОБЫТИЯ:',
+    narrativeText,
+    '',
+    'ЭМИССИОННАЯ КРИВАЯ:',
+    emissionText,
+    '',
+    'ИНСТИТУЦИОНАЛЬНЫЕ ВОЛНЫ:',
+    wavesText,
+    '',
+    'ПЕРЕКРЁСТНЫЕ СВЯЗИ:',
+    crossText,
+    '',
+    'ПРИОРИТЕТЫ ПРИ КОНФЛИКТЕ: ' + CROSSLINKS.priorities.join(' > '),
+    '',
+    'ФОРМАТ ОТВЕТА — строго JSON без markdown:',
+    '{"signal":"...","interpretation":"...","historical_analog":"...","structural_cause":"...","caveats":"..."}'
+  ].join('\n');
 
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {

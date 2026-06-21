@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BITCOIN INTEL</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data/holders.js"></script>
+<script src="data/crosslinks.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
@@ -1065,7 +1067,8 @@ header {
 <div class="clusterbar">
   <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
   <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">KNOWLEDGE</button>
-  <button class="cbar-btn" id="cbar-context" onclick="selectCluster('context')">CONTEXT</button>
+  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">MACRO</button>
+  <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -1517,8 +1520,201 @@ header {
 </section>
 
 <!-- ══════════════════════════════════════
-     TECH
+     MACRO / ХОЛДЕРЫ
 ══════════════════════════════════════ -->
+<section class="section" id="tab-holders">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">👥 Холдеры <span>Bitcoin</span></span>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Структура владения · 2009–2024</span>
+        <span class="panel-tag">📊 ON-CHAIN</span>
+      </div>
+      <div id="holders-table-wrap"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ключевые тренды</span>
+        <span class="panel-tag">ДИНАМИКА</span>
+      </div>
+      <div id="holders-trends"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Три волны институционализации</span>
+        <span class="panel-tag">🏦 ИНСТИТУЦИОНАЛЫ</span>
+      </div>
+      <div id="holders-waves"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     MACRO / ЭМИССИЯ
+══════════════════════════════════════ -->
+<section class="section" id="tab-emission">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">⛏️ Эмиссия <span>Bitcoin</span></span>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Not Yet Mined · динамика</span>
+        <span class="panel-tag">⛏️ МАЙНИНГ</span>
+      </div>
+      <div id="emission-table-wrap"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Скорость сокращения эмиссии</span>
+        <span class="panel-tag">ХАЛВИНГИ</span>
+      </div>
+      <div id="emission-speed-wrap"></div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
+        Осталось добыть: ~2,086,170 BTC (9.9%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     MACRO / НАРРАТИВ
+══════════════════════════════════════ -->
+<section class="section" id="tab-narrative">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">📰 Нарратив <span>Bitcoin</span></span>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Ключевые события · 2009–2024</span>
+        <span class="panel-tag">ХРОНОЛОГИЯ</span>
+      </div>
+      <div id="narrative-table-wrap"></div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
+        Каждый кризис парадоксально укреплял структуру владения — появлялись новые категории держателей.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ANALYSIS / SIGNALS
+══════════════════════════════════════ -->
+<section class="section" id="tab-signals">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">🔍 AI <span>Анализатор</span></span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Опиши аномалию или сигнал</span>
+        <span class="panel-tag">РУЧНОЙ ВВОД</span>
+      </div>
+      <div style="padding:12px 14px;display:flex;gap:8px">
+        <input id="sig-input" placeholder="Например: государство продаёт большой объём BTC..."
+          style="flex:1;background:var(--bg3);border:1px solid var(--line2);border-radius:4px;
+                 color:var(--txt);padding:10px 14px;font-size:13px;font-family:var(--mono);outline:none"/>
+        <button onclick="analyzeSignal()"
+          style="background:var(--btc);border:none;border-radius:4px;color:#000;
+                 padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;
+                 font-family:var(--mono);letter-spacing:0.05em;white-space:nowrap">
+          РАЗОБРАТЬ
+        </button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Или выбери из базы</span>
+        <span class="panel-tag">ГОТОВЫЕ СИГНАЛЫ</span>
+      </div>
+      <div id="preset-signals" style="padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+
+    <div id="analysis-result" style="display:none">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title" id="result-signal-title">—</span>
+          <span class="panel-tag">СИГНАЛ</span>
+        </div>
+        <div id="result-steps"></div>
+        <div style="padding:12px 14px;display:flex;gap:8px;border-top:1px solid var(--line)">
+          <button id="btn-next" onclick="showNextStep()"
+            style="background:transparent;border:1px solid var(--btc);border-radius:4px;
+                   color:var(--btc);padding:8px 16px;font-size:11px;cursor:pointer;
+                   font-family:var(--mono);letter-spacing:0.08em">
+            ДАЛЕЕ →
+          </button>
+          <button onclick="resetAnalysis()"
+            style="background:transparent;border:1px solid var(--line2);border-radius:4px;
+                   color:var(--dim);padding:8px 16px;font-size:11px;cursor:pointer;
+                   font-family:var(--mono);letter-spacing:0.08em">
+            НОВЫЙ СИГНАЛ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="analysis-loading" style="display:none;text-align:center;padding:40px 0;color:var(--dim)">
+      <div style="font-size:11px;letter-spacing:0.2em;font-family:var(--mono)">АНАЛИЗИРУЮ СИГНАЛ...</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ANALYSIS / BASE
+══════════════════════════════════════ -->
+<section class="section" id="tab-base">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">📚 База <span>разборов</span></span>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Накопленные разборы</span>
+        <span class="panel-tag">SIGNALS.MD</span>
+      </div>
+      <div style="padding:24px 14px;text-align:center;color:var(--dim);font-size:12px;font-family:var(--mono)">
+        База пополняется по мере накопления материала.<br>
+        <span style="color:var(--btc)">Первые разборы появятся здесь.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ANALYSIS / HOLDERS (визуализация)
+══════════════════════════════════════ -->
+<section class="section" id="tab-aholders">
+  <div class="page">
+    <div class="sh">
+      <span class="sh-title">📊 Холдеры <span>визуализация</span></span>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Динамика категорий · 2009–2024</span>
+        <span class="panel-tag">ON-CHAIN · АНАЛИЗ</span>
+      </div>
+      <div id="aholders-chart-wrap" style="padding:14px">
+        <canvas id="holdersChart" height="220"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Институциональная доля</span>
+        <span class="panel-tag">ТРЕНД</span>
+      </div>
+      <div id="aholders-institutional-wrap"></div>
+    </div>
+  </div>
+</section>
+
+
 <section class="section" id="tab-tech">
   <div class="page">
 
@@ -2065,18 +2261,26 @@ const TAB_META = {
   basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
   tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
   lightning: { cluster: 'ЗНАНИЕ',   tab: 'Lightning',   sub: 'Layer 2 · Как подключиться' },
-  history:   { cluster: 'КОНТЕКСТ', tab: 'История',     sub: 'Хронология BTC' }
+  history:   { cluster: 'MACRO',    tab: 'История',     sub: 'Хронология BTC' },
+  holders:   { cluster: 'MACRO',    tab: 'Холдеры',     sub: 'Кто держит Bitcoin' },
+  emission:  { cluster: 'MACRO',    tab: 'Эмиссия',     sub: 'Эмиссионная кривая' },
+  narrative: { cluster: 'MACRO',    tab: 'Нарратив',    sub: 'Ключевые события' },
+  signals:   { cluster: 'ANALYSIS', tab: 'Signals',     sub: 'AI-анализатор' },
+  base:      { cluster: 'ANALYSIS', tab: 'Base',        sub: 'База разборов' },
+  aholders:  { cluster: 'ANALYSIS', tab: 'Holders',     sub: 'Визуализация холдеров' }
 };
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['analytics','АНАЛИТИКА'],['pools','ПУЛЫ'],['market','РЫНОК']] },
   knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
-  context:   { label: 'КОНТЕКСТ', tabs: [['history','ИСТОРИЯ']] }
+  macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
+  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
   basics:'knowledge', tech:'knowledge', lightning:'knowledge',
-  history:'context'
+  history:'macro', holders:'macro', emission:'macro', narrative:'macro',
+  signals:'analysis', base:'analysis', aholders:'analysis'
 };
 
 let activeCluster = 'live';
@@ -2454,10 +2658,332 @@ function initCharts() {
     },
     options: so
   });
+
+// ══════════════════════════════════════════════════════
+// MACRO — рендер вкладок из HOLDERS_DATA
+// ══════════════════════════════════════════════════════
+
+function renderHolders() {
+  const cats = [
+    { key: 'individuals',  label: 'Individuals' },
+    { key: 'lost_satoshi', label: 'Lost & Satoshi' },
+    { key: 'governments',  label: 'Governments' },
+    { key: 'companies',    label: 'Companies' },
+    { key: 'etfs',         label: 'ETFs & Funds' },
+    { key: 'not_mined',    label: 'Not Yet Mined' }
+  ];
+
+  // Таблица снэпшотов
+  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr><th>Дата</th><th>Событие</th>';
+  cats.forEach(c => tbl += '<th>' + c.label + '</th>');
+  tbl += '<th>Total Mined</th></tr></thead><tbody>';
+
+  HOLDERS_DATA.snapshots.forEach(s => {
+    tbl += '<tr><td class="td-btc" style="white-space:nowrap">' + s.date + '</td>';
+    tbl += '<td style="font-size:11px;color:var(--dim)">' + s.event + '</td>';
+    cats.forEach(c => {
+      const v = s.categories[c.key];
+      tbl += v
+        ? '<td style="white-space:nowrap">' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
+        : '<td style="color:var(--dim)">—</td>';
+    });
+    tbl += '<td style="color:var(--btc)">' + s.total_mined.toLocaleString() + '</td></tr>';
+  });
+  tbl += '</tbody></table></div>';
+  document.getElementById('holders-table-wrap').innerHTML = tbl;
+
+  // Тренды
+  const trends = [
+    { label: 'Individuals', note: 'Росли с 5.4% (2009) до пика 72.7% (2022), затем снизились до 68.9% — часть перетекла в ETFs' },
+    { label: 'ETFs & Funds', note: 'Появились в Oct 2024: 4.6% · 966,839 BTC — 3-я категория среди активных держателей' },
+    { label: 'Governments', note: 'Впервые в 2014 (0.7% · изъятие FBI), выросли до 2.4% · 510,864 BTC к 2024' },
+    { label: 'Companies', note: 'Sep 2022: 0.9% · 184,390 BTC → Oct 2024: 2.0% · 421,313 BTC (+128% за 2 года)' },
+    { label: 'Lost & Satoshi', note: 'Стабилизировались на ~11-12% с 2018 года. Расчётная величина, точно неизвестна' }
+  ];
+  let tr = '';
+  trends.forEach(t => {
+    tr += '<div style="padding:10px 14px;border-bottom:1px solid var(--line)">'
+        + '<span style="font-family:var(--mono);font-size:11px;color:var(--btc)">' + t.label + '</span>'
+        + '<p style="font-size:12px;color:var(--dim);margin-top:4px;line-height:1.5">' + t.note + '</p>'
+        + '</div>';
+  });
+  document.getElementById('holders-trends').innerHTML = tr;
+
+  // Три волны
+  let wv = '';
+  HOLDERS_DATA.institutional_waves.forEach(w => {
+    wv += '<div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start">'
+        + '<div style="background:var(--btc);color:#000;font-family:var(--mono);font-weight:700;font-size:11px;'
+        + 'padding:2px 8px;border-radius:2px;white-space:nowrap;margin-top:2px">ВОЛНА ' + w.wave + '</div>'
+        + '<div><div style="font-size:13px;color:var(--txt)">' + w.label + ' · ' + w.year + '</div>'
+        + '<div style="font-size:11px;color:var(--dim);margin-top:3px">' + w.event + '</div>'
+        + '<div style="font-size:11px;color:var(--dim);margin-top:2px;font-style:italic">' + w.note + '</div></div>'
+        + '</div>';
+  });
+  document.getElementById('holders-waves').innerHTML = wv;
+}
+
+function renderEmission() {
+  // Таблица Not Yet Mined
+  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr>'
+          + '<th>Дата</th><th>Not Yet Mined %</th><th>Not Yet Mined BTC</th><th>Total Mined</th><th>Событие</th>'
+          + '</tr></thead><tbody>';
+  HOLDERS_DATA.snapshots.forEach(s => {
+    const nm = s.categories.not_mined;
+    tbl += '<tr>'
+         + '<td class="td-btc">' + s.date + '</td>'
+         + '<td style="color:var(--grn)">' + (nm ? nm.pct + '%' : '—') + '</td>'
+         + '<td>' + (nm ? nm.btc.toLocaleString() : '—') + '</td>'
+         + '<td style="color:var(--btc)">' + s.total_mined.toLocaleString() + '</td>'
+         + '<td style="font-size:11px;color:var(--dim)">' + s.event + '</td>'
+         + '</tr>';
+  });
+  tbl += '</tbody></table></div>';
+  document.getElementById('emission-table-wrap').innerHTML = tbl;
+
+  // Скорость сокращения
+  let sp = '<table class="dtable"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
+  HOLDERS_DATA.emission.forEach(e => {
+    sp += '<tr>'
+        + '<td style="font-family:var(--mono)">' + e.period + '</td>'
+        + '<td style="color:var(--red)">−' + e.drop_pct + '%</td>'
+        + '<td style="color:var(--dim)">' + e.years + '</td>'
+        + '</tr>';
+  });
+  sp += '</tbody></table>';
+  document.getElementById('emission-speed-wrap').innerHTML = sp;
+}
+
+function renderNarrative() {
+  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr>'
+          + '<th>Дата</th><th>Событие</th><th>Категория</th><th>Эффект на структуру</th>'
+          + '</tr></thead><tbody>';
+  HOLDERS_DATA.narratives.forEach(n => {
+    tbl += '<tr>'
+         + '<td class="td-btc" style="white-space:nowrap">' + n.date + '</td>'
+         + '<td style="font-size:12px">' + n.event + '</td>'
+         + '<td style="white-space:nowrap;font-size:11px">' + n.category_label + '</td>'
+         + '<td style="font-size:11px;color:var(--dim)">' + n.effect + '</td>'
+         + '</tr>';
+  });
+  tbl += '</tbody></table></div>';
+  document.getElementById('narrative-table-wrap').innerHTML = tbl;
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYSIS / SIGNALS — AI-анализатор
+// ══════════════════════════════════════════════════════
+
+const PRESET_SIGNALS_LIST = [
+  'Крупное государство продаёт BTC',
+  'ETFs поглощают продажи без падения цены',
+  'Халвинг приближается',
+  'Компании начинают покупать BTC',
+  'Цена не реагирует на негативные новости',
+  'Новый исторический максимум добытых BTC'
+];
+
+const ANALYSIS_STEPS = [
+  { key: 'interpretation',    label: '01 — Интерпретация' },
+  { key: 'historical_analog', label: '02 — Исторический аналог' },
+  { key: 'structural_cause',  label: '03 — Структурная причина' },
+  { key: 'caveats',           label: '04 — Оговорки' }
+];
+
+let analysisResult = null;
+let currentStepIdx = 0;
+
+function renderPresetSignals() {
+  const wrap = document.getElementById('preset-signals');
+  if (!wrap) return;
+  wrap.innerHTML = PRESET_SIGNALS_LIST.map(s =>
+    '<button onclick="selectPreset(this)" data-signal="' + s + '" '
+    + 'style="background:transparent;border:1px solid var(--line2);border-radius:20px;'
+    + 'color:var(--dim);padding:6px 14px;font-size:11px;cursor:pointer;'
+    + 'font-family:var(--mono);letter-spacing:0.03em">' + s + '</button>'
+  ).join('');
+}
+
+function selectPreset(btn) {
+  document.getElementById('sig-input').value = btn.dataset.signal;
+  analyzeSignal();
+}
+
+async function analyzeSignal() {
+  const input = document.getElementById('sig-input').value.trim();
+  if (!input) return;
+
+  document.getElementById('analysis-result').style.display = 'none';
+  document.getElementById('analysis-loading').style.display = 'block';
+  analysisResult = null;
+  currentStepIdx = 0;
+
+  const knowledgeBase = `
+Ты — аналитик Bitcoin. Отвечаешь ТОЛЬКО по теме Bitcoin. Используй базу знаний ниже.
+
+СТРУКТУРА ВЛАДЕНИЯ (снэпшоты 2009–2024):
+${JSON.stringify(HOLDERS_DATA.snapshots, null, 1)}
+
+КЛЮЧЕВЫЕ СОБЫТИЯ:
+${JSON.stringify(HOLDERS_DATA.narratives, null, 1)}
+
+ЭМИССИОННАЯ КРИВАЯ:
+${JSON.stringify(HOLDERS_DATA.emission, null, 1)}
+
+ИНСТИТУЦИОНАЛЬНЫЕ ВОЛНЫ:
+${JSON.stringify(HOLDERS_DATA.institutional_waves, null, 1)}
+
+ПЕРЕКРЁСТНЫЕ СВЯЗИ:
+${JSON.stringify(CROSSLINKS.strong_pairs, null, 1)}
+
+ПРИОРИТЕТЫ ПРИ КОНФЛИКТЕ: ${CROSSLINKS.priorities.join(' > ')}
+
+ФОРМАТ ОТВЕТА — строго JSON без markdown:
+{
+  "signal": "Краткое название сигнала",
+  "interpretation": "Что это означает прямо сейчас (2-3 предложения)",
+  "historical_analog": "Исторический аналог из базы знаний (2-3 предложения)",
+  "structural_cause": "Структурная причина из данных (2-3 предложения)",
+  "caveats": "Важные оговорки и риски (2-3 предложения)"
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: knowledgeBase,
+        messages: [{ role: 'user', content: 'Проанализируй сигнал: "' + input + '"' }]
+      })
+    });
+    const data = await resp.json();
+    const text = (data.content || []).map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    analysisResult = JSON.parse(clean);
+    showAnalysisResult();
+  } catch(e) {
+    document.getElementById('analysis-loading').style.display = 'none';
+    alert('Ошибка анализа. Попробуй ещё раз.');
+  }
+}
+
+function showAnalysisResult() {
+  document.getElementById('analysis-loading').style.display = 'none';
+  document.getElementById('result-signal-title').textContent = analysisResult.signal;
+  document.getElementById('result-steps').innerHTML = '';
+  currentStepIdx = 0;
+  renderStep(0);
+  document.getElementById('analysis-result').style.display = 'block';
+  updateNextBtn();
+}
+
+function renderStep(idx) {
+  const step = ANALYSIS_STEPS[idx];
+  const wrap = document.getElementById('result-steps');
+  const div = document.createElement('div');
+  div.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--line)';
+  div.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--btc);letter-spacing:0.15em;margin-bottom:6px">'
+    + step.label + '</div>'
+    + '<p style="font-size:13px;color:var(--dim);line-height:1.6">' + analysisResult[step.key] + '</p>';
+  wrap.appendChild(div);
+}
+
+function showNextStep() {
+  if (currentStepIdx < ANALYSIS_STEPS.length - 1) {
+    currentStepIdx++;
+    renderStep(currentStepIdx);
+    updateNextBtn();
+  }
+}
+
+function updateNextBtn() {
+  const btn = document.getElementById('btn-next');
+  if (currentStepIdx >= ANALYSIS_STEPS.length - 1) {
+    btn.style.display = 'none';
+  } else {
+    btn.style.display = '';
+    btn.textContent = 'ДАЛЕЕ → ' + ANALYSIS_STEPS[currentStepIdx + 1].label;
+  }
+}
+
+function resetAnalysis() {
+  document.getElementById('analysis-result').style.display = 'none';
+  document.getElementById('sig-input').value = '';
+  analysisResult = null;
+  currentStepIdx = 0;
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYSIS / HOLDERS — визуализация
+// ══════════════════════════════════════════════════════
+
+function renderAHolders() {
+  const labels = HOLDERS_DATA.snapshots.map(s => s.date);
+  const getVals = key => HOLDERS_DATA.snapshots.map(s => s.categories[key] ? s.categories[key].pct : null);
+
+  const datasets = [
+    { label: 'Individuals',   data: getVals('individuals'),  borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.08)', fill: true },
+    { label: 'Lost & Satoshi',data: getVals('lost_satoshi'), borderColor: '#7A8BA0', backgroundColor: 'transparent' },
+    { label: 'Governments',   data: getVals('governments'),  borderColor: '#EF4444', backgroundColor: 'transparent' },
+    { label: 'Companies',     data: getVals('companies'),    borderColor: '#3B82F6', backgroundColor: 'transparent' },
+    { label: 'ETFs & Funds',  data: getVals('etfs'),         borderColor: '#22C55E', backgroundColor: 'transparent' }
+  ].map(d => ({ ...d, borderWidth: 1.5, tension: 0.3, pointRadius: 3, spanGaps: false }));
+
+  const ctx = document.getElementById('holdersChart');
+  if (ctx && ctx.getContext) {
+    new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 }, boxWidth: 10 } }
+        },
+        scales: {
+          x: { ticks: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#242A38' } },
+          y: { ticks: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' }, grid: { color: '#242A38' } }
+        }
+      }
+    });
+  }
+
+  // Институциональная доля по снэпшотам
+  let inst = '<table class="dtable"><thead><tr><th>Дата</th><th>Companies</th><th>ETFs</th><th>Governments</th><th>Итого</th></tr></thead><tbody>';
+  HOLDERS_DATA.snapshots.forEach(s => {
+    const c = s.categories;
+    const gov = c.governments ? c.governments.pct : 0;
+    const com = c.companies   ? c.companies.pct   : 0;
+    const etf = c.etfs        ? c.etfs.pct         : 0;
+    const total = +(gov + com + etf).toFixed(1);
+    if (total === 0 && !c.governments) return;
+    inst += '<tr>'
+          + '<td class="td-btc">' + s.date + '</td>'
+          + '<td>' + (com ? com + '%' : '—') + '</td>'
+          + '<td>' + (etf ? etf + '%' : '—') + '</td>'
+          + '<td>' + (gov ? gov + '%' : '—') + '</td>'
+          + '<td style="color:var(--btc);font-weight:600">' + total + '%</td>'
+          + '</tr>';
+  });
+  inst += '</tbody></table>';
+  document.getElementById('aholders-institutional-wrap').innerHTML = inst;
+}
+
+// ── Инициализация MACRO и ANALYSIS при открытии вкладок ──
+const _origShowTab = showTab;
+function showTab(id, btn, keepCluster) {
+  _origShowTab(id, btn, keepCluster);
+  if (id === 'holders')   renderHolders();
+  if (id === 'emission')  renderEmission();
+  if (id === 'narrative') renderNarrative();
+  if (id === 'signals')   renderPresetSignals();
+  if (id === 'aholders')  renderAHolders();
 }
 </script>
 </body>
 </html>
+
 
 
 

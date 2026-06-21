@@ -993,6 +993,14 @@ header {
 .dash-m-val.dash-m-warn { color: var(--yel); }
 .dash-m-val.dash-m-neg { color: var(--red); }
 .dash-m-lbl { font-family: var(--mono); font-size: 7px; letter-spacing: 0.08em; color: var(--dim); }
+.dash-m-est { color: var(--btc); }
+.dash-disclaimer {
+  margin: -8px 16px 12px;
+  font-family: var(--mono); font-size: 8px; line-height: 1.5;
+  color: var(--dim); padding: 7px 10px;
+  border: 1px solid var(--line); border-top: none;
+  background: var(--bg2);
+}
 
 .dash-signal {
   margin: 0 16px 12px;
@@ -1093,12 +1101,15 @@ header {
       </div>
       <div class="dash-m-cell">
         <div class="dash-m-val dash-m-warn" id="dash-cost">—</div>
-        <div class="dash-m-lbl">PROD. COST</div>
+        <div class="dash-m-lbl">PROD. COST <span class="dash-m-est">~</span></div>
       </div>
       <div class="dash-m-cell">
         <div class="dash-m-val" id="dash-gap">—</div>
         <div class="dash-m-lbl">РАЗРЫВ</div>
       </div>
+    </div>
+    <div class="dash-disclaimer">
+      ~ Production Cost — расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
     </div>
 
     <!-- ══ БЛОК 3: СИГНАЛ ДНЯ ══ -->

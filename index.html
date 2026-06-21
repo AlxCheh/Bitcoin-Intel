@@ -2605,7 +2605,23 @@ function initCharts() {
     const wrap = document.getElementById('terminal-price-chart');
     if (!wrap) return;
 
-    // 90-day simulated BTC data (updated on each page load)
+    // CSS variables from project palette (resolved once)
+    const CS = getComputedStyle(document.documentElement);
+    const C = {
+      bg:    CS.getPropertyValue('--bg').trim()    || '#0C0F14',
+      bg2:   CS.getPropertyValue('--bg2').trim()   || '#111520',
+      bg3:   CS.getPropertyValue('--bg3').trim()   || '#171D2B',
+      line:  CS.getPropertyValue('--line').trim()  || '#242A38',
+      line2: CS.getPropertyValue('--line2').trim() || '#2E3648',
+      txt:   CS.getPropertyValue('--txt').trim()   || '#E8EDF5',
+      dim:   CS.getPropertyValue('--dim').trim()   || '#7A8BA0',
+      dim2:  CS.getPropertyValue('--dim2').trim()  || '#2D3748',
+      btc:   CS.getPropertyValue('--btc').trim()   || '#F7931A',
+      grn:   CS.getPropertyValue('--grn').trim()   || '#22C55E',
+      red:   CS.getPropertyValue('--red').trim()   || '#EF4444',
+      mono:  CS.getPropertyValue('--mono').trim()  || "'IBM Plex Mono', monospace",
+    };
+
     const DAY = 86400000;
     const now  = Date.now();
     const PERIODS = [
@@ -2616,7 +2632,7 @@ function initCharts() {
     ];
     let activePeriod = 2; // default 90D
 
-    // Build 1-year of fake-but-realistic BTC data
+    // Build 1-year of realistic BTC data
     const seedSeq = [0.52,0.47,0.53,0.44,0.56,0.48,0.51,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53,0.47,0.51,0.44,0.56,0.50,0.42,0.58,0.47,0.53,0.49,0.52,0.45,0.55,0.48,0.53,0.46,0.54,0.50,0.43,0.57,0.49,0.52,0.45,0.55,0.48,0.53];
     const allData = [];
     let p = 58000;
@@ -2625,9 +2641,22 @@ function initCharts() {
       p = Math.max(38000, Math.min(115000, p + (s - 0.48) * 3200 + (i < 60 ? 700 : i < 120 ? -300 : 100)));
       allData.push({ ts: now - i * DAY, price: Math.round(p), volume: Math.round((0.3 + Math.abs(s - 0.5) * 4) * 14000 + 3000) });
     }
-    allData[allData.length - 1].price = (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) ? Math.round(dashBtcPrice) : allData[allData.length - 1].price;
+    // Last point: use real price if already loaded, otherwise fetch it now
+    if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
+      allData[allData.length - 1].price = Math.round(dashBtcPrice);
+    } else {
+      // Fetch real price independently (don't wait for fetchProdCost)
+      fetch('https://mempool.space/api/v1/prices')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.USD > 0) {
+            allData[allData.length - 1].price = Math.round(d.USD);
+            render();
+          }
+        }).catch(() => {});
+    }
 
-    // Expose update hook so renderDashboard() can refresh the last point with the real price
+    // Expose update hook so fetchProdCost() can refresh the last point
     window.terminalChartUpdate = function(realPrice) {
       if (realPrice && realPrice > 0) {
         allData[allData.length - 1].price = Math.round(realPrice);
@@ -2636,7 +2665,7 @@ function initCharts() {
     };
 
     // Formatters
-    const fmtP = v => '$' + v.toLocaleString('en-US');
+    const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');
     const fmtD = (ts, compact) => {
       const d = new Date(ts);
       return compact
@@ -2669,7 +2698,7 @@ function initCharts() {
       const last = data[data.length - 1].price, first = data[0].price;
       const chg = (last - first) / first * 100;
       const up = chg >= 0;
-      const accent = up ? '#00e676' : '#ff4444';
+      const accent = up ? C.grn : C.red;
       const W = 700, PH = 220, VH = 52;
       const PAD = { t: 20, b: 0 };
       const range = maxP - minP || 1;
@@ -2684,24 +2713,24 @@ function initCharts() {
 
       // ── TOP BAR ──
       const topBar = div({}, {
-        background: '#111', borderBottom: '1px solid #1e1e1e', padding: '11px 16px',
+        background: C.bg2, borderBottom: '1px solid ' + C.line, padding: '11px 16px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
       });
       // Left side
       const tleft = div({}, { display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' });
       const ticker = document.createElement('span');
       ticker.textContent = 'BTC/USD';
-      Object.assign(ticker.style, { color: '#ffb800', fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.18em' });
+      Object.assign(ticker.style, { color: C.btc, fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.18em' });
       const priceEl = document.createElement('span');
       priceEl.id = 'tc-price';
       priceEl.textContent = fmtP(last);
-      Object.assign(priceEl.style, { color: '#fff', fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.02em' });
+      Object.assign(priceEl.style, { color: C.txt, fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.02em' });
       const chgEl = document.createElement('span');
       chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
-      Object.assign(chgEl.style, { color: accent, fontSize: '12px', background: up ? 'rgba(0,230,118,0.08)' : 'rgba(255,68,68,0.08)', padding: '2px 7px', borderRadius: '2px' });
+      Object.assign(chgEl.style, { color: accent, fontSize: '12px', background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 7px', borderRadius: '2px' });
       const dateEl = document.createElement('span');
       dateEl.id = 'tc-date';
-      Object.assign(dateEl.style, { color: '#555', fontSize: '10px' });
+      Object.assign(dateEl.style, { color: C.dim, fontSize: '10px', fontFamily: C.mono });
       tleft.appendChild(ticker); tleft.appendChild(priceEl); tleft.appendChild(chgEl); tleft.appendChild(dateEl);
 
       // Period buttons
@@ -2711,10 +2740,10 @@ function initCharts() {
         btn.textContent = per.label;
         Object.assign(btn.style, {
           background: activePeriod === i ? accent : 'transparent',
-          color: activePeriod === i ? '#000' : '#555',
-          border: '1px solid ' + (activePeriod === i ? accent : '#222'),
+          color: activePeriod === i ? C.bg : C.dim,
+          border: '1px solid ' + (activePeriod === i ? accent : C.line),
           borderRadius: '2px', padding: '3px 9px', fontSize: '10px',
-          fontFamily: "'IBM Plex Mono', monospace", fontWeight: 'bold',
+          fontFamily: C.mono, fontWeight: 'bold',
           letterSpacing: '0.06em', cursor: 'pointer',
         });
         btn.addEventListener('click', () => { activePeriod = i; hoverIdx = null; render(); });
@@ -2724,17 +2753,17 @@ function initCharts() {
 
       // ── STATS ROW ──
       const statsRow = div({}, {
-        background: '#0d0d0d', borderBottom: '1px solid #181818',
+        background: C.bg, borderBottom: '1px solid ' + C.line,
         padding: '7px 16px', display: 'flex', gap: '24px', flexWrap: 'wrap',
       });
       [['HIGH', fmtP(maxP)], ['LOW', fmtP(minP)], ['RANGE', fmtP(maxP - minP)], ['VOL', fmtV(data[data.length-1].volume)], ['OPEN', fmtP(first)]].forEach(([l, v]) => {
         const cell = div({}, {});
         const lbl = document.createElement('div');
         lbl.textContent = l;
-        Object.assign(lbl.style, { color: '#2e2e2e', fontSize: '9px', letterSpacing: '0.14em' });
+        Object.assign(lbl.style, { color: C.dim2, fontSize: '9px', letterSpacing: '0.14em', fontFamily: C.mono });
         const val = document.createElement('div');
         val.textContent = v;
-        Object.assign(val.style, { color: '#888', fontSize: '12px', marginTop: '2px' });
+        Object.assign(val.style, { color: C.dim, fontSize: '12px', marginTop: '2px', fontFamily: C.mono });
         cell.appendChild(lbl); cell.appendChild(val); statsRow.appendChild(cell);
       });
       wrap.appendChild(statsRow);
@@ -2754,8 +2783,8 @@ function initCharts() {
       // Grid lines + Y labels
       [0.15, 0.38, 0.62, 0.85].forEach(t => {
         const gy = PAD.t + t * (PH - PAD.t - 10);
-        svg.appendChild(svgEl('line', { x1: 0, y1: gy, x2: W, y2: gy, stroke: '#161616', 'stroke-width': '1' }));
-        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: '#2a2a2a', 'font-size': '8.5', 'text-anchor': 'end', 'font-family': "'IBM Plex Mono', monospace" });
+        svg.appendChild(svgEl('line', { x1: 0, y1: gy, x2: W, y2: gy, stroke: C.line, 'stroke-width': '1' }));
+        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: C.dim2, 'font-size': '8.5', 'text-anchor': 'end', 'font-family': C.mono });
         txt.textContent = fmtP(Math.round(maxP - t * (maxP - minP)));
         svg.appendChild(txt);
       });
@@ -2767,9 +2796,9 @@ function initCharts() {
       svg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: accent, 'stroke-width': '1.6', 'stroke-linejoin': 'round' }));
 
       // Crosshair & end dot (will update on hover)
-      const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: '#333', 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
-      const crossH   = svgEl('line', { x1: 0, y1: 0, x2: W, y2: 0, stroke: '#333', 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
-      const crossLblBg = svgEl('rect', { x: W-80, y: 0, width: 80, height: 18, fill: '#1a1a1a', opacity: '0' });
+      const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
+      const crossH   = svgEl('line', { x1: 0, y1: 0, x2: W, y2: 0, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
+      const crossLblBg = svgEl('rect', { x: W-80, y: 0, width: 80, height: 18, fill: C.bg3, opacity: '0' });
       const crossLbl  = svgEl('text', { x: W-6, y: 0, fill: accent, 'font-size': '9', 'text-anchor': 'end', 'font-family': "'IBM Plex Mono', monospace", 'font-weight': 'bold', opacity: '0' });
       const dotMain   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '3.5', fill: accent });
       const dotRing   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '7', fill: 'none', stroke: accent, 'stroke-width': '1', opacity: '0.35' });
@@ -2778,7 +2807,7 @@ function initCharts() {
 
       // Tooltip div
       const tooltip = div({}, {
-        position: 'absolute', background: '#111', border: '1px solid #2a2a2a',
+        position: 'absolute', background: C.bg2, border: '1px solid ' + C.line,
         borderLeft: `2px solid ${accent}`, borderRadius: '2px', padding: '7px 11px',
         pointerEvents: 'none', zIndex: '10', minWidth: '138px', display: 'none',
         fontFamily: "'IBM Plex Mono', monospace",
@@ -2810,15 +2839,15 @@ function initCharts() {
         // Tooltip
         const hChg = ((hd.price - first) / first * 100);
         tooltip.innerHTML = `
-          <div style="color:#555;font-size:9px;letter-spacing:.1em;margin-bottom:5px">${fmtD(hd.ts).toUpperCase()}</div>
-          <div style="color:#fff;font-size:16px;font-weight:bold">${fmtP(hd.price)}</div>
-          <div style="margin-top:6px;border-top:1px solid #222;padding-top:6px">
+          <div style="color:" + C.dim + ";font-size:9px;letter-spacing:.1em;margin-bottom:5px">${fmtD(hd.ts).toUpperCase()}</div>
+          <div style="color:" + C.txt + ";font-size:16px;font-weight:bold">${fmtP(hd.price)}</div>
+          <div style="margin-top:6px;border-top:1px solid " + C.line + ";padding-top:6px">
             <div style="display:flex;justify-content:space-between;gap:14px;margin-top:2px">
-              <span style="color:#444;font-size:9px;letter-spacing:.1em">VOL</span>
+              <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">VOL</span>
               <span style="color:#999;font-size:10px">${fmtV(hd.volume)}</span>
             </div>
             <div style="display:flex;justify-content:space-between;gap:14px;margin-top:3px">
-              <span style="color:#444;font-size:9px;letter-spacing:.1em">CHG</span>
+              <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">CHG</span>
               <span style="color:${hChg>=0?'#00e676':'#ff4444'};font-size:10px">${(hChg>=0?'+':'') + hChg.toFixed(2)}%</span>
             </div>
           </div>`;
@@ -2841,9 +2870,9 @@ function initCharts() {
       });
 
       // ── VOLUME SVG ──
-      const volSvg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${VH}`, preserveAspectRatio: 'none', style: 'display:block;background:#080808;border-top:1px solid #141414' });
+      const volSvg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${VH}`, preserveAspectRatio: 'none', style: 'display:block;background:' + C.bg + ';border-top:1px solid ' + C.line });
       const volLbl = svgEl('text', { x: 6, y: 13, fill: '#242424', 'font-size': '8', 'font-family': "'IBM Plex Mono', monospace", 'letter-spacing': '0.12em' });
-      volLbl.textContent = 'VOLUME';
+      volLbl.textContent = 'VOLUME'; volLbl.setAttribute('fill', C.dim2);
       volSvg.appendChild(volLbl);
       data.forEach((d, i) => {
         const bH = (d.volume / maxVol) * (VH - 14);
@@ -2854,22 +2883,22 @@ function initCharts() {
       wrap.appendChild(volSvg);
 
       // ── X-AXIS ──
-      const xAxis = div({}, { background: '#0a0a0a', borderTop: '1px solid #141414', padding: '5px 0 8px', position: 'relative', height: '18px' });
+      const xAxis = div({}, { background: C.bg, borderTop: '1px solid ' + C.line, padding: '5px 0 8px', position: 'relative', height: '18px' });
       const xCount = data.length <= 7 ? data.length : 5;
       Array.from({ length: xCount }, (_, i) => {
         const idx = Math.round((i / (xCount - 1)) * (data.length - 1));
         const sp = document.createElement('span');
         sp.textContent = fmtD(data[idx].ts, true).toUpperCase();
-        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: '#2a2a2a', fontSize: '9px', letterSpacing: '0.07em', whiteSpace: 'nowrap', fontFamily: "'IBM Plex Mono', monospace" });
+        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim2, fontSize: '9px', letterSpacing: '0.07em', whiteSpace: 'nowrap', fontFamily: C.mono });
         xAxis.appendChild(sp);
       });
       wrap.appendChild(xAxis);
 
       // ── STATUS BAR ──
       const statusBar = div({}, {
-        background: '#0d0d0d', borderTop: '1px solid #161616',
+        background: C.bg2, borderTop: '1px solid ' + C.line,
         padding: '5px 16px', display: 'flex', justifyContent: 'space-between',
-        color: '#2a2a2a', fontSize: '9px', letterSpacing: '0.1em',
+        color: C.dim2, fontSize: '9px', letterSpacing: '0.1em',
       });
       const sl = document.createElement('span'); sl.textContent = 'BTC · BITCOIN NETWORK ANALYTICS';
       const sr = document.createElement('span'); sr.textContent = '● LIVE';

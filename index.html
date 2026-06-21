@@ -1812,48 +1812,119 @@ header {
       <span class="sh-title">📊 Метрики <span>сети</span></span>
     </div>
 
-    <!-- DIFFICULTY — dynamic -->
+    <!-- DIFFICULTY — Вариант 2: Контекст -->
     <div class="chart-panel" style="margin-top:12px" id="diff-block">
+
+      <!-- Header -->
       <div class="chart-head">
         <span class="chart-title">Сложность сети</span>
-        <span class="chart-meta" id="diff-next-label">СЛЕДУЮЩИЙ РЕТАРГЕТ</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:9px;font-family:var(--mono);color:var(--btc)" id="diff-change">—</span>
+          <span class="chart-meta" id="diff-next-label">РЕТАРГЕТ —</span>
+        </div>
       </div>
-      <!-- Stats row -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)">
-        <div style="padding:12px 14px;border-right:1px solid var(--line)">
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">СЛОЖНОСТЬ</div>
-          <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--btc)" id="diff-value">—</div>
-          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px" id="diff-unit-label">T</div>
+
+      <!-- Текущее значение + ATH% -->
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--line)">
+        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:6px">ТЕКУЩЕЕ ЗНАЧЕНИЕ</div>
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <span style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--btc);letter-spacing:-.02em" id="diff-value">—</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--dim)" id="diff-unit-label">T</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--dim)">·</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--txt)" id="diff-ath-pct">— от ATH</span>
+        </div>
+      </div>
+
+      <!-- Шкала позиции в истории -->
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--line)">
+        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:12px">ПОЗИЦИЯ В ИСТОРИИ BITCOIN</div>
+        <div style="position:relative;height:6px;background:var(--line2);border-radius:3px;margin-bottom:22px">
+          <div id="diff-scale-fill" style="position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,rgba(247,147,26,.4),var(--btc));border-radius:3px;transition:width 1s ease"></div>
+          <!-- Epoch markers — static -->
+          <div style="position:absolute;left:0%;top:0;transform:translateX(-50%)">
+            <div style="width:1px;height:6px;background:var(--line2)"></div>
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--dim2);font-family:var(--mono);text-align:center">
+              <div>GENESIS</div><div style="color:var(--dim2);margin-top:1px">~1</div>
+            </div>
+          </div>
+          <div style="position:absolute;left:20%;top:0;transform:translateX(-50%)">
+            <div style="width:1px;height:6px;background:var(--line2)"></div>
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--dim2);font-family:var(--mono);text-align:center">
+              <div>HALVING 1</div><div style="color:var(--dim2);margin-top:1px">~1M</div>
+            </div>
+          </div>
+          <div style="position:absolute;left:40%;top:0;transform:translateX(-50%)">
+            <div style="width:1px;height:6px;background:var(--line2)"></div>
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--dim2);font-family:var(--mono);text-align:center">
+              <div>HALVING 2</div><div style="color:var(--dim2);margin-top:1px">~200B</div>
+            </div>
+          </div>
+          <div style="position:absolute;left:62%;top:0;transform:translateX(-50%)">
+            <div style="width:1px;height:6px;background:var(--line2)"></div>
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--dim2);font-family:var(--mono);text-align:center">
+              <div>HALVING 3</div><div style="color:var(--dim2);margin-top:1px">~20T</div>
+            </div>
+          </div>
+          <div style="position:absolute;left:82%;top:0;transform:translateX(-50%)">
+            <div style="width:1px;height:6px;background:var(--line2)"></div>
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--dim2);font-family:var(--mono);text-align:center">
+              <div>HALVING 4</div><div style="color:var(--dim2);margin-top:1px">~80T</div>
+            </div>
+          </div>
+          <!-- Current position marker (dynamic) -->
+          <div id="diff-scale-marker" style="position:absolute;top:-3px;width:12px;height:12px;background:var(--btc);border-radius:50%;transform:translateX(-50%);left:0%;transition:left 1s ease;box-shadow:0 0 6px rgba(247,147,26,.5)">
+            <div id="diff-scale-label" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--btc);font-family:var(--mono);font-weight:700">СЕЙЧАС</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 интерпретации -->
+      <div style="display:grid;grid-template-columns:1fr 1fr">
+        <div style="padding:12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <span style="font-size:13px">⛏️</span>
+            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">ДЛЯ МАЙНЕРА</span>
+          </div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--btc);margin-bottom:4px" id="diff-blocktime">— мин/блок</div>
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5">Среднее время поиска блока в текущей эпохе. Протокол целится в 10 мин.</div>
+        </div>
+        <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <span style="font-size:13px">📊</span>
+            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">В ЦИКЛЕ</span>
+          </div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);margin-bottom:4px" id="diff-cycle-val">—% от ATH</div>
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5" id="diff-cycle-desc">—</div>
         </div>
         <div style="padding:12px 14px;border-right:1px solid var(--line)">
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
-          <div style="font-size:20px;font-weight:700;font-family:var(--mono)" id="diff-change">—</div>
-          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px">ОТ ПРОШЛОГО РЕТАРГЕТА</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <span style="font-size:13px">🖥️</span>
+            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">В ЖЕЛЕЗЕ</span>
+          </div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:#60A5FA;margin-bottom:4px" id="diff-asic">— машин</div>
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5">Эквивалент Antminer S19 (110 TH/s), работающих одновременно.</div>
         </div>
         <div style="padding:12px 14px">
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px">БЛОКОВ ОСТАЛОСЬ</div>
-          <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--txt)" id="diff-blocks">—</div>
-          <div style="font-size:9px;font-family:var(--mono);color:var(--dim);margin-top:2px" id="diff-eta">~—</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <span style="font-size:13px">📈</span>
+            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">РОСТ</span>
+          </div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:#A78BFA;margin-bottom:4px" id="diff-yoy">× — за год</div>
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5" id="diff-yoy-desc">—</div>
         </div>
       </div>
-      <!-- Progress bar to next retarget -->
-      <div style="padding:10px 14px 4px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <span style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em">ПРОГРЕСС ЭПОХИ</span>
-          <span style="font-size:9px;font-family:var(--mono);color:var(--btc)" id="diff-progress-pct">—%</span>
+
+      <!-- История + прогресс эпохи -->
+      <div style="border-top:1px solid var(--line)">
+        <div style="padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">ИСТОРИЯ · 52 НЕДЕЛИ</span>
+          <span style="font-size:8px;color:var(--dim);font-family:var(--mono)">ПРОГРЕСС ЭПОХИ <span style="color:var(--btc)" id="diff-progress-pct">—%</span> · <span id="diff-blocks">—</span> БЛ. ОСТАЛОСЬ</span>
         </div>
-        <div class="bar-track">
+        <svg id="diff-chart" width="100%" viewBox="0 0 600 72" preserveAspectRatio="none" style="display:block"></svg>
+        <div style="height:3px;background:var(--line2);margin:0 14px 0">
           <div class="bar-fill" id="diffBar" style="width:0%"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--dim);font-family:var(--mono)">
-          <span>СТАРТ ЭПОХИ</span><span>2016 БЛОКОВ</span>
-        </div>
-      </div>
-      <!-- SVG chart of difficulty history -->
-      <div style="padding:10px 14px 6px;border-top:1px solid var(--line);margin-top:6px">
-        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:6px">ИСТОРИЯ · 1 ГОД</div>
-        <svg id="diff-chart" width="100%" viewBox="0 0 600 80" preserveAspectRatio="none" style="display:block"></svg>
-        <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:8px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:8px;color:var(--dim2);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
     </div>
 
@@ -2592,7 +2663,7 @@ setInterval(fetchBlocks, 60000);
 fetchProdCost();
 setInterval(fetchProdCost, 300000); // обновлять Production Cost каждые 5 минут
 
-// ── DIFFICULTY — live data ───────────────────────────────────────────────────
+// ── DIFFICULTY — Вариант 2: Контекст ────────────────────────────────────────
 async function fetchDifficulty() {
   try {
     const [adjRes, hrRes] = await Promise.all([
@@ -2602,100 +2673,158 @@ async function fetchDifficulty() {
     const adj = await adjRes.json();
     const hr  = await hrRes.json();
 
-    // ── Current difficulty ──
-    // adj fields: difficultyChange, progressPercent, remainingBlocks,
-    //             estimatedRetargetDate, previousRetarget, nextRetargetHeight
-    const diffRaw    = adj.nextRetargetHeight
-      ? null  // not directly in adj — derive from hashrate
+    const diffs     = hr.difficulty  || [];
+    const hashrates = hr.hashrates   || [];
+    const lastDiff  = diffs.length   ? diffs[diffs.length - 1]     : null;
+    const curDiff   = lastDiff       ? lastDiff.difficulty          : null;
+    const firstDiff = diffs.length   ? diffs[0].difficulty          : null;
+
+    // ATH difficulty (max in history array)
+    const athDiff = diffs.length ? Math.max(...diffs.map(d => d.difficulty)) : null;
+    const athPct  = (curDiff && athDiff) ? (curDiff / athDiff * 100) : null;
+
+    // Year-over-year multiplier
+    const yoyDiff = firstDiff && curDiff ? (curDiff / firstDiff) : null;
+
+    // Current hashrate (last entry, H/s → EH/s)
+    const lastHR    = hashrates.length ? hashrates[hashrates.length - 1] : null;
+    const hrEH      = lastHR ? (lastHR.avgHashrate / 1e18) : null;
+
+    // Derived: avg block time = difficulty * 2^32 / hashrate / 60
+    const blockTimeMins = (curDiff && lastHR)
+      ? (curDiff * Math.pow(2, 32) / lastHR.avgHashrate / 60)
       : null;
 
-    // Current difficulty from last hashrate entry
-    const diffs = hr.difficulty || [];
-    const lastDiff = diffs.length ? diffs[diffs.length - 1] : null;
-    const curDiff  = lastDiff ? lastDiff.difficulty : null;
+    // ASIC equivalent (Antminer S19 = 110 TH/s)
+    const asicM = hrEH ? (hrEH * 1e18 / 110e12 / 1e6) : null;
 
-    // Format difficulty: divide by 1T for display
-    function fmtDiff(d) {
-      if (!d) return '—';
-      const t = d / 1e12;
-      return t >= 100 ? Math.round(t) + 'T' : t.toFixed(1) + 'T';
-    }
+    // ── Update DOM ────────────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
 
-    // Update stats
-    const elVal  = document.getElementById('diff-value');
-    const elChg  = document.getElementById('diff-change');
-    const elBlks = document.getElementById('diff-blocks');
-    const elEta  = document.getElementById('diff-eta');
-    const elPct  = document.getElementById('diff-progress-pct');
-    const elBar  = document.getElementById('diffBar');
-    const elNext = document.getElementById('diff-next-label');
-
-    if (elVal && curDiff) {
-      const tVal = curDiff / 1e12;
-      elVal.textContent = tVal >= 100 ? Math.round(tVal) : tVal.toFixed(2);
-      document.getElementById('diff-unit-label').textContent = 'TRILLION (T)';
-    }
-
-    if (elChg && adj.difficultyChange !== undefined) {
+    // Header: change % + next retarget
+    if (adj.difficultyChange !== undefined) {
       const chg = adj.difficultyChange;
-      elChg.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-      elChg.style.color = chg >= 0 ? 'var(--grn)' : 'var(--red)';
+      const el = $('diff-change');
+      if (el) {
+        el.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+        el.style.color = chg >= 0 ? 'var(--grn)' : 'var(--red)';
+      }
     }
-
-    if (elBlks && adj.remainingBlocks !== undefined) {
-      elBlks.textContent = adj.remainingBlocks.toLocaleString();
-    }
-
-    if (elEta && adj.estimatedRetargetDate) {
+    if (adj.estimatedRetargetDate) {
       const eta = new Date(adj.estimatedRetargetDate * 1000);
-      elEta.textContent = '~' + eta.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+      const el = $('diff-next-label');
+      if (el) el.textContent = 'РЕТАРГЕТ ' + eta.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).toUpperCase();
     }
 
-    if (elPct && adj.progressPercent !== undefined) {
+    // Hero value
+    if (curDiff) {
+      const tVal = curDiff / 1e12;
+      const el = $('diff-value');
+      if (el) el.textContent = tVal >= 100 ? Math.round(tVal) : tVal.toFixed(2);
+      const ul = $('diff-unit-label');
+      if (ul) ul.textContent = 'TRILLION';
+    }
+
+    // ATH % in hero row
+    if (athPct) {
+      const el = $('diff-ath-pct');
+      if (el) {
+        el.textContent = athPct.toFixed(1) + '% от ATH';
+        el.style.color = athPct >= 90 ? 'var(--red)' : athPct >= 70 ? 'var(--btc)' : 'var(--grn)';
+      }
+    }
+
+    // Historical scale — move fill + marker
+    if (athPct) {
+      const fill   = $('diff-scale-fill');
+      const marker = $('diff-scale-marker');
+      const lbl    = $('diff-scale-label');
+      const pct    = Math.min(98, athPct); // cap at 98% so dot stays visible
+      setTimeout(() => {
+        if (fill)   fill.style.width = pct + '%';
+        if (marker) marker.style.left = pct + '%';
+        if (lbl)    lbl.textContent   = athPct.toFixed(1) + '%';
+      }, 400);
+    }
+
+    // Card 1 — для майнера: avg block time
+    if (blockTimeMins) {
+      const el = $('diff-blocktime');
+      if (el) el.textContent = blockTimeMins.toFixed(1) + ' мин/блок';
+    }
+
+    // Card 2 — в цикле: ATH%
+    if (athPct) {
+      const val  = $('diff-cycle-val');
+      const desc = $('diff-cycle-desc');
+      if (val) {
+        val.textContent  = athPct.toFixed(1) + '% от ATH';
+        val.style.color  = athPct >= 90 ? 'var(--red)' : athPct >= 70 ? 'var(--btc)' : 'var(--grn)';
+      }
+      if (desc) desc.textContent = athPct >= 90
+        ? 'Вблизи исторического максимума. Высокая нагрузка на майнеров.'
+        : athPct >= 70
+        ? 'Высокий уровень. Сеть в фазе активного роста.'
+        : 'Умеренный уровень. Сеть в стабильном состоянии.';
+    }
+
+    // Card 3 — в железе: ASIC эквивалент
+    if (asicM) {
+      const el = $('diff-asic');
+      if (el) el.textContent = asicM.toFixed(1) + 'M машин';
+    }
+
+    // Card 4 — рост год к году
+    if (yoyDiff) {
+      const el   = $('diff-yoy');
+      const desc = $('diff-yoy-desc');
+      if (el) el.textContent = '×' + yoyDiff.toFixed(2) + ' за год';
+      if (desc && firstDiff) {
+        desc.textContent = 'Год назад: ' + (firstDiff / 1e12).toFixed(1) + 'T. '
+          + 'Хешрейт сети вырос пропорционально.';
+      }
+    }
+
+    // Epoch progress bar + remaining blocks
+    if (adj.progressPercent !== undefined) {
       const pct = Math.min(100, Math.max(0, adj.progressPercent));
-      elPct.textContent = pct.toFixed(1) + '%';
-      setTimeout(() => { if (elBar) elBar.style.width = pct.toFixed(1) + '%'; }, 300);
+      const elPct = $('diff-progress-pct');
+      const elBar = $('diffBar');
+      const elBlk = $('diff-blocks');
+      if (elPct) elPct.textContent = pct.toFixed(1) + '%';
+      if (elBlk && adj.remainingBlocks !== undefined) elBlk.textContent = adj.remainingBlocks.toLocaleString();
+      setTimeout(() => { if (elBar) elBar.style.width = pct.toFixed(1) + '%'; }, 500);
     }
 
-    if (elNext && adj.estimatedRetargetDate) {
-      const eta = new Date(adj.estimatedRetargetDate * 1000);
-      elNext.textContent = 'РЕТАРГЕТ ~' + eta.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).toUpperCase();
-    }
-
-    // ── SVG chart of difficulty history ──
-    const svg = document.getElementById('diff-chart');
-    const labelsEl = document.getElementById('diff-chart-labels');
+    // ── SVG history chart ─────────────────────────────────────────────────────
+    const svg      = $('diff-chart');
+    const labelsEl = $('diff-chart-labels');
     if (svg && diffs.length > 1) {
-      const W = 600, H = 80, PAD = { t: 8, b: 4 };
+      const W = 600, H = 72, Pt = 6, Pb = 4;
       const vals = diffs.map(d => d.difficulty);
       const minD = Math.min(...vals), maxD = Math.max(...vals);
       const range = maxD - minD || 1;
       const n = diffs.length;
-
       const pts = diffs.map((d, i) => ({
         x: (i / (n - 1)) * W,
-        y: PAD.t + (1 - (d.difficulty - minD) / range) * (H - PAD.t - PAD.b),
+        y: Pt + (1 - (d.difficulty - minD) / range) * (H - Pt - Pb),
         ts: d.time * 1000,
       }));
-
       const lineD = pts.map((p, i) => (i === 0 ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}` : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`)).join(' ');
-      const areaD = lineD + ` L${pts[n-1].x},${H} L0,${H} Z`;
-
+      const areaD = lineD + ` L${W},${H} L0,${H} Z`;
       svg.innerHTML = `
         <defs>
-          <linearGradient id="diff-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--btc)" stop-opacity="0.25"/>
+          <linearGradient id="dg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--btc)" stop-opacity=".2"/>
             <stop offset="100%" stop-color="var(--btc)" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <path d="${areaD}" fill="url(#diff-grad)"/>
+        <path d="${areaD}" fill="url(#dg)"/>
         <path d="${lineD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
         <circle cx="${pts[n-1].x.toFixed(1)}" cy="${pts[n-1].y.toFixed(1)}" r="3" fill="var(--btc)"/>
       `;
-
-      // X-axis labels: first, middle, last
       if (labelsEl) {
-        const picks = [pts[0], pts[Math.floor(n/2)], pts[n-1]];
+        const picks = [pts[0], pts[Math.floor(n / 2)], pts[n - 1]];
         labelsEl.innerHTML = picks.map(p =>
           `<span>${new Date(p.ts).toLocaleDateString('ru-RU', { month: 'short', year: '2-digit' })}</span>`
         ).join('');

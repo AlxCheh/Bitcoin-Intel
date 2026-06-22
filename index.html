@@ -2747,8 +2747,8 @@ function fetchBlocks() {
 fetchBlocks();
 setInterval(fetchBlocks, 60000);
 fetchProdCost();
-setInterval(fetchProdCost, 300000); // обновлять Production Cost каждые 5 минут
-initPriceChart(); // инициализировать график цены на стартовой вкладке
+setInterval(fetchProdCost, 300000);
+initPriceChart();
 
 // ── DIFFICULTY — Вариант 2: Контекст ────────────────────────────────────────
 async function fetchDifficulty() {
@@ -2966,7 +2966,9 @@ function initPriceChart() {
   // ── TERMINAL PRICE CHART ─────────────────────────────────────────────────
   (function renderTerminalChart() {
     const wrap = document.getElementById('terminal-price-chart');
-    if (!wrap) return;
+    if (!wrap) { console.error('PRICE CHART: wrap not found'); return; }
+    wrap.innerHTML = '<div style="padding:8px 14px;font-family:monospace;font-size:10px;color:#F7931A">INIT OK — загрузка данных...</div>';
+    console.log('PRICE CHART: wrap found, starting init');
 
     // CSS variables from project palette (resolved once)
     const CS = getComputedStyle(document.documentElement);

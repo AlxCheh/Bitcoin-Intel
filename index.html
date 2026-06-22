@@ -2111,6 +2111,7 @@ const DIR_META = {
 };
 
 let sigFilter = 'all';
+let sigActorFilter = 'all';
 let sigMode = 'date'; // 'date' | 'theme'
 
 const THEME_META = {
@@ -2119,6 +2120,21 @@ const THEME_META = {
   infrastructure:      { label: '🔗 ИНФРАСТРУКТУРА',    order: 2 },
   macro:               { label: '📉 МАКРО',             order: 3 },
   narrative:           { label: '📰 НАРРАТИВ',          order: 4 }
+};
+
+const ACTOR_META = {
+  etf:       { label: '🏦 ETF' },
+  corporate: { label: '🏢 КОРПОРАЦИИ' },
+  government:{ label: '🏛️ ПРАВИТЕЛЬСТВА' },
+  defi:      { label: '🔗 DEFI' },
+  retail:    { label: '👤 РОЗНИЦА' },
+  miner:     { label: '⛏️ МАЙНЕРЫ' }
+};
+
+const FLOW_META = {
+  inflow:  { icon: '📥', label: 'ПРИТОК' },
+  outflow: { icon: '📤', label: 'ОТТОК' },
+  neutral: { icon: '➖', label: '' }
 };
 
 function renderSignals() {
@@ -2138,37 +2154,56 @@ function renderSignals() {
     + '<div class="sig-sum-cell neu' + (activeSum==='neu'?' active':'') + '" onclick="setSigFilter(\'neu\')""><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
     + '</div>';
 
-  // переключатель режима + кнопки категорий
-  const cats = {};
-  SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
+  // переключатель режима
   let fhtml =
     '<div style="display:flex;gap:8px;margin-bottom:10px">'
     + '<button class="sig-fbtn' + (sigMode==='date'?' active':'') + '" onclick="setSigMode(\'date\')">📅 ПО ДАТЕ</button>'
     + '<button class="sig-fbtn' + (sigMode==='theme'?' active':'') + '" onclick="setSigMode(\'theme\')">🗂 ПО ТЕМЕ</button>'
     + '</div>';
-  fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px">'
-    + '<button class="sig-fbtn' + (sigFilter === 'all' ? ' active' : '') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
+
+  // фильтры по категории
+  const cats = {};
+  SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
+  fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
+    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
   Object.keys(cats).forEach(c => {
-    fhtml += '<button class="sig-fbtn' + (sigFilter === c ? ' active' : '') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
+    fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
   });
   fhtml += '</div>';
+
+  // фильтры по actor — только те акторы что есть в данных
+  const actors = {};
+  SIGNALS.forEach(s => { if (s.actor) actors[s.actor] = true; });
+  fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid #1A1F2A">'
+    + '<button class="sig-fbtn' + (sigActorFilter==='all'?' active':'') + '" onclick="setSigActorFilter(\'all\')" style="font-size:10px">ВСЕ АКТОРЫ</button>';
+  Object.keys(actors).forEach(a => {
+    const meta = ACTOR_META[a] || { label: a.toUpperCase() };
+    fhtml += '<button class="sig-fbtn' + (sigActorFilter===a?' active':'') + '" onclick="setSigActorFilter(\'' + a + '\')" style="font-size:10px">' + meta.label + '</button>';
+  });
+  fhtml += '</div>';
+
   filWrap.innerHTML = fhtml;
 
-  // фильтрация
+  // фильтрация — категория/dir + actor
   const dirKeys = ['pos', 'neg', 'neu'];
   const items = SIGNALS
     .filter(s => sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : s.cat === sigFilter))
+    .filter(s => sigActorFilter === 'all' || s.actor === sigActorFilter)
     .slice().sort((a, b) => b.date.localeCompare(a.date));
 
   function cardHTML(s) {
     const d = DIR_META[s.dir];
     const chips = s.data.map(x => '<span class="sig-chip">' + x + '</span>').join('');
     const horizonLabel = { short: 'SHORT', mid: 'MID', long: 'LONG' }[s.horizon] || '';
+    const flowMeta = s.flow && s.flow !== 'neutral' ? FLOW_META[s.flow] : null;
+    const actorMeta = s.actor ? ACTOR_META[s.actor] : null;
     return '<div class="sig-card ' + s.dir + '">'
       + '<div class="sig-top"><span class="sig-cat">' + s.catLabel + '</span><span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
       + '<div class="sig-signal">' + s.signal + '</div>'
       + '<div class="sig-data">' + chips
       + (horizonLabel ? '<span class="sig-chip" style="opacity:.5">⏱ ' + horizonLabel + '</span>' : '')
+      + (actorMeta ? '<span class="sig-chip" style="opacity:.5">' + actorMeta.label + '</span>' : '')
+      + (flowMeta ? '<span class="sig-chip" style="opacity:.5">' + flowMeta.icon + ' ' + flowMeta.label + '</span>' : '')
       + '</div>'
       + '<div class="sig-body">'
       + '<p><span class="lbl">КОНТЕКСТ.</span> ' + s.context + '</p>'
@@ -2179,9 +2214,10 @@ function renderSignals() {
   }
 
   if (sigMode === 'date') {
-    feed.innerHTML = items.map(cardHTML).join('');
+    feed.innerHTML = items.length
+      ? items.map(cardHTML).join('')
+      : '<div style="padding:24px;text-align:center;color:#4A5568;font-family:\'IBM Plex Mono\',monospace;font-size:12px">НЕТ СИГНАЛОВ ПО ВЫБРАННЫМ ФИЛЬТРАМ</div>';
   } else {
-    // группировка по theme
     const groups = {};
     items.forEach(s => {
       const t = s.theme || 'narrative';
@@ -2191,18 +2227,25 @@ function renderSignals() {
     const sortedThemes = Object.keys(groups).sort((a,b) =>
       (THEME_META[a]?.order ?? 99) - (THEME_META[b]?.order ?? 99)
     );
-    feed.innerHTML = sortedThemes.map(t => {
-      const meta = THEME_META[t] || { label: t.toUpperCase() };
-      return '<div style="margin-bottom:8px;padding:6px 0;border-bottom:1px solid #1A1F2A">'
-        + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:#F7931A;letter-spacing:.08em">'
-        + meta.label + ' · ' + groups[t].length + ' сигн.</span></div>'
-        + groups[t].map(cardHTML).join('');
-    }).join('');
+    feed.innerHTML = sortedThemes.length
+      ? sortedThemes.map(t => {
+          const meta = THEME_META[t] || { label: t.toUpperCase() };
+          return '<div style="margin-bottom:8px;padding:6px 0;border-bottom:1px solid #1A1F2A">'
+            + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:#F7931A;letter-spacing:.08em">'
+            + meta.label + ' · ' + groups[t].length + ' сигн.</span></div>'
+            + groups[t].map(cardHTML).join('');
+        }).join('')
+      : '<div style="padding:24px;text-align:center;color:#4A5568;font-family:\'IBM Plex Mono\',monospace;font-size:12px">НЕТ СИГНАЛОВ ПО ВЫБРАННЫМ ФИЛЬТРАМ</div>';
   }
 }
 
 function setSigMode(mode) {
   sigMode = mode;
+  renderSignals();
+}
+
+function setSigActorFilter(actor) {
+  sigActorFilter = actor;
   renderSignals();
 }
 

@@ -2512,7 +2512,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
 
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
   if (id === 'analytics') initCharts();
   if (id === 'market')    renderSignals();
   if (id === 'pools') {
@@ -2748,6 +2748,7 @@ fetchBlocks();
 setInterval(fetchBlocks, 60000);
 fetchProdCost();
 setInterval(fetchProdCost, 300000); // обновлять Production Cost каждые 5 минут
+initPriceChart(); // инициализировать график цены на стартовой вкладке
 
 // ── DIFFICULTY — Вариант 2: Контекст ────────────────────────────────────────
 async function fetchDifficulty() {
@@ -2956,6 +2957,11 @@ function initCharts() {
       }
     }
   });
+
+let priceChartInited = false;
+function initPriceChart() {
+  if (priceChartInited) return;
+  priceChartInited = true;
 
   // ── TERMINAL PRICE CHART ─────────────────────────────────────────────────
   (function renderTerminalChart() {
@@ -3427,6 +3433,7 @@ function initCharts() {
       }
     });
   })();
+} // end initPriceChart
 
   // Price (Chart.js — REMOVED, replaced by Terminal chart above)
 

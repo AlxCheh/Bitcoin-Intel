@@ -1123,14 +1123,15 @@ header {
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="terminal-price-chart" style="margin:0 16px 12px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
 
-    <!-- ══ БЛОК 3: СИГНАЛ ДНЯ ══ -->
-    <div class="dash-signal" id="dash-signal-card">
+    <!-- ══ БЛОК 3: СВОДКА ПО ТЕМЕ ══ -->
+    <div class="dash-signal" id="dash-theme-card">
       <div class="dash-signal-head">
-        <span class="dash-signal-cat" id="dash-sig-cat">📰 НАРРАТИВ · ПОСЛЕДНИЙ СИГНАЛ</span>
-        <span class="dash-signal-dir" id="dash-sig-dir">🟢 ПОЗИТИВ</span>
+        <span id="dash-theme-label">ДОМИНИРУЮЩАЯ ТЕМА</span>
+        <span id="dash-theme-count" style="color:var(--btc)">— сигналов</span>
       </div>
-      <div class="dash-signal-title" id="dash-sig-title">BlackRock: ETF втягивают биткоинеров в традфин — «Великая конвергенция»</div>
-      <div class="dash-signal-chips" id="dash-sig-chips"></div>
+      <div class="dash-signal-title" id="dash-theme-name">—</div>
+      <div class="dash-sum-bar" id="dash-theme-bar" style="margin-bottom:6px"></div>
+      <div class="dash-sum-counts" id="dash-theme-counts"></div>
     </div>
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
@@ -2366,17 +2367,39 @@ function renderDashboard() {
 
   if (!window.SIGNALS || !SIGNALS.length) return;
 
-  // ── Блок 3: последний сигнал ──
-  const last = SIGNALS[SIGNALS.length - 1];
-  const card = document.getElementById('dash-signal-card');
-  const dirMap = { pos: { icon: '🟢', label: 'ПОЗИТИВ', cls: 'pos' }, neg: { icon: '🔴', label: 'НЕГАТИВ', cls: 'neg' }, neu: { icon: '⚪', label: 'НЕЙТРАЛ', cls: 'neu' } };
-  if (card && last) {
-    const d = dirMap[last.dir] || dirMap.neu;
-    card.className = 'dash-signal ' + d.cls;
-    document.getElementById('dash-sig-cat').textContent = last.catLabel + ' · ПОСЛЕДНИЙ СИГНАЛ';
-    document.getElementById('dash-sig-dir').textContent = d.icon + ' ' + d.label;
-    document.getElementById('dash-sig-title').textContent = last.signal;
-    document.getElementById('dash-sig-chips').innerHTML = (last.data||[]).map(c => '<span class="sig-chip">' + c + '</span>').join('');
+  // ── Блок 3: сводка по доминирующей теме ──
+  const THEME_NAMES = {
+    institutionalization: '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
+    supply:               '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
+    infrastructure:       '🔗 ИНФРАСТРУКТУРА',
+    macro:                '📉 МАКРОЭКОНОМИКА',
+    narrative:            '📰 НАРРАТИВ'
+  };
+  const themeCounts = {};
+  const themeDir    = {};
+  SIGNALS.forEach(s => {
+    const t = s.theme || 'narrative';
+    if (!themeCounts[t]) { themeCounts[t] = 0; themeDir[t] = { pos:0, neg:0, neu:0 }; }
+    themeCounts[t]++;
+    themeDir[t][s.dir] = (themeDir[t][s.dir] || 0) + 1;
+  });
+  const topTheme = Object.keys(themeCounts).sort((a,b) => themeCounts[b] - themeCounts[a])[0];
+  if (topTheme) {
+    const n   = themeCounts[topTheme];
+    const dir = themeDir[topTheme];
+    const cls = dir.pos >= dir.neg ? (dir.neg === 0 ? 'pos' : '') : 'neg';
+    const card = document.getElementById('dash-theme-card');
+    if (card) card.className = 'dash-signal ' + cls;
+    document.getElementById('dash-theme-name').textContent  = THEME_NAMES[topTheme] || topTheme.toUpperCase();
+    document.getElementById('dash-theme-count').textContent = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+    document.getElementById('dash-theme-bar').innerHTML =
+      '<div class="dsb-pos" style="flex:' + (dir.pos||0) + '"></div>' +
+      '<div class="dsb-neg" style="flex:' + (dir.neg||0) + '"></div>' +
+      '<div class="dsb-neu" style="flex:' + (dir.neu||0.1) + '"></div>';
+    document.getElementById('dash-theme-counts').innerHTML =
+      '<span class="dsc-pos">🟢 ' + (dir.pos||0) + '</span>' +
+      '<span class="dsc-neg">🔴 ' + (dir.neg||0) + '</span>' +
+      '<span class="dsc-neu">⚪ ' + (dir.neu||0) + '</span>';
   }
 
   // ── Блок 4: сводка ──

@@ -3010,8 +3010,23 @@ function initCharts() {
       render();
     };
 
-    // Show loading state immediately
-    wrap.innerHTML = '<div style="padding:24px 16px;color:' + C.dim + ';font-family:' + C.mono + ';font-size:10px;letter-spacing:0.1em">ЗАГРУЗКА ДАННЫХ...</div>';
+    // Show skeleton immediately
+    wrap.innerHTML =
+      '<div style="padding:10px 14px 6px;border-bottom:1px solid ' + C.line + ';display:flex;justify-content:space-between;align-items:center">' +
+        '<div style="width:90px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
+        '<div style="width:60px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
+      '</div>' +
+      '<div style="padding:12px 14px 14px">' +
+        '<svg width="100%" height="80" style="display:block;opacity:.2">' +
+          '<polyline points="0,60 40,50 80,55 120,35 160,40 200,25 240,30 280,20 320,28 360,15 400,22 440,18 480,10" fill="none" stroke="' + C.btc + '" stroke-width="1.5"/>' +
+        '</svg>' +
+      '</div>';
+    if (!document.getElementById('skPulseKF')) {
+      const st = document.createElement('style');
+      st.id = 'skPulseKF';
+      st.textContent = '@keyframes skPulse{0%,100%{opacity:.3}50%{opacity:.7}}';
+      document.head.appendChild(st);
+    }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
     // Normalise raw mempool price array → {ts, price} deduplicated by day
@@ -3065,64 +3080,44 @@ function initCharts() {
 
     // ── Main load function ────────────────────────────────────────────────────
     async function loadPriceData() {
-      // 1. Read cache
       const cached = loadCache();
-      const today = todayStr();
+      const today  = todayStr();
+      const cutoffTs = Date.now() - 366 * 86400000;
 
-      // Find the last cached day
+      // ── Шаг 1: мгновенно рендерим кеш если он есть ──
+      if (cached.length) {
+        allData = cached.filter(d => d.ts >= cutoffTs);
+        if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
+          allData[allData.length - 1].price = Math.round(dashBtcPrice);
+        dataLoaded = true;
+        render(); // моментальный рендер из кеша
+      }
+
+      // ── Шаг 2: определяем нужен ли сетевой запрос ──
       const lastCachedDay = cached.length
         ? (cached[cached.length - 1].day || new Date(cached[cached.length - 1].ts).toISOString().slice(0, 10))
         : null;
 
-      // 2. Decide what to fetch
-      let fetched = [];
+      if (lastCachedDay === today) return; // кеш свежий — ничего не делаем
 
-      if (!lastCachedDay) {
-        // Cache empty — fetch full history
-        wrap.innerHTML = '<div style="padding:24px 16px;color:' + C.dim + ';font-family:' + C.mono + ';font-size:10px;letter-spacing:0.1em">ПЕРВАЯ ЗАГРУЗКА...</div>';
-        const res = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
-        const json = await res.json();
-        const cutoff = Math.floor(Date.now() / 1000) - 365 * 86400;
-        const raw = (json.prices || []).filter(p => p.time >= cutoff);
-        fetched = normalisePrices(raw);
+      // ── Шаг 3: один запрос — всегда полная история, фильтруем нужное ──
+      const fromTs = lastCachedDay
+        ? Math.floor(new Date(lastCachedDay).getTime() / 1000)
+        : Math.floor(Date.now() / 1000) - 365 * 86400;
 
-      } else if (lastCachedDay < today) {
-        // Cache exists but missing some days — fetch only from last cached day
-        // mempool returns weekly data points; we fetch from lastCached timestamp
-        const fromTs = Math.floor(new Date(lastCachedDay).getTime() / 1000);
-        const res = await fetch('https://mempool.space/api/v1/historical-price?currency=USD&timestamp=' + Math.floor(Date.now() / 1000));
-        const json = await res.json();
-        // This returns one point; supplement with a full fetch if gap > 7 days
-        const gapDays = Math.floor((Date.now() - new Date(lastCachedDay).getTime()) / 86400000);
-        if (gapDays > 7) {
-          // Gap too large for single-point fetch — get full history and filter
-          const res2 = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
-          const json2 = await res2.json();
-          const raw2 = (json2.prices || []).filter(p => p.time > fromTs);
-          fetched = normalisePrices(raw2);
-        } else {
-          // Small gap — single point is enough for today
-          fetched = normalisePrices(json.prices || []);
-        }
+      const res  = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
+      const json = await res.json();
+      const raw  = (json.prices || []).filter(p => p.time > fromTs);
+      const fetched = normalisePrices(raw);
 
-      }
-      // else: lastCachedDay === today → nothing to fetch
-
-      // 3. Merge + save
+      // ── Шаг 4: merge + save + re-render ──
       const merged = mergeData(cached, fetched);
       saveCache(merged);
-
-      // 4. Trim to 365 days for display
-      const cutoffTs = Date.now() - 366 * 86400000;
       allData = merged.filter(d => d.ts >= cutoffTs);
-
-      // 5. Sync last point with live price
-      if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length) {
+      if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
         allData[allData.length - 1].price = Math.round(dashBtcPrice);
-      }
-
       dataLoaded = true;
-      render();
+      render(); // обновляем с актуальными данными
     }
 
     loadPriceData().catch(() => {

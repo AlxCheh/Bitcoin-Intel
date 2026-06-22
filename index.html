@@ -3120,18 +3120,6 @@ function initCharts() {
       render(); // обновляем с актуальными данными
     }
 
-    loadPriceData().catch(() => {
-      // If network fails but cache exists — render from cache
-      const cached = loadCache();
-      if (cached.length) {
-        allData = cached;
-        dataLoaded = true;
-        render();
-      } else {
-        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Нет данных и нет соединения с mempool.space</div>';
-      }
-    });
-
     // Formatters
     const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');
     const fmtD = (ts, compact) => {
@@ -3428,7 +3416,16 @@ function initCharts() {
       wrap.appendChild(statusBar);
     }
 
-    render();
+    loadPriceData().catch(() => {
+      const cached = loadCache();
+      if (cached.length) {
+        allData = cached.filter(d => d.ts >= Date.now() - 366 * 86400000);
+        dataLoaded = true;
+        render();
+      } else {
+        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Нет данных. Нет соединения с mempool.space</div>';
+      }
+    });
   })();
 
   // Price (Chart.js — REMOVED, replaced by Terminal chart above)

@@ -2098,7 +2098,9 @@ async function loadSignals() {
   try {
     const resp = await fetch('signals.json?v=' + Date.now());
     SIGNALS = await resp.json();
-    // если вкладка market уже открыта — перерисовать
+    // перерисовать дашборд с загруженными сигналами
+    renderDashboard();
+    // если вкладка market уже открыта — перерисовать список
     const marketTab = document.getElementById('tab-market');
     if (marketTab && marketTab.classList.contains('active')) renderSignals();
   } catch(e) {

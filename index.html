@@ -1082,7 +1082,10 @@ header {
     <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
     <div class="dash-cycle">
       <div class="dash-cycle-label">ФАЗА ЦИКЛА · BITCOIN 2026</div>
-      <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--dim)" id="dash-ratio">—</div>
+      </div>
       <div class="dash-cycle-sub" id="dash-phase-sub">Цена у себестоимости добычи. Исторически — зона долгосрочных покупок перед ростом.</div>
       <div class="dash-cycle-track">
         <div class="dct-seg done"></div>
@@ -2316,6 +2319,10 @@ function renderDashboard() {
   if (phaseEl) {
     const { phase, sub, cls, seg } = calcCyclePhase(dashBtcPrice, dashProdCost);
     phaseEl.textContent = phase;
+    const ratioEl = document.getElementById('dash-ratio');
+    if (ratioEl && dashBtcPrice && dashProdCost) {
+      ratioEl.textContent = '×' + (dashBtcPrice / dashProdCost).toFixed(2);
+    }
     if (subEl) subEl.textContent = sub;
     if (cycleBlock) {
       cycleBlock.classList.remove('warn', 'danger');

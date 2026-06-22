@@ -4,6 +4,9 @@
     "cat": "macro",
     "catLabel": "🏦 МАКРО",
     "dir": "neg",
+    "horizon": "short",
+    "theme": "institutionalization",
+    "weight": "market",
     "signal": "STRC Сэйлора падает ниже номинала — дивидендная машина под давлением",
     "data": [
       "STRC ~$85",
@@ -20,6 +23,9 @@
     "cat": "narrative",
     "catLabel": "📰 НАРРАТИВ",
     "dir": "pos",
+    "horizon": "mid",
+    "theme": "institutionalization",
+    "weight": "media",
     "signal": "BlackRock: ETF втягивают биткоинеров в традфин — «Великая конвергенция»",
     "data": [
       "IBIT $48 млрд",
@@ -36,6 +42,9 @@
     "cat": "layer2",
     "catLabel": "🔗 LAYER 2",
     "dir": "pos",
+    "horizon": "long",
+    "theme": "infrastructure",
+    "weight": "media",
     "signal": "Stacks SIP-034: пропускная способность Bitcoin DeFi выросла до 30x",
     "data": [
       "до 30x для DeFi",
@@ -52,6 +61,9 @@
     "cat": "ownership",
     "catLabel": "🏛️ ВЛАДЕНИЕ",
     "dir": "neu",
+    "horizon": "long",
+    "theme": "institutionalization",
+    "weight": "market",
     "signal": "Институты контролируют ~58% BTC — к 2035 прогноз превысит большинство",
     "data": [
       "Individuals 6.54M",
@@ -69,6 +81,9 @@
     "cat": "layer2",
     "catLabel": "🔗 LAYER 2",
     "dir": "pos",
+    "horizon": "mid",
+    "theme": "infrastructure",
+    "weight": "market",
     "signal": "Lightning Network: $1,17 млрд за ноябрь — исторический максимум объёма",
     "data": [
       "$1,17 млрд/мес",
@@ -85,6 +100,9 @@
     "cat": "narrative",
     "catLabel": "📰 НАРРАТИВ",
     "dir": "neg",
+    "horizon": "short",
+    "theme": "institutionalization",
+    "weight": "market",
     "signal": "Bitcoin ETF: рекордный месячный отток $6,4 млрд на фоне падения BTC на 17%",
     "data": [
       "отток $6,4 млрд/мес",
@@ -101,6 +119,9 @@
     "cat": "narrative",
     "catLabel": "📰 НАРРАТИВ",
     "dir": "pos",
+    "horizon": "long",
+    "theme": "supply",
+    "weight": "primary",
     "signal": "Фразе Сатоши о потерянных монетах исполнилось 16 лет — потеря как свойство системы",
     "data": [
       "21.06.2010 — дата высказывания",

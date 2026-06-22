@@ -2100,6 +2100,485 @@ header {
 // Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
 let SIGNALS = [];
 
+let priceChartInited = false;
+function initPriceChart() {
+  if (priceChartInited) return;
+  priceChartInited = true;
+
+  // ── TERMINAL PRICE CHART ─────────────────────────────────────────────────
+  (function renderTerminalChart() {
+    const wrap = document.getElementById('terminal-price-chart');
+    if (!wrap) { console.error('PRICE CHART: wrap not found'); return; }
+    wrap.innerHTML = '<div style="padding:8px 14px;font-family:monospace;font-size:10px;color:#F7931A">INIT OK — загрузка данных...</div>';
+    console.log('PRICE CHART: wrap found, starting init');
+
+    // CSS variables from project palette (resolved once)
+    const CS = getComputedStyle(document.documentElement);
+    const C = {
+      bg:    CS.getPropertyValue('--bg').trim()    || '#0C0F14',
+      bg2:   CS.getPropertyValue('--bg2').trim()   || '#111520',
+      bg3:   CS.getPropertyValue('--bg3').trim()   || '#171D2B',
+      line:  CS.getPropertyValue('--line').trim()  || '#242A38',
+      line2: CS.getPropertyValue('--line2').trim() || '#2E3648',
+      txt:   CS.getPropertyValue('--txt').trim()   || '#E8EDF5',
+      dim:   CS.getPropertyValue('--dim').trim()   || '#7A8BA0',
+      dim2:  CS.getPropertyValue('--dim2').trim()  || '#2D3748',
+      btc:   CS.getPropertyValue('--btc').trim()   || '#F7931A',
+      grn:   CS.getPropertyValue('--grn').trim()   || '#22C55E',
+      red:   CS.getPropertyValue('--red').trim()   || '#EF4444',
+      mono:  CS.getPropertyValue('--mono').trim()  || "'IBM Plex Mono', monospace",
+    };
+
+    const DAY = 86400000;
+    const now  = Date.now();
+    const PERIODS = [
+      { label: '7D',  days: 7   },
+      { label: '30D', days: 30  },
+      { label: '90D', days: 90  },
+      { label: '1Y',  days: 365 },
+    ];
+    let activePeriod = 2; // default 90D
+
+    // ── localStorage + incremental fetch ────────────────────────────────────
+    // Strategy:
+    //   1. Load cached data from localStorage (instant, no network)
+    //   2. Find the last cached date
+    //   3. Fetch only missing days from mempool.space (timestamp by timestamp)
+    //      — if cache is empty: fetch full history once
+    //      — if cache has today: no fetch at all
+    //   4. Merge, dedupe, trim to 365 days, save back to localStorage
+    //   5. render()
+
+    const LS_KEY = 'btc_price_history_v1';
+    let allData = [];
+    let dataLoaded = false;
+
+    // Expose update hook so fetchProdCost() can sync the live price
+    window.terminalChartUpdate = function(realPrice) {
+      if (!dataLoaded || !realPrice || realPrice <= 0 || !allData.length) return;
+      allData[allData.length - 1].price = Math.round(realPrice);
+      render();
+    };
+
+    // Show skeleton immediately
+    wrap.innerHTML =
+      '<div style="padding:10px 14px 6px;border-bottom:1px solid ' + C.line + ';display:flex;justify-content:space-between;align-items:center">' +
+        '<div style="width:90px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
+        '<div style="width:60px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
+      '</div>' +
+      '<div style="padding:12px 14px 14px">' +
+        '<svg width="100%" height="80" style="display:block;opacity:.2">' +
+          '<polyline points="0,60 40,50 80,55 120,35 160,40 200,25 240,30 280,20 320,28 360,15 400,22 440,18 480,10" fill="none" stroke="' + C.btc + '" stroke-width="1.5"/>' +
+        '</svg>' +
+      '</div>';
+    if (!document.getElementById('skPulseKF')) {
+      const st = document.createElement('style');
+      st.id = 'skPulseKF';
+      st.textContent = '@keyframes skPulse{0%,100%{opacity:.3}50%{opacity:.7}}';
+      document.head.appendChild(st);
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    // Normalise raw mempool price array → {ts, price} deduplicated by day
+    function normalisePrices(rawArr) {
+      const byDay = {};
+      rawArr.forEach(p => {
+        if (!p.time || !p.USD || p.USD <= 0) return;
+        const day = new Date(p.time * 1000).toISOString().slice(0, 10);
+        // keep the last entry per day
+        if (!byDay[day] || p.time > byDay[day].time) byDay[day] = p;
+      });
+      return Object.keys(byDay).sort().map(d => ({
+        ts:    byDay[d].time * 1000,
+        price: Math.round(byDay[d].USD),
+        day:   d,
+      }));
+    }
+
+    // Today's date string (UTC)
+    function todayStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    // Save to localStorage (trim to last 365 days before saving)
+    function saveCache(data) {
+      const cutoff = Date.now() - 366 * 86400000;
+      const trimmed = data.filter(d => d.ts >= cutoff);
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(trimmed));
+      } catch(e) {} // ignore quota errors
+    }
+
+    // Load from localStorage
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch(e) { return []; }
+    }
+
+    // Merge two arrays by day, keep newest price per day, sort ascending
+    function mergeData(existing, incoming) {
+      const byDay = {};
+      [...existing, ...incoming].forEach(p => {
+        const day = p.day || new Date(p.ts).toISOString().slice(0, 10);
+        if (!byDay[day] || p.ts > byDay[day].ts) byDay[day] = { ...p, day };
+      });
+      return Object.keys(byDay).sort().map(d => byDay[d]);
+    }
+
+    // ── Main load function ────────────────────────────────────────────────────
+    async function loadPriceData() {
+      const cached = loadCache();
+      const today  = todayStr();
+      const cutoffTs = Date.now() - 366 * 86400000;
+
+      // ── Шаг 1: мгновенно рендерим кеш если он есть ──
+      if (cached.length) {
+        allData = cached.filter(d => d.ts >= cutoffTs);
+        if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
+          allData[allData.length - 1].price = Math.round(dashBtcPrice);
+        dataLoaded = true;
+        render(); // моментальный рендер из кеша
+      }
+
+      // ── Шаг 2: определяем нужен ли сетевой запрос ──
+      const lastCachedDay = cached.length
+        ? (cached[cached.length - 1].day || new Date(cached[cached.length - 1].ts).toISOString().slice(0, 10))
+        : null;
+
+      if (lastCachedDay === today) return; // кеш свежий — ничего не делаем
+
+      // ── Шаг 3: один запрос — всегда полная история, фильтруем нужное ──
+      const fromTs = lastCachedDay
+        ? Math.floor(new Date(lastCachedDay).getTime() / 1000)
+        : Math.floor(Date.now() / 1000) - 365 * 86400;
+
+      const res  = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
+      const json = await res.json();
+      const raw  = (json.prices || []).filter(p => p.time > fromTs);
+      const fetched = normalisePrices(raw);
+
+      // ── Шаг 4: merge + save + re-render ──
+      const merged = mergeData(cached, fetched);
+      saveCache(merged);
+      allData = merged.filter(d => d.ts >= cutoffTs);
+      if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
+        allData[allData.length - 1].price = Math.round(dashBtcPrice);
+      dataLoaded = true;
+      render(); // обновляем с актуальными данными
+    }
+
+    // Formatters
+    const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');
+    const fmtD = (ts, compact) => {
+      const d = new Date(ts);
+      return compact
+        ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // SVG namespace helper
+    const svgEl = (tag, attrs = {}) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      return el;
+    };
+    const div = (attrs = {}, styles = {}) => {
+      const el = document.createElement('div');
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      Object.assign(el.style, styles);
+      return el;
+    };
+
+    // State
+    let hoverIdx = null;
+
+    function render() {
+      if (!allData.length) return; // wait for API data
+      wrap.innerHTML = '';
+      const data = allData.slice(-PERIODS[activePeriod].days);
+      const prices = data.map(d => d.price);
+      const minP = Math.min(...prices), maxP = Math.max(...prices);
+      const last = data[data.length - 1].price, first = data[0].price;
+      const chg = (last - first) / first * 100;
+      const up = chg >= 0;
+      const accent = up ? C.grn : C.red;
+      const W = 700, PH = 220;
+      const PAD = { t: 20, b: 0 };
+      const range = maxP - minP || 1;
+
+      // Map to SVG coords
+      const pts = data.map((d, i) => ({
+        ...d,
+        x: (i / (data.length - 1)) * W,
+        y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
+      }));
+
+      // ── TOP BAR ──
+      const topBar = div({}, {
+        background: C.bg2, borderBottom: '1px solid ' + C.line, padding: '11px 16px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+      });
+      // Left side
+      const tleft = div({}, { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' });
+      const ticker = document.createElement('span');
+      ticker.textContent = 'BTC/USD';
+      Object.assign(ticker.style, { color: C.btc, fontSize: '14px', fontWeight: 'bold', letterSpacing: '0.18em' });
+      const priceEl = document.createElement('span');
+      priceEl.id = 'tc-price';
+      priceEl.textContent = fmtP(last);
+      Object.assign(priceEl.style, { color: C.txt, fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.02em' });
+      const chgEl = document.createElement('span');
+      chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
+      Object.assign(chgEl.style, { color: accent, fontSize: '12px', background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 7px', borderRadius: '2px' });
+      const dateEl = document.createElement('span');
+      dateEl.id = 'tc-date';
+      Object.assign(dateEl.style, { color: C.dim, fontSize: '10px', fontFamily: C.mono });
+      tleft.appendChild(ticker); tleft.appendChild(priceEl); tleft.appendChild(chgEl); tleft.appendChild(dateEl);
+
+      // Period buttons
+      const tright = div({}, { display: 'flex', gap: '3px' });
+      PERIODS.forEach((per, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = per.label;
+        Object.assign(btn.style, {
+          background: activePeriod === i ? accent : 'transparent',
+          color: activePeriod === i ? C.bg : C.dim,
+          border: '1px solid ' + (activePeriod === i ? accent : C.line),
+          borderRadius: '2px', padding: '3px 9px', fontSize: '10px',
+          fontFamily: C.mono, fontWeight: 'bold',
+          letterSpacing: '0.06em', cursor: 'pointer',
+        });
+        btn.addEventListener('click', () => { activePeriod = i; hoverIdx = null; render(); });
+        tright.appendChild(btn);
+      });
+      topBar.appendChild(tleft); topBar.appendChild(tright); wrap.appendChild(topBar);
+
+      // ── STATS ROW ──
+      const statsRow = div({}, {
+        background: C.bg, borderBottom: '1px solid ' + C.line,
+        padding: '7px 16px', display: 'flex', gap: '24px', flexWrap: 'wrap',
+      });
+      [['HIGH', fmtP(maxP)], ['LOW', fmtP(minP)], ['RANGE', fmtP(maxP - minP)], ['OPEN', fmtP(first)]].forEach(([l, v]) => {
+        const cell = div({}, {});
+        const lbl = document.createElement('div');
+        lbl.textContent = l;
+        Object.assign(lbl.style, { color: C.dim, fontSize: '10px', letterSpacing: '0.12em', fontFamily: C.mono });
+        const val = document.createElement('div');
+        val.textContent = v;
+        Object.assign(val.style, { color: C.txt, fontSize: '13px', marginTop: '2px', fontFamily: C.mono });
+        cell.appendChild(lbl); cell.appendChild(val); statsRow.appendChild(cell);
+      });
+      wrap.appendChild(statsRow);
+
+      // ── PRICE SVG ──
+      const chartWrap = div({}, { position: 'relative' });
+      const svg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${PH}`, preserveAspectRatio: 'none', style: 'display:block;cursor:crosshair' });
+
+      // ── Mean price for zone coloring ──
+      const meanPrice = Math.round(data.reduce((s, d) => s + d.price, 0) / data.length);
+      const meanY = PAD.t + (1 - (meanPrice - minP) / (maxP - minP || 1)) * (PH - PAD.t - 10);
+
+      // Defs — two gradients: green (above mean) and red (below mean)
+      const defs = svgEl('defs');
+      const gradG = svgEl('linearGradient', { id: 'tc-grn', x1: '0', y1: '0', x2: '0', y2: '1' });
+      gradG.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.grn, 'stop-opacity': '0.28' }));
+      gradG.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.grn, 'stop-opacity': '0.04' }));
+      const gradR = svgEl('linearGradient', { id: 'tc-red', x1: '0', y1: '0', x2: '0', y2: '1' });
+      gradR.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.red, 'stop-opacity': '0.04' }));
+      gradR.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.red, 'stop-opacity': '0.28' }));
+      defs.appendChild(gradG); defs.appendChild(gradR); svg.appendChild(defs);
+
+      // Grid lines + Y labels
+      [0.15, 0.38, 0.62, 0.85].forEach(t => {
+        const gy = PAD.t + t * (PH - PAD.t - 10);
+        svg.appendChild(svgEl('line', { x1: 0, y1: gy, x2: W, y2: gy, stroke: C.line, 'stroke-width': '1' }));
+        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: C.dim, 'font-size': '10', 'text-anchor': 'end', 'font-family': C.mono });
+        txt.textContent = fmtP(Math.round(maxP - t * (maxP - minP)));
+        svg.appendChild(txt);
+      });
+
+      // Build zone-split area paths (clipped at mean line)
+      function buildZoneArea(aboveFlag) {
+        let d = ''; let open = false;
+        const n = pts.length;
+        for (let i = 0; i < n; i++) {
+          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
+          const isAbove = pts[i].y <= meanY;
+          const match = aboveFlag ? isAbove : !isAbove;
+          if (i === 0) {
+            if (match) { d += `M${x},${meanY.toFixed(1)} L${x},${y}`; open = true; }
+            continue;
+          }
+          const px = pts[i-1].x, py = pts[i-1].y;
+          const wasAbove = py <= meanY;
+          const wasMatch = aboveFlag ? wasAbove : !wasAbove;
+          if (!wasMatch && match) {
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px + t * (pts[i].x - px)).toFixed(1);
+            d += ` M${cx},${meanY.toFixed(1)} L${x},${y}`; open = true;
+          } else if (wasMatch && !match) {
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px + t * (pts[i].x - px)).toFixed(1);
+            d += ` L${cx},${meanY.toFixed(1)} Z`; open = false;
+          } else if (match) {
+            d += ` L${x},${y}`;
+          }
+        }
+        if (open) d += ` L${pts[n-1].x.toFixed(1)},${meanY.toFixed(1)} Z`;
+        return d;
+      }
+
+      const aboveArea = buildZoneArea(true);
+      const belowArea = buildZoneArea(false);
+      svg.appendChild(svgEl('path', { d: aboveArea, fill: 'url(#tc-grn)' }));
+      svg.appendChild(svgEl('path', { d: belowArea, fill: 'url(#tc-red)' }));
+
+      // Mean line + label
+      svg.appendChild(svgEl('line', { x1: 0, y1: meanY, x2: W, y2: meanY, stroke: C.dim, 'stroke-width': '1', 'stroke-dasharray': '5,4', opacity: '0.6' }));
+      const meanLbl = svgEl('text', { x: 6, y: meanY - 4, fill: C.dim, 'font-size': '8', 'font-family': C.mono, opacity: '0.8' });
+      meanLbl.textContent = 'AVG ' + fmtP(meanPrice);
+      svg.appendChild(meanLbl);
+
+      // Price line — coloured by zone (green above mean, red below)
+      (function drawColoredLine() {
+        const n = pts.length;
+        let seg = '', lastColor = null;
+        for (let i = 0; i < n; i++) {
+          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
+          const col = pts[i].y <= meanY ? C.grn : C.red;
+          if (i === 0) { seg = `M${x},${y}`; lastColor = col; continue; }
+          const py = pts[i-1].y, px2 = pts[i-1].x;
+          const crossedMean = (py <= meanY) !== (pts[i].y <= meanY);
+          if (crossedMean) {
+            // interpolate crossing
+            const t = (meanY - py) / (pts[i].y - py);
+            const cx = (px2 + t * (pts[i].x - px2)).toFixed(1);
+            seg += ` L${cx},${meanY.toFixed(1)}`;
+            svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+            seg = `M${cx},${meanY.toFixed(1)} L${x},${y}`;
+            lastColor = col;
+          } else {
+            seg += ` L${x},${y}`;
+          }
+        }
+        if (seg) svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      })();
+
+      // Crosshair & end dot (will update on hover)
+      const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
+      const crossH   = svgEl('line', { x1: 0, y1: 0, x2: W, y2: 0, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
+      const crossLblBg = svgEl('rect', { x: W-80, y: 0, width: 80, height: 18, fill: C.bg3, opacity: '0' });
+      const crossLbl  = svgEl('text', { x: W-6, y: 0, fill: accent, 'font-size': '9', 'text-anchor': 'end', 'font-family': "'IBM Plex Mono', monospace", 'font-weight': 'bold', opacity: '0' });
+      const zoneAccent = last > meanPrice ? C.grn : C.red;
+      const dotMain   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '3.5', fill: zoneAccent });
+      const dotRing   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '7', fill: 'none', stroke: zoneAccent, 'stroke-width': '1', opacity: '0.35' });
+      const lastDash  = svgEl('line', { x1: 0, y1: pts[pts.length-1].y, x2: W, y2: pts[pts.length-1].y, stroke: zoneAccent, 'stroke-width': '0.6', 'stroke-dasharray': '4,5', opacity: '0.4' });
+      svg.appendChild(lastDash); svg.appendChild(crossV); svg.appendChild(crossH); svg.appendChild(crossLblBg); svg.appendChild(crossLbl); svg.appendChild(dotMain); svg.appendChild(dotRing);
+
+      // Tooltip div
+      const tooltip = div({}, {
+        position: 'absolute', background: C.bg2, border: '1px solid ' + C.line,
+        borderLeft: `2px solid ${accent}`, borderRadius: '2px', padding: '7px 11px',
+        pointerEvents: 'none', zIndex: '10', minWidth: '138px', display: 'none',
+        fontFamily: "'IBM Plex Mono', monospace",
+      });
+      chartWrap.appendChild(svg); chartWrap.appendChild(tooltip); wrap.appendChild(chartWrap);
+
+      // Mouse events
+      svg.addEventListener('mousemove', e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) / rect.width * W;
+        let closest = 0, minDist = Infinity;
+        pts.forEach((pt, i) => { const d = Math.abs(pt.x - mx); if (d < minDist) { minDist = d; closest = i; } });
+        hoverIdx = closest;
+        const hp = pts[closest], hd = data[closest];
+
+        // Update crosshair
+        crossV.setAttribute('x1', hp.x); crossV.setAttribute('x2', hp.x); crossV.setAttribute('opacity', '1');
+        crossH.setAttribute('y1', hp.y); crossH.setAttribute('y2', hp.y); crossH.setAttribute('opacity', '1');
+        crossLblBg.setAttribute('y', hp.y - 10); crossLblBg.setAttribute('opacity', '1');
+        crossLbl.setAttribute('y', hp.y + 4); crossLbl.textContent = fmtP(hd.price); crossLbl.setAttribute('opacity', '1');
+        dotMain.setAttribute('cx', hp.x); dotMain.setAttribute('cy', hp.y); dotMain.setAttribute('r', '4');
+        dotRing.setAttribute('cx', hp.x); dotRing.setAttribute('cy', hp.y); dotRing.setAttribute('opacity', '0.4');
+        lastDash.setAttribute('opacity', '0');
+
+        // Update header price + date
+        document.getElementById('tc-price').textContent = fmtP(hd.price);
+        document.getElementById('tc-date').textContent = fmtD(hd.ts);
+
+        // Tooltip
+        const hChg = ((hd.price - first) / first * 100);
+        tooltip.innerHTML = `
+          <div style="color:" + C.dim + ";font-size:9px;letter-spacing:.1em;margin-bottom:5px">${fmtD(hd.ts).toUpperCase()}</div>
+          <div style="color:" + C.txt + ";font-size:16px;font-weight:bold">${fmtP(hd.price)}</div>
+          <div style="margin-top:6px;border-top:1px solid " + C.line + ";padding-top:6px">
+
+            <div style="display:flex;justify-content:space-between;gap:14px;margin-top:3px">
+              <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">CHG</span>
+              <span style="color:${hChg>=0?'#00e676':'#ff4444'};font-size:10px">${(hChg>=0?'+':'') + hChg.toFixed(2)}%</span>
+            </div>
+          </div>`;
+        const pct = hp.x / W * 100;
+        tooltip.style.display = 'block';
+        tooltip.style.left  = (pct > 70 ? (pct - 22) : pct + 2) + '%';
+        tooltip.style.top   = Math.max(2, hp.y / PH * 100 - 16) + '%';
+      });
+
+      svg.addEventListener('mouseleave', () => {
+        crossV.setAttribute('opacity','0'); crossH.setAttribute('opacity','0');
+        crossLblBg.setAttribute('opacity','0'); crossLbl.setAttribute('opacity','0');
+        lastDash.setAttribute('opacity','0.4');
+        dotMain.setAttribute('cx', pts[pts.length-1].x); dotMain.setAttribute('cy', pts[pts.length-1].y); dotMain.setAttribute('r','3.5');
+        dotRing.setAttribute('cx', pts[pts.length-1].x); dotRing.setAttribute('cy', pts[pts.length-1].y); dotRing.setAttribute('opacity','0.35');
+        document.getElementById('tc-price').textContent = fmtP(last);
+        document.getElementById('tc-date').textContent = '';
+        tooltip.style.display = 'none';
+        hoverIdx = null;
+      });
+
+
+
+      // ── X-AXIS ──
+      const xAxis = div({}, { background: C.bg, borderTop: '1px solid ' + C.line, padding: '5px 0 8px', position: 'relative', height: '18px' });
+      const xCount = data.length <= 7 ? data.length : 5;
+      Array.from({ length: xCount }, (_, i) => {
+        const idx = Math.round((i / (xCount - 1)) * (data.length - 1));
+        const sp = document.createElement('span');
+        sp.textContent = fmtD(data[idx].ts, true).toUpperCase();
+        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim, fontSize: '10px', letterSpacing: '0.06em', whiteSpace: 'nowrap', fontFamily: C.mono });
+        xAxis.appendChild(sp);
+      });
+      wrap.appendChild(xAxis);
+
+      // ── STATUS BAR ──
+      const statusBar = div({}, {
+        background: C.bg2, borderTop: '1px solid ' + C.line,
+        padding: '5px 16px', display: 'flex', justifyContent: 'space-between',
+        color: C.dim, fontSize: '10px', letterSpacing: '0.1em',
+      });
+      const sl = document.createElement('span'); sl.textContent = 'BTC · BITCOIN NETWORK ANALYTICS';
+      const sr = document.createElement('span'); sr.textContent = '● LIVE';
+      Object.assign(sr.style, { color: accent, opacity: '0.55' });
+      statusBar.appendChild(sl); statusBar.appendChild(sr);
+      wrap.appendChild(statusBar);
+    }
+
+    loadPriceData().catch(() => {
+      const cached = loadCache();
+      if (cached.length) {
+        allData = cached.filter(d => d.ts >= Date.now() - 366 * 86400000);
+        dataLoaded = true;
+        render();
+      } else {
+        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Нет данных. Нет соединения с mempool.space</div>';
+      }
+    });
+  })();
+} // end initPriceChart
+
 async function loadSignals() {
   try {
     const resp = await fetch('signals.json?v=' + Date.now());
@@ -2958,484 +3437,6 @@ function initCharts() {
     }
   });
 
-let priceChartInited = false;
-function initPriceChart() {
-  if (priceChartInited) return;
-  priceChartInited = true;
-
-  // ── TERMINAL PRICE CHART ─────────────────────────────────────────────────
-  (function renderTerminalChart() {
-    const wrap = document.getElementById('terminal-price-chart');
-    if (!wrap) { console.error('PRICE CHART: wrap not found'); return; }
-    wrap.innerHTML = '<div style="padding:8px 14px;font-family:monospace;font-size:10px;color:#F7931A">INIT OK — загрузка данных...</div>';
-    console.log('PRICE CHART: wrap found, starting init');
-
-    // CSS variables from project palette (resolved once)
-    const CS = getComputedStyle(document.documentElement);
-    const C = {
-      bg:    CS.getPropertyValue('--bg').trim()    || '#0C0F14',
-      bg2:   CS.getPropertyValue('--bg2').trim()   || '#111520',
-      bg3:   CS.getPropertyValue('--bg3').trim()   || '#171D2B',
-      line:  CS.getPropertyValue('--line').trim()  || '#242A38',
-      line2: CS.getPropertyValue('--line2').trim() || '#2E3648',
-      txt:   CS.getPropertyValue('--txt').trim()   || '#E8EDF5',
-      dim:   CS.getPropertyValue('--dim').trim()   || '#7A8BA0',
-      dim2:  CS.getPropertyValue('--dim2').trim()  || '#2D3748',
-      btc:   CS.getPropertyValue('--btc').trim()   || '#F7931A',
-      grn:   CS.getPropertyValue('--grn').trim()   || '#22C55E',
-      red:   CS.getPropertyValue('--red').trim()   || '#EF4444',
-      mono:  CS.getPropertyValue('--mono').trim()  || "'IBM Plex Mono', monospace",
-    };
-
-    const DAY = 86400000;
-    const now  = Date.now();
-    const PERIODS = [
-      { label: '7D',  days: 7   },
-      { label: '30D', days: 30  },
-      { label: '90D', days: 90  },
-      { label: '1Y',  days: 365 },
-    ];
-    let activePeriod = 2; // default 90D
-
-    // ── localStorage + incremental fetch ────────────────────────────────────
-    // Strategy:
-    //   1. Load cached data from localStorage (instant, no network)
-    //   2. Find the last cached date
-    //   3. Fetch only missing days from mempool.space (timestamp by timestamp)
-    //      — if cache is empty: fetch full history once
-    //      — if cache has today: no fetch at all
-    //   4. Merge, dedupe, trim to 365 days, save back to localStorage
-    //   5. render()
-
-    const LS_KEY = 'btc_price_history_v1';
-    let allData = [];
-    let dataLoaded = false;
-
-    // Expose update hook so fetchProdCost() can sync the live price
-    window.terminalChartUpdate = function(realPrice) {
-      if (!dataLoaded || !realPrice || realPrice <= 0 || !allData.length) return;
-      allData[allData.length - 1].price = Math.round(realPrice);
-      render();
-    };
-
-    // Show skeleton immediately
-    wrap.innerHTML =
-      '<div style="padding:10px 14px 6px;border-bottom:1px solid ' + C.line + ';display:flex;justify-content:space-between;align-items:center">' +
-        '<div style="width:90px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
-        '<div style="width:60px;height:10px;background:' + C.line2 + ';border-radius:2px;animation:skPulse 1.2s ease-in-out infinite"></div>' +
-      '</div>' +
-      '<div style="padding:12px 14px 14px">' +
-        '<svg width="100%" height="80" style="display:block;opacity:.2">' +
-          '<polyline points="0,60 40,50 80,55 120,35 160,40 200,25 240,30 280,20 320,28 360,15 400,22 440,18 480,10" fill="none" stroke="' + C.btc + '" stroke-width="1.5"/>' +
-        '</svg>' +
-      '</div>';
-    if (!document.getElementById('skPulseKF')) {
-      const st = document.createElement('style');
-      st.id = 'skPulseKF';
-      st.textContent = '@keyframes skPulse{0%,100%{opacity:.3}50%{opacity:.7}}';
-      document.head.appendChild(st);
-    }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-    // Normalise raw mempool price array → {ts, price} deduplicated by day
-    function normalisePrices(rawArr) {
-      const byDay = {};
-      rawArr.forEach(p => {
-        if (!p.time || !p.USD || p.USD <= 0) return;
-        const day = new Date(p.time * 1000).toISOString().slice(0, 10);
-        // keep the last entry per day
-        if (!byDay[day] || p.time > byDay[day].time) byDay[day] = p;
-      });
-      return Object.keys(byDay).sort().map(d => ({
-        ts:    byDay[d].time * 1000,
-        price: Math.round(byDay[d].USD),
-        day:   d,
-      }));
-    }
-
-    // Today's date string (UTC)
-    function todayStr() {
-      return new Date().toISOString().slice(0, 10);
-    }
-
-    // Save to localStorage (trim to last 365 days before saving)
-    function saveCache(data) {
-      const cutoff = Date.now() - 366 * 86400000;
-      const trimmed = data.filter(d => d.ts >= cutoff);
-      try {
-        localStorage.setItem(LS_KEY, JSON.stringify(trimmed));
-      } catch(e) {} // ignore quota errors
-    }
-
-    // Load from localStorage
-    function loadCache() {
-      try {
-        const raw = localStorage.getItem(LS_KEY);
-        if (!raw) return [];
-        return JSON.parse(raw);
-      } catch(e) { return []; }
-    }
-
-    // Merge two arrays by day, keep newest price per day, sort ascending
-    function mergeData(existing, incoming) {
-      const byDay = {};
-      [...existing, ...incoming].forEach(p => {
-        const day = p.day || new Date(p.ts).toISOString().slice(0, 10);
-        if (!byDay[day] || p.ts > byDay[day].ts) byDay[day] = { ...p, day };
-      });
-      return Object.keys(byDay).sort().map(d => byDay[d]);
-    }
-
-    // ── Main load function ────────────────────────────────────────────────────
-    async function loadPriceData() {
-      const cached = loadCache();
-      const today  = todayStr();
-      const cutoffTs = Date.now() - 366 * 86400000;
-
-      // ── Шаг 1: мгновенно рендерим кеш если он есть ──
-      if (cached.length) {
-        allData = cached.filter(d => d.ts >= cutoffTs);
-        if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
-          allData[allData.length - 1].price = Math.round(dashBtcPrice);
-        dataLoaded = true;
-        render(); // моментальный рендер из кеша
-      }
-
-      // ── Шаг 2: определяем нужен ли сетевой запрос ──
-      const lastCachedDay = cached.length
-        ? (cached[cached.length - 1].day || new Date(cached[cached.length - 1].ts).toISOString().slice(0, 10))
-        : null;
-
-      if (lastCachedDay === today) return; // кеш свежий — ничего не делаем
-
-      // ── Шаг 3: один запрос — всегда полная история, фильтруем нужное ──
-      const fromTs = lastCachedDay
-        ? Math.floor(new Date(lastCachedDay).getTime() / 1000)
-        : Math.floor(Date.now() / 1000) - 365 * 86400;
-
-      const res  = await fetch('https://mempool.space/api/v1/historical-price?currency=USD');
-      const json = await res.json();
-      const raw  = (json.prices || []).filter(p => p.time > fromTs);
-      const fetched = normalisePrices(raw);
-
-      // ── Шаг 4: merge + save + re-render ──
-      const merged = mergeData(cached, fetched);
-      saveCache(merged);
-      allData = merged.filter(d => d.ts >= cutoffTs);
-      if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0 && allData.length)
-        allData[allData.length - 1].price = Math.round(dashBtcPrice);
-      dataLoaded = true;
-      render(); // обновляем с актуальными данными
-    }
-
-    // Formatters
-    const fmtP = v => '$' + Math.round(v).toLocaleString('en-US');
-    const fmtD = (ts, compact) => {
-      const d = new Date(ts);
-      return compact
-        ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-        : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    };
-
-    // SVG namespace helper
-    const svgEl = (tag, attrs = {}) => {
-      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-      return el;
-    };
-    const div = (attrs = {}, styles = {}) => {
-      const el = document.createElement('div');
-      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-      Object.assign(el.style, styles);
-      return el;
-    };
-
-    // State
-    let hoverIdx = null;
-
-    function render() {
-      if (!allData.length) return; // wait for API data
-      wrap.innerHTML = '';
-      const data = allData.slice(-PERIODS[activePeriod].days);
-      const prices = data.map(d => d.price);
-      const minP = Math.min(...prices), maxP = Math.max(...prices);
-      const last = data[data.length - 1].price, first = data[0].price;
-      const chg = (last - first) / first * 100;
-      const up = chg >= 0;
-      const accent = up ? C.grn : C.red;
-      const W = 700, PH = 220;
-      const PAD = { t: 20, b: 0 };
-      const range = maxP - minP || 1;
-
-      // Map to SVG coords
-      const pts = data.map((d, i) => ({
-        ...d,
-        x: (i / (data.length - 1)) * W,
-        y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
-      }));
-
-      // ── TOP BAR ──
-      const topBar = div({}, {
-        background: C.bg2, borderBottom: '1px solid ' + C.line, padding: '11px 16px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
-      });
-      // Left side
-      const tleft = div({}, { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' });
-      const ticker = document.createElement('span');
-      ticker.textContent = 'BTC/USD';
-      Object.assign(ticker.style, { color: C.btc, fontSize: '14px', fontWeight: 'bold', letterSpacing: '0.18em' });
-      const priceEl = document.createElement('span');
-      priceEl.id = 'tc-price';
-      priceEl.textContent = fmtP(last);
-      Object.assign(priceEl.style, { color: C.txt, fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.02em' });
-      const chgEl = document.createElement('span');
-      chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
-      Object.assign(chgEl.style, { color: accent, fontSize: '12px', background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 7px', borderRadius: '2px' });
-      const dateEl = document.createElement('span');
-      dateEl.id = 'tc-date';
-      Object.assign(dateEl.style, { color: C.dim, fontSize: '10px', fontFamily: C.mono });
-      tleft.appendChild(ticker); tleft.appendChild(priceEl); tleft.appendChild(chgEl); tleft.appendChild(dateEl);
-
-      // Period buttons
-      const tright = div({}, { display: 'flex', gap: '3px' });
-      PERIODS.forEach((per, i) => {
-        const btn = document.createElement('button');
-        btn.textContent = per.label;
-        Object.assign(btn.style, {
-          background: activePeriod === i ? accent : 'transparent',
-          color: activePeriod === i ? C.bg : C.dim,
-          border: '1px solid ' + (activePeriod === i ? accent : C.line),
-          borderRadius: '2px', padding: '3px 9px', fontSize: '10px',
-          fontFamily: C.mono, fontWeight: 'bold',
-          letterSpacing: '0.06em', cursor: 'pointer',
-        });
-        btn.addEventListener('click', () => { activePeriod = i; hoverIdx = null; render(); });
-        tright.appendChild(btn);
-      });
-      topBar.appendChild(tleft); topBar.appendChild(tright); wrap.appendChild(topBar);
-
-      // ── STATS ROW ──
-      const statsRow = div({}, {
-        background: C.bg, borderBottom: '1px solid ' + C.line,
-        padding: '7px 16px', display: 'flex', gap: '24px', flexWrap: 'wrap',
-      });
-      [['HIGH', fmtP(maxP)], ['LOW', fmtP(minP)], ['RANGE', fmtP(maxP - minP)], ['OPEN', fmtP(first)]].forEach(([l, v]) => {
-        const cell = div({}, {});
-        const lbl = document.createElement('div');
-        lbl.textContent = l;
-        Object.assign(lbl.style, { color: C.dim, fontSize: '10px', letterSpacing: '0.12em', fontFamily: C.mono });
-        const val = document.createElement('div');
-        val.textContent = v;
-        Object.assign(val.style, { color: C.txt, fontSize: '13px', marginTop: '2px', fontFamily: C.mono });
-        cell.appendChild(lbl); cell.appendChild(val); statsRow.appendChild(cell);
-      });
-      wrap.appendChild(statsRow);
-
-      // ── PRICE SVG ──
-      const chartWrap = div({}, { position: 'relative' });
-      const svg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${PH}`, preserveAspectRatio: 'none', style: 'display:block;cursor:crosshair' });
-
-      // ── Mean price for zone coloring ──
-      const meanPrice = Math.round(data.reduce((s, d) => s + d.price, 0) / data.length);
-      const meanY = PAD.t + (1 - (meanPrice - minP) / (maxP - minP || 1)) * (PH - PAD.t - 10);
-
-      // Defs — two gradients: green (above mean) and red (below mean)
-      const defs = svgEl('defs');
-      const gradG = svgEl('linearGradient', { id: 'tc-grn', x1: '0', y1: '0', x2: '0', y2: '1' });
-      gradG.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.grn, 'stop-opacity': '0.28' }));
-      gradG.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.grn, 'stop-opacity': '0.04' }));
-      const gradR = svgEl('linearGradient', { id: 'tc-red', x1: '0', y1: '0', x2: '0', y2: '1' });
-      gradR.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.red, 'stop-opacity': '0.04' }));
-      gradR.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.red, 'stop-opacity': '0.28' }));
-      defs.appendChild(gradG); defs.appendChild(gradR); svg.appendChild(defs);
-
-      // Grid lines + Y labels
-      [0.15, 0.38, 0.62, 0.85].forEach(t => {
-        const gy = PAD.t + t * (PH - PAD.t - 10);
-        svg.appendChild(svgEl('line', { x1: 0, y1: gy, x2: W, y2: gy, stroke: C.line, 'stroke-width': '1' }));
-        const txt = svgEl('text', { x: W - 6, y: gy - 4, fill: C.dim, 'font-size': '10', 'text-anchor': 'end', 'font-family': C.mono });
-        txt.textContent = fmtP(Math.round(maxP - t * (maxP - minP)));
-        svg.appendChild(txt);
-      });
-
-      // Build zone-split area paths (clipped at mean line)
-      function buildZoneArea(aboveFlag) {
-        let d = ''; let open = false;
-        const n = pts.length;
-        for (let i = 0; i < n; i++) {
-          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
-          const isAbove = pts[i].y <= meanY;
-          const match = aboveFlag ? isAbove : !isAbove;
-          if (i === 0) {
-            if (match) { d += `M${x},${meanY.toFixed(1)} L${x},${y}`; open = true; }
-            continue;
-          }
-          const px = pts[i-1].x, py = pts[i-1].y;
-          const wasAbove = py <= meanY;
-          const wasMatch = aboveFlag ? wasAbove : !wasAbove;
-          if (!wasMatch && match) {
-            const t = (meanY - py) / (pts[i].y - py);
-            const cx = (px + t * (pts[i].x - px)).toFixed(1);
-            d += ` M${cx},${meanY.toFixed(1)} L${x},${y}`; open = true;
-          } else if (wasMatch && !match) {
-            const t = (meanY - py) / (pts[i].y - py);
-            const cx = (px + t * (pts[i].x - px)).toFixed(1);
-            d += ` L${cx},${meanY.toFixed(1)} Z`; open = false;
-          } else if (match) {
-            d += ` L${x},${y}`;
-          }
-        }
-        if (open) d += ` L${pts[n-1].x.toFixed(1)},${meanY.toFixed(1)} Z`;
-        return d;
-      }
-
-      const aboveArea = buildZoneArea(true);
-      const belowArea = buildZoneArea(false);
-      svg.appendChild(svgEl('path', { d: aboveArea, fill: 'url(#tc-grn)' }));
-      svg.appendChild(svgEl('path', { d: belowArea, fill: 'url(#tc-red)' }));
-
-      // Mean line + label
-      svg.appendChild(svgEl('line', { x1: 0, y1: meanY, x2: W, y2: meanY, stroke: C.dim, 'stroke-width': '1', 'stroke-dasharray': '5,4', opacity: '0.6' }));
-      const meanLbl = svgEl('text', { x: 6, y: meanY - 4, fill: C.dim, 'font-size': '8', 'font-family': C.mono, opacity: '0.8' });
-      meanLbl.textContent = 'AVG ' + fmtP(meanPrice);
-      svg.appendChild(meanLbl);
-
-      // Price line — coloured by zone (green above mean, red below)
-      (function drawColoredLine() {
-        const n = pts.length;
-        let seg = '', lastColor = null;
-        for (let i = 0; i < n; i++) {
-          const x = pts[i].x.toFixed(1), y = pts[i].y.toFixed(1);
-          const col = pts[i].y <= meanY ? C.grn : C.red;
-          if (i === 0) { seg = `M${x},${y}`; lastColor = col; continue; }
-          const py = pts[i-1].y, px2 = pts[i-1].x;
-          const crossedMean = (py <= meanY) !== (pts[i].y <= meanY);
-          if (crossedMean) {
-            // interpolate crossing
-            const t = (meanY - py) / (pts[i].y - py);
-            const cx = (px2 + t * (pts[i].x - px2)).toFixed(1);
-            seg += ` L${cx},${meanY.toFixed(1)}`;
-            svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
-            seg = `M${cx},${meanY.toFixed(1)} L${x},${y}`;
-            lastColor = col;
-          } else {
-            seg += ` L${x},${y}`;
-          }
-        }
-        if (seg) svg.appendChild(svgEl('path', { d: seg, fill: 'none', stroke: lastColor, 'stroke-width': '1.8', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
-      })();
-
-      // Crosshair & end dot (will update on hover)
-      const crossV   = svgEl('line', { x1: 0, y1: 0, x2: 0, y2: PH, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
-      const crossH   = svgEl('line', { x1: 0, y1: 0, x2: W, y2: 0, stroke: C.line2, 'stroke-width': '1', 'stroke-dasharray': '3,4', opacity: '0' });
-      const crossLblBg = svgEl('rect', { x: W-80, y: 0, width: 80, height: 18, fill: C.bg3, opacity: '0' });
-      const crossLbl  = svgEl('text', { x: W-6, y: 0, fill: accent, 'font-size': '9', 'text-anchor': 'end', 'font-family': "'IBM Plex Mono', monospace", 'font-weight': 'bold', opacity: '0' });
-      const zoneAccent = last > meanPrice ? C.grn : C.red;
-      const dotMain   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '3.5', fill: zoneAccent });
-      const dotRing   = svgEl('circle', { cx: pts[pts.length-1].x, cy: pts[pts.length-1].y, r: '7', fill: 'none', stroke: zoneAccent, 'stroke-width': '1', opacity: '0.35' });
-      const lastDash  = svgEl('line', { x1: 0, y1: pts[pts.length-1].y, x2: W, y2: pts[pts.length-1].y, stroke: zoneAccent, 'stroke-width': '0.6', 'stroke-dasharray': '4,5', opacity: '0.4' });
-      svg.appendChild(lastDash); svg.appendChild(crossV); svg.appendChild(crossH); svg.appendChild(crossLblBg); svg.appendChild(crossLbl); svg.appendChild(dotMain); svg.appendChild(dotRing);
-
-      // Tooltip div
-      const tooltip = div({}, {
-        position: 'absolute', background: C.bg2, border: '1px solid ' + C.line,
-        borderLeft: `2px solid ${accent}`, borderRadius: '2px', padding: '7px 11px',
-        pointerEvents: 'none', zIndex: '10', minWidth: '138px', display: 'none',
-        fontFamily: "'IBM Plex Mono', monospace",
-      });
-      chartWrap.appendChild(svg); chartWrap.appendChild(tooltip); wrap.appendChild(chartWrap);
-
-      // Mouse events
-      svg.addEventListener('mousemove', e => {
-        const rect = svg.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) / rect.width * W;
-        let closest = 0, minDist = Infinity;
-        pts.forEach((pt, i) => { const d = Math.abs(pt.x - mx); if (d < minDist) { minDist = d; closest = i; } });
-        hoverIdx = closest;
-        const hp = pts[closest], hd = data[closest];
-
-        // Update crosshair
-        crossV.setAttribute('x1', hp.x); crossV.setAttribute('x2', hp.x); crossV.setAttribute('opacity', '1');
-        crossH.setAttribute('y1', hp.y); crossH.setAttribute('y2', hp.y); crossH.setAttribute('opacity', '1');
-        crossLblBg.setAttribute('y', hp.y - 10); crossLblBg.setAttribute('opacity', '1');
-        crossLbl.setAttribute('y', hp.y + 4); crossLbl.textContent = fmtP(hd.price); crossLbl.setAttribute('opacity', '1');
-        dotMain.setAttribute('cx', hp.x); dotMain.setAttribute('cy', hp.y); dotMain.setAttribute('r', '4');
-        dotRing.setAttribute('cx', hp.x); dotRing.setAttribute('cy', hp.y); dotRing.setAttribute('opacity', '0.4');
-        lastDash.setAttribute('opacity', '0');
-
-        // Update header price + date
-        document.getElementById('tc-price').textContent = fmtP(hd.price);
-        document.getElementById('tc-date').textContent = fmtD(hd.ts);
-
-        // Tooltip
-        const hChg = ((hd.price - first) / first * 100);
-        tooltip.innerHTML = `
-          <div style="color:" + C.dim + ";font-size:9px;letter-spacing:.1em;margin-bottom:5px">${fmtD(hd.ts).toUpperCase()}</div>
-          <div style="color:" + C.txt + ";font-size:16px;font-weight:bold">${fmtP(hd.price)}</div>
-          <div style="margin-top:6px;border-top:1px solid " + C.line + ";padding-top:6px">
-
-            <div style="display:flex;justify-content:space-between;gap:14px;margin-top:3px">
-              <span style="color:" + C.dim2 + ";font-size:9px;letter-spacing:.1em">CHG</span>
-              <span style="color:${hChg>=0?'#00e676':'#ff4444'};font-size:10px">${(hChg>=0?'+':'') + hChg.toFixed(2)}%</span>
-            </div>
-          </div>`;
-        const pct = hp.x / W * 100;
-        tooltip.style.display = 'block';
-        tooltip.style.left  = (pct > 70 ? (pct - 22) : pct + 2) + '%';
-        tooltip.style.top   = Math.max(2, hp.y / PH * 100 - 16) + '%';
-      });
-
-      svg.addEventListener('mouseleave', () => {
-        crossV.setAttribute('opacity','0'); crossH.setAttribute('opacity','0');
-        crossLblBg.setAttribute('opacity','0'); crossLbl.setAttribute('opacity','0');
-        lastDash.setAttribute('opacity','0.4');
-        dotMain.setAttribute('cx', pts[pts.length-1].x); dotMain.setAttribute('cy', pts[pts.length-1].y); dotMain.setAttribute('r','3.5');
-        dotRing.setAttribute('cx', pts[pts.length-1].x); dotRing.setAttribute('cy', pts[pts.length-1].y); dotRing.setAttribute('opacity','0.35');
-        document.getElementById('tc-price').textContent = fmtP(last);
-        document.getElementById('tc-date').textContent = '';
-        tooltip.style.display = 'none';
-        hoverIdx = null;
-      });
-
-
-
-      // ── X-AXIS ──
-      const xAxis = div({}, { background: C.bg, borderTop: '1px solid ' + C.line, padding: '5px 0 8px', position: 'relative', height: '18px' });
-      const xCount = data.length <= 7 ? data.length : 5;
-      Array.from({ length: xCount }, (_, i) => {
-        const idx = Math.round((i / (xCount - 1)) * (data.length - 1));
-        const sp = document.createElement('span');
-        sp.textContent = fmtD(data[idx].ts, true).toUpperCase();
-        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim, fontSize: '10px', letterSpacing: '0.06em', whiteSpace: 'nowrap', fontFamily: C.mono });
-        xAxis.appendChild(sp);
-      });
-      wrap.appendChild(xAxis);
-
-      // ── STATUS BAR ──
-      const statusBar = div({}, {
-        background: C.bg2, borderTop: '1px solid ' + C.line,
-        padding: '5px 16px', display: 'flex', justifyContent: 'space-between',
-        color: C.dim, fontSize: '10px', letterSpacing: '0.1em',
-      });
-      const sl = document.createElement('span'); sl.textContent = 'BTC · BITCOIN NETWORK ANALYTICS';
-      const sr = document.createElement('span'); sr.textContent = '● LIVE';
-      Object.assign(sr.style, { color: accent, opacity: '0.55' });
-      statusBar.appendChild(sl); statusBar.appendChild(sr);
-      wrap.appendChild(statusBar);
-    }
-
-    loadPriceData().catch(() => {
-      const cached = loadCache();
-      if (cached.length) {
-        allData = cached.filter(d => d.ts >= Date.now() - 366 * 86400000);
-        dataLoaded = true;
-        render();
-      } else {
-        wrap.innerHTML = '<div style="padding:20px 16px;color:' + C.red + ';font-family:' + C.mono + ';font-size:10px">⚠ Нет данных. Нет соединения с mempool.space</div>';
-      }
-    });
-  })();
-} // end initPriceChart
 
   // Price (Chart.js — REMOVED, replaced by Terminal chart above)
 

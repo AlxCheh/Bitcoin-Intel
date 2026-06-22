@@ -966,6 +966,7 @@ header {
   background: var(--bg2);
   border: 1px solid var(--line);
   padding: 16px;
+  overflow: hidden;
 }
 .dash-cycle-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 10px; }
 .dash-cycle-phase { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--grn); letter-spacing: 0.04em; margin-bottom: 6px; }
@@ -1081,10 +1082,15 @@ header {
 
     <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
     <div class="dash-cycle">
-      <div class="dash-cycle-label">ФАЗА ЦИКЛА · BITCOIN 2026</div>
+      <div class="chart-head" style="margin:-16px -16px 16px">
+        <span class="chart-title">Фаза цикла</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="dash-ratio" style="font-family:var(--mono);font-size:9px;color:var(--btc)">—</span>
+          <span class="chart-meta">BITCOIN 2026</span>
+        </div>
+      </div>
       <div style="display:flex;align-items:baseline;gap:10px">
         <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--dim)" id="dash-ratio">—</div>
       </div>
       <div class="dash-cycle-sub" id="dash-phase-sub">Цена у себестоимости добычи. Исторически — зона долгосрочных покупок перед ростом.</div>
       <div class="dash-cycle-track">

@@ -1117,6 +1117,9 @@ header {
       ~ Production Cost — расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
     </div>
 
+    <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
+    <div id="terminal-price-chart" style="margin:0 16px 12px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
+
     <!-- ══ БЛОК 3: СИГНАЛ ДНЯ ══ -->
     <div class="dash-signal" id="dash-signal-card">
       <div class="dash-signal-head">
@@ -1923,10 +1926,6 @@ header {
         <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
     </div>
-
-    <!-- PRICE CHART -->
-    <!-- TERMINAL PRICE CHART -->
-    <div id="terminal-price-chart" style="margin:12px 16px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
 
     <!-- HASHRATE CHART -->
     <div class="chart-panel">

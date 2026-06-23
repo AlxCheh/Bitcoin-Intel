@@ -905,6 +905,16 @@ header {
   transition: 0.15s;
 }
 .sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }
+.sig-fbtn-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-left: 6px;
+  padding: 1px 5px;
+  background: var(--bg); border-radius: 8px;
+  font-size: 8px; font-family: var(--mono);
+  color: var(--dim); letter-spacing: 0;
+  vertical-align: middle;
+}
+.sig-fbtn.active .sig-fbtn-badge { background: var(--btc-mid); color: var(--btc); }
 
 .sig-card {
   background: var(--bg2);
@@ -2708,11 +2718,17 @@ function renderSignals() {
 
   // фильтры по категории
   const cats = {};
-  SIGNALS.forEach(s => { cats[s.cat] = s.catLabel; });
+  const catCounts = {};
+  SIGNALS.forEach(s => {
+    cats[s.cat] = s.catLabel;
+    catCounts[s.cat] = (catCounts[s.cat] || 0) + 1;
+  });
   fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
-    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ</button>';
+    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">'
+    + 'ВСЕ<span class="sig-fbtn-badge">' + SIGNALS.length + '</span></button>';
   Object.keys(cats).forEach(c => {
-    fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">' + cats[c] + '</button>';
+    fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">'
+      + cats[c] + '<span class="sig-fbtn-badge">' + (catCounts[c] || 0) + '</span></button>';
   });
   fhtml += '</div>';
 

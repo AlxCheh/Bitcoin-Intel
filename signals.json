@@ -1,5 +1,44 @@
 [
   {
+    "id": "STR-2026-0623-002",
+    "date": "2026-06-23",
+    "cat": "ownership",
+    "catLabel": "🏛️ ВЛАДЕНИЕ",
+    "dir": "pos",
+    "horizon": "mid",
+    "theme": "institutionalization",
+    "weight": "media",
+    "actor": "corporate",
+    "flow": "inflow",
+    "signal": "Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC",
+    "data": [
+      "759 BTC за $50 млн",
+      "цена покупки ~$65 900",
+      "итого резерв 19 864 BTC",
+      "Strategy за ту же неделю: 520 BTC",
+      "Strive > Strategy по недельному объёму впервые"
+    ],
+    "context": "Strive Asset Management основана Вивеком Рамасвами, позиционирует себя как анти-ESG фонд. Копирует модель Strategy: привлекать капитал → конвертировать в BTC — но без многолетнего долгового балласта. 19 864 BTC — это ~2,3% от резервов Strategy (846 842 BTC). Корпоративное казначейство в BTC перестаёт быть монополией одного игрока.",
+    "caveat": "Источник — Bitcoin Magazine, медиа с выраженной биткоин-позицией. Структура баланса Strive не верифицирована через SEC filing. Сравнение недельных объёмов корректно только если Strategy не делала дополнительных покупок вне ATM-программы.",
+    "source": "Bitcoin Magazine, Jun 2026",
+    "links": {
+      "confirms": [
+        "STR-2026-0622-003",
+        "STR-2026-0620-001"
+      ],
+      "contradicts": [
+        "STR-2026-0623-001"
+      ],
+      "context_chain": [
+        "STR-2026-0618-002"
+      ]
+    },
+    "narrative_role": "trigger",
+    "cluster": "btc_treasury_competition",
+    "tension": "Strategy теряет темп накопления BTC из-за долговой нагрузки — новые игроки покупают быстрее",
+    "macro_implication": "корпоративное накопление BTC децентрализуется: модель Strategy тиражируется без её долговых ограничений"
+  },
+  {
     "id": "STR-2026-0623-001",
     "date": "2026-06-23",
     "cat": "ownership",

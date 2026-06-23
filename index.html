@@ -925,6 +925,16 @@ header {
   letter-spacing: 0;
 }
 .sig-fbtn.active .sig-fbtn-count { color: var(--btc); }
+.dash-narrative-link {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em;
+  color: var(--dim); cursor: pointer;
+  transition: color 0.15s;
+}
+.dash-narrative-link:hover { color: var(--btc); }
+.dash-narrative-link span { font-size: 10px; }
 
 .sig-card {
   background: var(--bg2);
@@ -1198,6 +1208,9 @@ header {
         <div class="dash-narrative-tension" id="dash-n1-tension"></div>
         <div class="dash-sum-bar" id="dash-n1-bar" style="margin-bottom:5px"></div>
         <div class="dash-sum-counts" id="dash-n1-counts"></div>
+        <div class="dash-narrative-link" id="dash-n1-link">
+          СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
+        </div>
       </div>
       <div id="dash-narrative-2" class="dash-narrative-item">
         <div class="dash-narrative-cluster">
@@ -1208,6 +1221,9 @@ header {
         <div class="dash-narrative-tension" id="dash-n2-tension"></div>
         <div class="dash-sum-bar" id="dash-n2-bar" style="margin-bottom:5px"></div>
         <div class="dash-sum-counts" id="dash-n2-counts"></div>
+        <div class="dash-narrative-link" id="dash-n2-link">
+          СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
+        </div>
       </div>
     </div>
 
@@ -3034,6 +3050,13 @@ function renderDashboard() {
       '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>' +
       '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>' +
       '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>';
+
+    // Кликабельная строка → дайджест с фильтром по cat кластера
+    const catKey = (best && best.cat) || clKey;
+    const linkEl = document.getElementById('dash-n' + prefix + '-link');
+    if (linkEl) {
+      linkEl.onclick = () => goToDigest(catKey);
+    }
   }
 
   renderNarrativeItem(topClusters[0], '1');
@@ -3058,6 +3081,12 @@ function renderDashboard() {
 function setSigFilter(c) {
   sigFilter = c;
   renderSignals();
+}
+
+function goToDigest(cat) {
+  sigFilter = cat || 'all';
+  showTab('market', null);
+  window.scrollTo(0, 0);
 }
 
 // ── TABS ──

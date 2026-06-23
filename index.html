@@ -989,8 +989,8 @@ header {
 .dct-active { color: var(--grn); }
 
 .dash-metrics {
-  display: flex; gap: 1px; margin: 0 16px 12px;
-  background: var(--line);
+  display: flex; flex-wrap: wrap; gap: 1px; margin: 0 16px 0;
+  background: var(--line); border: 1px solid var(--line); overflow: hidden;
 }
 .dash-m-cell { flex: 1; background: var(--bg2); padding: 12px 10px; text-align: center; }
 .dash-m-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
@@ -1010,7 +1010,8 @@ header {
 .dash-signal {
   margin: 0 16px 12px;
   background: var(--bg2); border: 1px solid var(--line);
-  border-left: 3px solid var(--grn); padding: 12px 14px;
+  border-left: 3px solid var(--grn); padding: 16px 14px 12px;
+  overflow: hidden;
 }
 .dash-signal.neg { border-left-color: var(--red); }
 .dash-signal.neu { border-left-color: var(--dim); }
@@ -1024,7 +1025,7 @@ header {
 .dash-signal-title { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--txt); line-height: 1.35; margin-bottom: 8px; }
 .dash-signal-chips { display: flex; gap: 5px; flex-wrap: wrap; }
 
-.dash-summary { margin: 0 16px 16px; }
+.dash-summary { margin: 0 16px 16px; background: var(--bg2); border: 1px solid var(--line); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
 .dash-sum-bar { display: flex; height: 6px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
 .dsb-pos { background: var(--grn); }
@@ -1109,6 +1110,10 @@ header {
 
     <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
     <div class="dash-metrics">
+      <div class="chart-head" style="width:100%;background:var(--bg2)">
+        <span class="chart-title">Ключевые метрики</span>
+        <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
+      </div>
       <div class="dash-m-cell">
         <div class="dash-m-val" id="dash-price">—</div>
         <div class="dash-m-lbl">ЦЕНА BTC</div>
@@ -1131,9 +1136,9 @@ header {
 
     <!-- ══ БЛОК 3: ГЛАВНЫЙ НАРРАТИВ ══ -->
     <div class="dash-signal" id="dash-theme-card">
-      <div class="dash-signal-head">
-        <span id="dash-theme-label" style="font-size:9px;letter-spacing:0.08em">ГЛАВНЫЙ НАРРАТИВ</span>
-        <span id="dash-theme-count" style="color:var(--btc);font-size:9px"></span>
+      <div class="chart-head" style="margin:-16px -16px 12px">
+        <span class="chart-title">Главный нарратив</span>
+        <span id="dash-theme-count" class="chart-meta"></span>
       </div>
       <div class="dash-signal-title" id="dash-theme-name" style="font-size:12px;line-height:1.5;margin-bottom:8px">—</div>
       <div id="dash-theme-tension" style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.04em;margin-bottom:6px"></div>
@@ -1143,7 +1148,10 @@ header {
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
     <div class="dash-summary">
-      <div class="dash-sum-label" id="dash-sum-label">ОБЩИЙ ФОН</div>
+      <div class="chart-head" style="margin:-16px -16px 12px">
+        <span class="chart-title">Общий фон</span>
+        <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
+      </div>
       <div class="dash-sum-bar" id="dash-sum-bar"></div>
       <div class="dash-sum-counts" id="dash-sum-counts"></div>
       <div class="dash-sum-link" onclick="showTab('market', null)">
@@ -1153,11 +1161,9 @@ header {
 
     <!-- ══ БЛОК 5: ПОСЛЕДНИЕ БЛОКИ ══ -->
     <div class="terminal" style="margin:0 16px 16px">
-      <div class="terminal-bar">
-        <div class="t-dot" style="background:#EF4444"></div>
-        <div class="t-dot" style="background:#F59E0B"></div>
-        <div class="t-dot" style="background:#22C55E"></div>
-        <span class="terminal-title" id="block-title">LATEST_BLOCKS — загрузка...</span>
+      <div class="chart-head" style="margin:-0px -0px 0px;border-bottom:none">
+        <span class="chart-title">Последние блоки</span>
+        <span class="terminal-title chart-meta" id="block-title">загрузка...</span>
       </div>
       <div class="terminal-body" style="padding:0">
         <div class="blk-head">

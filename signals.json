@@ -319,7 +319,7 @@
   {
     "date": "2026-06-22",
     "cat": "layer2",
-    "catLabel": "🔗 LAYER 2",
+    "catLabel": "🔗 ИНФРАСТРУКТУРА",
     "dir": "pos",
     "horizon": "mid",
     "theme": "infrastructure",
@@ -386,7 +386,7 @@
   {
     "date": "2026-06-21",
     "cat": "layer2",
-    "catLabel": "🔗 LAYER 2",
+    "catLabel": "🔗 ИНФРАСТРУКТУРА",
     "dir": "pos",
     "horizon": "mid",
     "theme": "infrastructure",
@@ -408,7 +408,7 @@
   {
     "date": "2026-06-20",
     "cat": "layer2",
-    "catLabel": "🔗 LAYER 2",
+    "catLabel": "🔗 ИНФРАСТРУКТУРА",
     "dir": "pos",
     "horizon": "long",
     "theme": "infrastructure",

@@ -1129,13 +1129,14 @@ header {
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="terminal-price-chart" style="margin:0 16px 12px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
 
-    <!-- ══ БЛОК 3: СВОДКА ПО ТЕМЕ ══ -->
+    <!-- ══ БЛОК 3: ГЛАВНЫЙ НАРРАТИВ ══ -->
     <div class="dash-signal" id="dash-theme-card">
       <div class="dash-signal-head">
-        <span id="dash-theme-label">ДОМИНИРУЮЩАЯ ТЕМА</span>
-        <span id="dash-theme-count" style="color:var(--btc)">— сигналов</span>
+        <span id="dash-theme-label" style="font-size:9px;letter-spacing:0.08em">ГЛАВНЫЙ НАРРАТИВ</span>
+        <span id="dash-theme-count" style="color:var(--btc);font-size:9px"></span>
       </div>
-      <div class="dash-signal-title" id="dash-theme-name">—</div>
+      <div class="dash-signal-title" id="dash-theme-name" style="font-size:12px;line-height:1.5;margin-bottom:8px">—</div>
+      <div id="dash-theme-tension" style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.04em;margin-bottom:6px"></div>
       <div class="dash-sum-bar" id="dash-theme-bar" style="margin-bottom:6px"></div>
       <div class="dash-sum-counts" id="dash-theme-counts"></div>
     </div>
@@ -2854,39 +2855,78 @@ function renderDashboard() {
 
   if (!SIGNALS || !SIGNALS.length) return;
 
-  // ── Блок 3: сводка по доминирующей теме ──
-  const THEME_NAMES = {
-    institutionalization: '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
-    supply:               '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
-    infrastructure:       '🔗 ИНФРАСТРУКТУРА',
-    macro:                '📉 МАКРОЭКОНОМИКА',
-    narrative:            '📰 НАРРАТИВ'
-  };
-  const themeCounts = {};
-  const themeDir    = {};
+  // ── Блок 3: главный нарратив ──
+  // Алгоритм: находим кластер с наибольшим числом сигналов,
+  // берём из него macro_implication и tension с наибольшим весом (primary > market > media)
+  const WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
+  const clusters = {};
   SIGNALS.forEach(s => {
-    const t = s.theme || 'narrative';
-    if (!themeCounts[t]) { themeCounts[t] = 0; themeDir[t] = { pos:0, neg:0, neu:0 }; }
-    themeCounts[t]++;
-    themeDir[t][s.dir] = (themeDir[t][s.dir] || 0) + 1;
+    const cl = s.cluster || s.theme || 'narrative';
+    if (!clusters[cl]) clusters[cl] = { signals: [], pos: 0, neg: 0, neu: 0 };
+    clusters[cl].signals.push(s);
+    clusters[cl][s.dir] = (clusters[cl][s.dir] || 0) + 1;
   });
-  const topTheme = Object.keys(themeCounts).sort((a,b) => themeCounts[b] - themeCounts[a])[0];
-  if (topTheme) {
-    const n   = themeCounts[topTheme];
-    const dir = themeDir[topTheme];
-    const cls = dir.pos >= dir.neg ? (dir.neg === 0 ? 'pos' : '') : 'neg';
+
+  // Топ кластер — по числу сигналов
+  const topCluster = Object.keys(clusters).sort((a, b) =>
+    clusters[b].signals.length - clusters[a].signals.length
+  )[0];
+
+  if (topCluster) {
+    const cl   = clusters[topCluster];
+    const n    = cl.signals.length;
+
+    // Лучший сигнал кластера — по весу источника, с macro_implication
+    const best = cl.signals
+      .filter(s => s.macro_implication || s.tension)
+      .sort((a, b) => (WEIGHT_RANK[b.weight] || 0) - (WEIGHT_RANK[a.weight] || 0))[0]
+      || cl.signals[0];
+
+    // Противоречие — самый острый contradicts в кластере
+    const withContra = cl.signals.find(s => s.links && s.links.contradicts && s.links.contradicts.length);
+
     const card = document.getElementById('dash-theme-card');
-    if (card) card.className = 'dash-signal ' + cls;
-    document.getElementById('dash-theme-name').textContent  = THEME_NAMES[topTheme] || topTheme.toUpperCase();
-    document.getElementById('dash-theme-count').textContent = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : '';
+    if (card) card.className = 'dash-signal ' + dirCls;
+
+    // Шапка: тема + счёт
+    const CLUSTER_LABELS = {
+      strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
+      etf_institutional_flow:   '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК',
+      btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
+      btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА BITCOIN',
+      supply_scarcity:          '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
+      institutionalization:     '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
+      infrastructure:           '🔗 ИНФРАСТРУКТУРА',
+      supply:                   '💎 ПРЕДЛОЖЕНИЕ',
+      macro:                    '📉 МАКРО',
+      narrative:                '📰 НАРРАТИВ'
+    };
+    document.getElementById('dash-theme-label').textContent = 'ГЛАВНЫЙ НАРРАТИВ';
+    document.getElementById('dash-theme-count').textContent =
+      (CLUSTER_LABELS[topCluster] || topCluster.toUpperCase()) +
+      ' · ' + n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+
+    // Главный текст — macro_implication лучшего сигнала
+    document.getElementById('dash-theme-name').textContent =
+      (best && best.macro_implication) || (best && best.signal) || '—';
+
+    // Tension — противоречие
+    const tensionEl = document.getElementById('dash-theme-tension');
+    if (tensionEl) {
+      const t = (withContra && withContra.tension) || (best && best.tension);
+      tensionEl.textContent = t ? '⚡ ' + t : '';
+    }
+
+    // Полоска pos/neg/neu
     document.getElementById('dash-theme-bar').innerHTML =
-      '<div class="dsb-pos" style="flex:' + (dir.pos||0) + '"></div>' +
-      '<div class="dsb-neg" style="flex:' + (dir.neg||0) + '"></div>' +
-      '<div class="dsb-neu" style="flex:' + (dir.neu||0.1) + '"></div>';
+      '<div class="dsb-pos" style="flex:' + (cl.pos||0) + '"></div>' +
+      '<div class="dsb-neg" style="flex:' + (cl.neg||0) + '"></div>' +
+      '<div class="dsb-neu" style="flex:' + (cl.neu||0.1) + '"></div>';
     document.getElementById('dash-theme-counts').innerHTML =
-      '<span class="dsc-pos">🟢 ' + (dir.pos||0) + '</span>' +
-      '<span class="dsc-neg">🔴 ' + (dir.neg||0) + '</span>' +
-      '<span class="dsc-neu">⚪ ' + (dir.neu||0) + '</span>';
+      '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>' +
+      '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>' +
+      '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>';
   }
 
   // ── Блок 4: сводка ──

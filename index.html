@@ -1014,6 +1014,34 @@ header {
   border-left: 3px solid var(--grn); padding: 16px 14px 12px;
   overflow: hidden;
 }
+.dash-narratives {
+  margin: 0 16px 12px;
+  background: var(--bg2); border: 1px solid var(--line);
+  overflow: hidden;
+}
+.dash-narrative-item {
+  padding: 12px 14px;
+  border-left: 3px solid var(--grn);
+}
+.dash-narrative-item.neg { border-left-color: var(--red); }
+.dash-narrative-item.neu { border-left-color: var(--dim); }
+.dash-narrative-item + .dash-narrative-item {
+  border-top: 1px solid var(--line);
+}
+.dash-narrative-cluster {
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em;
+  color: var(--dim); margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dash-narrative-cluster-name { color: var(--btc); }
+.dash-narrative-text {
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  color: var(--txt); line-height: 1.4; margin-bottom: 7px;
+}
+.dash-narrative-tension {
+  font-family: var(--mono); font-size: 9px; color: var(--dim);
+  letter-spacing: 0.03em; margin-bottom: 7px;
+}
 .dash-signal.neg { border-left-color: var(--red); }
 .dash-signal.neu { border-left-color: var(--dim); }
 .dash-signal-head {
@@ -1135,16 +1163,32 @@ header {
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="terminal-price-chart" style="margin:0 16px 12px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
 
-    <!-- ══ БЛОК 3: ГЛАВНЫЙ НАРРАТИВ ══ -->
-    <div class="dash-signal" id="dash-theme-card">
-      <div class="chart-head" style="margin:-16px -16px 12px">
-        <span class="chart-title">Главный нарратив</span>
-        <span id="dash-theme-count" class="chart-meta"></span>
+    <!-- ══ БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ ══ -->
+    <div class="dash-narratives" id="dash-narratives-wrap">
+      <div class="chart-head" style="margin:0">
+        <span class="chart-title">Главные нарративы</span>
+        <span id="dash-narratives-total" class="chart-meta"></span>
       </div>
-      <div class="dash-signal-title" id="dash-theme-name" style="font-size:12px;line-height:1.5;margin-bottom:8px">—</div>
-      <div id="dash-theme-tension" style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.04em;margin-bottom:6px"></div>
-      <div class="dash-sum-bar" id="dash-theme-bar" style="margin-bottom:6px"></div>
-      <div class="dash-sum-counts" id="dash-theme-counts"></div>
+      <div id="dash-narrative-1" class="dash-narrative-item">
+        <div class="dash-narrative-cluster">
+          <span class="dash-narrative-cluster-name" id="dash-n1-cluster">—</span>
+          <span id="dash-n1-count"></span>
+        </div>
+        <div class="dash-narrative-text" id="dash-n1-text">—</div>
+        <div class="dash-narrative-tension" id="dash-n1-tension"></div>
+        <div class="dash-sum-bar" id="dash-n1-bar" style="margin-bottom:5px"></div>
+        <div class="dash-sum-counts" id="dash-n1-counts"></div>
+      </div>
+      <div id="dash-narrative-2" class="dash-narrative-item">
+        <div class="dash-narrative-cluster">
+          <span class="dash-narrative-cluster-name" id="dash-n2-cluster">—</span>
+          <span id="dash-n2-count"></span>
+        </div>
+        <div class="dash-narrative-text" id="dash-n2-text">—</div>
+        <div class="dash-narrative-tension" id="dash-n2-tension"></div>
+        <div class="dash-sum-bar" id="dash-n2-bar" style="margin-bottom:5px"></div>
+        <div class="dash-sum-counts" id="dash-n2-counts"></div>
+      </div>
     </div>
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
@@ -2862,9 +2906,7 @@ function renderDashboard() {
 
   if (!SIGNALS || !SIGNALS.length) return;
 
-  // ── Блок 3: главный нарратив ──
-  // Алгоритм: находим кластер с наибольшим числом сигналов,
-  // берём из него macro_implication и tension с наибольшим весом (primary > market > media)
+  // ── Блок 3: главные нарративы (два топ-кластера) ──
   const WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
   const clusters = {};
   SIGNALS.forEach(s => {
@@ -2874,68 +2916,77 @@ function renderDashboard() {
     clusters[cl][s.dir] = (clusters[cl][s.dir] || 0) + 1;
   });
 
-  // Топ кластер — по числу сигналов
-  const topCluster = Object.keys(clusters).sort((a, b) =>
-    clusters[b].signals.length - clusters[a].signals.length
-  )[0];
+  const CLUSTER_LABELS = {
+    strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
+    etf_institutional_flow:   '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК',
+    btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
+    btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА BITCOIN',
+    supply_scarcity:          '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
+    institutionalization:     '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
+    infrastructure:           '🔗 ИНФРАСТРУКТУРА',
+    supply:                   '💎 ПРЕДЛОЖЕНИЕ',
+    macro:                    '📉 МАКРО',
+    narrative:                '📰 НАРРАТИВ'
+  };
 
-  if (topCluster) {
-    const cl   = clusters[topCluster];
-    const n    = cl.signals.length;
+  // Топ-2 кластера по числу сигналов
+  const topClusters = Object.keys(clusters)
+    .sort((a, b) => clusters[b].signals.length - clusters[a].signals.length)
+    .slice(0, 2);
 
-    // Лучший сигнал кластера — по весу источника, с macro_implication
+  // Счётчик в шапке
+  const totalNarrativeSignals = topClusters.reduce((s, cl) => s + clusters[cl].signals.length, 0);
+  const totalEl = document.getElementById('dash-narratives-total');
+  if (totalEl) totalEl.textContent = totalNarrativeSignals + ' СИГНАЛОВ';
+
+  function renderNarrativeItem(clKey, prefix) {
+    if (!clKey || !clusters[clKey]) return;
+    const cl = clusters[clKey];
+    const n  = cl.signals.length;
     const best = cl.signals
       .filter(s => s.macro_implication || s.tension)
       .sort((a, b) => (WEIGHT_RANK[b.weight] || 0) - (WEIGHT_RANK[a.weight] || 0))[0]
       || cl.signals[0];
-
-    // Противоречие — самый острый contradicts в кластере
     const withContra = cl.signals.find(s => s.links && s.links.contradicts && s.links.contradicts.length);
 
-    const card = document.getElementById('dash-theme-card');
-    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : '';
-    if (card) card.className = 'dash-signal ' + dirCls;
+    const itemEl = document.getElementById('dash-narrative-' + prefix);
+    if (itemEl) {
+      const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : '';
+      itemEl.className = 'dash-narrative-item' + (dirCls ? ' ' + dirCls : '');
+    }
 
-    // Шапка: тема + счёт
-    const CLUSTER_LABELS = {
-      strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
-      etf_institutional_flow:   '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК',
-      btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
-      btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА BITCOIN',
-      supply_scarcity:          '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
-      institutionalization:     '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
-      infrastructure:           '🔗 ИНФРАСТРУКТУРА',
-      supply:                   '💎 ПРЕДЛОЖЕНИЕ',
-      macro:                    '📉 МАКРО',
-      narrative:                '📰 НАРРАТИВ'
-    };
-    document.getElementById('dash-theme-count').textContent =
-      (CLUSTER_LABELS[topCluster] || topCluster.toUpperCase()) +
-      ' · ' + n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+    const clEl = document.getElementById('dash-n' + prefix + '-cluster');
+    if (clEl) clEl.textContent = CLUSTER_LABELS[clKey] || clKey.toUpperCase();
 
-    // Главный текст — macro_implication лучшего сигнала
-    document.getElementById('dash-theme-name').textContent =
-      (best && best.macro_implication) || (best && best.signal) || '—';
+    const cntEl = document.getElementById('dash-n' + prefix + '-count');
+    if (cntEl) cntEl.textContent = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
 
-    // Tension — противоречие
-    const tensionEl = document.getElementById('dash-theme-tension');
+    const textEl = document.getElementById('dash-n' + prefix + '-text');
+    if (textEl) textEl.textContent = (best && best.macro_implication) || (best && best.signal) || '—';
+
+    const tensionEl = document.getElementById('dash-n' + prefix + '-tension');
     if (tensionEl) {
       const t = (withContra && withContra.tension) || (best && best.tension);
       tensionEl.textContent = t ? '⚡ ' + t : '';
     }
 
-    // Полоска pos/neg/neu
-    document.getElementById('dash-theme-bar').innerHTML =
+    const barEl = document.getElementById('dash-n' + prefix + '-bar');
+    if (barEl) barEl.innerHTML =
       '<div class="dsb-pos" style="flex:' + (cl.pos||0) + '"></div>' +
       '<div class="dsb-neg" style="flex:' + (cl.neg||0) + '"></div>' +
       '<div class="dsb-neu" style="flex:' + (cl.neu||0.1) + '"></div>';
-    document.getElementById('dash-theme-counts').innerHTML =
+
+    const countsEl = document.getElementById('dash-n' + prefix + '-counts');
+    if (countsEl) countsEl.innerHTML =
       '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>' +
       '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>' +
       '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>';
   }
 
-  // ── Блок 4: сводка ──
+  renderNarrativeItem(topClusters[0], '1');
+  renderNarrativeItem(topClusters[1], '2');
+
+    // ── Блок 4: сводка ──
   const counts = { pos: 0, neg: 0, neu: 0 };
   SIGNALS.forEach(s => counts[s.dir]++);
   const total = SIGNALS.length;

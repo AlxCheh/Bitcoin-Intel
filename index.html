@@ -2743,15 +2743,30 @@ function renderSignals() {
     + '<button class="sig-fbtn' + (sigMode==='theme'?' active':'') + '" onclick="setSigMode(\'theme\')">🗂 ПО ТЕМЕ</button>'
     + '</div>';
 
-  // фильтры по категории
+  // фильтры по кластеру
+  const DIGEST_CLUSTER_LABELS = {
+    strategy_model_stress:    '🏦 STRATEGY',
+    etf_institutional_flow:   '📊 ETF',
+    btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА',
+    btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА',
+    supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
+    institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
+    infrastructure:           '🔗 ИНФРАСТРУКТУРА',
+    supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
+    macro:                    '📉 МАКРО',
+    narrative:                '📰 НАРРАТИВ',
+    onchain:                  '📊 ON-CHAIN',
+    layer2:                   '🔗 ИНФРАСТРУКТУРА',
+  };
   const cats = {};
   const catCounts = {};
-  const catDir = {}; // pos/neg/neu counts per cat
+  const catDir = {};
   SIGNALS.forEach(s => {
-    cats[s.cat] = s.catLabel;
-    catCounts[s.cat] = (catCounts[s.cat] || 0) + 1;
-    if (!catDir[s.cat]) catDir[s.cat] = { pos: 0, neg: 0, neu: 0 };
-    catDir[s.cat][s.dir] = (catDir[s.cat][s.dir] || 0) + 1;
+    const cl = s.cluster || s.theme || s.cat;
+    cats[cl] = DIGEST_CLUSTER_LABELS[cl] || cl.toUpperCase();
+    catCounts[cl] = (catCounts[cl] || 0) + 1;
+    if (!catDir[cl]) catDir[cl] = { pos: 0, neg: 0, neu: 0 };
+    catDir[cl][s.dir] = (catDir[cl][s.dir] || 0) + 1;
   });
 
   function makeBar(dir, total) {
@@ -2796,7 +2811,7 @@ function renderSignals() {
   // фильтрация — категория/dir + actor
   const dirKeys = ['pos', 'neg', 'neu'];
   const items = SIGNALS
-    .filter(s => sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : s.cat === sigFilter))
+    .filter(s => sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : (s.cluster || s.theme || s.cat) === sigFilter))
     .filter(s => sigActorFilter === 'all' || s.actor === sigActorFilter)
     .slice().sort((a, b) => b.date.localeCompare(a.date));
 
@@ -2807,7 +2822,7 @@ function renderSignals() {
     const flowMeta = s.flow && s.flow !== 'neutral' ? FLOW_META[s.flow] : null;
     const actorMeta = s.actor ? ACTOR_META[s.actor] : null;
     return '<div class="sig-card ' + s.dir + '">'
-      + '<div class="sig-top"><span class="sig-cat">' + s.catLabel + '</span><span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
+      + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span><span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
       + '<div class="sig-signal">' + s.signal + '</div>'
       + '<div class="sig-data">' + chips
       + (horizonLabel ? '<span class="sig-chip" style="opacity:.5">⏱ ' + horizonLabel + '</span>' : '')
@@ -3047,7 +3062,7 @@ function renderDashboard() {
       '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>';
 
     // Кликабельная строка → дайджест с фильтром по cat кластера
-    const catKey = (best && best.cat) || clKey;
+    const catKey = clKey;
     const linkEl = document.getElementById('dash-n' + prefix + '-link');
     if (linkEl) {
       linkEl.onclick = () => goToDigest(catKey);
@@ -3078,8 +3093,8 @@ function setSigFilter(c) {
   renderSignals();
 }
 
-function goToDigest(cat) {
-  sigFilter = cat || 'all';
+function goToDigest(clusterKey) {
+  sigFilter = clusterKey || 'all';
   showTab('market', null);
   window.scrollTo(0, 0);
 }

@@ -1206,7 +1206,6 @@ header {
         </div>
         <div class="dash-narrative-text" id="dash-n1-text">—</div>
         <div class="dash-narrative-tension" id="dash-n1-tension"></div>
-        <div class="dash-sum-bar" id="dash-n1-bar" style="margin-bottom:5px"></div>
         <div class="dash-sum-counts" id="dash-n1-counts"></div>
         <div class="dash-narrative-link" id="dash-n1-link">
           СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
@@ -1219,7 +1218,6 @@ header {
         </div>
         <div class="dash-narrative-text" id="dash-n2-text">—</div>
         <div class="dash-narrative-tension" id="dash-n2-tension"></div>
-        <div class="dash-sum-bar" id="dash-n2-bar" style="margin-bottom:5px"></div>
         <div class="dash-sum-counts" id="dash-n2-counts"></div>
         <div class="dash-narrative-link" id="dash-n2-link">
           СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
@@ -3038,12 +3036,6 @@ function renderDashboard() {
       const t = (withContra && withContra.tension) || (best && best.tension);
       tensionEl.textContent = t ? '⚡ ' + t : '';
     }
-
-    const barEl = document.getElementById('dash-n' + prefix + '-bar');
-    if (barEl) barEl.innerHTML =
-      '<div class="dsb-pos" style="flex:' + (cl.pos||0) + '"></div>' +
-      '<div class="dsb-neg" style="flex:' + (cl.neg||0) + '"></div>' +
-      '<div class="dsb-neu" style="flex:' + (cl.neu||0.1) + '"></div>';
 
     const countsEl = document.getElementById('dash-n' + prefix + '-counts');
     if (countsEl) countsEl.innerHTML =

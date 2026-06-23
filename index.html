@@ -973,20 +973,21 @@ header {
 .dash-cycle.warn .dash-cycle-phase { color: var(--yel); }
 .dash-cycle.danger .dash-cycle-phase { color: var(--red); }
 .dash-cycle-sub { font-family: var(--sans); font-size: 11px; color: var(--dim); line-height: 1.4; margin-bottom: 14px; }
-.dash-cycle-track { display: flex; gap: 2px; margin-bottom: 6px; }
-.dct-seg { height: 4px; flex: 1; background: var(--line2); }
+.dash-cycle-track { display: flex; gap: 5px; margin-bottom: 6px; }
+.dct-seg { height: 6px; flex: 1; background: var(--line2); border-radius: 2px; }
 .dct-seg.done { background: var(--grn); }
 .dct-seg.current { background: var(--grn); position: relative; }
 .dct-seg.current::after {
-  content: ''; position: absolute; right: -1px; top: -3px;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--grn); box-shadow: 0 0 8px rgba(34,197,94,0.6);
+  content: ''; position: absolute; right: -1px; top: -4px;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--grn); box-shadow: 0 0 12px rgba(34,197,94,0.9);
 }
 .dash-cycle-labels {
   display: flex; justify-content: space-between;
-  font-family: var(--mono); font-size: 7px; color: var(--dim); letter-spacing: 0.06em; margin-top: 8px;
+  font-family: var(--mono); font-size: 8px; color: var(--dim); letter-spacing: 0.07em; margin-top: 10px;
 }
-.dct-active { color: var(--grn); }
+.dct-active { color: var(--grn); font-weight: 700; }
+.dash-cycle-labels span:not(.dct-active) { opacity: 0.45; }
 
 .dash-metrics {
   display: flex; flex-wrap: wrap; gap: 1px; margin: 0 16px 0;

@@ -905,16 +905,26 @@ header {
   transition: 0.15s;
 }
 .sig-fbtn.active { border-color: var(--btc); color: var(--btc); background: var(--btc-low); }
-.sig-fbtn-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  margin-left: 6px;
-  padding: 1px 5px;
-  background: var(--bg); border-radius: 8px;
-  font-size: 8px; font-family: var(--mono);
-  color: var(--dim); letter-spacing: 0;
-  vertical-align: middle;
+.sig-fbtn {
+  position: relative;
+  overflow: hidden;
 }
-.sig-fbtn.active .sig-fbtn-badge { background: var(--btc-mid); color: var(--btc); }
+.sig-fbtn-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; display: flex; gap: 1px;
+}
+.sig-fbtn-bar-pos { background: var(--grn); }
+.sig-fbtn-bar-neg { background: var(--red); }
+.sig-fbtn-bar-neu { background: var(--dim2); }
+.sig-fbtn-count {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 8px;
+  color: var(--dim);
+  font-family: var(--mono);
+  letter-spacing: 0;
+}
+.sig-fbtn.active .sig-fbtn-count { color: var(--btc); }
 
 .sig-card {
   background: var(--bg2);
@@ -2719,16 +2729,38 @@ function renderSignals() {
   // фильтры по категории
   const cats = {};
   const catCounts = {};
+  const catDir = {}; // pos/neg/neu counts per cat
   SIGNALS.forEach(s => {
     cats[s.cat] = s.catLabel;
     catCounts[s.cat] = (catCounts[s.cat] || 0) + 1;
+    if (!catDir[s.cat]) catDir[s.cat] = { pos: 0, neg: 0, neu: 0 };
+    catDir[s.cat][s.dir] = (catDir[s.cat][s.dir] || 0) + 1;
   });
+
+  function makeBar(dir, total) {
+    if (!dir || !total) return '';
+    return '<span class="sig-fbtn-bar">'
+      + '<span class="sig-fbtn-bar-pos" style="flex:' + (dir.pos||0) + '"></span>'
+      + '<span class="sig-fbtn-bar-neg" style="flex:' + (dir.neg||0) + '"></span>'
+      + '<span class="sig-fbtn-bar-neu" style="flex:' + (dir.neu||0.1) + '"></span>'
+      + '</span>';
+  }
+
+  const allDir = { pos: 0, neg: 0, neu: 0 };
+  SIGNALS.forEach(s => { allDir[s.dir] = (allDir[s.dir]||0) + 1; });
+
   fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
-    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">'
-    + 'ВСЕ<span class="sig-fbtn-badge">' + SIGNALS.length + '</span></button>';
+    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ'
+    + '<span class="sig-fbtn-count">' + SIGNALS.length + '</span>'
+    + makeBar(allDir, SIGNALS.length) + '</button>';
+
   Object.keys(cats).forEach(c => {
+    const n = catCounts[c] || 0;
     fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">'
-      + cats[c] + '<span class="sig-fbtn-badge">' + (catCounts[c] || 0) + '</span></button>';
+      + cats[c]
+      + '<span class="sig-fbtn-count">' + n + '</span>'
+      + makeBar(catDir[c], n)
+      + '</button>';
   });
   fhtml += '</div>';
 

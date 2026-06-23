@@ -2677,14 +2677,14 @@ let sigActorFilter = 'all';
 let sigMode = 'date'; // 'date' | 'theme'
 
 const THEME_META = {
-  supply:              { label: '⬛ ПРЕДЛОЖЕНИЕ',       order: 0 },
-  institutionalization:{ label: '🏦 ИНСТИТУЦИОНАЛЫ',   order: 1 },
-  infrastructure:      { label: '🔗 ИНФРАСТРУКТУРА',    order: 2 },
-  macro:               { label: '📉 МАКРО',             order: 3 },
-  narrative:           { label: '📰 НАРРАТИВ',          order: 4 },
-  ownership:           { label: '🏦 ИНСТИТУЦИОНАЛЫ',   order: 1 },
-  onchain:             { label: '📊 ON-CHAIN',          order: 5 },
-  layer2:              { label: '🔗 LAYER 2',           order: 6 },
+  ownership:           { label: '🏦 ИНСТИТУЦИОНАЛЫ',   order: 0 },
+  institutionalization:{ label: '🏦 ИНСТИТУЦИОНАЛЫ',   order: 0 },
+  onchain:             { label: '📊 ON-CHAIN',          order: 1 },
+  layer2:              { label: '🔗 LAYER 2',           order: 2 },
+  infrastructure:      { label: '🔗 ИНФРАСТРУКТУРА',    order: 3 },
+  macro:               { label: '📉 МАКРО',             order: 4 },
+  narrative:           { label: '📰 НАРРАТИВ',          order: 5 },
+  supply:              { label: '⬛ ПРЕДЛОЖЕНИЕ',       order: 6 },
 };
 
 const ACTOR_META = {
@@ -2973,7 +2973,7 @@ function renderDashboard() {
     btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
     btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА BITCOIN',
     supply_scarcity:          '💎 ДЕФИЦИТ ПРЕДЛОЖЕНИЯ',
-    institutionalization:     '🏦 ИНСТИТУЦИОНАЛИЗАЦИЯ',
+    institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '💎 ПРЕДЛОЖЕНИЕ',
     macro:                    '📉 МАКРО',

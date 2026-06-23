@@ -2752,14 +2752,13 @@ function renderSignals() {
   fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
     + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ'
     + '<span class="sig-fbtn-count">' + SIGNALS.length + '</span>'
-    + makeBar(allDir, SIGNALS.length) + '</button>';
+    + '</button>';
 
   Object.keys(cats).forEach(c => {
     const n = catCounts[c] || 0;
     fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">'
       + cats[c]
       + '<span class="sig-fbtn-count">' + n + '</span>'
-      + makeBar(catDir[c], n)
       + '</button>';
   });
   fhtml += '</div>';

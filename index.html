@@ -2907,6 +2907,7 @@ function renderDashboard() {
   if (!SIGNALS || !SIGNALS.length) return;
 
   // ── Блок 3: главные нарративы (два топ-кластера) ──
+  if (SIGNALS && SIGNALS.length) {
   const WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
   const clusters = {};
   SIGNALS.forEach(s => {
@@ -2985,6 +2986,7 @@ function renderDashboard() {
 
   renderNarrativeItem(topClusters[0], '1');
   renderNarrativeItem(topClusters[1], '2');
+  } // end if SIGNALS
 
     // ── Блок 4: сводка ──
   const counts = { pos: 0, neg: 0, neu: 0 };

@@ -1135,7 +1135,12 @@ header {
 
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
-  <span style="color:var(--dim)">[ ~/</span><span class="crumb-tab" id="crumb-tab">home</span><span style="color:var(--dim)"> ]</span>
+  <span style="color:var(--dim);opacity:0.5">[ ~</span>
+  <span style="color:var(--dim);opacity:0.5"> / </span>
+  <span id="crumb-cluster" style="font-family:var(--mono);color:var(--dim);opacity:0.5;font-size:11px"></span>
+  <span style="color:var(--dim);opacity:0.5"> / </span>
+  <span id="crumb-tab" style="font-family:var(--mono);color:var(--txt);font-size:11px">home</span>
+  <span style="color:var(--dim);opacity:0.5"> ]</span>
 </div>
 <nav class="subnav" id="subnav"></nav>
 
@@ -3394,10 +3399,7 @@ function showTab(id, btn, keepCluster) {
   const meta = TAB_META[id];
   if (meta) {
     document.getElementById('crumb-tab').textContent = meta.tab;
-    // sub removed — clean path format [ ~/tab ]
-    if (false) {
-      sepEl.style.display = 'none';
-    }
+    document.getElementById('crumb-cluster').textContent = meta.cluster.toLowerCase();
   }
 
   if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }

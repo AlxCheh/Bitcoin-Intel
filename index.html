@@ -935,6 +935,22 @@ header {
 }
 .dash-narrative-link:hover { color: var(--btc); }
 .dash-narrative-link span { font-size: 10px; }
+.dash-narrative-score {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 8px; color: var(--dim);
+  cursor: pointer; letter-spacing: 0.04em;
+}
+.dash-narrative-score:hover { color: var(--btc); }
+.dash-narrative-score.hot { color: var(--btc); }
+.dash-breakdown {
+  display: none; margin-top: 6px; padding: 8px 10px;
+  background: var(--bg3); border: 1px solid var(--line);
+  font-family: var(--mono); font-size: 8px; color: var(--dim);
+  line-height: 2;
+}
+.dash-breakdown.open { display: block; }
+.dash-breakdown-row { display: flex; justify-content: space-between; }
+.dash-breakdown-total { color: var(--txt); border-top: 1px solid var(--line2); margin-top: 4px; padding-top: 4px; }
 
 .sig-card {
   background: var(--bg2);
@@ -1202,30 +1218,7 @@ header {
         <span class="chart-title">Главные нарративы</span>
         <span id="dash-narratives-total" class="chart-meta"></span>
       </div>
-      <div id="dash-narrative-1" class="dash-narrative-item">
-        <div class="dash-narrative-text" id="dash-n1-text">—</div>
-        <div class="dash-narrative-cluster">
-          <span class="dash-narrative-cluster-name" id="dash-n1-cluster">—</span>
-          <span id="dash-n1-count"></span>
-        </div>
-        <div class="dash-narrative-tension" id="dash-n1-tension"></div>
-        <div class="dash-sum-counts" id="dash-n1-counts"></div>
-        <div class="dash-narrative-link" id="dash-n1-link">
-          СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
-        </div>
-      </div>
-      <div id="dash-narrative-2" class="dash-narrative-item">
-        <div class="dash-narrative-text" id="dash-n2-text">—</div>
-        <div class="dash-narrative-cluster">
-          <span class="dash-narrative-cluster-name" id="dash-n2-cluster">—</span>
-          <span id="dash-n2-count"></span>
-        </div>
-        <div class="dash-narrative-tension" id="dash-n2-tension"></div>
-        <div class="dash-sum-counts" id="dash-n2-counts"></div>
-        <div class="dash-narrative-link" id="dash-n2-link">
-          СМОТРЕТЬ СИГНАЛЫ В ДАЙДЖЕСТЕ <span>→</span>
-        </div>
-      </div>
+      <div id="dash-narratives-list"></div>
     </div>
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
@@ -2990,16 +2983,14 @@ function renderDashboard() {
 
   if (!SIGNALS || !SIGNALS.length) return;
 
-  // ── Блок 3: главные нарративы (два топ-кластера) ──
+  // ── Блок 3: главные нарративы — scoring algorithm v2 ──
   if (SIGNALS && SIGNALS.length) {
+
   const WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
-  const clusters = {};
-  SIGNALS.forEach(s => {
-    const cl = s.cluster || s.theme || 'narrative';
-    if (!clusters[cl]) clusters[cl] = { signals: [], pos: 0, neg: 0, neu: 0 };
-    clusters[cl].signals.push(s);
-    clusters[cl][s.dir] = (clusters[cl][s.dir] || 0) + 1;
-  });
+  const ROLE_RANK   = { trigger: 4, complication: 3, resolution: 2, background: 0 };
+  const SCORE_MIN   = 10;
+  const SCORE_HOT   = 20;
+  const MAX_SHOWN   = 4;
 
   const CLUSTER_LABELS = {
     strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
@@ -3013,66 +3004,101 @@ function renderDashboard() {
     macro:                    '📉 МАКРО',
     narrative:                '📰 НАРРАТИВ',
     onchain:                  '📊 ON-CHAIN',
-    layer2:                   '🔗 LAYER 2',
+    layer2:                   '🔗 ИНФРАСТРУКТУРА',
   };
 
-  // Топ-2 кластера по числу сигналов
-  const topClusters = Object.keys(clusters)
-    .sort((a, b) => clusters[b].signals.length - clusters[a].signals.length)
-    .slice(0, 2);
+  // Собираем кластеры
+  const clusters = {};
+  const today = new Date();
+  SIGNALS.forEach(s => {
+    const cl = s.cluster || s.theme || 'narrative';
+    if (!clusters[cl]) clusters[cl] = { signals: [], pos: 0, neg: 0, neu: 0 };
+    clusters[cl].signals.push(s);
+    clusters[cl][s.dir] = (clusters[cl][s.dir] || 0) + 1;
+  });
 
-  // Счётчик в шапке
-  const totalNarrativeSignals = topClusters.reduce((s, cl) => s + clusters[cl].signals.length, 0);
-  const totalEl = document.getElementById('dash-narratives-total');
-  if (totalEl) totalEl.textContent = totalNarrativeSignals + ' СИГНАЛОВ';
-
-  function renderNarrativeItem(clKey, prefix) {
-    if (!clKey || !clusters[clKey]) return;
-    const cl = clusters[clKey];
-    const n  = cl.signals.length;
-    const best = cl.signals
-      .filter(s => s.macro_implication || s.tension)
-      .sort((a, b) => (WEIGHT_RANK[b.weight] || 0) - (WEIGHT_RANK[a.weight] || 0))[0]
-      || cl.signals[0];
-    const withContra = cl.signals.find(s => s.links && s.links.contradicts && s.links.contradicts.length);
-
-    const itemEl = document.getElementById('dash-narrative-' + prefix);
-    if (itemEl) {
-      const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : '';
-      itemEl.className = 'dash-narrative-item' + (dirCls ? ' ' + dirCls : '');
-    }
-
-    const clEl = document.getElementById('dash-n' + prefix + '-cluster');
-    if (clEl) clEl.textContent = CLUSTER_LABELS[clKey] || clKey.toUpperCase();
-
-    const cntEl = document.getElementById('dash-n' + prefix + '-count');
-    if (cntEl) cntEl.textContent = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
-
-    const textEl = document.getElementById('dash-n' + prefix + '-text');
-    if (textEl) textEl.textContent = (best && best.macro_implication) || (best && best.signal) || '—';
-
-    const tensionEl = document.getElementById('dash-n' + prefix + '-tension');
-    if (tensionEl) {
-      const t = (withContra && withContra.tension) || (best && best.tension);
-      tensionEl.textContent = t ? '⚡ ' + t : '';
-    }
-
-    const countsEl = document.getElementById('dash-n' + prefix + '-counts');
-    if (countsEl) countsEl.innerHTML =
-      '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>' +
-      '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>' +
-      '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>';
-
-    // Кликабельная строка → дайджест с фильтром по cat кластера
-    const catKey = clKey;
-    const linkEl = document.getElementById('dash-n' + prefix + '-link');
-    if (linkEl) {
-      linkEl.onclick = () => goToDigest(catKey);
-    }
+  // Скоринг каждого кластера
+  function scoreCluster(signals) {
+    let freshness = 0, weight = 0, tension = 0, roles = 0;
+    signals.forEach(s => {
+      // Freshness
+      const days = s.date ? Math.floor((today - new Date(s.date)) / 86400000) : 999;
+      freshness += days <= 7 ? 3 : days <= 30 ? 1 : 0;
+      // Weight
+      weight += WEIGHT_RANK[s.weight] || 1;
+      // Tension
+      if (s.links && s.links.contradicts && s.links.contradicts.length) tension += 5;
+      if (s.tension) tension += 2;
+      // Role
+      roles += ROLE_RANK[s.narrative_role] || 0;
+    });
+    return { total: freshness + weight + tension + roles, freshness, weight, tension, roles };
   }
 
-  renderNarrativeItem(topClusters[0], '1');
-  renderNarrativeItem(topClusters[1], '2');
+  // Отбор и сортировка
+  const scored = Object.keys(clusters).map(key => ({
+    key,
+    cl: clusters[key],
+    score: scoreCluster(clusters[key].signals)
+  })).sort((a, b) => b.score.total - a.score.total);
+
+  const active = scored.filter(x => x.score.total >= SCORE_MIN).slice(0, MAX_SHOWN);
+  const shown  = active.length > 0 ? active : [{ ...scored[0], weak: true }];
+
+  // Счётчик в шапке
+  const totalEl = document.getElementById('dash-narratives-total');
+  if (totalEl) totalEl.textContent = shown.length + ' НАРРАТИВ' + (shown.length === 1 ? '' : shown.length < 5 ? 'А' : 'ОВ');
+
+  // Рендер
+  const listEl = document.getElementById('dash-narratives-list');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+
+  shown.forEach(({ key, cl, score, weak }, idx) => {
+    const n    = cl.signals.length;
+    const best = cl.signals
+      .filter(s => s.macro_implication || s.tension)
+      .sort((a, b) => (WEIGHT_RANK[b.weight]||0) - (WEIGHT_RANK[a.weight]||0))[0]
+      || cl.signals[0];
+    const withContra = cl.signals.find(s => s.links && s.links.contradicts && s.links.contradicts.length);
+    const tension    = (withContra && withContra.tension) || (best && best.tension) || '';
+    const dirCls     = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
+    const isHot      = score.total >= SCORE_HOT;
+    const bdId       = 'nbd-' + idx;
+    const label      = CLUSTER_LABELS[key] || key.toUpperCase();
+    const cnt        = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+    const macroText  = (best && best.macro_implication) || (best && best.signal) || '—';
+
+    const html = '<div class="dash-narrative-item ' + dirCls + '" style="' + (idx > 0 ? 'border-top:1px solid var(--line)' : '') + '">'
+      + '<div class="dash-narrative-text">' + macroText + '</div>'
+      + '<div class="dash-narrative-cluster" style="margin-top:5px">'
+      +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
+      +   '<span style="color:var(--dim);font-size:8px">' + cnt + '</span>'
+      + '</div>'
+      + (tension ? '<div class="dash-narrative-tension">⚡ ' + tension + '</div>' : '')
+      + '<div class="dash-sum-counts" style="margin:5px 0">'
+      +   '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>'
+      +   '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>'
+      +   '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
+      +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" onclick="goToDigest('' + key + '')">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" onclick="document.getElementById('' + bdId + '').classList.toggle('open')">'
+      +     (isHot ? '🔥 ' : '') + 'score: ' + score.total + ' ▾'
+      +   '</div>'
+      + '</div>'
+      + '<div class="dash-breakdown" id="' + bdId + '">'
+      +   '<div class="dash-breakdown-row"><span>freshness</span><span>+' + score.freshness + '</span></div>'
+      +   '<div class="dash-breakdown-row"><span>weight</span><span>+' + score.weight + '</span></div>'
+      +   '<div class="dash-breakdown-row"><span>tension</span><span>+' + score.tension + '</span></div>'
+      +   '<div class="dash-breakdown-row"><span>roles</span><span>+' + score.roles + '</span></div>'
+      +   '<div class="dash-breakdown-row dash-breakdown-total"><span>total</span><span>' + score.total + '</span></div>'
+      + '</div>'
+      + '</div>';
+
+    listEl.innerHTML += html;
+  });
+
   } // end if SIGNALS
 
     // ── Блок 4: сводка ──

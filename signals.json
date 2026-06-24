@@ -117,7 +117,7 @@
       ]
     },
     "narrative_role": "trigger",
-    "cluster": "btc_treasury_competition",
+    "cluster": "strategy_model_stress",
     "tension": "Strategy теряет темп накопления BTC из-за долговой нагрузки — новые игроки покупают быстрее",
     "macro_implication": "корпоративное накопление BTC децентрализуется: модель Strategy тиражируется без её долговых ограничений"
   },
@@ -196,7 +196,8 @@
       "context_chain": [
         "STR-2026-0616-001"
       ]
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-15",
@@ -229,7 +230,8 @@
       ],
       "contradicts": [],
       "context_chain": []
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-22",
@@ -260,7 +262,8 @@
       ],
       "contradicts": [],
       "context_chain": []
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-22",
@@ -360,7 +363,8 @@
       "context_chain": [
         "STR-2026-0615-001"
       ]
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-22",
@@ -418,7 +422,7 @@
     "actor": "defi",
     "flow": "neutral",
     "id": "STR-2026-0622-006",
-    "cluster": "btc_infrastructure_growth",
+    "cluster": "strategy_model_stress",
     "narrative_role": "complication",
     "tension": "STRC токенизируется в DeFi — BTC-backed инструмент выходит за рамки традфина в децентрализованные протоколы",
     "macro_implication": "Токенизация STRC в DeFi создаёт новый вектор: институциональный BTC-долг становится строительным блоком для децентрализованных финансов. Граница между TradFi и DeFi в BTC-экосистеме размывается.",
@@ -466,7 +470,8 @@
       "context_chain": [
         "STR-2026-0618-001"
       ]
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-22",
@@ -640,7 +645,8 @@
         "STR-2026-0622-004"
       ],
       "context_chain": []
-    }
+    },
+    "cluster": "strategy_model_stress"
   },
   {
     "date": "2026-06-18",
@@ -710,7 +716,7 @@
       ]
     },
     "narrative_role": "trigger",
-    "cluster": "btc_treasury_competition",
+    "cluster": "strategy_model_stress",
     "tension": "Европейские казначейства копируют модель Strategy без её масштаба и кредитоспособности — мандат огромен, исполнение под вопросом",
     "macro_implication": "Модель корпоративных BTC-казначейств выходит за рамки США и единственного доминирующего игрока. Если часть европейских мандатов будет реализована — структурный спрос на BTC растёт вне зависимости от американского регуляторного цикла."
   },
@@ -867,7 +873,7 @@
       ]
     },
     "narrative_role": "complication",
-    "cluster": "btc_treasury_competition",
+    "cluster": "strategy_model_stress",
     "tension": "Суверенное государство наращивает BTC-резервы вопреки требованиям МВФ — давление международных институтов не останавливает накопление",
     "macro_implication": "Государственные BTC-резервы становятся устойчивой стратегией даже под внешним давлением. Сальвадор создаёт прецедент: суверенный актор может системно накапливать BTC обходя институциональные ограничения."
   },
@@ -906,7 +912,7 @@
       ]
     },
     "narrative_role": "complication",
-    "cluster": "btc_treasury_competition",
+    "cluster": "strategy_model_stress",
     "tension": "Европейские BTC-казначейства консолидируются через M&A без кэша — новый механизм масштабирования vs долговая модель Strategy",
     "macro_implication": "BTC-казначейства начинают консолидироваться как отрасль — через поглощения, а не только накопление. Оценка компаний напрямую привязывается к BTC-резервам, вытесняя традиционные финансовые метрики. Европейский рынок формирует собственную конкурентную динамику."
   },

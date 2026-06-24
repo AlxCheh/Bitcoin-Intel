@@ -3227,26 +3227,6 @@ function renderDashboard() {
     listEl.appendChild(item);
   });
 
-    // Асинхронно синтезируем через API и обновляем текст
-    synthesizeCluster(key, cl).then(synthesis => {
-      const existing = listEl.querySelector('[data-cluster-key="' + key + '"]');
-      if (!existing) return;
-      const textEl    = existing.querySelector('.dash-narrative-text');
-      const tensionEl = existing.querySelector('.dash-narrative-tension');
-      const cntEl     = existing.querySelector('.dash-narrative-cluster span:last-child');
-      if (textEl && synthesis.narrative) textEl.textContent = synthesis.narrative;
-      if (tensionEl && synthesis.tension) tensionEl.textContent = '⚡ ' + synthesis.tension;
-      if (cntEl && synthesis.source === 'api') {
-        const n = cl.signals.length;
-        cntEl.innerHTML = n + ' сигнал' + (n===1?'':n<5?'а':'ов')
-          + ' <span style="color:var(--btc);font-size:7px;opacity:0.7">✦ AI</span>';
-      }
-    });
-  });
-
-  listEl.appendChild(item);
-  });
-
   } // end if SIGNALS
 
     // ── Блок 4: сводка ──

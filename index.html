@@ -1210,7 +1210,13 @@ header {
     </div>
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
-    <div id="terminal-price-chart" style="margin:0 16px 12px;border-radius:3px;overflow:hidden;border:1px solid var(--line);"></div>
+    <div style="margin:0 16px 12px;border:1px solid var(--line);overflow:hidden;">
+      <div class="chart-head" style="margin:0">
+        <span class="chart-title">График BTC / USD</span>
+        <span class="chart-meta">ЦЕНА · ИСТОРИЯ</span>
+      </div>
+      <div id="terminal-price-chart"></div>
+    </div>
 
     <!-- ══ БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ ══ -->
     <div class="dash-narratives" id="dash-narratives-wrap">
@@ -2400,29 +2406,49 @@ function initPriceChart() {
         y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
       }));
 
-      // ── TOP BAR ──
+      // ── TOP BAR — тикер / цена / % слева выровнены, периоды справа ──
       const topBar = div({}, {
-        background: C.bg2, borderBottom: '1px solid ' + C.line, padding: '11px 16px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+        background: C.bg2, borderBottom: '1px solid ' + C.line,
+        padding: '10px 14px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
       });
-      // Left side
-      const tleft = div({}, { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' });
+
+      // Левая часть — сетка: тикер | цена | %
+      const tleft = div({}, { display: 'flex', alignItems: 'baseline', gap: '10px' });
+
       const ticker = document.createElement('span');
       ticker.textContent = 'BTC/USD';
-      Object.assign(ticker.style, { color: C.btc, fontSize: '14px', fontWeight: 'bold', letterSpacing: '0.18em' });
+      Object.assign(ticker.style, {
+        fontFamily: C.mono, color: C.dim, fontSize: '9px',
+        letterSpacing: '0.12em', minWidth: '64px',
+      });
+
       const priceEl = document.createElement('span');
       priceEl.id = 'tc-price';
       priceEl.textContent = fmtP(last);
-      Object.assign(priceEl.style, { color: C.txt, fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.02em' });
+      Object.assign(priceEl.style, {
+        color: C.txt, fontSize: '20px', fontWeight: 'bold',
+        letterSpacing: '-0.02em', minWidth: '120px', textAlign: 'right',
+      });
+
       const chgEl = document.createElement('span');
       chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
-      Object.assign(chgEl.style, { color: accent, fontSize: '12px', background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 7px', borderRadius: '2px' });
+      Object.assign(chgEl.style, {
+        fontFamily: C.mono, color: accent, fontSize: '10px',
+        background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+        padding: '2px 7px', borderRadius: '2px', minWidth: '64px', textAlign: 'center',
+      });
+
       const dateEl = document.createElement('span');
       dateEl.id = 'tc-date';
-      Object.assign(dateEl.style, { color: C.dim, fontSize: '10px', fontFamily: C.mono });
-      tleft.appendChild(ticker); tleft.appendChild(priceEl); tleft.appendChild(chgEl); tleft.appendChild(dateEl);
+      Object.assign(dateEl.style, { color: C.dim, fontSize: '9px', fontFamily: C.mono });
 
-      // Period buttons
+      tleft.appendChild(ticker);
+      tleft.appendChild(priceEl);
+      tleft.appendChild(chgEl);
+      tleft.appendChild(dateEl);
+
+      // Правая часть — кнопки периодов
       const tright = div({}, { display: 'flex', gap: '3px' });
       PERIODS.forEach((per, i) => {
         const btn = document.createElement('button');
@@ -2430,8 +2456,8 @@ function initPriceChart() {
         Object.assign(btn.style, {
           background: activePeriod === i ? accent : 'transparent',
           color: activePeriod === i ? C.bg : C.dim,
-          border: '1px solid ' + (activePeriod === i ? accent : C.line),
-          borderRadius: '2px', padding: '3px 9px', fontSize: '10px',
+          border: '1px solid ' + (activePeriod === i ? accent : C.line2),
+          borderRadius: '2px', padding: '3px 9px', fontSize: '9px',
           fontFamily: C.mono, fontWeight: 'bold',
           letterSpacing: '0.06em', cursor: 'pointer',
         });

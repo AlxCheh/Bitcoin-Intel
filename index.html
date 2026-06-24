@@ -3069,8 +3069,10 @@ function renderDashboard() {
     const cnt        = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
     const macroText  = (best && best.macro_implication) || (best && best.signal) || '—';
 
-    const html = '<div class="dash-narrative-item ' + dirCls + '" style="' + (idx > 0 ? 'border-top:1px solid var(--line)' : '') + '">'
-      + '<div class="dash-narrative-text">' + macroText + '</div>'
+    const item = document.createElement('div');
+    item.className = 'dash-narrative-item ' + dirCls;
+    if (idx > 0) item.style.borderTop = '1px solid var(--line)';
+    item.innerHTML = '<div class="dash-narrative-text">' + macroText + '</div>'
       + '<div class="dash-narrative-cluster" style="margin-top:5px">'
       +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
       +   '<span style="color:var(--dim);font-size:8px">' + cnt + '</span>'
@@ -3082,8 +3084,8 @@ function renderDashboard() {
       +   '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>'
       + '</div>'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
-      +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" onclick="goToDigest('' + key + '')">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
-      +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" onclick="document.getElementById('' + bdId + '').classList.toggle('open')">'
+      +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" data-bd="' + bdId + '">'
       +     (isHot ? '🔥 ' : '') + 'score: ' + score.total + ' ▾'
       +   '</div>'
       + '</div>'
@@ -3093,10 +3095,10 @@ function renderDashboard() {
       +   '<div class="dash-breakdown-row"><span>tension</span><span>+' + score.tension + '</span></div>'
       +   '<div class="dash-breakdown-row"><span>roles</span><span>+' + score.roles + '</span></div>'
       +   '<div class="dash-breakdown-row dash-breakdown-total"><span>total</span><span>' + score.total + '</span></div>'
-      + '</div>'
       + '</div>';
-
-    listEl.innerHTML += html;
+    item.querySelector('[data-cl]').addEventListener('click', function() { goToDigest(this.dataset.cl); });
+    item.querySelector('[data-bd]').addEventListener('click', function() { document.getElementById(this.dataset.bd).classList.toggle('open'); });
+    listEl.appendChild(item);
   });
 
   } // end if SIGNALS

@@ -37,7 +37,7 @@
       ]
     },
     "narrative_role": "complication",
-    "cluster": "strategy_model_stress",
+    "cluster": "etf_institutional_flow",
     "tension": "ETF-оттоки как поверхностное давление vs долгосрочные держатели покупают в 10x больше",
     "macro_implication": "ETF-потоки стали доминирующим драйвером цены BTC — но их хрупкость определяется концентрацией на одном игроке (IBIT) и структурными издержками устаревших продуктов (GBTC)"
   },
@@ -78,7 +78,7 @@
       ]
     },
     "narrative_role": "trigger",
-    "cluster": "strategy_model_stress",
+    "cluster": "etf_institutional_flow",
     "tension": "BTC как актив без доходности vs BTC как инструмент денежного потока для традфина",
     "macro_implication": "BlackRock последовательно превращает BTC в полноценный финансовый инструмент — каждый новый продукт открывает доступ для нового типа институционального капитала"
   },
@@ -298,7 +298,8 @@
       "context_chain": [
         "STR-2026-0619-001"
       ]
-    }
+    },
+    "cluster": "etf_institutional_flow"
   },
   {
     "date": "2026-06-22",
@@ -328,7 +329,8 @@
       "confirms": [],
       "contradicts": [],
       "context_chain": []
-    }
+    },
+    "cluster": "supply_scarcity"
   },
   {
     "date": "2026-06-22",
@@ -398,7 +400,9 @@
       "context_chain": [
         "STR-2026-0618-001"
       ]
-    }
+    },
+    "cluster": "strategy_model_stress",
+    "id": "STR-2026-0622-007"
   },
   {
     "date": "2026-06-22",
@@ -611,7 +615,8 @@
       "context_chain": [
         "STR-2026-0618-002"
       ]
-    }
+    },
+    "cluster": "etf_institutional_flow"
   },
   {
     "date": "2026-06-18",
@@ -679,7 +684,8 @@
       ],
       "contradicts": [],
       "context_chain": []
-    }
+    },
+    "cluster": "etf_institutional_flow"
   },
   {
     "id": "STR-2026-0623-003",
@@ -836,7 +842,7 @@
       ]
     },
     "narrative_role": "complication",
-    "cluster": "strategy_model_stress",
+    "cluster": "etf_institutional_flow",
     "tension": "Крупнейшие банки США наращивают BTC-позиции через собственные ETF в момент когда рынок корректируется — институциональный спрос структурно расходится с розничным сентиментом",
     "macro_implication": "Wall Street переходит от пассивного хранения BTC-ETF к активной тактике на просадках. Первый банковский спотовый ETF становится инструментом накопления, а не просто дистрибуции — меняется роль банка в BTC-экосистеме."
   },

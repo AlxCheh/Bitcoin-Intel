@@ -3345,7 +3345,7 @@ const TAB_META = {
   narrative:   { cluster: 'MACRO',     tab: 'narrative' },
   signals:     { cluster: 'ANALYSIS',  tab: 'signals' },
   base:        { cluster: 'ANALYSIS',  tab: 'base' },
-  aholders:  { cluster: 'ANALYSIS', tab: 'Holders',     sub: 'Визуализация холдеров' }
+  aholders:  { cluster: 'ANALYSIS', tab: 'holders' }
 };
 
 // ── Инициализация крошки ──
@@ -3374,8 +3374,8 @@ const TAB_TO_CLUSTER = {
 
 let activeCluster = 'live';
 
-// Крошка при загрузке
-window.addEventListener('DOMContentLoaded', () => updateCrumb('home'));
+// Крошка при загрузке — скрипт в конце body, DOM уже готов
+updateCrumb('home');
 
 // выбор кластера снизу: рендерит подвкладки и открывает первую вкладку
 function selectCluster(key) {

@@ -1172,8 +1172,8 @@ header {
 
     <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
     <div class="dash-metrics">
-      <div class="chart-head" style="width:100%;background:var(--bg2)">
-        <span class="chart-title">Ключевые метрики</span>
+      <div class="chart-head" style="width:100%">
+        <span class="chart-title">Цена BTC / USD</span>
         <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
       </div>
       <div class="dash-m-cell">
@@ -1230,14 +1230,16 @@ header {
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
     <div class="dash-summary">
-      <div class="chart-head" style="margin:-16px -16px 12px">
+      <div class="chart-head" style="margin:0 0 12px">
         <span class="chart-title">Общий фон</span>
         <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
       </div>
-      <div class="dash-sum-bar" id="dash-sum-bar"></div>
-      <div class="dash-sum-counts" id="dash-sum-counts"></div>
-      <div class="dash-sum-link" onclick="showTab('market', null)">
-        ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+      <div class="dash-summary-body">
+        <div class="dash-sum-bar" id="dash-sum-bar"></div>
+        <div class="dash-sum-counts" id="dash-sum-counts"></div>
+        <div class="dash-sum-link" onclick="showTab('market', null)">
+          ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+        </div>
       </div>
     </div>
 

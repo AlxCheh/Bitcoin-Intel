@@ -120,10 +120,7 @@ header {
   font-family: var(--mono);
   font-size: 11px;
 }
-.crumb-cluster { color: var(--btc); font-weight: 600; letter-spacing: 0.05em; }
-.crumb-sep { color: var(--dim); }
 .crumb-tab { color: var(--txt); }
-.crumb-sub { color: var(--dim); }
 
 .subnav {
   display: flex;
@@ -1138,11 +1135,7 @@ header {
 
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
-  <span class="crumb-cluster" id="crumb-cluster">LIVE</span>
-  <span class="crumb-sep">/</span>
-  <span class="crumb-tab" id="crumb-tab">Обзор</span>
-  <span class="crumb-sep crumb-sub-sep" id="crumb-sub-sep" style="display:none">/</span>
-  <span class="crumb-sub" id="crumb-sub" style="display:none"></span>
+  <span style="color:var(--dim)">[ ~/</span><span class="crumb-tab" id="crumb-tab">home</span><span style="color:var(--dim)"> ]</span>
 </div>
 <nav class="subnav" id="subnav"></nav>
 
@@ -3333,20 +3326,20 @@ function goToDigest(clusterKey) {
 
 // ── TABS ──
 const TAB_META = {
-  home:      { cluster: 'LIVE',     tab: 'Обзор',       sub: '' },
-  analytics: { cluster: 'LIVE',     tab: 'Метрики',     sub: 'Метрики сети' },
-  pools:     { cluster: 'LIVE',     tab: 'Пулы',        sub: 'Майнинг-пулы' },
-  market:    { cluster: 'LIVE',     tab: 'Дайджест',    sub: 'База сигналов' },
-  basics:    { cluster: 'ECOSYSTEM',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
-  tech:      { cluster: 'ECOSYSTEM',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
-  lightning: { cluster: 'ECOSYSTEM', tab: 'Lightning',  sub: 'Layer 2 · Как подключиться' },
-  instruments: { cluster: 'ECOSYSTEM', tab: 'Инструменты', sub: 'ETF · Структуры · Инструменты рынка' },
-  history:   { cluster: 'MACRO',    tab: 'История',     sub: 'Хронология BTC' },
-  holders:   { cluster: 'MACRO',    tab: 'Холдеры',     sub: 'Кто держит Bitcoin' },
-  emission:  { cluster: 'MACRO',    tab: 'Эмиссия',     sub: 'Эмиссионная кривая' },
-  narrative: { cluster: 'MACRO',    tab: 'Нарратив',    sub: 'Ключевые события' },
-  signals:   { cluster: 'ANALYSIS', tab: 'Signals',     sub: 'AI-анализатор' },
-  base:      { cluster: 'ANALYSIS', tab: 'Base',        sub: 'База разборов' },
+  home:        { cluster: 'LIVE',      tab: 'home' },
+  analytics:   { cluster: 'LIVE',      tab: 'analytics' },
+  pools:       { cluster: 'LIVE',      tab: 'pools' },
+  market:      { cluster: 'LIVE',      tab: 'digests' },
+  basics:      { cluster: 'ECOSYSTEM', tab: 'basics' },
+  tech:        { cluster: 'ECOSYSTEM', tab: 'tech' },
+  lightning:   { cluster: 'ECOSYSTEM', tab: 'lightning' },
+  instruments: { cluster: 'ECOSYSTEM', tab: 'instruments' },
+  history:     { cluster: 'MACRO',     tab: 'history' },
+  holders:     { cluster: 'MACRO',     tab: 'holders' },
+  emission:    { cluster: 'MACRO',     tab: 'emission' },
+  narrative:   { cluster: 'MACRO',     tab: 'narrative' },
+  signals:     { cluster: 'ANALYSIS',  tab: 'signals' },
+  base:        { cluster: 'ANALYSIS',  tab: 'base' },
   aholders:  { cluster: 'ANALYSIS', tab: 'Holders',     sub: 'Визуализация холдеров' }
 };
 
@@ -3400,16 +3393,9 @@ function showTab(id, btn, keepCluster) {
   // крошки
   const meta = TAB_META[id];
   if (meta) {
-    document.getElementById('crumb-cluster').textContent = meta.cluster;
     document.getElementById('crumb-tab').textContent = meta.tab;
-    const subEl = document.getElementById('crumb-sub');
-    const sepEl = document.getElementById('crumb-sub-sep');
-    if (meta.sub) {
-      subEl.textContent = meta.sub;
-      subEl.style.display = '';
-      sepEl.style.display = '';
-    } else {
-      subEl.style.display = 'none';
+    // sub removed — clean path format [ ~/tab ]
+    if (false) {
       sepEl.style.display = 'none';
     }
   }

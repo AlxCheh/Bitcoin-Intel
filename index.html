@@ -1542,6 +1542,72 @@ header {
 <!-- ══════════════════════════════════════
      HISTORY
 ══════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     ЭКОСИСТЕМА / ИНСТРУМЕНТЫ
+══════════════════════════════════════ -->
+<section class="section" id="tab-instruments">
+  <div class="page">
+
+    <div class="panel" id="instrument-strc">
+      <div class="panel-head">
+        <span class="panel-title">STRC — Perpetual Preferred Strategy</span>
+        <span class="panel-tag">STRATEGY</span>
+      </div>
+      <div class="panel-body" style="padding:14px 16px">
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">ТИП</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--txt)">Вечная привилегированная акция</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">ОБЕСПЕЧЕНИЕ</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--btc)">BTC-резерв 4–5×</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">USD-РЕЗЕРВ</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--txt)">$1,4 млрд</div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--sans);font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:12px">
+          STRC — гибридный инструмент между корпоративной облигацией и BTC-экспозицией. Выпускается Strategy для привлечения капитала без прямой продажи биткоина. Держатели получают фиксированный дивиденд и приоритет перед обычными акционерами при выплатах.
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">КАК РАБОТАЕТ</div>
+        <div style="border-left:2px solid var(--btc);padding-left:12px;margin-bottom:14px">
+          <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.7">
+            Strategy выпускает STRC → привлекает USD → <span style="color:var(--txt)">90% идёт в USD-резерв</span> для поддержки кредитного качества → 10% на покупку BTC. Число новых STRC = обязательство держать больше USD, а не BTC.
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">КЛЮЧЕВОЕ ПРОТИВОРЕЧИЕ</div>
+        <div style="background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--red);padding:10px 12px;margin-bottom:14px">
+          <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.5">
+            STRC создан для накопления BTC — но требует держать растущий фиатный резерв. Чем больше STRC выпущено, тем больше USD нужно держать, тем меньше капитала идёт в BTC. Модель самоограничивающая.
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">BTC-резерв: 847 363 BTC</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">USD-резерв: $1,4 млрд</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Покрытие: ~2,6%</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--red);color:var(--red)">Торговался ниже номинала (июнь 2026)</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Токенизирован в DeFi</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin:0 16px 12px;padding:14px;background:var(--bg2);border:1px solid var(--line2);border-style:dashed;text-align:center">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em">СЛЕДУЮЩИЕ ИНСТРУМЕНТЫ</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);margin-top:6px">MSBT · BITA · DRIP ETF · EZBC</div>
+    </div>
+
+  </div>
+</section>
+
 <section class="section" id="tab-history">
   <div class="page">
 

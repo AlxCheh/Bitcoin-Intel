@@ -3092,27 +3092,118 @@ function renderDashboard() {
   if (!listEl) return;
   listEl.innerHTML = '';
 
-  shown.forEach(({ key, cl, score, weak }, idx) => {
-    const n    = cl.signals.length;
+  // ── Синтез нарратива через Claude API ──────────────────────────────────
+
+  // Хэш кластера — для инвалидации кэша при изменении сигналов
+  function clusterHash(signals) {
+    return signals.map(s => s.id + s.date).join('|');
+  }
+
+  // Fallback — лучший сигнал из кластера (старая логика)
+  function fallbackNarrative(cl) {
+    const WEIGHT_RANK_LOCAL = { onchain: 4, primary: 3, market: 2, media: 1 };
     const best = cl.signals
       .filter(s => s.macro_implication || s.tension)
-      .sort((a, b) => (WEIGHT_RANK[b.weight]||0) - (WEIGHT_RANK[a.weight]||0))[0]
+      .sort((a, b) => (WEIGHT_RANK_LOCAL[b.weight]||0) - (WEIGHT_RANK_LOCAL[a.weight]||0))[0]
       || cl.signals[0];
     const withContra = cl.signals.find(s => s.links && s.links.contradicts && s.links.contradicts.length);
-    const tension    = (withContra && withContra.tension) || (best && best.tension) || '';
-    const dirCls     = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
-    const isHot      = score.total >= SCORE_HOT;
-    const bdId       = 'nbd-' + idx;
-    const label      = CLUSTER_LABELS[key] || key.toUpperCase();
-    const cnt        = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
-    const macroText  = (best && best.macro_implication) || (best && best.signal) || '—';
+    return {
+      narrative: (best && best.macro_implication) || (best && best.signal) || '—',
+      tension:   (withContra && withContra.tension) || (best && best.tension) || '',
+      macro:     (best && best.macro_implication) || '',
+      source:    'fallback',
+    };
+  }
+
+  // Синтез через Claude API
+  async function synthesizeCluster(key, cl) {
+    const cacheKey = 'narrative_synthesis_v1_' + key;
+    const hash = clusterHash(cl.signals);
+
+    // Проверяем кэш
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.hash === hash) return { ...parsed.data, source: 'cache' };
+      }
+    } catch(e) {}
+
+    // Готовим данные для промпта
+    const sigData = cl.signals.map(s => ({
+      id:     s.id,
+      date:   s.date,
+      dir:    s.dir,
+      weight: s.weight,
+      role:   s.narrative_role,
+      signal: s.signal,
+      macro:  s.macro_implication || '',
+      tension: s.tension || '',
+      contradicts: (s.links && s.links.contradicts) || [],
+    }));
+
+    const prompt = `Ты аналитик Bitcoin. Перед тобой ${sigData.length} сигналов из кластера "${key}".
+
+Сигналы (от новейшего к старейшему):
+${sigData.map((s,i) => `${i+1}. [${s.dir.toUpperCase()}][${s.weight}][${s.role}] ${s.signal}${s.macro ? ' | МАКРО: ' + s.macro : ''}${s.tension ? ' | TENSION: ' + s.tension : ''}${s.contradicts.length ? ' | ПРОТИВОРЕЧИТ: ' + s.contradicts.join(', ') : ''}`).join('
+')}
+
+Синтезируй структурированный вывод. Отвечай ТОЛЬКО валидным JSON без markdown:
+{
+  "narrative": "2-3 предложения — главный вывод кластера, синтез всех сигналов, не пересказ одного",
+  "tension": "1 предложение — главное противоречие или напряжение внутри кластера",
+  "macro": "1 предложение — что это означает для Bitcoin на макроуровне"
+}`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      });
+      const apiData = await resp.json();
+      const text = apiData.content && apiData.content[0] && apiData.content[0].text;
+      if (!text) throw new Error('empty response');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(clean);
+      // Сохраняем в кэш
+      try { localStorage.setItem(cacheKey, JSON.stringify({ hash, data: result })); } catch(e) {}
+      return { ...result, source: 'api' };
+    } catch(e) {
+      console.warn('Narrative synthesis failed, using fallback:', e);
+      return fallbackNarrative(cl);
+    }
+  }
+
+  // Рендер одного нарратива (синхронный — данные уже готовы)
+  function renderNarrativeItem(key, cl, score, weak, idx, synthesis) {
+    const n      = cl.signals.length;
+    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
+    const isHot  = score.total >= SCORE_HOT;
+    const bdId   = 'nbd-' + idx;
+    const label  = CLUSTER_LABELS[key] || key.toUpperCase();
+    const cnt    = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
+
+    const macroText = synthesis.narrative || synthesis.macro || '—';
+    const tension   = synthesis.tension || '';
+    const isAI      = synthesis.source === 'api';
 
     const item = document.createElement('div');
     item.className = 'dash-narrative-item ' + dirCls;
+    item.dataset.clusterKey = key;
     if (idx > 0) item.style.borderTop = '1px solid var(--line)';
-    item.innerHTML = '<div class="dash-narrative-cluster" style="margin-bottom:6px">'
+
+    item.innerHTML =
+        '<div class="dash-narrative-cluster" style="margin-bottom:6px">'
       +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
-      +   '<span style="color:var(--dim);font-size:8px">' + cnt + '</span>'
+      +   '<span style="color:var(--dim);font-size:8px;display:flex;align-items:center;gap:6px">'
+      +     cnt
+      +     (isAI ? '<span style="color:var(--btc);font-size:7px;opacity:0.7">✦ AI</span>' : '')
+      +   '</span>'
       + '</div>'
       + '<div class="dash-narrative-text">' + macroText + '</div>'
       + (tension ? '<div class="dash-narrative-tension">⚡ ' + tension + '</div>' : '')
@@ -3134,9 +3225,36 @@ function renderDashboard() {
       +   '<div class="dash-breakdown-row"><span>roles</span><span>+' + score.roles + '</span></div>'
       +   '<div class="dash-breakdown-row dash-breakdown-total"><span>total</span><span>' + score.total + '</span></div>'
       + '</div>';
+
     item.querySelector('[data-cl]').addEventListener('click', function() { goToDigest(this.dataset.cl); });
     item.querySelector('[data-bd]').addEventListener('click', function() { document.getElementById(this.dataset.bd).classList.toggle('open'); });
+    return item;
+  }
+
+  // Сначала рендерим с fallback, потом обновляем через API
+  shown.forEach(({ key, cl, score, weak }, idx) => {
+    const fb = fallbackNarrative(cl);
+    const item = renderNarrativeItem(key, cl, score, weak, idx, fb);
     listEl.appendChild(item);
+
+    // Асинхронно синтезируем через API и обновляем текст
+    synthesizeCluster(key, cl).then(synthesis => {
+      const existing = listEl.querySelector('[data-cluster-key="' + key + '"]');
+      if (!existing) return;
+      const textEl    = existing.querySelector('.dash-narrative-text');
+      const tensionEl = existing.querySelector('.dash-narrative-tension');
+      const cntEl     = existing.querySelector('.dash-narrative-cluster span:last-child');
+      if (textEl && synthesis.narrative) textEl.textContent = synthesis.narrative;
+      if (tensionEl && synthesis.tension) tensionEl.textContent = '⚡ ' + synthesis.tension;
+      if (cntEl && synthesis.source === 'api') {
+        const n = cl.signals.length;
+        cntEl.innerHTML = n + ' сигнал' + (n===1?'':n<5?'а':'ов')
+          + ' <span style="color:var(--btc);font-size:7px;opacity:0.7">✦ AI</span>';
+      }
+    });
+  });
+
+  listEl.appendChild(item);
   });
 
   } // end if SIGNALS

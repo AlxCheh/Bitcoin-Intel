@@ -1148,7 +1148,7 @@ header {
 
 <div class="clusterbar">
   <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
-  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">KNOWLEDGE</button>
+  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ЭКОСИСТЕМА</button>
   <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">MACRO</button>
   <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
 </div>
@@ -3270,9 +3270,10 @@ const TAB_META = {
   analytics: { cluster: 'LIVE',     tab: 'Метрики',     sub: 'Метрики сети' },
   pools:     { cluster: 'LIVE',     tab: 'Пулы',        sub: 'Майнинг-пулы' },
   market:    { cluster: 'LIVE',     tab: 'Дайджест',    sub: 'База сигналов' },
-  basics:    { cluster: 'ЗНАНИЕ',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
-  tech:      { cluster: 'ЗНАНИЕ',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
-  lightning: { cluster: 'ЗНАНИЕ',   tab: 'Lightning',   sub: 'Layer 2 · Как подключиться' },
+  basics:    { cluster: 'ЭКОСИСТЕМА',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
+  tech:      { cluster: 'ЭКОСИСТЕМА',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
+  lightning: { cluster: 'ЭКОСИСТЕМА', tab: 'Lightning',  sub: 'Layer 2 · Как подключиться' },
+  instruments: { cluster: 'ЭКОСИСТЕМА', tab: 'Инструменты', sub: 'ETF · Структуры · Инструменты рынка' },
   history:   { cluster: 'MACRO',    tab: 'История',     sub: 'Хронология BTC' },
   holders:   { cluster: 'MACRO',    tab: 'Холдеры',     sub: 'Кто держит Bitcoin' },
   emission:  { cluster: 'MACRO',    tab: 'Эмиссия',     sub: 'Эмиссионная кривая' },
@@ -3284,13 +3285,13 @@ const TAB_META = {
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
-  knowledge: { label: 'ЗНАНИЕ',   tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
+  knowledge: { label: 'ЭКОСИСТЕМА', tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING'],['instruments','ИНСТРУМЕНТЫ']] },
   macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
-  basics:'knowledge', tech:'knowledge', lightning:'knowledge',
+  basics:'knowledge', tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
   history:'macro', holders:'macro', emission:'macro', narrative:'macro',
   signals:'analysis', base:'analysis', aholders:'analysis'
 };

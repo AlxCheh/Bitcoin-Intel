@@ -3348,6 +3348,17 @@ const TAB_META = {
   aholders:  { cluster: 'ANALYSIS', tab: 'Holders',     sub: 'Визуализация холдеров' }
 };
 
+// ── Инициализация крошки ──
+function updateCrumb(id) {
+  const meta = TAB_META[id];
+  if (!meta) return;
+  const clusterEl = document.getElementById('crumb-cluster');
+  const tabEl     = document.getElementById('crumb-tab');
+  if (clusterEl) clusterEl.textContent = meta.cluster.toLowerCase();
+  if (tabEl)     tabEl.textContent     = meta.tab;
+}
+
+
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['instruments','ИНСТРУМЕНТЫ'],['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
@@ -3362,6 +3373,9 @@ const TAB_TO_CLUSTER = {
 };
 
 let activeCluster = 'live';
+
+// Крошка при загрузке
+window.addEventListener('DOMContentLoaded', () => updateCrumb('home'));
 
 // выбор кластера снизу: рендерит подвкладки и открывает первую вкладку
 function selectCluster(key) {
@@ -3398,8 +3412,7 @@ function showTab(id, btn, keepCluster) {
   // крошки
   const meta = TAB_META[id];
   if (meta) {
-    document.getElementById('crumb-tab').textContent = meta.tab;
-    document.getElementById('crumb-cluster').textContent = meta.cluster.toLowerCase();
+    updateCrumb(id);
   }
 
   if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
@@ -4229,18 +4242,7 @@ function renderAHolders() {
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──
 // Обработка встроена напрямую в showTab выше
 
-// ── Инициализация крошки при загрузке ──
-(function initCrumb() {
-  const activeSec = document.querySelector('.section.active');
-  if (!activeSec) return;
-  const id = activeSec.id.replace('tab-', '');
-  const meta = TAB_META[id];
-  if (!meta) return;
-  const clusterEl = document.getElementById('crumb-cluster');
-  const tabEl     = document.getElementById('crumb-tab');
-  if (clusterEl) clusterEl.textContent = meta.cluster.toLowerCase();
-  if (tabEl)     tabEl.textContent     = meta.tab;
-})();
+
 </script>
 </body>
 </html>

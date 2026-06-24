@@ -1184,14 +1184,19 @@ header {
         <span>РОСТ</span>
         <span>ЭЙФОРИЯ</span>
       </div>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-family:var(--mono);font-size:8px;color:var(--dim);line-height:1.6">
+        <span id="dash-ratio-note">—</span> · Цена / Production Cost.
+        <span style="opacity:0.7">Ниже ×1.0 — добыча убыточна. ×0.5–0.8 — исторически зона дна. ×2.5+ — зона перегрева.</span>
+      </div>
     </div>
 
     <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
-    <div class="dash-metrics">
-      <div class="chart-head" style="width:100%">
+    <div style="margin:0 16px 0;border:1px solid var(--line);overflow:hidden;">
+      <div class="chart-head" style="margin:0">
         <span class="chart-title">Ключевые метрики</span>
         <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
       </div>
+      <div class="dash-metrics" style="margin:0;border:none;border-top:1px solid var(--line);">
       <div class="dash-m-cell">
         <div class="dash-m-val" id="dash-price">—</div>
         <div class="dash-m-lbl">ЦЕНА BTC</div>
@@ -1207,6 +1212,7 @@ header {
     </div>
     <div class="dash-disclaimer">
       ~ Production Cost — расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
+      </div>
     </div>
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
@@ -2976,7 +2982,10 @@ function renderDashboard() {
     phaseEl.textContent = phase;
     const ratioEl = document.getElementById('dash-ratio');
     if (ratioEl && dashBtcPrice && dashProdCost) {
-      ratioEl.textContent = '×' + (dashBtcPrice / dashProdCost).toFixed(2);
+      const ratio = (dashBtcPrice / dashProdCost).toFixed(2);
+      ratioEl.textContent = '×' + ratio;
+      const noteEl = document.getElementById('dash-ratio-note');
+      if (noteEl) noteEl.textContent = '×' + ratio;
     }
     if (subEl) subEl.textContent = sub;
     if (cycleBlock) {

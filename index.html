@@ -1148,7 +1148,7 @@ header {
 
 <div class="clusterbar">
   <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
-  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ЭКОСИСТЕМА</button>
+  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ECOSYSTEM</button>
   <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">MACRO</button>
   <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
 </div>
@@ -1549,9 +1549,10 @@ header {
   <div class="page">
 
     <div class="panel" id="instrument-strc">
-      <div class="panel-head">
-        <span class="panel-title">STRC — Perpetual Preferred Strategy</span>
-        <span class="panel-tag">STRATEGY</span>
+      <div class="panel-head" style="background:var(--bg2);border-bottom:1px solid var(--line);padding:14px 16px">
+        <span style="font-family:var(--mono);font-size:16px;font-weight:700;letter-spacing:0.18em;
+          color:var(--btc);
+          text-shadow:0 0 18px rgba(247,147,26,0.4), 0 0 6px rgba(247,147,26,0.2);">STRC</span>
       </div>
       <div class="panel-body" style="padding:14px 16px">
 
@@ -3336,10 +3337,10 @@ const TAB_META = {
   analytics: { cluster: 'LIVE',     tab: 'Метрики',     sub: 'Метрики сети' },
   pools:     { cluster: 'LIVE',     tab: 'Пулы',        sub: 'Майнинг-пулы' },
   market:    { cluster: 'LIVE',     tab: 'Дайджест',    sub: 'База сигналов' },
-  basics:    { cluster: 'ЭКОСИСТЕМА',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
-  tech:      { cluster: 'ЭКОСИСТЕМА',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
-  lightning: { cluster: 'ЭКОСИСТЕМА', tab: 'Lightning',  sub: 'Layer 2 · Как подключиться' },
-  instruments: { cluster: 'ЭКОСИСТЕМА', tab: 'Инструменты', sub: 'ETF · Структуры · Инструменты рынка' },
+  basics:    { cluster: 'ECOSYSTEM',   tab: 'Основы',      sub: 'Что такое Bitcoin' },
+  tech:      { cluster: 'ECOSYSTEM',   tab: 'Технологии',  sub: 'Блокчейн и протокол' },
+  lightning: { cluster: 'ECOSYSTEM', tab: 'Lightning',  sub: 'Layer 2 · Как подключиться' },
+  instruments: { cluster: 'ECOSYSTEM', tab: 'Инструменты', sub: 'ETF · Структуры · Инструменты рынка' },
   history:   { cluster: 'MACRO',    tab: 'История',     sub: 'Хронология BTC' },
   holders:   { cluster: 'MACRO',    tab: 'Холдеры',     sub: 'Кто держит Bitcoin' },
   emission:  { cluster: 'MACRO',    tab: 'Эмиссия',     sub: 'Эмиссионная кривая' },
@@ -3351,7 +3352,7 @@ const TAB_META = {
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
-  knowledge: { label: 'ЭКОСИСТЕМА', tabs: [['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING'],['instruments','ИНСТРУМЕНТЫ']] },
+  knowledge: { label: 'ECOSYSTEM', tabs: [['instruments','ИНСТРУМЕНТЫ'],['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
   macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };

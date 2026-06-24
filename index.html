@@ -2406,29 +2406,33 @@ function initPriceChart() {
         y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
       }));
 
-      // ── TOP BAR — тикер / цена / % слева выровнены, периоды справа ──
+      // ── TOP BAR — тикер крупный + цена/% под ним ──
       const topBar = div({}, {
         background: C.bg2, borderBottom: '1px solid ' + C.line,
-        padding: '10px 14px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
+        padding: '12px 14px',
+        display: 'flex', alignItems: 'center', gap: '16px',
       });
 
-      // Левая часть — сетка: тикер | цена | %
-      const tleft = div({}, { display: 'flex', alignItems: 'baseline', gap: '10px' });
-
+      // Тикер — крупный, оранжевый, с лёгкой подсветкой
       const ticker = document.createElement('span');
-      ticker.textContent = 'BTC/USD';
+      ticker.textContent = 'BTC / USD';
       Object.assign(ticker.style, {
-        fontFamily: C.mono, color: C.dim, fontSize: '9px',
-        letterSpacing: '0.12em', minWidth: '64px',
+        fontFamily: C.mono, color: C.btc, fontSize: '13px', fontWeight: 'bold',
+        letterSpacing: '0.14em',
+        background: 'rgba(247,147,26,0.08)',
+        padding: '4px 10px', borderRadius: '3px',
+        border: '1px solid rgba(247,147,26,0.2)',
+        whiteSpace: 'nowrap',
       });
+
+      // Цена + % — колонка рядом
+      const priceGroup = div({}, { display: 'flex', alignItems: 'baseline', gap: '8px' });
 
       const priceEl = document.createElement('span');
       priceEl.id = 'tc-price';
       priceEl.textContent = fmtP(last);
       Object.assign(priceEl.style, {
-        color: C.txt, fontSize: '20px', fontWeight: 'bold',
-        letterSpacing: '-0.02em', minWidth: '120px', textAlign: 'right',
+        color: C.txt, fontSize: '22px', fontWeight: 'bold', letterSpacing: '-0.02em',
       });
 
       const chgEl = document.createElement('span');
@@ -2436,35 +2440,20 @@ function initPriceChart() {
       Object.assign(chgEl.style, {
         fontFamily: C.mono, color: accent, fontSize: '10px',
         background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-        padding: '2px 7px', borderRadius: '2px', minWidth: '64px', textAlign: 'center',
+        padding: '2px 7px', borderRadius: '2px',
       });
 
       const dateEl = document.createElement('span');
       dateEl.id = 'tc-date';
       Object.assign(dateEl.style, { color: C.dim, fontSize: '9px', fontFamily: C.mono });
 
-      tleft.appendChild(ticker);
-      tleft.appendChild(priceEl);
-      tleft.appendChild(chgEl);
-      tleft.appendChild(dateEl);
+      priceGroup.appendChild(priceEl);
+      priceGroup.appendChild(chgEl);
+      priceGroup.appendChild(dateEl);
 
-      // Правая часть — кнопки периодов
-      const tright = div({}, { display: 'flex', gap: '3px' });
-      PERIODS.forEach((per, i) => {
-        const btn = document.createElement('button');
-        btn.textContent = per.label;
-        Object.assign(btn.style, {
-          background: activePeriod === i ? accent : 'transparent',
-          color: activePeriod === i ? C.bg : C.dim,
-          border: '1px solid ' + (activePeriod === i ? accent : C.line2),
-          borderRadius: '2px', padding: '3px 9px', fontSize: '9px',
-          fontFamily: C.mono, fontWeight: 'bold',
-          letterSpacing: '0.06em', cursor: 'pointer',
-        });
-        btn.addEventListener('click', () => { activePeriod = i; hoverIdx = null; render(); });
-        tright.appendChild(btn);
-      });
-      topBar.appendChild(tleft); topBar.appendChild(tright); wrap.appendChild(topBar);
+      topBar.appendChild(ticker);
+      topBar.appendChild(priceGroup);
+      wrap.appendChild(topBar);
 
       // ── STATS ROW ──
       const statsRow = div({}, {
@@ -2481,6 +2470,24 @@ function initPriceChart() {
         Object.assign(val.style, { color: C.txt, fontSize: '13px', marginTop: '2px', fontFamily: C.mono });
         cell.appendChild(lbl); cell.appendChild(val); statsRow.appendChild(cell);
       });
+
+      // Периоды — справа в statsRow
+      const periodsWrap = div({}, { display: 'flex', gap: '3px', marginLeft: 'auto', alignItems: 'center' });
+      PERIODS.forEach((per, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = per.label;
+        Object.assign(btn.style, {
+          background: activePeriod === i ? accent : 'transparent',
+          color: activePeriod === i ? C.bg : C.dim,
+          border: '1px solid ' + (activePeriod === i ? accent : C.line2),
+          borderRadius: '2px', padding: '3px 9px', fontSize: '9px',
+          fontFamily: C.mono, fontWeight: 'bold',
+          letterSpacing: '0.06em', cursor: 'pointer',
+        });
+        btn.addEventListener('click', () => { activePeriod = i; hoverIdx = null; render(); });
+        periodsWrap.appendChild(btn);
+      });
+      statsRow.appendChild(periodsWrap);
       wrap.appendChild(statsRow);
 
       // ── PRICE SVG ──

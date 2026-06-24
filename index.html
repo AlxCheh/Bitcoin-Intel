@@ -1054,10 +1054,7 @@ header {
 }
 .dash-narrative-item {
   padding: 12px 14px;
-  border-left: 3px solid var(--grn);
 }
-.dash-narrative-item.neg { border-left-color: var(--red); }
-.dash-narrative-item.neu { border-left-color: var(--dim); }
 .dash-narrative-item + .dash-narrative-item {
   border-top: 1px solid var(--line);
 }
@@ -1066,10 +1063,13 @@ header {
   color: var(--dim); margin-bottom: 6px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.dash-narrative-cluster-name { color: var(--btc); }
+.dash-narrative-cluster-name { color: var(--txt); }
+.dash-narrative-item.pos .dash-narrative-cluster-name { color: var(--grn); }
+.dash-narrative-item.neg .dash-narrative-cluster-name { color: var(--red); }
+.dash-narrative-item.neu .dash-narrative-cluster-name { color: var(--txt); }
 .dash-narrative-text {
-  font-family: var(--sans); font-size: 12px; font-weight: 500;
-  color: var(--txt); line-height: 1.4; margin-bottom: 7px;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  color: var(--txt); line-height: 1.4; margin-bottom: 6px;
 }
 .dash-narrative-tension {
   font-family: var(--mono); font-size: 9px; color: var(--dim);
@@ -1203,11 +1203,11 @@ header {
         <span id="dash-narratives-total" class="chart-meta"></span>
       </div>
       <div id="dash-narrative-1" class="dash-narrative-item">
+        <div class="dash-narrative-text" id="dash-n1-text">—</div>
         <div class="dash-narrative-cluster">
           <span class="dash-narrative-cluster-name" id="dash-n1-cluster">—</span>
           <span id="dash-n1-count"></span>
         </div>
-        <div class="dash-narrative-text" id="dash-n1-text">—</div>
         <div class="dash-narrative-tension" id="dash-n1-tension"></div>
         <div class="dash-sum-counts" id="dash-n1-counts"></div>
         <div class="dash-narrative-link" id="dash-n1-link">
@@ -1215,11 +1215,11 @@ header {
         </div>
       </div>
       <div id="dash-narrative-2" class="dash-narrative-item">
+        <div class="dash-narrative-text" id="dash-n2-text">—</div>
         <div class="dash-narrative-cluster">
           <span class="dash-narrative-cluster-name" id="dash-n2-cluster">—</span>
           <span id="dash-n2-count"></span>
         </div>
-        <div class="dash-narrative-text" id="dash-n2-text">—</div>
         <div class="dash-narrative-tension" id="dash-n2-tension"></div>
         <div class="dash-sum-counts" id="dash-n2-counts"></div>
         <div class="dash-narrative-link" id="dash-n2-link">

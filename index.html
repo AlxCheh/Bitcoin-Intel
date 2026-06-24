@@ -2406,35 +2406,40 @@ function initPriceChart() {
         y: PAD.t + (1 - (d.price - minP) / range) * (PH - PAD.t - 10),
       }));
 
-      // ── TOP BAR — тикер крупный + цена/% под ним ──
+      // ── TOP BAR — вариант D: BTC/USD · цена ▲% в одну строку ──
       const topBar = div({}, {
         background: C.bg2, borderBottom: '1px solid ' + C.line,
-        padding: '12px 14px',
-        display: 'flex', alignItems: 'center', gap: '16px',
+        padding: '11px 14px',
+        display: 'flex', alignItems: 'center', gap: '0',
       });
 
-      // Тикер — крупный, оранжевый, с лёгкой подсветкой
+      // Тикер
       const ticker = document.createElement('span');
-      ticker.textContent = 'BTC / USD';
+      ticker.textContent = 'BTC/USD';
       Object.assign(ticker.style, {
-        fontFamily: C.mono, color: C.btc, fontSize: '13px', fontWeight: 'bold',
-        letterSpacing: '0.14em',
-        background: 'rgba(247,147,26,0.08)',
-        padding: '4px 10px', borderRadius: '3px',
-        border: '1px solid rgba(247,147,26,0.2)',
-        whiteSpace: 'nowrap',
+        fontFamily: C.mono, color: C.btc, fontSize: '11px', fontWeight: 'bold',
+        letterSpacing: '0.12em', whiteSpace: 'nowrap',
       });
 
-      // Цена + % — колонка рядом
-      const priceGroup = div({}, { display: 'flex', alignItems: 'baseline', gap: '8px' });
+      // Разделитель
+      const sep = document.createElement('span');
+      sep.textContent = ' · ';
+      Object.assign(sep.style, { color: C.dim, fontSize: '14px', margin: '0 6px' });
 
+      // Цена
       const priceEl = document.createElement('span');
       priceEl.id = 'tc-price';
       priceEl.textContent = fmtP(last);
       Object.assign(priceEl.style, {
-        color: C.txt, fontSize: '22px', fontWeight: 'bold', letterSpacing: '-0.02em',
+        color: C.txt, fontSize: '20px', fontWeight: 'bold', letterSpacing: '-0.02em',
       });
 
+      // Разделитель 2
+      const sep2 = document.createElement('span');
+      sep2.textContent = ' · ';
+      Object.assign(sep2.style, { color: C.dim, fontSize: '14px', margin: '0 4px' });
+
+      // Изменение %
       const chgEl = document.createElement('span');
       chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
       Object.assign(chgEl.style, {
@@ -2445,14 +2450,14 @@ function initPriceChart() {
 
       const dateEl = document.createElement('span');
       dateEl.id = 'tc-date';
-      Object.assign(dateEl.style, { color: C.dim, fontSize: '9px', fontFamily: C.mono });
-
-      priceGroup.appendChild(priceEl);
-      priceGroup.appendChild(chgEl);
-      priceGroup.appendChild(dateEl);
+      Object.assign(dateEl.style, { color: C.dim, fontSize: '9px', fontFamily: C.mono, marginLeft: '8px' });
 
       topBar.appendChild(ticker);
-      topBar.appendChild(priceGroup);
+      topBar.appendChild(sep);
+      topBar.appendChild(priceEl);
+      topBar.appendChild(sep2);
+      topBar.appendChild(chgEl);
+      topBar.appendChild(dateEl);
       wrap.appendChild(topBar);
 
       // ── STATS ROW ──

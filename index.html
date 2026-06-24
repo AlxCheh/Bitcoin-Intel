@@ -4228,6 +4228,19 @@ function renderAHolders() {
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──
 // Обработка встроена напрямую в showTab выше
+
+// ── Инициализация крошки при загрузке ──
+(function initCrumb() {
+  const activeSec = document.querySelector('.section.active');
+  if (!activeSec) return;
+  const id = activeSec.id.replace('tab-', '');
+  const meta = TAB_META[id];
+  if (!meta) return;
+  const clusterEl = document.getElementById('crumb-cluster');
+  const tabEl     = document.getElementById('crumb-tab');
+  if (clusterEl) clusterEl.textContent = meta.cluster.toLowerCase();
+  if (tabEl)     tabEl.textContent     = meta.tab;
+})();
 </script>
 </body>
 </html>

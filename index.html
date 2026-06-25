@@ -1564,15 +1564,15 @@ header {
         <div style="display:flex;border-top:1px solid var(--line)">
           <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
             <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">BTC-РЕЗЕРВ</div>
-            <div style="font-family:var(--mono);font-size:10px;color:var(--btc)">847 363</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--btc)" id="mstr-live-btc">847 363</div>
           </div>
           <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
             <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">NAV-СТАТУС</div>
-            <div style="font-family:var(--mono);font-size:10px;color:var(--red)">Дисконт 0.83×</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--red)" id="mstr-nav-val">Дисконт 0.83×</div>
           </div>
           <div style="flex:1;padding:6px 12px">
             <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">ЦЕНА</div>
-            <div style="font-family:var(--mono);font-size:10px;color:var(--red)">~$92</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--red)" id="mstr-live-price">~$92</div>
           </div>
         </div>
       </div>
@@ -3902,6 +3902,57 @@ fetchBlocks();
 setInterval(fetchBlocks, 60000);
 fetchProdCost();
 setInterval(fetchProdCost, 300000);
+
+// ── MSTR live data ──────────────────────────────────────────────────────────
+const MSTR_BTC_RESERVE = 847363;
+const MSTR_SHARES      = 242000000;  // акций в обращении
+const MSTR_DEBT        = 8200000000; // долг ~$8.2B
+const MSTR_PREF        = 4100000000; // привилегированные обязательства ~$4.1B
+
+async function fetchMstrData() {
+  try {
+    // Цена MSTR через Yahoo Finance (CORS-friendly endpoint)
+    const res = await fetch(
+      'https://query1.finance.yahoo.com/v8/finance/chart/MSTR?interval=1d&range=1d',
+      { cache: 'no-store' }
+    );
+    const data = await res.json();
+    const meta = data?.chart?.result?.[0]?.meta;
+    const mstrPrice = meta?.regularMarketPrice || meta?.previousClose;
+
+    if (!mstrPrice) return;
+
+    // Обновить цену в шапке
+    const priceEl = document.getElementById('mstr-live-price');
+    if (priceEl) {
+      priceEl.textContent = '$' + mstrPrice.toFixed(2);
+      priceEl.style.color = mstrPrice < 100 ? 'var(--red)' : 'var(--grn)';
+    }
+
+    // NAV-мультипликатор если есть BTC-цена
+    if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
+      const btcNav    = MSTR_BTC_RESERVE * dashBtcPrice;
+      const netNav    = btcNav - MSTR_DEBT - MSTR_PREF;
+      const navPerSh  = netNav / MSTR_SHARES;
+      const mult      = mstrPrice / navPerSh;
+      const navEl     = document.getElementById('mstr-nav-val');
+      if (navEl && navPerSh > 0) {
+        const label = mult >= 1
+          ? 'Премия ' + mult.toFixed(2) + '×'
+          : 'Дисконт ' + mult.toFixed(2) + '×';
+        navEl.textContent  = label;
+        navEl.style.color  = mult >= 1 ? 'var(--grn)' : 'var(--red)';
+      }
+    }
+  } catch(e) {
+    // тихо — не ломаем страницу
+  }
+}
+
+// Запускаем после того как BTC-цена уже загружена (300ms delay)
+setTimeout(fetchMstrData, 300);
+setInterval(fetchMstrData, 300000); // обновляем каждые 5 мин вместе с BTC
+
 initPriceChart();
 
 // ── DIFFICULTY — Вариант 2: Контекст ────────────────────────────────────────

@@ -27,6 +27,8 @@
   --blue:     #3B82F6;
   --mono:     'IBM Plex Mono', monospace;
   --sans:     'IBM Plex Sans', sans-serif;
+  --amber:    #D4A017;
+  --slate:    #4A5D75;
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -872,7 +874,7 @@ header {
 .sig-sum-l { font-size: 8px; letter-spacing: 0.08em; color: var(--dim); margin-top: 2px; }
 .sig-sum-cell.neg .sig-sum-n { color: var(--red); }
 .sig-sum-cell.pos .sig-sum-n { color: var(--grn); }
-.sig-sum-cell.neu .sig-sum-n { color: var(--dim); }
+.sig-sum-cell.neu .sig-sum-n { color: var(--amber); }
 .sig-sum-cell.neg.active { border-bottom-color: var(--red); }
 .sig-sum-cell.pos.active { border-bottom-color: var(--grn); }
 
@@ -962,7 +964,7 @@ header {
 }
 .sig-card.neg { border-left-color: var(--red); }
 .sig-card.pos { border-left-color: var(--grn); }
-.sig-card.neu { border-left-color: var(--dim); }
+.sig-card.neu { border-left-color: var(--amber); }
 .sig-top {
   display: flex;
   align-items: center;
@@ -985,7 +987,7 @@ header {
 }
 .sig-card.pos .sig-signal { color: var(--grn); }
 .sig-card.neg .sig-signal { color: var(--red); }
-.sig-card.neu .sig-signal { color: var(--txt); }
+.sig-card.neu .sig-signal { color: var(--amber); }
 .sig-data {
   display: flex;
   flex-wrap: wrap;
@@ -1083,7 +1085,7 @@ header {
 .dash-narrative-cluster-name { color: var(--btc); }
 .dash-narrative-item.pos .dash-narrative-text { color: var(--grn); }
 .dash-narrative-item.neg .dash-narrative-text { color: var(--red); }
-.dash-narrative-item.neu .dash-narrative-text { color: var(--txt); }
+.dash-narrative-item.neu .dash-narrative-text { color: var(--amber); }
 .dash-narrative-text {
   font-family: var(--sans); font-size: 13px; font-weight: 500;
   color: var(--txt); line-height: 1.4; margin-bottom: 6px;
@@ -3158,7 +3160,7 @@ async function loadSignals() {
 const DIR_META = {
   neg: { icon: '🔴', label: 'НЕГАТИВ' },
   pos: { icon: '🟢', label: 'ПОЗИТИВ' },
-  neu: { icon: '⚪', label: 'НЕЙТРАЛЬНО' }
+  neu: { icon: '🟡', label: 'НЕЙТРАЛЬНО' }
 };
 
 let sigFilter = 'all';
@@ -3293,11 +3295,17 @@ function renderSignals() {
     const horizonLabel = { short: 'SHORT', mid: 'MID', long: 'LONG' }[s.horizon] || '';
     const flowMeta = s.flow && s.flow !== 'neutral' ? FLOW_META[s.flow] : null;
     const actorMeta = s.actor ? ACTOR_META[s.actor] : null;
+    const roleColor = {trigger:'var(--btc)', complication:'var(--amber)', resolution:'var(--grn)', background:'var(--slate)'}[s.narrative_role] || 'var(--dim)';
+    const roleDot = s.narrative_role ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + roleColor + ';margin-right:2px;vertical-align:middle"></span>' : '';
     return '<div class="sig-card ' + s.dir + '">'
-      + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span><span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
+      + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span>' + roleDot + '<span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
       + '<div class="sig-signal">' + s.signal + '</div>'
       + '<div class="sig-data">' + chips
-      + (horizonLabel ? '<span class="sig-chip" style="opacity:.5">⏱ ' + horizonLabel + '</span>' : '')
+      + (horizonLabel ? '<span class="sig-chip" style="'
+        + (s.horizon === 'short' ? 'color:var(--red);border-color:rgba(239,68,68,0.3)' :
+           s.horizon === 'mid'   ? 'color:var(--amber);border-color:rgba(212,160,23,0.35)' :
+           s.horizon === 'long'  ? 'color:var(--slate);border-color:rgba(74,93,117,0.4)' : 'opacity:.5')
+        + '">⏱ ' + horizonLabel + '</span>' : '')
       + (actorMeta ? '<span class="sig-chip" style="opacity:.5">' + actorMeta.label + '</span>' : '')
       + (flowMeta ? '<span class="sig-chip" style="opacity:.5">' + flowMeta.icon + ' ' + flowMeta.label + '</span>' : '')
       + '</div>'

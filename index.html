@@ -522,9 +522,8 @@ header {
 /* ── INSTRUMENT STICKY HEADER ── */
 .inst-head-stuck {
   position: fixed;
-  left: 0; right: 0;
   z-index: 50;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 /* ══════════════════════════════════
    ACCORDION
@@ -1557,7 +1556,7 @@ header {
   <div class="page">
 
     <!-- MSTR -->
-    <div class="panel" id="instrument-mstr" style="margin-bottom:20px;border:1px solid var(--line2);position:relative">
+    <div class="panel" id="instrument-mstr" style="margin-bottom:20px;border:1px solid var(--btc);position:relative">
       <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line);background:var(--bg2)" id="mstr-head" onclick="toggleInstrument('mstr')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--txt)">MSTR</span>
@@ -1762,7 +1761,7 @@ header {
     </div>
 
     <!-- STRC -->
-    <div class="panel" id="instrument-strc" style="margin-bottom:20px;border:1px solid var(--line2);position:relative">
+    <div class="panel" id="instrument-strc" style="margin-bottom:20px;border:1px solid var(--btc);position:relative">
       <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line);background:var(--bg2)" id="strc-head" onclick="toggleInstrument('strc')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--btc);text-shadow:0 0 12px rgba(247,147,26,0.35)">STRC</span>
@@ -1854,13 +1853,13 @@ header {
 
     // Вычислить высоту фиксированных элементов сверху
     function getTopOffset() {
+      var h = 0;
       var header = document.querySelector('header');
       var crumb  = document.querySelector('.nav-crumb');
       var subnav = document.querySelector('.subnav');
-      var h = 0;
-      if (header) h += header.getBoundingClientRect().height;
-      if (crumb)  h += crumb.getBoundingClientRect().height;
-      if (subnav) h += subnav.getBoundingClientRect().height;
+      if (header) h += header.offsetHeight;
+      if (crumb)  h += crumb.offsetHeight;
+      if (subnav) h += subnav.offsetHeight;
       return h + 4; // 4px top stripe
     }
 
@@ -1893,19 +1892,24 @@ header {
             item.head.parentNode.insertBefore(ph, item.head);
             placeholders[i] = ph;
           }
+          var pr = item.panel.getBoundingClientRect();
           item.head.classList.add('inst-head-stuck');
           item.head.style.top   = topOff + 'px';
-          item.head.style.width = item.panel.getBoundingClientRect().width + 'px';
+          item.head.style.left  = pr.left + 'px';
+          item.head.style.width = pr.width + 'px';
         } else if (!shouldStick && item.head.classList.contains('inst-head-stuck')) {
           item.head.classList.remove('inst-head-stuck');
           item.head.style.top = '';
+          item.head.style.left = '';
           item.head.style.width = '';
           if (placeholders[i]) { placeholders[i].remove(); placeholders[i] = null; }
         }
 
         // Обновить ширину если залипла (на случай ресайза)
         if (item.head.classList.contains('inst-head-stuck')) {
-          item.head.style.width = item.panel.getBoundingClientRect().width + 'px';
+          var pr2 = item.panel.getBoundingClientRect();
+          item.head.style.left  = pr2.left + 'px';
+          item.head.style.width = pr2.width + 'px';
         }
       });
     }

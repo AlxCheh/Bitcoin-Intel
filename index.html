@@ -518,6 +518,14 @@ header {
 .panel-body p + p { margin-top: 10px; }
 .panel-body strong { color: var(--txt); font-weight: 600; }
 
+
+/* ── INSTRUMENT STICKY HEADER ── */
+.inst-head-stuck {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 50;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
 /* ══════════════════════════════════
    ACCORDION
 ══════════════════════════════════ */
@@ -1550,7 +1558,7 @@ header {
 
     <!-- MSTR -->
     <div class="panel" id="instrument-mstr" style="margin-bottom:20px;border:1px solid var(--line2);position:relative">
-      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;background:var(--bg2)" onclick="toggleInstrument('mstr')">
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line);background:var(--bg2)" id="mstr-head" onclick="toggleInstrument('mstr')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--txt)">MSTR</span>
           <div style="display:flex;align-items:center;gap:10px">
@@ -1755,7 +1763,7 @@ header {
 
     <!-- STRC -->
     <div class="panel" id="instrument-strc" style="margin-bottom:20px;border:1px solid var(--line2);position:relative">
-      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;background:var(--bg2)" onclick="toggleInstrument('strc')">
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line);background:var(--bg2)" id="strc-head" onclick="toggleInstrument('strc')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--btc);text-shadow:0 0 12px rgba(247,147,26,0.35)">STRC</span>
           <div style="display:flex;align-items:center;gap:10px">
@@ -1834,6 +1842,85 @@ header {
 </section>
 
 <script>
+
+// ── Instrument sticky headers ──
+(function() {
+  function initStickyHeads() {
+    var heads = [
+      { head: document.getElementById('mstr-head'), panel: document.getElementById('instrument-mstr') },
+      { head: document.getElementById('strc-head'), panel: document.getElementById('instrument-strc') }
+    ];
+    if (!heads[0].head) return;
+
+    // Вычислить высоту фиксированных элементов сверху
+    function getTopOffset() {
+      var header = document.querySelector('header');
+      var crumb  = document.querySelector('.nav-crumb');
+      var subnav = document.querySelector('.subnav');
+      var h = 0;
+      if (header) h += header.getBoundingClientRect().height;
+      if (crumb)  h += crumb.getBoundingClientRect().height;
+      if (subnav) h += subnav.getBoundingClientRect().height;
+      return h + 4; // 4px top stripe
+    }
+
+    var placeholders = heads.map(function() { return null; });
+
+    function onScroll() {
+      var topOff = getTopOffset();
+      heads.forEach(function(item, i) {
+        if (!item.head || !item.panel) return;
+        var body = document.getElementById(item.panel.id.replace('instrument-','') + '-body');
+        if (body && body.style.display === 'none') {
+          // Свёрнут — убрать sticky
+          if (item.head.classList.contains('inst-head-stuck')) {
+            item.head.classList.remove('inst-head-stuck');
+            item.head.style.top = '';
+            item.head.style.width = '';
+            if (placeholders[i]) { placeholders[i].remove(); placeholders[i] = null; }
+          }
+          return;
+        }
+        var panelRect  = item.panel.getBoundingClientRect();
+        var headHeight = item.head.getBoundingClientRect().height;
+        var shouldStick = panelRect.top < topOff && panelRect.bottom > (topOff + headHeight);
+
+        if (shouldStick && !item.head.classList.contains('inst-head-stuck')) {
+          // Создать плейсхолдер чтоб контент не прыгал
+          if (!placeholders[i]) {
+            var ph = document.createElement('div');
+            ph.style.height = headHeight + 'px';
+            item.head.parentNode.insertBefore(ph, item.head);
+            placeholders[i] = ph;
+          }
+          item.head.classList.add('inst-head-stuck');
+          item.head.style.top   = topOff + 'px';
+          item.head.style.width = item.panel.getBoundingClientRect().width + 'px';
+        } else if (!shouldStick && item.head.classList.contains('inst-head-stuck')) {
+          item.head.classList.remove('inst-head-stuck');
+          item.head.style.top = '';
+          item.head.style.width = '';
+          if (placeholders[i]) { placeholders[i].remove(); placeholders[i] = null; }
+        }
+
+        // Обновить ширину если залипла (на случай ресайза)
+        if (item.head.classList.contains('inst-head-stuck')) {
+          item.head.style.width = item.panel.getBoundingClientRect().width + 'px';
+        }
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStickyHeads);
+  } else {
+    initStickyHeads();
+  }
+})();
+
 function toggleInstrument(id) {
   var body = document.getElementById(id + '-body');
   var arrow = document.getElementById(id + '-arrow');

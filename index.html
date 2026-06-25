@@ -1218,6 +1218,90 @@ header {
       </div>
     </div>
 
+
+    <!-- ══ БЛОК 2.2: REALIZED PRICE ══ -->
+    <div style="margin:0 16px 12px;border:1px solid var(--line);background:var(--bg2)">
+
+      <!-- Шапка с живым значением -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--line)">
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--dim);margin-bottom:4px">REALIZED PRICE</div>
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--txt)" id="rp-value">~$53 000</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="rp-vs-market"></span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em;margin-bottom:4px">BTC / ЦЕНА</div>
+          <div style="font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid var(--line);color:var(--dim)" id="rp-ratio">—</div>
+        </div>
+      </div>
+
+      <!-- Статусная строка -->
+      <div style="padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5" id="rp-status-text">
+          Средняя цена покупки всего предложения BTC по последнему on-chain движению каждой монеты
+        </div>
+      </div>
+
+      <!-- Аккордеон: что такое и как считается -->
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-explainer')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">КАК СЧИТАЕТСЯ</span>
+          <span id="arr-rp-explainer" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="rp-explainer" style="display:none;padding:12px 14px;background:var(--bg2)">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);letter-spacing:0.08em;margin-bottom:8px">ФОРМУЛА</div>
+          <div style="background:var(--bg);border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;font-family:var(--mono);font-size:10px;color:var(--btc);line-height:2">
+            Realized Cap = Σ (BTC в UTXO × цена на дату последнего движения)<br>
+            <span style="color:var(--dim)">Realized Price = Realized Cap ÷ Циркулирующее предложение</span>
+          </div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.65">
+            Блокчейн хранит монеты в UTXO — каждый имеет дату последнего движения. Берётся цена BTC на ту дату, умножается на количество монет в этом UTXO. Сумма всех UTXO = <span style="color:var(--txt)">Realized Cap</span>. Делится на все монеты в обращении = Realized Price.<br><br>
+            Когда рыночная цена падает <span style="color:var(--red)">ниже Realized Price</span> — больше половины всех монет уходят в убыток одновременно. Исторически это зона капитуляции и дна.
+          </div>
+        </div>
+      </div>
+
+      <!-- Аккордеон: историческое значение -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-history')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">ИСТОРИЧЕСКИЕ УРОВНИ ДНА</span>
+          <span id="arr-rp-history" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="rp-history" style="display:none;padding:12px 14px;background:var(--bg2)">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2015</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC уходил ниже Realized Price на несколько месяцев перед разворотом</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2018–19</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Декабрь 2018 — цена на $3 200, RP ~$5 000. Дно сформировалось ниже</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2022</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Ноябрь 2022 — $15 700, RP ~$19 700. Пробой на 20% ниже</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2026</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:60px">выше RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC ~$59–61K, RP ~$53K. Пока выше — капитуляция не достигнута</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--dim)">
+            <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5">
+              <span style="color:var(--txt)">Оговорка:</span> в 2026 впервые присутствуют ETF и корпоративные покупатели — паттерн может не повториться. RP растёт медленно и не падает.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div style="margin:0 16px 12px;border:1px solid var(--line);overflow:hidden;">
       <div class="chart-head" style="margin:0">
@@ -3283,6 +3367,8 @@ async function fetchProdCost() {
     console.warn('ProdCost fetch error:', e);
   }
   renderDashboard();
+  // Обновить RP-соотношение при новой BTC-цене
+  if (typeof window._lastRP === 'number') updateRealizedPriceUI(window._lastRP);
 }
 
 function calcCyclePhase(price, prodCost) {
@@ -3911,6 +3997,68 @@ fetchBlocks();
 setInterval(fetchBlocks, 60000);
 fetchProdCost();
 setInterval(fetchProdCost, 300000);
+
+
+// ── REALIZED PRICE (Glassnode via CoinMetrics public) ──────────────────────
+async function fetchRealizedPrice() {
+  try {
+    // CoinMetrics public API — realized price (CapMrktCurUSD / SplyCur)
+    const res = await fetch(
+      'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=CapRealUSD,SplyCur&frequency=1d&page_size=1&api_key=',
+      { cache: 'no-store' }
+    );
+    const json = await res.json();
+    const row  = json?.data?.[0];
+    if (!row) return;
+
+    const realizedCap = parseFloat(row.CapRealUSD);
+    const supply      = parseFloat(row.SplyCur);
+    if (!realizedCap || !supply) return;
+
+    const rp = realizedCap / supply;
+    updateRealizedPriceUI(rp);
+  } catch(e) {
+    // Тихо — блок остаётся со статичным значением
+  }
+}
+
+function updateRealizedPriceUI(rp) {
+  window._lastRP = rp;
+  const rpEl     = document.getElementById('rp-value');
+  const ratioEl  = document.getElementById('rp-ratio');
+  const vsEl     = document.getElementById('rp-vs-market');
+  const statusEl = document.getElementById('rp-status-text');
+
+  if (rpEl) rpEl.textContent = '$' + Math.round(rp).toLocaleString('ru-RU');
+
+  if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
+    const ratio  = dashBtcPrice / rp;
+    const pct    = ((dashBtcPrice - rp) / rp * 100).toFixed(1);
+    const above  = dashBtcPrice >= rp;
+
+    if (ratioEl) {
+      ratioEl.textContent = ratio.toFixed(2) + '×';
+      ratioEl.style.color = above ? 'var(--grn)' : 'var(--red)';
+      ratioEl.style.borderColor = above ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+    }
+
+    if (vsEl) {
+      vsEl.textContent = (above ? '+' : '') + pct + '% от RP';
+      vsEl.style.color = above ? 'var(--grn)' : 'var(--red)';
+    }
+
+    if (statusEl) {
+      if (above) {
+        statusEl.innerHTML = 'Цена <span style="color:var(--grn)">выше</span> Realized Price — большинство держателей в прибыли. До RP: <span style="color:var(--txt)">−$' + Math.round(dashBtcPrice - rp).toLocaleString('ru-RU') + '</span>';
+      } else {
+        statusEl.innerHTML = 'Цена <span style="color:var(--red)">ниже</span> Realized Price — большинство держателей в убытке. <span style="color:var(--red)">Зона капитуляции</span>';
+      }
+    }
+  }
+}
+
+setTimeout(fetchRealizedPrice, 500);
+// Realized Price обновляется раз в сутки — достаточно при загрузке
 
 // ── MSTR live data ──────────────────────────────────────────────────────────
 const MSTR_BTC_RESERVE = 847363;

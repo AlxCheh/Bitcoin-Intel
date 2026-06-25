@@ -1548,12 +1548,78 @@ header {
 <section class="section" id="tab-instruments">
   <div class="page">
 
-    <div class="panel" id="instrument-strc">
-      <div class="chart-head" style="margin:0">
-        <span class="chart-title" style="color:var(--btc);text-shadow:0 0 18px rgba(247,147,26,0.4),0 0 6px rgba(247,147,26,0.2);letter-spacing:0.18em">STRC</span>
-        <span class="chart-meta">STRATEGY · PERPETUAL PREFERRED</span>
+    <!-- MSTR -->
+    <div class="panel" id="instrument-mstr" style="margin-bottom:20px">
+      <div class="chart-head" style="margin:0;cursor:pointer;user-select:none" onclick="toggleInstrument('mstr')">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <span class="chart-title" style="color:var(--txt);letter-spacing:0.18em">MSTR</span>
+          <span class="chart-meta">STRATEGY · COMMON STOCK · NASDAQ</span>
+        </div>
+        <span id="mstr-arrow" style="font-family:var(--mono);font-size:11px;color:var(--dim);transition:transform 0.2s">▼</span>
       </div>
-      <div class="panel-body" style="padding:14px 16px">
+      <div id="mstr-body" class="panel-body" style="padding:14px 16px">
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <div style="flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">ТИП</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--txt)">Обыкновенная акция</div>
+          </div>
+          <div style="flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">BTC-РЕЗЕРВ</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--btc)">847 363 BTC</div>
+          </div>
+          <div style="flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px">NAV-СТАТУС</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--red)">Дисконт 0.83×</div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--sans);font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:12px">
+          MSTR — обыкновенная акция Strategy (бывш. MicroStrategy). Фактически работает как инструмент BTC-экспозиции с левереджем: компания конвертирует привлечённый капитал в биткоин и держит его на балансе. Стоит ниже STRC в капитальной структуре — при ликвидации держатели MSTR получают выплаты после привилегированных акционеров.
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">КАК РАБОТАЕТ</div>
+        <div style="border-left:2px solid var(--txt);padding-left:12px;margin-bottom:14px">
+          <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.7">
+            Strategy выпускает STRC/облигации → привлекает USD → покупает BTC → BTC растёт → <span style="color:var(--txt)">MSTR торгуется с премией к NAV</span> → можно выпускать новые инструменты на выгодных условиях. Петля самоусиления работает только пока акция стоит дороже BTC-резерва.
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">СВЯЗЬ С STRC</div>
+        <div style="background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--btc);padding:10px 12px;margin-bottom:14px">
+          <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.5">
+            STRC — топливный насос для MSTR. Пока STRC торгуется у номинала ($100), Strategy привлекает дешёвый капитал → покупает BTC → MSTR растёт. Когда STRC падает ниже номинала, насос даёт сбой: новый капитал привлекать невыгодно, BTC-накопление тормозит, MSTR падает быстрее самого BTC.
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">КЛЮЧЕВОЙ РИСК</div>
+        <div style="background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--red);padding:10px 12px;margin-bottom:14px">
+          <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.5">
+            Дивидендные обязательства по STRC/STRK/STRF/STRD/STRE выросли с $300 млн до $1,2 млрд за 6 месяцев. При NAV-дисконте 0.83× и дивидендном покрытии 14 месяцев модель требует паузы в BTC-накоплении — крупнейший корпоративный покупатель выходит из активной фазы.
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--red);color:var(--red)">~$92 · двухлетний минимум (июнь 2026)</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">−81% от пика</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Нереализ. убыток: $10,6 млрд</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Ликвидация BTC: ~$3 500</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STRC -->
+    <div class="panel" id="instrument-strc" style="margin-bottom:20px">
+      <div class="chart-head" style="margin:0;cursor:pointer;user-select:none" onclick="toggleInstrument('strc')">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <span class="chart-title" style="color:var(--btc);text-shadow:0 0 18px rgba(247,147,26,0.4),0 0 6px rgba(247,147,26,0.2);letter-spacing:0.18em">STRC</span>
+          <span class="chart-meta">STRATEGY · PERPETUAL PREFERRED</span>
+        </div>
+        <span id="strc-arrow" style="font-family:var(--mono);font-size:11px;color:var(--dim);transition:transform 0.2s">▼</span>
+      </div>
+      <div id="strc-body" class="panel-body" style="padding:14px 16px">
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
           <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--line);padding:10px 12px">
@@ -1571,7 +1637,7 @@ header {
         </div>
 
         <div style="font-family:var(--sans);font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:12px">
-          STRC — гибридный инструмент между корпоративной облигацией и BTC-экспозицией. Выпускается Strategy для привлечения капитала без прямой продажи биткоина. Держатели получают фиксированный дивиденд и приоритет перед обычными акционерами при выплатах.
+          STRC — гибридный инструмент между корпоративной облигацией и BTC-экспозицией. Выпускается Strategy для привлечения капитала без прямой продажи биткоина. Держатели получают переменный дивиденд и приоритет перед обычными акционерами при выплатах. Дивиденды кумулятивные — пропущенные нельзя просто отменить.
         </div>
 
         <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">КАК РАБОТАЕТ</div>
@@ -1592,9 +1658,9 @@ header {
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">BTC-резерв: 847 363 BTC</span>
           <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">USD-резерв: $1,4 млрд</span>
-          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Покрытие: ~2,6%</span>
-          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--red);color:var(--red)">Торговался ниже номинала (июнь 2026)</span>
-          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Токенизирован в DeFi</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Покрытие: ~14 мес.</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--red);color:var(--red)">Ниже номинала: $84–87 (июнь 2026)</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:4px 9px;background:var(--bg3);border:1px solid var(--line);color:var(--dim)">Дивиденды: $1,2 млрд/год</span>
         </div>
 
       </div>
@@ -1607,6 +1673,17 @@ header {
 
   </div>
 </section>
+
+<script>
+function toggleInstrument(id) {
+  var body = document.getElementById(id + '-body');
+  var arrow = document.getElementById(id + '-arrow');
+  if (!body) return;
+  var collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  arrow.style.transform = collapsed ? '' : 'rotate(-90deg)';
+}
+</script>
 
 <section class="section" id="tab-history">
   <div class="page">

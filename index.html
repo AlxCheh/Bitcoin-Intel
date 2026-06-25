@@ -3026,10 +3026,19 @@ function initPriceChart() {
 async function loadSignals() {
   try {
     const resp = await fetch('signals.json?v=' + Date.now());
-    SIGNALS = await resp.json();
-    // перерисовать дашборд с загруженными сигналами
+    const data = await resp.json();
+    // Поддержка нового формата {meta, signals} и старого массива
+    if (Array.isArray(data)) {
+      SIGNALS = data;
+    } else {
+      SIGNALS = data.signals || [];
+      if (data.meta) {
+        window.SIGNALS_META = data.meta;
+        // Обновить константу резерва если fetchMstrData уже запущен
+        if (typeof fetchMstrData === 'function') fetchMstrData();
+      }
+    }
     renderDashboard();
-    // если вкладка market уже открыта — перерисовать список
     const marketTab = document.getElementById('tab-market');
     if (marketTab && marketTab.classList.contains('active')) renderSignals();
   } catch(e) {
@@ -3911,7 +3920,18 @@ const MSTR_PREF        = 4100000000; // привилегированные об�
 
 async function fetchMstrData() {
   try {
-    // Цена MSTR через Yahoo Finance (CORS-friendly endpoint)
+    // Параметры из meta signals.json (или fallback на константы)
+    const sm          = window.SIGNALS_META || {};
+    const btcReserve  = sm.strategy_btc_reserve          || MSTR_BTC_RESERVE;
+    const shares      = sm.strategy_shares_outstanding   || MSTR_SHARES;
+    const debt        = sm.strategy_debt_usd             || MSTR_DEBT;
+    const pref        = sm.strategy_pref_obligations_usd || MSTR_PREF;
+
+    // Обновить отображение резерва в шапке
+    const btcEl = document.getElementById('mstr-live-btc');
+    if (btcEl) btcEl.textContent = btcReserve.toLocaleString('ru-RU');
+
+    // Цена MSTR через Yahoo Finance
     const res = await fetch(
       'https://query1.finance.yahoo.com/v8/finance/chart/MSTR?interval=1d&range=1d',
       { cache: 'no-store' }
@@ -3922,26 +3942,26 @@ async function fetchMstrData() {
 
     if (!mstrPrice) return;
 
-    // Обновить цену в шапке
+    // Цена в шапке
     const priceEl = document.getElementById('mstr-live-price');
     if (priceEl) {
       priceEl.textContent = '$' + mstrPrice.toFixed(2);
       priceEl.style.color = mstrPrice < 100 ? 'var(--red)' : 'var(--grn)';
     }
 
-    // NAV-мультипликатор если есть BTC-цена
+    // NAV-мультипликатор
     if (typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
-      const btcNav    = MSTR_BTC_RESERVE * dashBtcPrice;
-      const netNav    = btcNav - MSTR_DEBT - MSTR_PREF;
-      const navPerSh  = netNav / MSTR_SHARES;
-      const mult      = mstrPrice / navPerSh;
-      const navEl     = document.getElementById('mstr-nav-val');
+      const btcNav   = btcReserve * dashBtcPrice;
+      const netNav   = btcNav - debt - pref;
+      const navPerSh = netNav / shares;
+      const mult     = mstrPrice / navPerSh;
+      const navEl    = document.getElementById('mstr-nav-val');
       if (navEl && navPerSh > 0) {
         const label = mult >= 1
           ? 'Премия ' + mult.toFixed(2) + '×'
           : 'Дисконт ' + mult.toFixed(2) + '×';
-        navEl.textContent  = label;
-        navEl.style.color  = mult >= 1 ? 'var(--grn)' : 'var(--red)';
+        navEl.textContent = label;
+        navEl.style.color = mult >= 1 ? 'var(--grn)' : 'var(--red)';
       }
     }
   } catch(e) {

@@ -33,7 +33,7 @@
 
 html { font-size: 14px; }
 
-html { overflow-x: hidden; height: 100%; }
+html { overflow-x: hidden; height: 100%; scroll-padding-top: 52px; }
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -188,7 +188,7 @@ header {
 ══════════════════════════════════ */
 .section { display: none; }
 .section.active { display: block; }
-#tab-instruments.active { display: block; height: calc(100vh - 52px); overflow-y: auto; }
+#tab-instruments.active { display: block; }
 
 /* ══════════════════════════════════
    PAGE LAYOUT
@@ -1638,7 +1638,7 @@ header {
 
     <!-- MSTR -->
     <div class="panel" id="instrument-mstr" style="margin-bottom:20px;border:1px solid var(--btc);position:relative">
-      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line);background:var(--bg2);position:sticky;top:0;z-index:10" id="mstr-head" onclick="toggleInstrument('mstr')">
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line);background:var(--bg2);position:sticky;top:1px;z-index:10" id="mstr-head" onclick="toggleInstrument('mstr')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--txt)">MSTR</span>
           <div style="display:flex;align-items:center;gap:10px">
@@ -1843,7 +1843,7 @@ header {
 
     <!-- STRC -->
     <div class="panel" id="instrument-strc" style="margin-bottom:20px;border:1px solid var(--btc);position:relative">
-      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line);background:var(--bg2);position:sticky;top:0;z-index:10" id="strc-head" onclick="toggleInstrument('strc')">
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line);background:var(--bg2);position:sticky;top:1px;z-index:10" id="strc-head" onclick="toggleInstrument('strc')">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
           <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--btc);text-shadow:0 0 12px rgba(247,147,26,0.35)">STRC</span>
           <div style="display:flex;align-items:center;gap:10px">
@@ -1922,6 +1922,28 @@ header {
 </section>
 
 <script>
+
+
+// ── Instrument panels: prevent scrolling above header ──────────────────────
+(function() {
+  var HEADER_H = 52; // 4px stripe + 48px header
+  var panels = ['instrument-mstr', 'instrument-strc'];
+
+  function clampScroll() {
+    panels.forEach(function(id) {
+      var panel = document.getElementById(id);
+      if (!panel) return;
+      var rect = panel.getBoundingClientRect();
+      if (rect.top < HEADER_H) {
+        // Верхняя граница блока уходит за хедер — корректируем скролл
+        var overshoot = HEADER_H - rect.top;
+        window.scrollBy({ top: -overshoot, behavior: 'instant' });
+      }
+    });
+  }
+
+  window.addEventListener('scroll', clampScroll, { passive: false });
+})();
 
 // ── Instrument sticky headers: handled via CSS ──
 

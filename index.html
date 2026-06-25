@@ -1601,6 +1601,133 @@ header {
           </div>
         </div>
 
+
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">NAV — СТОИМОСТЬ ЧИСТЫХ АКТИВОВ</div>
+        <div style="border:1px solid var(--line);margin-bottom:14px">
+
+          <!-- Определение — всегда видно -->
+          <div style="padding:10px 12px 12px;border-bottom:1px solid var(--line)">
+            <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.6">
+              NAV (Net Asset Value) — справедливая стоимость компании если продать все активы и погасить все долги. Для Strategy это почти синоним стоимости BTC-резерва: <span style="color:var(--btc)">847 363 BTC × цена BTC = NAV</span>. Когда MSTR стоит дороже NAV — это <span style="color:var(--grn)">премия</span>. Когда дешевле — <span style="color:var(--red)">дисконт</span>.
+            </div>
+          </div>
+
+          <!-- Аккордеон: Как считается -->
+          <div class="nav-acc-item" style="border-bottom:1px solid var(--line)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('nav-formula')">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">КАК СЧИТАЕТСЯ</span>
+              <span id="arr-nav-formula" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+            </div>
+            <div id="nav-formula" style="display:none;padding:12px;background:var(--bg2)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.06em;margin-bottom:10px">ФОРМУЛА</div>
+              <div style="background:var(--bg);border:1px solid var(--line);padding:10px 12px;margin-bottom:12px">
+                <div style="font-family:var(--mono);font-size:11px;color:var(--btc);line-height:2">
+                  BTC NAV = кол-во BTC × цена BTC<br>
+                  <span style="color:var(--dim)">Чистый NAV = BTC NAV − долг − обязательства</span><br>
+                  <span style="color:var(--dim)">Мультипликатор = цена акции ÷ (Чистый NAV ÷ акции в обращении)</span>
+                </div>
+              </div>
+              <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.65">
+                <span style="color:var(--txt)">Пример (июнь 2026):</span> 847 363 BTC × $59 000 = $49,9 млрд BTC NAV. Минус долг ~$8,2 млрд и привилегированные обязательства ~$4,1 млрд = Чистый NAV ~$37,6 млрд. Акций в обращении ~242 млн → NAV на акцию ~$155. MSTR торгуется по $92 → мультипликатор 0.59×.
+              </div>
+            </div>
+          </div>
+
+          <!-- Аккордеон: Где берутся данные -->
+          <div class="nav-acc-item" style="border-bottom:1px solid var(--line)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('nav-sources')">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">ГДЕ БЕРУТСЯ ДАННЫЕ</span>
+              <span id="arr-nav-sources" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+            </div>
+            <div id="nav-sources" style="display:none;padding:12px;background:var(--bg2)">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:80px;padding-top:1px">BTC РЕЗЕРВ</span>
+                  <span style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">SEC-раскрытие (форма 8-K после каждой покупки) + on-chain верификация через Arkham Intelligence. Данные публичны и верифицируемы.</span>
+                </div>
+                <div style="border-top:1px solid var(--line);padding-top:8px;display:flex;gap:10px;align-items:flex-start">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:80px;padding-top:1px">ЦЕНА BTC</span>
+                  <span style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">Spot-цена с бирж (Coinbase, Binance). Разные источники используют разные эталонные цены — отсюда небольшие расхождения в цифрах NAV у разных аналитиков.</span>
+                </div>
+                <div style="border-top:1px solid var(--line);padding-top:8px;display:flex;gap:10px;align-items:flex-start">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:80px;padding-top:1px">ДОЛГ</span>
+                  <span style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">Квартальный отчёт 10-Q / 10-K в SEC. Включает конвертируемые облигации, обеспеченные кредиты. Обновляется раз в квартал — между отчётами данные могут устаревать.</span>
+                </div>
+                <div style="border-top:1px solid var(--line);padding-top:8px;display:flex;gap:10px;align-items:flex-start">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:80px;padding-top:1px">АГРЕГАТОРЫ</span>
+                  <span style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">SaylorTracker.com (неофициальный, обновляется в реальном времени), Coinglass, BitcoinTreasuries.net. Для точного расчёта всегда сверяться с первичными SEC-документами.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Аккордеон: Премия vs Дисконт -->
+          <div class="nav-acc-item" style="border-bottom:1px solid var(--line)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('nav-premium')">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">ПРЕМИЯ vs ДИСКОНТ</span>
+              <span id="arr-nav-premium" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+            </div>
+            <div id="nav-premium" style="display:none;padding:12px;background:var(--bg2)">
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <div style="flex:1;padding:8px 10px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.05)">
+                  <div style="font-family:var(--mono);font-size:7px;color:var(--grn);letter-spacing:0.1em;margin-bottom:4px">ПРЕМИЯ &gt; 1×</div>
+                  <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5">Рынок платит за левередж и удобство доступа к BTC через акцию. Исторически 1.5–3× в 2020–2024. Позволяет Strategy выпускать новые инструменты выгодно.</div>
+                </div>
+                <div style="flex:1;padding:8px 10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)">
+                  <div style="font-family:var(--mono);font-size:7px;color:var(--red);letter-spacing:0.1em;margin-bottom:4px">ДИСКОНТ &lt; 1×</div>
+                  <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">Рынок считает что долги и обязательства съедают часть BTC-стоимости. ETF дают ту же BTC-экспозицию дешевле. Дисконт делает новые выпуски разводняющими.</div>
+                </div>
+              </div>
+              <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+                <span style="color:var(--txt)">Почему сейчас дисконт:</span> запуск спотовых BTC-ETF в январе 2024 убил главный аргумент в пользу премии — «нет другого способа получить BTC через брокерский счёт». IBIT (BlackRock) берёт 0.25% в год против операционных издержек и долговой нагрузки Strategy. Одновременно дивидендные обязательства выросли 4× — рынок закладывает риск что их придётся покрывать за счёт BTC.
+              </div>
+            </div>
+          </div>
+
+          <!-- Аккордеон: История NAV MSTR -->
+          <div class="nav-acc-item">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('nav-history')">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">ИСТОРИЯ МУЛЬТИПЛИКАТОРА MSTR</span>
+              <span id="arr-nav-history" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+            </div>
+            <div id="nav-history" style="display:none;padding:12px;background:var(--bg2)">
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">2020–21</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--grn);min-width:40px">1.5–3×</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Первые BTC-покупки, уникальность модели, максимальная премия</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">2022</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--red);min-width:40px">0.5–0.9×</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Крипто-зима, BTC −75%, первый дисконт</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">2023–24</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--grn);min-width:40px">1.2–2.5×</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC-ралли, ETF-ожидания, пик ажиотажа вокруг модели</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">янв 2024</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--dim);min-width:40px">→</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Запуск спотовых ETF — главный аргумент премии исчезает</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">2025</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--grn);min-width:40px">1.5–2×</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Ребрендинг в Strategy, BTC $100K+, премия восстанавливается</span>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:7px 0">
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:60px">июнь 2026</span>
+                  <span style="font-family:var(--mono);font-size:10px;color:var(--red);min-width:40px">0.59×</span>
+                  <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC $59K, дивиденды $1,2 млрд, дисконт исторически глубокий</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em;margin-bottom:8px">СВЯЗЬ С STRC</div>
         <div style="background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--btc);padding:10px 12px;margin-bottom:14px">
           <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.5">
@@ -1714,6 +1841,14 @@ function toggleInstrument(id) {
   var collapsed = body.style.display === 'none';
   body.style.display = collapsed ? '' : 'none';
   arrow.style.transform = collapsed ? '' : 'rotate(-90deg)';
+}
+function toggleNav(id) {
+  var body = document.getElementById(id);
+  var arrow = document.getElementById('arr-' + id);
+  if (!body) return;
+  var collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  if (arrow) arrow.style.transform = collapsed ? 'rotate(90deg)' : '';
 }
 </script>
 

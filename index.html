@@ -33,12 +33,12 @@
 
 html { font-size: 14px; }
 
+html { overflow-x: hidden; }
 body {
   font-family: var(--sans);
   background: var(--bg);
   color: var(--txt);
   min-height: 100vh;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -1912,6 +1912,7 @@ header {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    window.triggerInstrumentSticky = onScroll;
   }
 
   if (document.readyState === 'loading') {
@@ -3762,6 +3763,7 @@ function showTab(id, btn, keepCluster) {
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();
   if (id === 'aholders')  renderAHolders();
+  if (id === 'instruments' && window.triggerInstrumentSticky) setTimeout(window.triggerInstrumentSticky, 50);
 }
 
 // инициализация подвкладок при загрузке

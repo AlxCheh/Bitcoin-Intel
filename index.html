@@ -1196,8 +1196,8 @@ header {
       </div>
     </div>
 
-    <!-- ══ БЛОК 2: ТРИ МЕТРИКИ ══ -->
-    <div style="margin:0 16px 0;border:1px solid var(--btc);overflow:hidden;">
+    <!-- ══ БЛОК 2 + 2.2: КЛЮЧЕВЫЕ МЕТРИКИ + REALIZED PRICE ══ -->
+    <div style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
       <div class="chart-head" style="margin:0">
         <span class="chart-title">Ключевые метрики</span>
         <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
@@ -1219,11 +1219,9 @@ header {
     <div class="dash-disclaimer">
       ~ Production Cost — расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
       </div>
-    </div>
 
-
-    <!-- ══ БЛОК 2.2: REALIZED PRICE ══ -->
-    <div style="margin:0 16px 12px;border:1px solid var(--btc);background:var(--bg2)">
+      <!-- Разделитель -->
+      <div style="border-top:1px solid var(--line)"></div>
 
       <!-- Шапка с живым значением -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--line)">
@@ -1303,7 +1301,8 @@ header {
         </div>
       </div>
 
-    </div>
+    </div><!-- /realized price inner -->
+    </div><!-- /общий wrapper метрики+RP -->
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;">

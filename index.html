@@ -1550,12 +1550,28 @@ header {
 
     <!-- MSTR -->
     <div class="panel" id="instrument-mstr" style="margin-bottom:20px">
-      <div class="chart-head" style="margin:0;cursor:pointer;user-select:none" onclick="toggleInstrument('mstr')">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span class="chart-title" style="color:var(--txt);letter-spacing:0.18em">MSTR</span>
-          <span class="chart-meta">STRATEGY · COMMON STOCK · NASDAQ</span>
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--line2);border-bottom:1px solid var(--line)" onclick="toggleInstrument('mstr')">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--txt)">MSTR</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em">COMMON STOCK · NASDAQ</span>
+            <span id="mstr-arrow" style="font-family:var(--mono);font-size:10px;color:var(--dim);transition:transform 0.2s">▼</span>
+          </div>
         </div>
-        <span id="mstr-arrow" style="font-family:var(--mono);font-size:11px;color:var(--dim);transition:transform 0.2s">▼</span>
+        <div style="display:flex;border-top:1px solid var(--line)">
+          <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">BTC-РЕЗЕРВ</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--btc)">847 363</div>
+          </div>
+          <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">NAV-СТАТУС</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--red)">Дисконт 0.83×</div>
+          </div>
+          <div style="flex:1;padding:6px 12px">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">ЦЕНА</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--red)">~$92</div>
+          </div>
+        </div>
       </div>
       <div id="mstr-body" class="panel-body" style="padding:14px 16px">
 
@@ -1612,12 +1628,28 @@ header {
 
     <!-- STRC -->
     <div class="panel" id="instrument-strc" style="margin-bottom:20px">
-      <div class="chart-head" style="margin:0;cursor:pointer;user-select:none" onclick="toggleInstrument('strc')">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span class="chart-title" style="color:var(--btc);text-shadow:0 0 18px rgba(247,147,26,0.4),0 0 6px rgba(247,147,26,0.2);letter-spacing:0.18em">STRC</span>
-          <span class="chart-meta">STRATEGY · PERPETUAL PREFERRED</span>
+      <div style="margin:0;cursor:pointer;user-select:none;border-left:3px solid var(--btc);border-bottom:1px solid var(--line)" onclick="toggleInstrument('strc')">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;gap:10px">
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--btc);text-shadow:0 0 12px rgba(247,147,26,0.35)">STRC</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em">PERPETUAL PREFERRED</span>
+            <span id="strc-arrow" style="font-family:var(--mono);font-size:10px;color:var(--dim);transition:transform 0.2s">▼</span>
+          </div>
         </div>
-        <span id="strc-arrow" style="font-family:var(--mono);font-size:11px;color:var(--dim);transition:transform 0.2s">▼</span>
+        <div style="display:flex;border-top:1px solid var(--line)">
+          <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">ОБЕСПЕЧЕНИЕ</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--btc)">4–5× BTC</div>
+          </div>
+          <div style="flex:1;padding:6px 12px;border-right:1px solid var(--line)">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">ДИВИДЕНДЫ</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--txt)">$1,2 млрд/год</div>
+          </div>
+          <div style="flex:1;padding:6px 12px">
+            <div style="font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:2px">СТАТУС</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--red)">Ниже номинала</div>
+          </div>
+        </div>
       </div>
       <div id="strc-body" class="panel-body" style="padding:14px 16px">
 

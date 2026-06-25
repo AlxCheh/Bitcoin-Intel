@@ -33,7 +33,7 @@
 
 html { font-size: 14px; }
 
-html { overflow-x: hidden; }
+html { overflow-x: hidden; height: 100%; }
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -188,6 +188,7 @@ header {
 ══════════════════════════════════ */
 .section { display: none; }
 .section.active { display: block; }
+#tab-instruments.active { display: block; height: calc(100vh - 52px); overflow-y: auto; }
 
 /* ══════════════════════════════════
    PAGE LAYOUT
@@ -1632,7 +1633,7 @@ header {
 <!-- ══════════════════════════════════════
      ЭКОСИСТЕМА / ИНСТРУМЕНТЫ
 ══════════════════════════════════════ -->
-<section class="section" id="tab-instruments" style="height:calc(100vh - 52px);overflow-y:auto;position:relative">
+<section class="section" id="tab-instruments">
   <div class="page">
 
     <!-- MSTR -->

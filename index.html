@@ -1305,7 +1305,7 @@ header {
     </div><!-- /общий wrapper метрики+RP -->
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
-    <div style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;">
+    <div id="price-chart-wrap" style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
       <div class="chart-head" style="margin:0">
         <span class="chart-title">График BTC / USD</span>
         <span class="chart-meta">ЦЕНА · ИСТОРИЯ</span>
@@ -2630,6 +2630,8 @@ function initPriceChart() {
   (function renderTerminalChart() {
     const wrap = document.getElementById('terminal-price-chart');
     if (!wrap) { console.error('PRICE CHART: wrap not found'); return; }
+    const wrapOuter = document.getElementById('price-chart-wrap');
+    if (wrapOuter) wrapOuter.style.display = '';
     wrap.innerHTML = '<div style="padding:8px 14px;font-family:monospace;font-size:10px;color:#F7931A">INIT OK — загрузка данных...</div>';
     console.log('PRICE CHART: wrap found, starting init');
 

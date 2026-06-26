@@ -185,6 +185,48 @@ header {
   border-top-color: var(--btc);
 }
 
+
+/* ══════════════════════════════════
+   ENTITY TOOLTIP
+══════════════════════════════════ */
+.entity-link {
+  color: var(--btc);
+  border-bottom: 1px dashed rgba(247,147,26,0.4);
+  cursor: pointer;
+  font-style: normal;
+  white-space: nowrap;
+}
+.entity-link:hover { border-bottom-color: var(--btc); }
+
+.entity-popup {
+  position: fixed;
+  z-index: 1000;
+  left: 12px; right: 12px;
+  bottom: 80px;
+  background: var(--bg2);
+  border: 1px solid var(--btc);
+  border-radius: 2px;
+  padding: 14px 16px;
+  display: none;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 0 24px rgba(247,147,26,0.15);
+}
+.entity-popup.visible { display: block; }
+.ep-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.ep-name { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--btc); letter-spacing:0.06em; }
+.ep-type { font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:0.1em; text-transform:uppercase; background:var(--bg3); padding:2px 6px; border-radius:2px; }
+.ep-status-closed { color:var(--red) !important; }
+.ep-close { background:none; border:none; color:var(--dim); font-size:18px; cursor:pointer; padding:0 0 0 12px; line-height:1; }
+.ep-close:hover { color:var(--txt); }
+.ep-summary { font-size:12px; color:var(--txt); line-height:1.5; margin-bottom:10px; }
+.ep-metric { font-family:var(--mono); font-size:11px; color:var(--dim); padding:3px 0; border-bottom:1px solid var(--line); }
+.ep-metric:last-child { border-bottom:none; }
+.ep-notable { font-size:11px; color:var(--amber); background:rgba(200,168,75,0.06); border-left:2px solid var(--amber); padding:6px 8px; margin-bottom:10px; line-height:1.4; }
+.ep-ref { font-family:var(--mono); font-size:10px; color:var(--dim); background:var(--bg3); border:1px solid var(--line); padding:2px 6px; border-radius:2px; }
+.ep-overlay { position:fixed; inset:0; z-index:999; background:rgba(6,8,11,0.6); display:none; }
+.ep-overlay.visible { display:block; }
+
 /* ══════════════════════════════════
    SECTIONS
 ══════════════════════════════════ */
@@ -2617,6 +2659,80 @@ function toggleNav(id) {
 </section>
 
 <script>
+
+// ── ENTITIES BASE ──────────────────────────────────────────────────────
+let ENTITIES = [];
+
+async function loadEntities() {
+  try {
+    const resp = await fetch('ENTITIES.json?v=' + Date.now());
+    const data = await resp.json();
+    ENTITIES = data.entities || [];
+  } catch(e) {
+    console.error('ENTITIES.json load error:', e);
+  }
+}
+
+const TYPE_META = {
+  l2:            'L2',
+  protocol:      'PROTOCOL',
+  corporate:     'CORP',
+  fund:          'FUND',
+  infrastructure:'INFRA',
+  exchange:      'EXCHANGE',
+};
+
+function highlightEntities(text) {
+  if (!ENTITIES || !ENTITIES.length) return text;
+  let result = text;
+  // Сортируем по длине имени убыв — длинные сначала, чтобы не съесть подстроку
+  const sorted = [...ENTITIES].sort((a, b) => b.name.length - a.name.length);
+  sorted.forEach(e => {
+    // Экранируем спецсимволы regex в имени
+    const escaped = e.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('(' + escaped + ')', 'g');
+    result = result.replace(re, '<span class="entity-link" onclick="showEntityPopup(\''+e.id+'\')" data-entity="'+e.id+'">$1</span>');
+  });
+  return result;
+}
+
+function showEntityPopup(id) {
+  const e = ENTITIES.find(x => x.id === id);
+  if (!e) return;
+
+  document.getElementById('ep-name').textContent = e.name;
+  const typeEl = document.getElementById('ep-type');
+  typeEl.textContent = TYPE_META[e.type] || e.type.toUpperCase();
+  if (e.status === 'closed') typeEl.classList.add('ep-status-closed');
+  else typeEl.classList.remove('ep-status-closed');
+
+  document.getElementById('ep-summary').textContent = e.summary;
+
+  const metrics = e.profile?.metrics || [];
+  const metricsEl = document.getElementById('ep-metrics');
+  metricsEl.innerHTML = metrics.length
+    ? metrics.map(m => '<div class="ep-metric">· ' + m + '</div>').join('')
+    : '';
+
+  const notableEl = document.getElementById('ep-notable');
+  notableEl.innerHTML = e.profile?.notable
+    ? '<div class="ep-notable">' + e.profile.notable + '</div>'
+    : '';
+
+  const refs = e.signal_refs || [];
+  document.getElementById('ep-refs').innerHTML = refs.length
+    ? refs.map(r => '<span class="ep-ref">' + r + '</span>').join('')
+    : '';
+
+  document.getElementById('entity-popup').classList.add('visible');
+  document.getElementById('ep-overlay').classList.add('visible');
+}
+
+function closeEntityPopup() {
+  document.getElementById('entity-popup').classList.remove('visible');
+  document.getElementById('ep-overlay').classList.remove('visible');
+}
+
 // ── SIGNALS BASE (загружается из signals.json) ──
 // Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
 let SIGNALS = [];
@@ -3300,7 +3416,7 @@ function renderSignals() {
     const roleDot = s.narrative_role ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + roleColor + ';margin-right:2px;vertical-align:middle"></span>' : '';
     return '<div class="sig-card ' + s.dir + '">'
       + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span>' + roleDot + '<span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
-      + '<div class="sig-signal">' + s.signal + '</div>'
+      + '<div class="sig-signal">' + highlightEntities(s.signal) + '</div>'
       + '<div class="sig-data">' + chips
       + (horizonLabel ? '<span class="sig-chip" style="'
         + (s.horizon === 'short' ? 'color:var(--red);border-color:rgba(194,96,96,0.3)' :
@@ -3311,8 +3427,8 @@ function renderSignals() {
       + (flowMeta ? '<span class="sig-chip" style="opacity:.5">' + flowMeta.icon + ' ' + flowMeta.label + '</span>' : '')
       + '</div>'
       + '<div class="sig-body">'
-      + '<p><span class="lbl">КОНТЕКСТ.</span> ' + s.context + '</p>'
-      + '<p><span class="lbl">ОГОВОРКИ.</span> ' + s.caveat + '</p>'
+      + '<p><span class="lbl">КОНТЕКСТ.</span> ' + highlightEntities(s.context) + '</p>'
+      + '<p><span class="lbl">ОГОВОРКИ.</span> ' + highlightEntities(s.caveat) + '</p>'
       + '</div>'
       + '<div class="sig-src">ИСТОЧНИК: ' + s.source + '</div>'
       + '</div>';

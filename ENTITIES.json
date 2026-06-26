@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "description": "База артефактов проекта Bitcoin-Intel. Сущности всплывающие при разборе сигналов.",
+    "total": 10,
+    "last_updated": "2026-06-26"
+  },
+  "entities": [
+    {
+      "id": "botanix",
+      "name": "Botanix",
+      "type": "l2",
+      "status": "closed",
+      "summary": "Bitcoin L2 на Spiderchain архитектуре — закрылся в июне 2026 после года на мейннете из-за отсутствия PMF",
+      "profile": {
+        "what": "EVM-совместимый Bitcoin L2 с федеративной Spiderchain архитектурой. Цель — принести Ethereum-функциональность на Bitcoin без изменения базового уровня.",
+        "metrics": [
+          "25 млн транзакций за год мейннета",
+          "200 тыс. кошельков",
+          "Нулевых инцидентов безопасности",
+          "Дедлайн вывода активов — 9 июля 2026"
+        ],
+        "links_to": ["bitcoin", "ethereum", "polychain_capital", "chainlink", "gmx", "morpho", "fireblocks"],
+        "notable": "Отказался от токен-инстентивов. Технически работал, но комиссионная выручка не покрывала операционные расходы. Постмортем: пользователи предпочли wBTC на Ethereum Bitcoin-нативному DeFi."
+      },
+      "signal_refs": ["INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "stacks",
+      "name": "Stacks",
+      "type": "l2",
+      "status": "active",
+      "summary": "Крупнейший Bitcoin L2 по TVL — ~41% сектора, фокус на смарт-контрактах и DeFi поверх Bitcoin",
+      "profile": {
+        "what": "Bitcoin L2 с собственным языком смарт-контрактов Clarity и механизмом Proof of Transfer (PoX). Позволяет строить dApps с расчётами в BTC.",
+        "metrics": [
+          "~41% TVL Bitcoin L2 сектора",
+          "30x рост пропускной способности BTC DeFi (июнь 2026)"
+        ],
+        "links_to": ["bitcoin", "rootstock", "citrea"],
+        "notable": "Использует токен-инстентивы в отличие от Botanix. Продолжает работу на фоне закрытия конкурентов."
+      },
+      "signal_refs": ["INF-2026-0620-001", "INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "rootstock",
+      "name": "Rootstock (RSK)",
+      "type": "l2",
+      "status": "active",
+      "summary": "Второй по TVL Bitcoin L2 — ~40% сектора, EVM-совместимый сайдчейн с merge-mining",
+      "profile": {
+        "what": "EVM-совместимый Bitcoin сайдчейн с merge-mining — майнеры Bitcoin одновременно майнят RSK. Работает с 2018 года, старейший Bitcoin L2.",
+        "metrics": [
+          "~40% TVL Bitcoin L2 сектора",
+          "Работает с 2018 года"
+        ],
+        "links_to": ["bitcoin", "stacks", "citrea"],
+        "notable": "Вместе со Stacks контролирует ~81% TVL Bitcoin L2 — рынок сильно концентрирован вокруг двух игроков."
+      },
+      "signal_refs": ["INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "citrea",
+      "name": "Citrea",
+      "type": "l2",
+      "status": "active",
+      "summary": "Bitcoin L2 нового поколения — фокус на Bitcoin-нативных кейсах (приватные платежи, capital markets), а не копировании EVM",
+      "profile": {
+        "what": "Bitcoin rollup с фокусом на trust-minimized settlement. Позиционируется как альтернатива EVM-копированию — строит вокруг специфики Bitcoin, а не переносит Ethereum.",
+        "metrics": [],
+        "links_to": ["bitcoin", "stacks", "rootstock"],
+        "notable": "CEO Orkun Mahir Kılıç о закрытии Botanix: 'провал не Bitcoin DeFi, а попытки скопировать EVM без уникального value proposition для BTC-держателей'."
+      },
+      "signal_refs": ["INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "wbtc",
+      "name": "wBTC (Wrapped Bitcoin)",
+      "type": "protocol",
+      "status": "active",
+      "summary": "Токенизированный BTC на Ethereum — доминирующий способ участия BTC-держателей в DeFi (~$20 млрд, ~2% предложения BTC)",
+      "profile": {
+        "what": "ERC-20 токен на Ethereum, обеспеченный реальным BTC 1:1. Позволяет использовать BTC в Ethereum DeFi без перехода на Bitcoin L2.",
+        "metrics": [
+          "~$20 млрд в wrapped-форме на EVM-сетях (май 2026)",
+          "~2% от всего предложения BTC",
+          "Доступен на Ethereum, Base, Arbitrum, Polygon, Solana, BNB"
+        ],
+        "links_to": ["bitcoin", "ethereum", "stacks", "rootstock"],
+        "notable": "Botanix в постмортеме признал: для lending, yield, leveraged exposure wBTC на зрелом general-purpose L2 достаточен большинству пользователей."
+      },
+      "signal_refs": ["INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "polychain_capital",
+      "name": "Polychain Capital",
+      "type": "fund",
+      "status": "active",
+      "summary": "Один из крупнейших крипто-фондов — инвестор Botanix и других Bitcoin L2 проектов",
+      "profile": {
+        "what": "Венчурный фонд специализирующийся на блокчейн и криптовалютных проектах. Один из пионеров институционального крипто-инвестирования.",
+        "metrics": [],
+        "links_to": ["botanix"],
+        "notable": "Инвестировал в Botanix — проект закрылся несмотря на поддержку топового фонда, что говорит о системной проблеме спроса, а не качества команды."
+      },
+      "signal_refs": ["INF-2026-0609-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "dmnd",
+      "name": "DMND",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Первый майнинг-пул с Job Declaration (Stratum V2) в production — позволяет майнерам самостоятельно формировать шаблон блока",
+      "profile": {
+        "what": "Bitcoin майнинг-пул построенный вокруг Stratum V2. Единственный пул с Job Declaration в production на июнь 2026.",
+        "metrics": [
+          "Блок #955 318 — первый production-блок Stratum V2 (25 июня 2026)"
+        ],
+        "links_to": ["bitcoin", "gomining", "stratum_v2"],
+        "notable": "CEO Alejandro De La Torre: 'GoMining объявил шаблон и включил платежи GoBTC Pay без пула на пути. Мы построили DMND именно для этого'."
+      },
+      "signal_refs": ["INF-2026-0625-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "gomining",
+      "name": "GoMining",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Топ-10 Bitcoin майнер по хешрейту — первый использовал Stratum V2 Job Declaration в production для включения транзакций собственного продукта",
+      "profile": {
+        "what": "Bitcoin майнинговая компания с токенизированным hashrate и собственным платёжным протоколом GoBTC Pay. 5 млн пользователей.",
+        "metrics": [
+          "Топ-10 по хешрейту",
+          "5 млн пользователей",
+          "Дата-центры в США и международно"
+        ],
+        "links_to": ["bitcoin", "dmnd", "stratum_v2"],
+        "notable": "Первый майнер использовавший Job Declaration в live production — включил транзакции GoBTC Pay в блок #955 318."
+      },
+      "signal_refs": ["INF-2026-0625-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "antalpha",
+      "name": "Antalpha (NASDAQ: ANTA)",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Nasdaq-листингованная BTC-финтех платформа — кредитование и supply chain для Bitcoin майнинга, тесно связана с Bitmain",
+      "profile": {
+        "what": "Финтех-платформа Antalpha Prime: BTC supply-chain финансирование и margin lending для Web3. Портфель BTC-кредитования ~$1.7 млрд.",
+        "metrics": [
+          "TVL кредитного портфеля $1.7 млрд (Q1 2026)",
+          "Выручка Q1 2026: $20.7 млн, +52% г/г",
+          "Supply-chain TVL Q1 2026: -25% г/г",
+          "IPO май 2025, цена $12.80/акция, привлечено ~$49.3 млн",
+          "Tether владеет 8.2% акций"
+        ],
+        "links_to": ["bitcoin", "bitmain", "bitplanet", "tether"],
+        "notable": "Ключевой финансовый посредник для Bitcoin майнинг-экосистемы. Мined BTC может использоваться как залог для хостинга и обслуживания оборудования."
+      },
+      "signal_refs": ["STR-2026-0625-001"],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "bitplanet",
+      "name": "Bitplanet",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Южнокорейская компания — строит BTC-казначейство через майнинг (модель DAT), а не рыночные покупки",
+      "profile": {
+        "what": "Южнокорейская компания в сфере AI-энергетической инфраструктуры: Bitcoin майнинг, GPU дистрибуция, AI дата-центры. Модель Digital Asset Treasury (DAT) — накопление BTC через производство.",
+        "metrics": [
+          "Инвестиции первой фазы: KRW 15 млрд (~$10.8 млн)",
+          "Цель: >7 BTC/мес, >80 BTC/год",
+          "Площадки: Оман и Парагвай"
+        ],
+        "links_to": ["bitcoin", "antalpha", "bitmain"],
+        "notable": "Первый известный корпоративный игрок строящий BTC-казначейство через майнинг (DAT модель) а не открытые покупки. Входит в майнинг при hashprice на минимумах."
+      },
+      "signal_refs": ["STR-2026-0625-001"],
+      "last_updated": "2026-06-26"
+    }
+  ]
+}

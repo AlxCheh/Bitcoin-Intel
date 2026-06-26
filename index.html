@@ -2798,8 +2798,7 @@ function renderEcosystem() {
   const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
 
   tabsEl.innerHTML = tabs.map(t =>
-    '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" ' +
-    'onclick="setEcoFilter('' + t.key + '')">' + t.label + '</button>'
+    '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" data-eco-filter="' + t.key + '">' + t.label + '</button>'
   ).join('');
 
   const filtered = ecoFilter === 'all'
@@ -2817,7 +2816,7 @@ function renderEcosystem() {
     const metrics = (e.profile?.metrics || []).slice(0, 2);
     const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || e.status;
     const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || e.type.toUpperCase();
-    return '<div class="eco-card" onclick="showEntityPopup('' + e.id + '')">'
+    return '<div class="eco-card" data-entity-id="' + e.id + '">'
       + '<div class="eco-card-head">'
       +   '<span class="eco-card-name">' + e.name + '</span>'
       +   '<div class="eco-card-badges">'
@@ -2835,6 +2834,12 @@ function setEcoFilter(key) {
   ecoFilter = key;
   renderEcosystem();
 }
+
+// Делегирование для eco-tabs
+document.addEventListener('click', function(ev) {
+  const tab = ev.target.closest('[data-eco-filter]');
+  if (tab) setEcoFilter(tab.getAttribute('data-eco-filter'));
+});
 
 // ── ENTITIES BASE ──────────────────────────────────────────────────────
 let ENTITIES = [];

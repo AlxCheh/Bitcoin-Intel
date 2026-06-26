@@ -167,7 +167,7 @@ header {
 }
 .cbar-btn {
   flex: 1;
-  padding: 14px 4px;
+  padding: 14px 2px;
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   background: transparent;
   border: none;
@@ -175,10 +175,17 @@ header {
   cursor: pointer;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
   transition: color 0.15s, border-color 0.15s;
+}
+.cbar-btn-sm {
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
 }
 .cbar-btn.active {
   color: var(--btc);
@@ -1322,7 +1329,7 @@ header {
 <div class="clusterbar">
   <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
   <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ECOSYSTEM</button>
-  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">FUNDAMENTAL</button>
+  <button class="cbar-btn cbar-btn-sm" id="cbar-macro" onclick="selectCluster('macro')">FUNDAMENTAL</button>
   <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
 </div>
 

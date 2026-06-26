@@ -2146,6 +2146,196 @@ function toggleNav(id) {
 
     <div class="panel" style="margin-top:12px">
       <div class="panel-head">
+        <span class="panel-title">Что такое деньги</span>
+        <span class="panel-tag">ТОНИ · 2019</span>
+      </div>
+
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Деньги — самый ликвидный товар на планете. Но большинство людей никогда не задумывались как они устроены. Это напрямую влияет на любое финансовое решение.
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">01</span>
+          <span class="acc-label">Три функции денег</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Деньги — инструмент для организации торговли. Чтобы выполнять эту роль, товар должен одновременно быть:</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО СБЕРЕЖЕНИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Хорошо хранить собственную ценность. Без этого никто не захочет держать деньги — они начнут тратить немедленно, экономика деградирует к бартеру.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО ОБМЕНА</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть востребованным при торговле. Чем больше участников готовы принять этот товар — тем лучшие это деньги.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ЕДИНИЦА ИСЧИСЛЕНИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть мерилом стоимости всего остального. Это финальная стадия — когда большинство участников измеряют цены именно в этом товаре.</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border:1px solid var(--line);font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Валюты (доллар, евро) выполняют только 2 из 3 функций — средство обмена и единица исчисления. Средством сбережения они не являются: их можно напечатать в любом количестве.
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">02</span>
+          <span class="acc-label">Шесть свойств денег</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">РЕДКОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Основа ценности. Без редкости товар не может сохранять стоимость. Золото — редко природно. Bitcoin — редко математически: ровно 21 млн, не больше никогда.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ВЗАИМОЗАМЕНЯЕМОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Каждая единица идентична любой другой. 1 BTC = 1 BTC. Бриллианты не взаимозаменяемы — каждый уникален, поэтому не могут быть деньгами.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ДЕЛИМОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Bitcoin делится до 8 знаков после запятой: 1 BTC = 100 000 000 сатоши. Золото физически неудобно делить для мелких покупок.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ТРАНСПОРТАБЕЛЬНОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">474 тонны золота из ФРС США в Германию транспортировались 4 года. Транзакция Bitcoin на $1 млрд заняла несколько часов и стоила $70.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ПРОЧНОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Цифровой актив не изнашивается. Bitcoin можно передавать бесконечное количество раз без деградации.</div>
+            </div>
+            <div style="padding:8px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ВЕРИФИЦИРУЕМОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Любой может в любой момент проверить сколько BTC существует, кому принадлежит и когда были созданы. Золото — нет: мы не знаем сколько золота в астероиде Psyche 16.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">03</span>
+          <span class="acc-label">История денег: от бартера к Bitcoin</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:56px;padding-top:2px">БАРТЕР</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Прямой обмен товарами. Проблема: нужно двойное совпадение желаний. Не масштабируется — количество цен растёт как n² от числа участников.</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:56px;padding-top:2px">КАМНИ ЯП</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Остров Яп: огромные каменные диски как деньги. Никуда не двигались — менялась лишь запись о владельце в памяти сообщества. Та же логика что у Bitcoin.</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:56px;padding-top:2px">ЗОЛОТО</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">~5000 лет денежного стандарта. Высокое S2F (запас/поток = 62). Проблема: сложно делить и транспортировать. Рим начал разбавлять монеты медью — первая «инфляция».</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:56px;padding-top:2px">ФИАТ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">1971 — Nixon shock: доллар отвязан от золота. Fiat с латыни — «да будет так». Дюжина чиновников решает сколько напечатать самого востребованного товара в мире. Зимбабве, Венесуэла — закономерный результат.</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:8px 0;align-items:flex-start">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:56px;padding-top:2px">BITCOIN</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Первый актив с исчисляемой цифровой редкостью. Делится на 100 млн сатоши. Транспортируется мгновенно. Не изнашивается. Верифицируется публично. S2F удваивается каждые ~4 года через халвинг.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">04</span>
+          <span class="acc-label">Bitcoin vs Золото vs Фиат</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
+              <tr style="border-bottom:1px solid var(--btc)">
+                <td style="padding:6px 8px;color:var(--dim);font-size:9px">СВОЙСТВО</td>
+                <td style="padding:6px 8px;color:var(--btc);text-align:center">BTC</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">ЗОЛОТО</td>
+                <td style="padding:6px 8px;color:var(--dim);text-align:center">ФИАТ</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Редкость</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Делимость</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Транспортабельность</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Верифицируемость</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Прочность</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Цензуроустойчивость</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
+              </tr>
+            </table>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+            Bitcoin превосходит золото и фиат по совокупности свойств. Это не мнение — это результат сравнения по объективным критериям. Bitcoin = деньги.
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">05</span>
+          <span class="acc-label">Асимметрия</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin молод — 17 лет против 5000 лет золота. Общая капитализация ~$1.2 трлн против десятков триллионов мировых денег. Активных пользователей — несколько сотен миллионов из 8 млрд.</p>
+          <p>Если Bitcoin действительно лучшие деньги — а по свойствам это так — то текущая капитализация составляет лишь малую долю от потенциальной. Соотношение возможного роста к возможным потерям асимметрично в пользу роста.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            «Каждый покупает Bitcoin по той цене, которую заслужил» — Тони, 21ideas.org
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ИСТОЧНИК: Тони · 21ideas.org · 2019 · <a href="https://21ideas.org/chto-takoe-dengi/" target="_blank" style="color:var(--btc);text-decoration:none">chto-takoe-dengi</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
         <span class="panel-title">Семь сетевых эффектов</span>
         <span class="panel-tag">ТРЕЙС МЕЙЕР · 2015</span>
       </div>

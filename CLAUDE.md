@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v4.9 · **Обновлено:** 2026-06-26
+> **Версия:** v5.0 · **Обновлено:** 2026-06-26
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -21,6 +21,7 @@
 | `SIGNALS.md` | Текстовая документация сигналов (читаемый архив) |
 | `STRUCTURE.md` | Архитектура, дизайн-система, навигация |
 | `CHANGELOG.md` | История версий CLAUDE.md |
+| `ENTITIES.json` | База артефактов: L2, протоколы, компании, фонды |
 
 ---
 
@@ -157,6 +158,50 @@
 | `supply_scarcity` | Дефицит предложения: потерянные монеты, эмиссия | 1 |
 
 > Новый кластер создаётся когда появляется 2+ сигнала с общим `tension` которого нет в существующих.
+
+---
+
+## База артефактов (ENTITIES.json)
+
+При разборе каждого сигнала Claude выявляет значимые сущности и обновляет `ENTITIES.json`.
+
+### Типы артефактов
+
+| type | Примеры |
+|------|---------|
+| `l2` | Stacks, Rootstock, Citrea, Botanix |
+| `protocol` | Lightning, Stratum V2, wBTC |
+| `corporate` | Strategy, GoMining, Bitplanet, Nakamoto |
+| `fund` | Polychain Capital, BlackRock, Fidelity |
+| `infrastructure` | Antalpha, Bitmain, Chainlink, DMND |
+| `exchange` | Coinbase, OKX, Arkham |
+
+### Схема объекта
+
+```json
+{
+  "id": "stacks",
+  "name": "Stacks",
+  "type": "l2",
+  "status": "active",
+  "summary": "Одна строка — суть сущности",
+  "profile": {
+    "what": "Что делает",
+    "metrics": ["ключевая метрика", "..."],
+    "links_to": ["bitcoin", "ethereum"],
+    "notable": "Ключевой факт или отличие"
+  },
+  "signal_refs": ["INF-2026-0609-001"],
+  "last_updated": "YYYY-MM-DD"
+}
+```
+
+### Правила обновления
+
+- **Новая сущность** → создать объект и добавить в `ENTITIES.json`
+- **Известная сущность** → обновить `profile` свежими данными + добавить `signal_ref` + обновить `last_updated`
+- **Критерий значимости** → сущность попадает в базу если упоминается в контексте сигнала как участник события, а не просто как сравнение
+- `status`: `active` / `closed` / `pending`
 
 ---
 

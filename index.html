@@ -186,6 +186,111 @@ header {
 }
 
 
+
+/* ══════════════════════════════════
+   ECOSYSTEM (ENTITIES)
+══════════════════════════════════ */
+.eco-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.eco-tabs::-webkit-scrollbar { display: none; }
+.eco-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.eco-tab.active { color: var(--btc); border-bottom-color: var(--btc); }
+
+.eco-list { padding: 0; }
+
+.eco-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.eco-card:last-child { border-bottom: none; }
+.eco-card:hover { background: var(--bg3); }
+
+.eco-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.eco-card-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt);
+  letter-spacing: 0.04em;
+}
+.eco-card-badges {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.eco-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 2px;
+  border: 1px solid var(--line2);
+  color: var(--dim);
+}
+.eco-badge.active  { color: var(--grn); border-color: rgba(90,158,114,0.3); }
+.eco-badge.closed  { color: var(--red); border-color: rgba(194,96,96,0.3); }
+.eco-badge.pending { color: var(--amber); border-color: rgba(200,168,75,0.3); }
+
+.eco-card-summary {
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.45;
+}
+.eco-card-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.eco-metric-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--slate);
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+.eco-empty {
+  padding: 24px 14px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+}
+
 /* ══════════════════════════════════
    ENTITY TOOLTIP
 ══════════════════════════════════ */
@@ -2300,6 +2405,15 @@ function toggleNav(id) {
       <span class="sh-title">⚙️ Технологии <span>Bitcoin</span></span>
     </div>
 
+    <div class="panel" style="margin-top:12px" id="eco-panel">
+      <div class="panel-head">
+        <span class="panel-title">Экосистема Bitcoin</span>
+        <span class="panel-tag" id="eco-count">—</span>
+      </div>
+      <div class="eco-tabs" id="eco-tabs"></div>
+      <div class="eco-list" id="eco-list"></div>
+    </div>
+
     <div class="panel" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Технические компоненты</span>
@@ -2659,6 +2773,68 @@ function toggleNav(id) {
 </section>
 
 <script>
+
+
+// ── ECOSYSTEM RENDER ──────────────────────────────────────────────────
+const ECO_TYPES = [
+  { key: 'all',            label: 'ВСЕ' },
+  { key: 'l2',             label: 'L2' },
+  { key: 'protocol',       label: 'ПРОТОКОЛЫ' },
+  { key: 'infrastructure', label: 'ИНФРА' },
+  { key: 'corporate',      label: 'КОРП' },
+  { key: 'fund',           label: 'ФОНДЫ' },
+];
+
+let ecoFilter = 'all';
+
+function renderEcosystem() {
+  const tabsEl  = document.getElementById('eco-tabs');
+  const listEl  = document.getElementById('eco-list');
+  const countEl = document.getElementById('eco-count');
+  if (!tabsEl || !listEl || !ENTITIES.length) return;
+
+  // Определяем какие типы реально есть
+  const presentTypes = new Set(ENTITIES.map(e => e.type));
+  const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
+
+  tabsEl.innerHTML = tabs.map(t =>
+    '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" ' +
+    'onclick="setEcoFilter('' + t.key + '')">' + t.label + '</button>'
+  ).join('');
+
+  const filtered = ecoFilter === 'all'
+    ? ENTITIES
+    : ENTITIES.filter(e => e.type === ecoFilter);
+
+  countEl.textContent = filtered.length + ' объект' + (filtered.length === 1 ? '' : filtered.length < 5 ? 'а' : 'ов');
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(e => {
+    const metrics = (e.profile?.metrics || []).slice(0, 2);
+    const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || e.status;
+    const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || e.type.toUpperCase();
+    return '<div class="eco-card" onclick="showEntityPopup('' + e.id + '')">'
+      + '<div class="eco-card-head">'
+      +   '<span class="eco-card-name">' + e.name + '</span>'
+      +   '<div class="eco-card-badges">'
+      +     '<span class="eco-badge">' + typeLabel + '</span>'
+      +     '<span class="eco-badge ' + e.status + '">' + statusLabel + '</span>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="eco-card-summary">' + e.summary + '</div>'
+      + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + m + '</span>').join('') + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function setEcoFilter(key) {
+  ecoFilter = key;
+  renderEcosystem();
+}
 
 // ── ENTITIES BASE ──────────────────────────────────────────────────────
 let ENTITIES = [];
@@ -3951,6 +4127,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
+  if (id === 'tech')       renderEcosystem();
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

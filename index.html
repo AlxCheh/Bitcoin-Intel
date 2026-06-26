@@ -1196,59 +1196,76 @@ header {
       </div>
     </div>
 
-    <!-- ══ БЛОК 2 + 2.2: КЛЮЧЕВЫЕ МЕТРИКИ + REALIZED PRICE ══ -->
+    <!-- ══ БЛОК 2: КЛЮЧЕВЫЕ МЕТРИКИ (вариант C) ══ -->
     <div style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
       <div class="chart-head" style="margin:0">
         <span class="chart-title">Ключевые метрики</span>
         <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
       </div>
-      <div class="dash-metrics" style="margin:0;border:none;border-top:1px solid var(--line);">
-      <div class="dash-m-cell">
-        <div class="dash-m-val" id="dash-price">—</div>
-        <div class="dash-m-lbl">ЦЕНА BTC</div>
-      </div>
-      <div class="dash-m-cell">
-        <div class="dash-m-val dash-m-warn" id="dash-cost">—</div>
-        <div class="dash-m-lbl">PROD. COST <span class="dash-m-est">~</span></div>
-      </div>
-      <div class="dash-m-cell">
-        <div class="dash-m-val" id="dash-gap">—</div>
-        <div class="dash-m-lbl">РАЗРЫВ</div>
-      </div>
-    </div>
-    <div class="dash-disclaimer">
-      ~ Production Cost — расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
+
+      <!-- СТРОКА 1: РАЗРЫВ — главный герой -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg2)">
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:4px">РАЗРЫВ К СЕБЕСТОИМОСТИ</div>
+          <div style="font-family:var(--mono);font-size:26px;font-weight:700" id="dash-gap">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.8">
+            Цена <span style="color:var(--txt)" id="dash-price-inline">—</span><br>
+            Себестоимость <span style="color:var(--txt)" id="dash-cost-inline">—</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Разделитель -->
-      <div style="border-top:1px solid var(--line)"></div>
-
-      <!-- Шапка с живым значением -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--line)">
+      <!-- СТРОКА 2: REALIZED PRICE -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg3)">
         <div>
           <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--dim);margin-bottom:4px">REALIZED PRICE</div>
-          <div style="display:flex;align-items:baseline;gap:10px">
+          <div style="display:flex;align-items:baseline;gap:8px">
             <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--txt)" id="rp-value">~$53 000</span>
             <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="rp-vs-market"></span>
           </div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4" id="rp-status-text">Средняя цена покупки всего предложения BTC по on-chain движению монеты</div>
         </div>
-        <div style="text-align:right">
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
           <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em;margin-bottom:4px">BTC / ЦЕНА</div>
           <div style="font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid var(--line);color:var(--dim)" id="rp-ratio">—</div>
         </div>
       </div>
 
-      <!-- Статусная строка -->
-      <div style="padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg3)">
-        <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5" id="rp-status-text">
-          Средняя цена покупки всего предложения BTC по последнему on-chain движению каждой монеты
+      <!-- СТРОКА 3: вспомогательные метрики -->
+      <div class="dash-metrics" style="margin:0;border:none;border-bottom:1px solid var(--line)">
+        <div class="dash-m-cell">
+          <div class="dash-m-val" id="dash-price">—</div>
+          <div class="dash-m-lbl">ЦЕНА BTC</div>
+        </div>
+        <div class="dash-m-cell">
+          <div class="dash-m-val dash-m-warn" id="dash-cost">—</div>
+          <div class="dash-m-lbl">PROD. COST <span class="dash-m-est">~</span></div>
+        </div>
+        <div class="dash-m-cell">
+          <div class="dash-m-val" id="dash-gap-aux">—</div>
+          <div class="dash-m-lbl">РАЗРЫВ</div>
         </div>
       </div>
 
-      <!-- Аккордеон: что такое и как считается -->
+      <!-- АККОРДЕОН 1: Production Cost -->
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('acc-prod-cost')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">~ ЧТО ТАКОЕ PRODUCTION COST</span>
+          <span id="arr-acc-prod-cost" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="acc-prod-cost" style="display:none;padding:10px 14px;background:var(--bg2)">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.7">
+            Расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
+          </div>
+        </div>
+      </div>
+
+      <!-- АККОРДЕОН 2: Как считается Realized Price -->
       <div style="border-bottom:1px solid var(--line)">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-explainer')">
-          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">КАК СЧИТАЕТСЯ</span>
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">КАК СЧИТАЕТСЯ REALIZED PRICE</span>
           <span id="arr-rp-explainer" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
         </div>
         <div id="rp-explainer" style="display:none;padding:12px 14px;background:var(--bg2)">
@@ -1264,7 +1281,7 @@ header {
         </div>
       </div>
 
-      <!-- Аккордеон: историческое значение -->
+      <!-- АККОРДЕОН 3: Исторические уровни дна -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-history')">
           <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">ИСТОРИЧЕСКИЕ УРОВНИ ДНА</span>
@@ -1301,7 +1318,7 @@ header {
         </div>
       </div>
 
-    </div><!-- /realized price inner -->
+    </div><!-- /ключевые метрики -->
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="price-chart-wrap" style="margin:0 16px 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
@@ -3454,16 +3471,29 @@ function renderDashboard() {
   const priceEl = document.getElementById('dash-price');
   const costEl  = document.getElementById('dash-cost');
   const gapEl   = document.getElementById('dash-gap');
-  if (priceEl && dashBtcPrice) {
-    priceEl.textContent = '$' + (dashBtcPrice >= 1000 ? (dashBtcPrice/1000).toFixed(1)+'K' : dashBtcPrice.toFixed(0));
-  }
-  if (costEl && dashProdCost) {
-    costEl.textContent = '$' + (dashProdCost/1000).toFixed(1) + 'K';
-  }
-  if (gapEl && dashBtcPrice && dashProdCost) {
+  const gapAux  = document.getElementById('dash-gap-aux');
+  const priceInline = document.getElementById('dash-price-inline');
+  const costInline  = document.getElementById('dash-cost-inline');
+
+  const fmtK = v => '$' + (v >= 1000 ? (v/1000).toFixed(1)+'K' : v.toFixed(0));
+
+  if (priceEl && dashBtcPrice) priceEl.textContent = fmtK(dashBtcPrice);
+  if (costEl  && dashProdCost) costEl.textContent  = fmtK(dashProdCost);
+  if (priceInline && dashBtcPrice) priceInline.textContent = fmtK(dashBtcPrice);
+  if (costInline  && dashProdCost) costInline.textContent  = fmtK(dashProdCost);
+
+  if (dashBtcPrice && dashProdCost) {
     const gap = ((dashBtcPrice - dashProdCost) / dashProdCost * 100);
-    gapEl.textContent = (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%';
-    gapEl.className = 'dash-m-val ' + (gap < 0 ? 'dash-m-neg' : gap < 15 ? 'dash-m-warn' : 'dash-m-up');
+    const gapStr = (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%';
+    const gapCls = gap < 0 ? 'dash-m-neg' : gap < 15 ? 'dash-m-warn' : 'dash-m-up';
+    if (gapEl) {
+      gapEl.textContent = gapStr;
+      gapEl.style.color = gap < 0 ? 'var(--red)' : gap < 15 ? 'var(--yel)' : 'var(--grn)';
+    }
+    if (gapAux) {
+      gapAux.textContent = gapStr;
+      gapAux.className = 'dash-m-val ' + gapCls;
+    }
   }
 
   // Обновляем Terminal price chart реальной ценой

@@ -199,6 +199,24 @@ header {
   scrollbar-width: none;
 }
 .eco-tabs::-webkit-scrollbar { display: none; }
+
+/* Золотая рамка для блоков в ТЕХНОЛОГИИ */
+#tab-tech .panel {
+  border: 1px solid rgba(247,147,26,0.22);
+  border-radius: 2px;
+}
+#tab-tech .panel-head {
+  border-bottom: 1px solid rgba(247,147,26,0.22);
+}
+#tab-tech .acc-item {
+  border-bottom: 1px solid rgba(247,147,26,0.12);
+}
+#tab-tech .acc-item:last-child {
+  border-bottom: none;
+}
+#tab-tech .acc-head:hover {
+  background: rgba(247,147,26,0.04);
+}
 .eco-tab {
   flex-shrink: 0;
   padding: 8px 14px;
@@ -224,11 +242,14 @@ header {
   gap: 4px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--line);
+  border-left: 1px solid rgba(247,147,26,0.2);
+  border-right: 1px solid rgba(247,147,26,0.2);
   cursor: pointer;
-  transition: background 0.12s;
+  transition: background 0.12s, border-color 0.15s;
 }
-.eco-card:last-child { border-bottom: none; }
-.eco-card:hover { background: var(--bg3); }
+.eco-card:first-child { border-top: 1px solid rgba(247,147,26,0.2); }
+.eco-card:last-child { border-bottom: 1px solid rgba(247,147,26,0.2); }
+.eco-card:hover { background: var(--bg3); border-color: rgba(247,147,26,0.45); }
 
 .eco-card-head {
   display: flex;
@@ -4141,7 +4162,7 @@ function updateCrumb(id) {
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
-  knowledge: { label: 'ECOSYSTEM', tabs: [['instruments','ИНСТРУМЕНТЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
+  knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
   macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };

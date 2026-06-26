@@ -3342,11 +3342,11 @@ function initPriceChart() {
       // Defs — two gradients: green (above mean) and red (below mean)
       const defs = svgEl('defs');
       const gradG = svgEl('linearGradient', { id: 'tc-grn', x1: '0', y1: '0', x2: '0', y2: '1' });
-      gradG.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.grn, 'stop-opacity': '0.28' }));
-      gradG.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.grn, 'stop-opacity': '0.04' }));
+      gradG.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.grn, 'stop-opacity': '0.45' }));
+      gradG.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.grn, 'stop-opacity': '0.10' }));
       const gradR = svgEl('linearGradient', { id: 'tc-red', x1: '0', y1: '0', x2: '0', y2: '1' });
-      gradR.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.red, 'stop-opacity': '0.04' }));
-      gradR.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.red, 'stop-opacity': '0.28' }));
+      gradR.appendChild(svgEl('stop', { offset: '0%', 'stop-color': C.red, 'stop-opacity': '0.10' }));
+      gradR.appendChild(svgEl('stop', { offset: '100%', 'stop-color': C.red, 'stop-opacity': '0.45' }));
       defs.appendChild(gradG); defs.appendChild(gradR); svg.appendChild(defs);
 
       // Grid lines + Y labels

@@ -3793,8 +3793,8 @@ function renderDashboard() {
       +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
       +   '<span style="color:var(--dim);font-size:8px">' + cnt + '</span>'
       + '</div>'
-      + '<div class="dash-narrative-text">' + macroText + '</div>'
-      + (tension ? '<div class="dash-narrative-tension">⚡ ' + tension + '</div>' : '')
+      + '<div class="dash-narrative-text">' + highlightEntities(macroText) + '</div>'
+      + (tension ? '<div class="dash-narrative-tension">⚡ ' + highlightEntities(tension) + '</div>' : '')
       + '<div class="dash-sum-counts" style="margin:5px 0">'
       +   '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>'
       +   '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>'

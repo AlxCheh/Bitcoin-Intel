@@ -22,8 +22,8 @@
   --txt:      #E8EDF5;
   --dim:      #7A8BA0;
   --dim2:     #2D3748;
-  --grn:      #22C55E;
-  --red:      #EF4444;
+  --grn:      #5A9E72;
+  --red:      #C26060;
   --blue:     #3B82F6;
   --mono:     'IBM Plex Mono', monospace;
   --sans:     'IBM Plex Sans', sans-serif;
@@ -1032,7 +1032,7 @@ header {
 .dct-seg.current::after {
   content: ''; position: absolute; right: -1px; top: -4px;
   width: 13px; height: 13px; border-radius: 50%;
-  background: var(--grn); box-shadow: 0 0 12px rgba(34,197,94,0.9);
+  background: var(--grn); box-shadow: 0 0 12px rgba(90,158,114,0.9);
 }
 .dash-cycle-labels {
   display: flex; justify-content: space-between;
@@ -1434,7 +1434,7 @@ header {
         </div>
         <div class="utxo-section-label">Выходы — создаём</div>
         <div class="utxo-row-item">
-          <div class="utxo-box" style="border-color:rgba(34,197,94,0.25)">
+          <div class="utxo-box" style="border-color:rgba(90,158,114,0.25)">
             <div class="utxo-addr">Bob</div>
             <div class="utxo-amt grn">0.8 BTC</div>
           </div>
@@ -1758,11 +1758,11 @@ header {
             </div>
             <div id="nav-premium" style="display:none;padding:12px;background:var(--bg2)">
               <div style="display:flex;gap:6px;margin-bottom:12px">
-                <div style="flex:1;padding:8px 10px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.05)">
+                <div style="flex:1;padding:8px 10px;border:1px solid rgba(90,158,114,0.3);background:rgba(90,158,114,0.05)">
                   <div style="font-family:var(--mono);font-size:7px;color:var(--grn);letter-spacing:0.1em;margin-bottom:4px">ПРЕМИЯ &gt; 1×</div>
                   <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5">Рынок платит за левередж и удобство доступа к BTC через акцию. Исторически 1.5–3× в 2020–2024. Позволяет Strategy выпускать новые инструменты выгодно.</div>
                 </div>
-                <div style="flex:1;padding:8px 10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)">
+                <div style="flex:1;padding:8px 10px;border:1px solid rgba(194,96,96,0.3);background:rgba(194,96,96,0.05)">
                   <div style="font-family:var(--mono);font-size:7px;color:var(--red);letter-spacing:0.1em;margin-bottom:4px">ДИСКОНТ &lt; 1×</div>
                   <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.5">Рынок считает что долги и обязательства съедают часть BTC-стоимости. ETF дают ту же BTC-экспозицию дешевле. Дисконт делает новые выпуски разводняющими.</div>
                 </div>
@@ -2645,8 +2645,8 @@ function initPriceChart() {
       dim:   CS.getPropertyValue('--dim').trim()   || '#7A8BA0',
       dim2:  CS.getPropertyValue('--dim2').trim()  || '#2D3748',
       btc:   CS.getPropertyValue('--btc').trim()   || '#F7931A',
-      grn:   CS.getPropertyValue('--grn').trim()   || '#22C55E',
-      red:   CS.getPropertyValue('--red').trim()   || '#EF4444',
+      grn:   CS.getPropertyValue('--grn').trim()   || '#5A9E72',
+      red:   CS.getPropertyValue('--red').trim()   || '#C26060',
       mono:  CS.getPropertyValue('--mono').trim()  || "'IBM Plex Mono', monospace",
     };
 
@@ -2875,7 +2875,7 @@ function initPriceChart() {
       chgEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(chg).toFixed(2) + '%';
       Object.assign(chgEl.style, {
         fontFamily: C.mono, color: accent, fontSize: '10px',
-        background: up ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+        background: up ? 'rgba(90,158,114,0.1)' : 'rgba(194,96,96,0.1)',
         padding: '2px 7px', borderRadius: '2px',
       });
 
@@ -3301,7 +3301,7 @@ function renderSignals() {
       + '<div class="sig-signal">' + s.signal + '</div>'
       + '<div class="sig-data">' + chips
       + (horizonLabel ? '<span class="sig-chip" style="'
-        + (s.horizon === 'short' ? 'color:var(--red);border-color:rgba(239,68,68,0.3)' :
+        + (s.horizon === 'short' ? 'color:var(--red);border-color:rgba(194,96,96,0.3)' :
            s.horizon === 'mid'   ? 'color:var(--amber);border-color:rgba(212,160,23,0.35)' :
            s.horizon === 'long'  ? 'color:var(--slate);border-color:rgba(74,93,117,0.4)' : 'opacity:.5')
         + '">⏱ ' + horizonLabel + '</span>' : '')
@@ -4070,7 +4070,7 @@ function updateRealizedPriceUI(rp) {
     if (ratioEl) {
       ratioEl.textContent = ratio.toFixed(2) + '×';
       ratioEl.style.color = above ? 'var(--grn)' : 'var(--red)';
-      ratioEl.style.borderColor = above ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+      ratioEl.style.borderColor = above ? 'rgba(90,158,114,0.3)' : 'rgba(194,96,96,0.3)';
     }
 
     if (vsEl) {
@@ -4696,9 +4696,9 @@ function renderAHolders() {
   const datasets = [
     { label: 'Individuals',   data: getVals('individuals'),  borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.08)', fill: true },
     { label: 'Lost & Satoshi',data: getVals('lost_satoshi'), borderColor: '#7A8BA0', backgroundColor: 'transparent' },
-    { label: 'Governments',   data: getVals('governments'),  borderColor: '#EF4444', backgroundColor: 'transparent' },
+    { label: 'Governments',   data: getVals('governments'),  borderColor: '#C26060', backgroundColor: 'transparent' },
     { label: 'Companies',     data: getVals('companies'),    borderColor: '#3B82F6', backgroundColor: 'transparent' },
-    { label: 'ETFs & Funds',  data: getVals('etfs'),         borderColor: '#22C55E', backgroundColor: 'transparent' }
+    { label: 'ETFs & Funds',  data: getVals('etfs'),         borderColor: '#5A9E72', backgroundColor: 'transparent' }
   ].map(d => ({ ...d, borderWidth: 1.5, tension: 0.3, pointRadius: 3, spanGaps: false }));
 
   const ctx = document.getElementById('holdersChart');

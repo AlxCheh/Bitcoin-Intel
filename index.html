@@ -4893,6 +4893,22 @@ function renderAHolders() {
 
 
 </script>
+
+<div class="ep-overlay" id="ep-overlay" onclick="closeEntityPopup()"></div>
+<div class="entity-popup" id="entity-popup">
+  <div class="ep-head">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="ep-name" id="ep-name"></span>
+      <span class="ep-type" id="ep-type"></span>
+    </div>
+    <button class="ep-close" onclick="closeEntityPopup()">✕</button>
+  </div>
+  <div class="ep-summary" id="ep-summary"></div>
+  <div class="ep-metrics" id="ep-metrics"></div>
+  <div id="ep-notable"></div>
+  <div class="ep-refs" id="ep-refs"></div>
+</div>
+
 </body>
 </html>
 

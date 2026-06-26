@@ -2690,16 +2690,23 @@ const TYPE_META = {
 function highlightEntities(text) {
   if (!ENTITIES || !ENTITIES.length) return text;
   let result = text;
-  // Сортируем по длине имени убыв — длинные сначала, чтобы не съесть подстроку
   const sorted = [...ENTITIES].sort((a, b) => b.name.length - a.name.length);
   sorted.forEach(e => {
-    // Экранируем спецсимволы regex в имени
     const escaped = e.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp('(' + escaped + ')', 'g');
-    result = result.replace(re, '<span class="entity-link" onclick="showEntityPopup(\''+e.id+'\')" data-entity="'+e.id+'">$1</span>');
+    result = result.replace(re, '<span class="entity-link" data-entity-id="' + e.id + '">$1</span>');
   });
   return result;
 }
+
+// Делегирование — один обработчик на весь документ
+document.addEventListener('click', function(ev) {
+  const el = ev.target.closest('[data-entity-id]');
+  if (el) {
+    ev.stopPropagation();
+    showEntityPopup(el.getAttribute('data-entity-id'));
+  }
+});
 
 function showEntityPopup(id) {
   const e = ENTITIES.find(x => x.id === id);

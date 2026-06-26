@@ -2668,6 +2668,11 @@ async function loadEntities() {
     const resp = await fetch('ENTITIES.json?v=' + Date.now());
     const data = await resp.json();
     ENTITIES = data.entities || [];
+    // Перерендериваем сигналы если они уже загружены
+    if (SIGNALS && SIGNALS.length) {
+      const marketTab = document.getElementById('tab-market');
+      if (marketTab && marketTab.classList.contains('active')) renderSignals();
+    }
   } catch(e) {
     console.error('ENTITIES.json load error:', e);
   }
@@ -3252,8 +3257,13 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const resp = await fetch('signals.json?v=' + Date.now());
-    const data = await resp.json();
+    const [sigResp, entResp] = await Promise.all([
+      fetch('signals.json?v=' + Date.now()),
+      fetch('ENTITIES.json?v=' + Date.now())
+    ]);
+    const data = await sigResp.json();
+    const entData = await entResp.json();
+    ENTITIES = entData.entities || [];
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
       SIGNALS = data;

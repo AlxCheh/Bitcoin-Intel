@@ -1322,7 +1322,7 @@ header {
 <div class="clusterbar">
   <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
   <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ECOSYSTEM</button>
-  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">MACRO</button>
+  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">FUNDAMENTAL</button>
   <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
 </div>
 
@@ -2134,6 +2134,131 @@ function toggleNav(id) {
 }
 </script>
 
+<section class="section" id="tab-theory">
+  <div class="page">
+
+    <div class="sh">
+      <span class="sh-title">⚡ Theory <span>Bitcoin</span></span>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Семь сетевых эффектов</span>
+        <span class="panel-tag">ТРЕЙС МЕЙЕР · 2015</span>
+      </div>
+
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Сетевые эффекты Bitcoin усиливают друг друга по нарастающей — каждый новый участник делает сеть ценнее для всех остальных. Любому конкуренту нужно превзойти все семь одновременно.
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">01</span>
+          <span class="acc-label">Спекуляция</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin — новый класс криптографически подкреплённых активов с потенциалом роста и высокой волатильностью. Это привлекает спекулянтов с высокой толерантностью к риску. Они создают первичную ликвидность и ценовое открытие — без этого не запускаются остальные эффекты.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Спекуляция → ликвидность → цена → стимул для майнеров → безопасность сети
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">02</span>
+          <span class="acc-label">Принятие бизнесами</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Бизнесы принимают Bitcoin потому что это увеличивает маржу: нет возвратных платежей, нет комиссий платёжных систем (2–3%), нет зависимости от банков. Каждый новый мерчант расширяет полезность сети для потребителей.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            2026: корпоративные казначейства как следующий уровень — бизнес не просто принимает BTC, но и держит его на балансе
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">03</span>
+          <span class="acc-label">Принятие потребителями</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Потребители получают доступ к товарам и услугам которые иначе недоступны: трансграничные переводы без банков, покупки несмотря на санкции и эмбарго, микроплатежи. Bitcoin повышает экономическую эффективность особенно в нишах где традиционная финансовая система неэффективна.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">04</span>
+          <span class="acc-label">Безопасность</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Принятие → рост цены → больше майнеров → выше хешрейт → дороже атака. Децентрализованный необратимый реестр — форма тройного бухучёта: дебет, кредит и публичное подтверждение в сети. Каждый новый участник делает систему безопаснее для всех.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Хешрейт июнь 2026: ~900 EH/s — исторический максимум несмотря на падение цены
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">05</span>
+          <span class="acc-label">Предпочтение разработчиков</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin — простая и предсказуемая сеть с элементарными правилами и открытым кодом. Децентрализованная природа допускает инновации без разрешения. Разработчики тянутся к Bitcoin потому что здесь самая глубокая ликвидность, самая высокая безопасность и самый консервативный протокол — именно то что нужно для финансовой инфраструктуры.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            L2 2026: Stacks, Rootstock, Citrea, Botanix — все строят на Bitcoin, не вокруг него
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">06</span>
+          <span class="acc-label">Финансирование</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin постепенно поглощает функции традиционных банков: денежные переводы, микроплатежи, p2p-кредитование, торговля активами. Институциональный капитал входит через ETF, корпоративные казначейства, суверенные резервы. Этот процесс необратим — деньги, однажды вошедшие в Bitcoin-инфраструктуру, не возвращаются в старую систему.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            2026: BlackRock IBIT, Fidelity FBTC, суверенные резервы США, Strategy 847K BTC — эффект 06 в действии
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">07</span>
+          <span class="acc-label">Мировая резервная валюта</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Логическое продолжение первых шести эффектов. Когда все транзакции — недвижимость, акции, валюты — рассчитываются через блокчейн, Bitcoin становится базовым расчётным слоем мировой экономики. Любому новому игроку нужно превзойти Bitcoin во всех семи областях одновременно. Это структурно невозможно.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Спекулятивная атака (Saifedean Ammous): страны с дешёвой энергией накапливают BTC → их валюта укрепляется → остальные вынуждены следовать
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ИСТОЧНИК: Трейс Мейер · WeUseCoins · 2015 · перевод 21ideas.org
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
 <section class="section" id="tab-history">
   <div class="page">
 
@@ -2285,7 +2410,7 @@ function toggleNav(id) {
 <!-- ══════════════════════════════════════
      MACRO / НАРРАТИВ
 ══════════════════════════════════════ -->
-<section class="section" id="tab-narrative">
+<section class="section" id="tab-narrative" style="display:none!important">
   <div class="page">
     <div class="sh">
       <span class="sh-title">📰 Нарратив <span>Bitcoin</span></span>
@@ -4162,7 +4287,7 @@ function updateCrumb(id) {
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
-  macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
+  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','THEORY'],['emission','ЭМИССИЯ'],['holders','ХОЛДЕРЫ'],['history','ИСТОРИЯ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };
 const TAB_TO_CLUSTER = {

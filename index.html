@@ -1509,7 +1509,7 @@ header {
 <!-- ══════════════════════════════════════
      BASICS
 ══════════════════════════════════════ -->
-<section class="section" id="tab-basics">
+<section class="section" id="tab-basics" style="display:none!important">
   <div class="page">
 
     <div class="sh">
@@ -2416,7 +2416,91 @@ function toggleNav(id) {
 
     <div class="panel" style="margin-top:12px">
       <div class="panel-head">
-        <span class="panel-title">Технические компоненты</span>
+        <span class="panel-title">Архитектура</span>
+        <span class="panel-tag">БАЗА</span>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">⛓</span>
+          <span class="acc-label">Блокчейн</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Блокчейн — публичная база данных всех транзакций. Каждый блок содержит транзакции, временну́ю метку и хэш предыдущего блока. Изменить один блок — значит пересчитать всю последующую цепочку.</p>
+          <div class="code">
+            <div><span class="c-cmt">// Структура блока</span></div>
+            <div><span class="c-key">Block</span> <span class="c-val">#850001</span> {</div>
+            <div>&nbsp; <span class="c-key">prev_hash</span>  <span class="c-str">"0000000000abc4f2..."</span></div>
+            <div>&nbsp; <span class="c-key">merkle_root</span> <span class="c-str">"d4e5f6a2..."</span></div>
+            <div>&nbsp; <span class="c-key">timestamp</span>  <span class="c-val">2024-04-20 14:32:07</span></div>
+            <div>&nbsp; <span class="c-key">nonce</span>      <span class="c-val">3,942,891</span></div>
+            <div>&nbsp; <span class="c-key">tx_count</span>   <span class="c-val">2,834</span></div>
+            <div>}</div>
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🔑</span>
+          <span class="acc-label">Ключи и адреса</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p><strong>Приватный ключ</strong> — секретное 256-битное число. Контролирует монеты.</p>
+          <p><strong>Публичный ключ</strong> генерируется из приватного через эллиптические кривые. Обратная операция вычислительно невозможна.</p>
+          <p><strong>Адрес</strong> — хэш публичного ключа.</p>
+          <div class="code">
+            <div><span class="c-cmt">// Цепочка генерации</span></div>
+            <div><span class="c-key">privKey</span> <span class="c-op">→ SECP256k1 →</span> <span class="c-key">pubKey</span></div>
+            <div><span class="c-key">pubKey</span>  <span class="c-op">→ SHA256 + RIPEMD160 →</span> <span class="c-key">addr</span></div>
+            <div style="margin-top:6px"><span class="c-val">"1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf"</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🪙</span>
+          <span class="acc-label">Модель UTXO</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin не хранит «баланс». Вместо этого — <strong>UTXO</strong> (Unspent Transaction Outputs): набор «монеток», адресованных твоему ключу. При трате уничтожаешь старые UTXO и создаёшь новые. Разница уходит майнеру как комиссия.</p>
+          <div class="utxo-diagram">
+            <div class="utxo-section-label">Входы — тратим</div>
+            <div class="utxo-row-item">
+              <div class="utxo-box">
+                <div class="utxo-addr">tx001:0 · Alice</div>
+                <div class="utxo-amt">1.5 BTC</div>
+              </div>
+              <div class="utxo-arrow-sym">→</div>
+              <div class="utxo-box" style="border-color:rgba(247,147,26,0.3);background:var(--btc-low)">
+                <div class="utxo-addr">Транзакция</div>
+                <div class="utxo-amt" style="font-size:10px;color:var(--dim)">Alice → Bob</div>
+              </div>
+            </div>
+            <div class="utxo-section-label">Выходы — создаём</div>
+            <div class="utxo-row-item">
+              <div class="utxo-box" style="border-color:rgba(90,158,114,0.25)">
+                <div class="utxo-addr">Bob</div>
+                <div class="utxo-amt grn">0.8 BTC</div>
+              </div>
+            </div>
+            <div class="utxo-row-item" style="margin-top:5px">
+              <div class="utxo-box">
+                <div class="utxo-addr">Alice · сдача</div>
+                <div class="utxo-amt">0.6999 BTC</div>
+              </div>
+            </div>
+            <div class="utxo-fee-note">Комиссия майнеру: 0.0001 BTC · разница входов и выходов</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Протоколы</span>
+        <span class="panel-tag">МЕХАНИКА</span>
       </div>
       <div class="acc-item">
         <div class="acc-head" onclick="toggleAcc(this)">
@@ -2437,17 +2521,7 @@ function toggleNav(id) {
           </div>
         </div>
       </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">🪙</span>
-          <span class="acc-label">Модель UTXO</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Bitcoin не хранит балансы. Существуют <strong>UTXO</strong> — неизрасходованные выходы транзакций. Твой баланс — сумма всех UTXO на твоих адресах.</p>
-          <p>При трате уничтожаешь старые UTXO и создаёшь новые. Разница уходит майнеру как комиссия. Транзакции можно проверять параллельно — это делает Bitcoin эффективнее Ethereum на базовом уровне.</p>
-        </div>
-      </div>
+
       <div class="acc-item">
         <div class="acc-head" onclick="toggleAcc(this)">
           <span class="acc-icon">🔐</span>
@@ -4067,7 +4141,7 @@ function updateCrumb(id) {
 
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
-  knowledge: { label: 'ECOSYSTEM', tabs: [['instruments','ИНСТРУМЕНТЫ'],['basics','ОСНОВЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
+  knowledge: { label: 'ECOSYSTEM', tabs: [['instruments','ИНСТРУМЕНТЫ'],['tech','ТЕХНОЛОГИИ'],['lightning','LIGHTNING']] },
   macro:     { label: 'MACRO',    tabs: [['history','ИСТОРИЯ'],['holders','ХОЛДЕРЫ'],['emission','ЭМИССИЯ'],['narrative','НАРРАТИВ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
 };

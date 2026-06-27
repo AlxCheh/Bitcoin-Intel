@@ -3745,13 +3745,22 @@ function renderDashStatus() {
     dateEl.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  // Фаза цикла — берём из существующих элементов
-  const phase = document.getElementById('dash-phase');
-  const ratio = document.getElementById('dash-ratio');
+  // Фаза цикла — из переменных (данные уже загружены)
   const statusPhase = document.getElementById('dash-status-phase');
   const statusRatio = document.getElementById('dash-status-ratio');
-  if (statusPhase && phase) statusPhase.textContent = phase.textContent || '—';
-  if (statusRatio && ratio) statusRatio.textContent = ratio.textContent || '—';
+  if (statusPhase) {
+    if (typeof dashBtcPrice !== 'undefined' && typeof dashProdCost !== 'undefined' && dashBtcPrice && dashProdCost) {
+      const { phase } = calcCyclePhase(dashBtcPrice, dashProdCost);
+      const ratio = (dashBtcPrice / dashProdCost).toFixed(2);
+      statusPhase.textContent = phase;
+      if (statusRatio) statusRatio.textContent = '×' + ratio + ' · Цена / Cost';
+    } else {
+      const phaseEl = document.getElementById('dash-phase');
+      const ratioEl = document.getElementById('dash-ratio');
+      if (phaseEl && phaseEl.textContent && phaseEl.textContent !== 'НАКОПЛЕНИЕ') statusPhase.textContent = phaseEl.textContent;
+      if (ratioEl && ratioEl.textContent) statusRatio && (statusRatio.textContent = ratioEl.textContent);
+    }
+  }
 
   // Фон сигналов
   if (!SIGNALS || !SIGNALS.length) return;
@@ -3903,7 +3912,10 @@ document.addEventListener('click', function(ev) {
   if (el) {
     ev.stopPropagation();
     showEntityPopup(el.getAttribute('data-entity-id'));
+    return;
   }
+  const goto = ev.target.closest('[data-goto]');
+  if (goto) showTab(goto.getAttribute('data-goto'), null);
 });
 
 function showEntityPopup(id) {

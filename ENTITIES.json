@@ -1,7 +1,7 @@
 {
   "meta": {
     "description": "База артефактов проекта Bitcoin-Intel. Сущности всплывающие при разборе сигналов.",
-    "total": 10,
+    "total": 12,
     "last_updated": "2026-06-26"
   },
   "entities": [
@@ -19,10 +19,20 @@
           "Нулевых инцидентов безопасности",
           "Дедлайн вывода активов — 9 июля 2026"
         ],
-        "links_to": ["bitcoin", "ethereum", "polychain_capital", "chainlink", "gmx", "morpho", "fireblocks"],
+        "links_to": [
+          "bitcoin",
+          "ethereum",
+          "polychain_capital",
+          "chainlink",
+          "gmx",
+          "morpho",
+          "fireblocks"
+        ],
         "notable": "Отказался от токен-инстентивов. Технически работал, но комиссионная выручка не покрывала операционные расходы. Постмортем: пользователи предпочли wBTC на Ethereum Bitcoin-нативному DeFi."
       },
-      "signal_refs": ["INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -37,10 +47,17 @@
           "~41% TVL Bitcoin L2 сектора",
           "30x рост пропускной способности BTC DeFi (июнь 2026)"
         ],
-        "links_to": ["bitcoin", "rootstock", "citrea"],
+        "links_to": [
+          "bitcoin",
+          "rootstock",
+          "citrea"
+        ],
         "notable": "Использует токен-инстентивы в отличие от Botanix. Продолжает работу на фоне закрытия конкурентов."
       },
-      "signal_refs": ["INF-2026-0620-001", "INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0620-001",
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -55,10 +72,16 @@
           "~40% TVL Bitcoin L2 сектора",
           "Работает с 2018 года"
         ],
-        "links_to": ["bitcoin", "stacks", "citrea"],
+        "links_to": [
+          "bitcoin",
+          "stacks",
+          "citrea"
+        ],
         "notable": "Вместе со Stacks контролирует ~81% TVL Bitcoin L2 — рынок сильно концентрирован вокруг двух игроков."
       },
-      "signal_refs": ["INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -70,10 +93,16 @@
       "profile": {
         "what": "Bitcoin rollup с фокусом на trust-minimized settlement. Позиционируется как альтернатива EVM-копированию — строит вокруг специфики Bitcoin, а не переносит Ethereum.",
         "metrics": [],
-        "links_to": ["bitcoin", "stacks", "rootstock"],
+        "links_to": [
+          "bitcoin",
+          "stacks",
+          "rootstock"
+        ],
         "notable": "CEO Orkun Mahir Kılıç о закрытии Botanix: 'провал не Bitcoin DeFi, а попытки скопировать EVM без уникального value proposition для BTC-держателей'."
       },
-      "signal_refs": ["INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -89,10 +118,17 @@
           "~2% от всего предложения BTC",
           "Доступен на Ethereum, Base, Arbitrum, Polygon, Solana, BNB"
         ],
-        "links_to": ["bitcoin", "ethereum", "stacks", "rootstock"],
+        "links_to": [
+          "bitcoin",
+          "ethereum",
+          "stacks",
+          "rootstock"
+        ],
         "notable": "Botanix в постмортеме признал: для lending, yield, leveraged exposure wBTC на зрелом general-purpose L2 достаточен большинству пользователей."
       },
-      "signal_refs": ["INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -104,10 +140,14 @@
       "profile": {
         "what": "Венчурный фонд специализирующийся на блокчейн и криптовалютных проектах. Один из пионеров институционального крипто-инвестирования.",
         "metrics": [],
-        "links_to": ["botanix"],
+        "links_to": [
+          "botanix"
+        ],
         "notable": "Инвестировал в Botanix — проект закрылся несмотря на поддержку топового фонда, что говорит о системной проблеме спроса, а не качества команды."
       },
-      "signal_refs": ["INF-2026-0609-001"],
+      "signal_refs": [
+        "INF-2026-0609-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -121,10 +161,16 @@
         "metrics": [
           "Блок #955 318 — первый production-блок Stratum V2 (25 июня 2026)"
         ],
-        "links_to": ["bitcoin", "gomining", "stratum_v2"],
+        "links_to": [
+          "bitcoin",
+          "gomining",
+          "stratum_v2"
+        ],
         "notable": "CEO Alejandro De La Torre: 'GoMining объявил шаблон и включил платежи GoBTC Pay без пула на пути. Мы построили DMND именно для этого'."
       },
-      "signal_refs": ["INF-2026-0625-001"],
+      "signal_refs": [
+        "INF-2026-0625-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -140,10 +186,16 @@
           "5 млн пользователей",
           "Дата-центры в США и международно"
         ],
-        "links_to": ["bitcoin", "dmnd", "stratum_v2"],
+        "links_to": [
+          "bitcoin",
+          "dmnd",
+          "stratum_v2"
+        ],
         "notable": "Первый майнер использовавший Job Declaration в live production — включил транзакции GoBTC Pay в блок #955 318."
       },
-      "signal_refs": ["INF-2026-0625-001"],
+      "signal_refs": [
+        "INF-2026-0625-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -161,10 +213,17 @@
           "IPO май 2025, цена $12.80/акция, привлечено ~$49.3 млн",
           "Tether владеет 8.2% акций"
         ],
-        "links_to": ["bitcoin", "bitmain", "bitplanet", "tether"],
+        "links_to": [
+          "bitcoin",
+          "bitmain",
+          "bitplanet",
+          "tether"
+        ],
         "notable": "Ключевой финансовый посредник для Bitcoin майнинг-экосистемы. Мined BTC может использоваться как залог для хостинга и обслуживания оборудования."
       },
-      "signal_refs": ["STR-2026-0625-001"],
+      "signal_refs": [
+        "STR-2026-0625-001"
+      ],
       "last_updated": "2026-06-26"
     },
     {
@@ -180,10 +239,67 @@
           "Цель: >7 BTC/мес, >80 BTC/год",
           "Площадки: Оман и Парагвай"
         ],
-        "links_to": ["bitcoin", "antalpha", "bitmain"],
+        "links_to": [
+          "bitcoin",
+          "antalpha",
+          "bitmain"
+        ],
         "notable": "Первый известный корпоративный игрок строящий BTC-казначейство через майнинг (DAT модель) а не открытые покупки. Входит в майнинг при hashprice на минимумах."
       },
-      "signal_refs": ["STR-2026-0625-001"],
+      "signal_refs": [
+        "STR-2026-0625-001"
+      ],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "metaplanet",
+      "name": "Metaplanet",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Японская публичная компания — крупнейший корпоративный держатель BTC в Азии, строит регулируемую продуктовую фабрику на Bitcoin-коллатерале",
+      "profile": {
+        "what": "BTC-казначейство + Project Nova: регулируемые BTC-linked продукты через дочернюю Siiibo Securities",
+        "metrics": [
+          "40 177 BTC ($2.41 млрд) — #3 в мире, #1 в Японии",
+          "mNAV < 1x (июнь 2026), акции −47% YTD",
+          "Нереализованный убыток $1.18 млрд, средняя цена входа $89 328",
+          "BTC Yield Q1 2026: 2.8%",
+          "TSE: 3350 / OTCQX: MTPLF"
+        ],
+        "links_to": [
+          "bitcoin",
+          "siiibo_securities"
+        ],
+        "notable": "Первое BTC-казначейство, купившее регуляторную лицензию для упаковки BTC в продукты — Project Nova: BTC-облигации, security tokens, preferred shares"
+      },
+      "signal_refs": [
+        "STR-2026-0626-001"
+      ],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "siiibo_securities",
+      "name": "Siiibo Securities",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Японская регулируемая облигационная платформа, приобретённая Metaplanet за $13 млн как инфраструктурный фундамент Project Nova",
+      "profile": {
+        "what": "Онлайн-платформа для выпуска и дистрибуции корпоративных облигаций с лицензией Type I Financial Instruments Business Operator (FSA Kanto No. 3230)",
+        "metrics": [
+          "40+ компаний-эмитентов, 100+ выпусков облигаций",
+          "Выручка ¥156 млн, убыток ¥175 млн (2025)",
+          "Приобретена за ¥2.1 млрд ($13 млн) — 0.5% от BTC-казначейства Metaplanet",
+          "Share transfer: 13 июля 2026, дочерняя компания: август 2026"
+        ],
+        "links_to": [
+          "metaplanet",
+          "bitcoin"
+        ],
+        "notable": "Лицензия Type I FIBO — единственный регулируемый канал в Японии для публичной дистрибуции Bitcoin-linked инструментов, доступ к рынку ¥1 000 трлн депозитов"
+      },
+      "signal_refs": [
+        "STR-2026-0626-001"
+      ],
       "last_updated": "2026-06-26"
     }
   ]

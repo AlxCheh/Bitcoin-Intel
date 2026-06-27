@@ -2475,6 +2475,217 @@ function toggleNav(id) {
 
     </div>
 
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Стратегия DCA</span>
+        <span class="panel-tag">SVETSKI · PLANB · 2020</span>
+      </div>
+
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Dollar Cost Averaging — покупать фиксированную сумму через равные промежутки времени вне зависимости от цены. Убирает эмоции, сглаживает волатильность, усредняет цену входа.
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">01</span>
+          <span class="acc-label">Почему не работает «купи дёшево»</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>«Покупай дёшево, продавай дорого» — мантра, которой следуют все. Менее 10% участников рынка делают это регулярно.</p>
+          <p>Причина: рынки — это отражение эмоций большинства. Когда всё растёт — люди покупают дороже из жадности. Когда падает — продают на дне из страха.</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">ЭМОЦИОНАЛЬНЫЙ ИНВЕСТОР</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает на хайпе → держит на просадке → продаёт на панике → пропускает восстановление. Итог: минус при растущем активе.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">DCA-ИНВЕСТОР</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает каждый месяц → на просадке получает больше BTC за те же деньги → на росте получает меньше. Эмоции исключены из уравнения.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">02</span>
+          <span class="acc-label">Как работает DCA</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Вместо одного крупного входа — серия равных покупок через фиксированные интервалы. Цена каждой покупки разная, итоговая средняя цена входа сглаживается.</p>
+          <div style="overflow-x:auto;margin-top:10px">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
+              <tr style="border-bottom:1px solid var(--btc)">
+                <td style="padding:6px 8px;color:var(--dim);font-size:9px">МЕСЯЦ</td>
+                <td style="padding:6px 8px;color:var(--btc);text-align:center">ЦЕНА BTC</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">СУММА</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">КУПЛЕНО BTC</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Янв</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">$100K</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.005</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Фев</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">$80K</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00625</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Мар</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">$60K</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00833</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;color:var(--dim2)">Апр</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">$90K</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00556</td>
+              </tr>
+            </table>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Потрачено $2000 → куплено 0.025 BTC → средняя цена $80K
+            Одноразовая покупка в январе по $100K: те же $2000 = 0.020 BTC
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">03</span>
+          <span class="acc-label">Шесть преимуществ</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">МЕНЬШЕ ПРИ РОСТЕ, БОЛЬШЕ ПРИ ПАДЕНИИ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Автоматически покупаешь больше BTC когда дёшево и меньше когда дорого — без анализа.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">НИЖЕ СРЕДНЯЯ ЦЕНА ВХОДА</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Итоговая средняя стоимость BTC в портфеле ниже чем при единоразовой покупке на пике.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">БЕЗ ЭМОЦИЙ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Решение принимается один раз в начале. Дальше — автоматика. FOMO и паника исключены.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">НЕ НУЖНА КРУПНАЯ СУММА</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Можно начать с $50 в месяц. Размер позиции наращивается постепенно.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">НЕТ СТРЕССА ОТ ТАЙМИРОВАНИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Не нужно угадывать «правильный момент». Рынок сам усредняет за тебя через время.</div>
+            </div>
+            <div style="padding:8px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">РАБОТАЕТ НА ВОЛАТИЛЬНЫХ АКТИВАХ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Чем выше волатильность — тем эффективнее DCA. Bitcoin идеален для этой стратегии.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">04</span>
+          <span class="acc-label">Модель PlanB: 1% в BTC</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Портфель из 1% BTC и 99% кэша превосходит традиционные активы по соотношению риск/доходность — даже если BTC упадёт на 99%, максимальные потери ограничены 1%.</p>
+          <div style="overflow-x:auto;margin-top:10px">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
+              <tr style="border-bottom:1px solid var(--btc)">
+                <td style="padding:6px 8px;color:var(--dim);font-size:9px">АКТИВ</td>
+                <td style="padding:6px 8px;color:var(--btc);text-align:center">ДОХОДНОСТЬ</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">МАКС. УБЫТОК</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Облигации</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">6%</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">-8%</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Золото</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">7.5%</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">-33%</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Акции</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">8%</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">-40%</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">BTC</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">200%</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">-80%</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;color:var(--btc)">1% BTC + 99% кэш</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">8%+</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">-1%</td>
+              </tr>
+            </table>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+            Увеличивай долю BTC по мере роста убеждённости и горизонта инвестирования. DCA позволяет наращивать позицию постепенно не беспокоясь о точке входа.
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">05</span>
+          <span class="acc-label">DCA подходит если...</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Ты инвестор, а не трейдер</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Нет крупной начальной суммы</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Горизонт 3+ лет</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Рынок волатилен — сейчас идеальное время для DCA</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Нет времени следить за графиками</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:5px 0;align-items:flex-start">
+              <span style="color:var(--grn);font-size:12px;flex-shrink:0">✓</span>
+              <span style="font-size:11px;color:var(--dim);line-height:1.5">Веришь в Bitcoin долгосрочно, но не хочешь зависеть от краткосрочных движений</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ИСТОЧНИК: Алекс Светски · PlanB · 21ideas.org · 2020 · <a href="https://21ideas.org/strategiya-dca/" target="_blank" style="color:var(--btc);text-decoration:none">strategiya-dca</a>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </section>
 

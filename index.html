@@ -323,6 +323,45 @@ header {
   color: var(--dim);
 }
 
+
+/* ══════════════════════════════════
+   THEORY STICKY NAV
+══════════════════════════════════ */
+.theory-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(247,147,26,0.3);
+  padding: 0 4px;
+}
+.theory-nav::-webkit-scrollbar { display: none; }
+.theory-nav-btn {
+  flex-shrink: 0;
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.theory-nav-btn:hover { color: var(--txt); }
+.theory-nav-btn.active {
+  color: var(--btc);
+  border-bottom-color: var(--btc);
+}
+.theory-anchor { scroll-margin-top: 36px; }
+
 /* ══════════════════════════════════
    ENTITY TOOLTIP
 ══════════════════════════════════ */
@@ -2170,7 +2209,14 @@ function toggleNav(id) {
       <span class="sh-title">⚡ Теория <span>Bitcoin</span></span>
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="theory-nav" id="theory-nav">
+      <button class="theory-nav-btn active" onclick="theoryScrollTo('theory-money')">ДЕНЬГИ</button>
+      <button class="theory-nav-btn" onclick="theoryScrollTo('theory-network')">СЕТЕВЫЕ ЭФФЕКТЫ</button>
+      <button class="theory-nav-btn" onclick="theoryScrollTo('theory-dca')">DCA</button>
+      <button class="theory-nav-btn" onclick="theoryScrollTo('theory-mnav')">mNAV</button>
+    </div>
+
+    <div class="panel theory-anchor" id="theory-money" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Что такое деньги</span>
         <span class="panel-tag">ТОНИ · 2019</span>
@@ -2360,7 +2406,7 @@ function toggleNav(id) {
 
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="panel theory-anchor" id="theory-network" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Семь сетевых эффектов</span>
         <span class="panel-tag">ТРЕЙС МЕЙЕР · 2015</span>
@@ -2475,7 +2521,7 @@ function toggleNav(id) {
 
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="panel theory-anchor" id="theory-dca" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Стратегия DCA</span>
         <span class="panel-tag">SVETSKI · PLANB · 2020</span>
@@ -2686,7 +2732,7 @@ function toggleNav(id) {
 
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="panel theory-anchor" id="theory-mnav" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">mNAV — механика BTC-казначейств</span>
         <span class="panel-tag">ИНСТИТУЦИОНАЛЬНЫЙ СЛОЙ</span>
@@ -4980,6 +5026,7 @@ function showTab(id, btn, keepCluster) {
   }
   if (id === 'holders')   renderHolders();
   if (id === 'tech')       renderEcosystem();
+  if (id === 'theory')     initTheoryScroll();
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

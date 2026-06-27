@@ -325,6 +325,44 @@ header {
 
 
 
+
+/* ══ DASH STATUS + TOP3 ══ */
+.dash-top3-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.dash-top3-item:last-child { border-bottom: none; }
+.dash-top3-item:hover { background: var(--bg3); }
+.dash-top3-dir {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  margin-top: 2px;
+}
+.dash-top3-dir.pos { color: var(--grn); }
+.dash-top3-dir.neg { color: var(--red); }
+.dash-top3-dir.neu { color: var(--dim); }
+.dash-top3-signal {
+  flex: 1;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--txt);
+  line-height: 1.4;
+}
+.dash-top3-meta {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* ══════════════════════════════════
    ENTITY TOOLTIP
 ══════════════════════════════════ */
@@ -1362,6 +1400,32 @@ header {
 ══════════════════════════════════════ -->
 <section class="section active" id="tab-home">
   <div class="page">
+
+    <!-- ══ БЛОК 0: СТАТУС ══ -->
+    <div id="dash-status-bar" style="margin:12px 16px 0;border:1px solid var(--btc);background:var(--bg2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)">
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--dim)">ТЕКУЩИЙ СТАТУС</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="dash-status-date">—</span>
+      </div>
+      <div style="display:flex;align-items:stretch;min-height:56px">
+        <!-- Фаза цикла -->
+        <div style="flex:1;padding:12px 14px;border-right:1px solid var(--line)">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:6px">ФАЗА ЦИКЛА</div>
+          <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--btc)" id="dash-status-phase">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px" id="dash-status-ratio">—</div>
+        </div>
+        <!-- Фон сигналов -->
+        <div style="flex:1;padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:6px">ФОН СИГНАЛОВ</div>
+          <div style="display:flex;align-items:center;gap:8px" id="dash-status-signals">
+            <span style="font-family:var(--mono);font-size:12px;color:var(--grn)" id="dash-status-pos">—↑</span>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--red)" id="dash-status-neg">—↓</span>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--dim)" id="dash-status-neu">—→</span>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px" id="dash-status-total">из — сигналов</div>
+        </div>
+      </div>
+    </div>
 
     <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
     <div class="dash-cycle">
@@ -3671,6 +3735,63 @@ function toggleNav(id) {
 <script>
 
 
+
+// ── DASH STATUS + TOP3 ────────────────────────────────────────────────
+function renderDashStatus() {
+  // Дата
+  const dateEl = document.getElementById('dash-status-date');
+  if (dateEl) {
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  // Фаза цикла — берём из существующих элементов
+  const phase = document.getElementById('dash-phase');
+  const ratio = document.getElementById('dash-ratio');
+  const statusPhase = document.getElementById('dash-status-phase');
+  const statusRatio = document.getElementById('dash-status-ratio');
+  if (statusPhase && phase) statusPhase.textContent = phase.textContent || '—';
+  if (statusRatio && ratio) statusRatio.textContent = ratio.textContent || '—';
+
+  // Фон сигналов
+  if (!SIGNALS || !SIGNALS.length) return;
+  const pos = SIGNALS.filter(s => s.dir === 'pos').length;
+  const neg = SIGNALS.filter(s => s.dir === 'neg').length;
+  const neu = SIGNALS.filter(s => s.dir === 'neu').length;
+  const total = SIGNALS.length;
+
+  const elPos = document.getElementById('dash-status-pos');
+  const elNeg = document.getElementById('dash-status-neg');
+  const elNeu = document.getElementById('dash-status-neu');
+  const elTotal = document.getElementById('dash-status-total');
+  if (elPos) elPos.textContent = pos + '↑';
+  if (elNeg) elNeg.textContent = neg + '↓';
+  if (elNeu) elNeu.textContent = neu + '→';
+  if (elTotal) elTotal.textContent = 'из ' + total + ' сигналов';
+
+  // ТОП-3 последних сигнала
+  renderDashTop3();
+}
+
+function renderDashTop3() {
+  const el = document.getElementById('dash-top3-list');
+  if (!el || !SIGNALS || !SIGNALS.length) return;
+
+  const DIR = { pos: '↑', neg: '↓', neu: '→' };
+  const top3 = [...SIGNALS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+
+  el.innerHTML = top3.map(s => {
+    const dir = s.dir || 'neu';
+    const arrow = DIR[dir] || '→';
+    const date = s.date ? s.date.slice(5).replace('-', '.') : '';
+    return '<div class="dash-top3-item" onclick="showTab('market', null)">'
+      + '<span class="dash-top3-dir ' + dir + '">' + arrow + '</span>'
+      + '<span class="dash-top3-signal">' + highlightEntities(s.signal) + '</span>'
+      + '<span class="dash-top3-meta">' + date + '</span>'
+      + '</div>';
+  }).join('');
+}
+
 // ── ECOSYSTEM RENDER ──────────────────────────────────────────────────
 const ECO_TYPES = [
   { key: 'all',            label: 'ВСЕ' },
@@ -4360,6 +4481,7 @@ async function loadSignals() {
       }
     }
     renderDashboard();
+    setTimeout(renderDashStatus, 600);
     const marketTab = document.getElementById('tab-market');
     if (marketTab && marketTab.classList.contains('active')) renderSignals();
   } catch(e) {

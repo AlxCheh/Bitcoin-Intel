@@ -3786,20 +3786,33 @@ function renderDashTop3() {
   const el = document.getElementById('dash-top3-list');
   if (!el || !SIGNALS || !SIGNALS.length) return;
 
-  const DIR = { pos: '↑', neg: '↓', neu: '→' };
+  const dirArrow = { pos: '↑', neg: '↓', neu: '→' };
   const top3 = [...SIGNALS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
-  el.innerHTML = top3.map(s => {
+  el.innerHTML = '';
+  top3.forEach(function(s) {
     const dir = s.dir || 'neu';
-    const arrow = DIR[dir] || '→';
+    const arrow = dirArrow[dir] || '→';
     const date = s.date ? s.date.slice(5).replace('-', '.') : '';
-    return '<div class="dash-top3-item" onclick="showTab('market', null)">'
-      + '<span class="dash-top3-dir ' + dir + '">' + arrow + '</span>'
-      + '<span class="dash-top3-signal">' + highlightEntities(s.signal) + '</span>'
-      + '<span class="dash-top3-meta">' + date + '</span>'
-      + '</div>';
-  }).join('');
+    const div = document.createElement('div');
+    div.className = 'dash-top3-item';
+    div.setAttribute('data-goto', 'market');
+    const sp1 = document.createElement('span');
+    sp1.className = 'dash-top3-dir ' + dir;
+    sp1.textContent = arrow;
+    const sp2 = document.createElement('span');
+    sp2.className = 'dash-top3-signal';
+    sp2.innerHTML = highlightEntities(s.signal);
+    const sp3 = document.createElement('span');
+    sp3.className = 'dash-top3-meta';
+    sp3.textContent = date;
+    div.appendChild(sp1);
+    div.appendChild(sp2);
+    div.appendChild(sp3);
+    el.appendChild(div);
+  });
 }
+
 
 // ── ECOSYSTEM RENDER ──────────────────────────────────────────────────
 const ECO_TYPES = [

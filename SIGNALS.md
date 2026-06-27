@@ -524,3 +524,41 @@
 - confirms: STR-2026-0622-007, STR-2026-0623-002
 - contradicts: STR-2026-0622-001
 - context_chain: STR-2026-0616-001
+
+---
+
+## NAR-2026-0626-001 · 📰 Нарратив · 2026-06-03
+
+**Сигнал:** Kalshi запустил первые в истории США CFTC-regulated crypto perps — BTCPERP живёт с 3 июня, BTC единственный с полным onshore-стеком
+
+**Данные:**
+- BTCPERP — первый regulated perpetual futures в США, торги с 3 июня 2026
+- CFTC Order for Approval 29 мая 2026 (KalshiEX LLC, Regulation 40.3)
+- 13 CFTC-approved perp контрактов на старте, нулевые комиссии при запуске
+- Офшорный рынок perps: $92.9 трлн в 2025 (рост с $28 трлн в 2023)
+- Kalshi оценён в $22 млрд (Series F, май 2026), annualized volume $178 млрд
+- Kraken: CFTC-regulated perps в течение 30 дней; Robinhood, Gemini — в очереди
+- Coinbase: no-action letter для роутинга через Бермуды — не onshore
+- Главный конкурент: Hyperliquid (DEX, no KYC, годы ликвидности форы)
+- CFTC: остальные perp контракты case-by-case, BTC одобрен первым
+
+**Контекст:** Offshore perps существуют с 2016 (BitMEX). За 10 лет вырос до $92.9 трлн — крупнейший инструмент в крипто, закрытый для американских институтов. BTC теперь имеет полный стек US-регулируемой инфраструктуры: spot ETF (янв 2024) → корпоративные казначейства → perp futures (июнь 2026). Hyperliquid — главная угроза: DEX без KYC с глубокой ликвидностью.
+
+**Оговорки:** Реальный приток определят глубина стакана, спреды и funding vs офшор. Дискуссия futures vs swaps не закрыта. Нулевые комиссии — временно. Расширение на другие токены — case-by-case.
+
+**Источник:** Kalshi / CFTC / CryptoSlate / Bitcoin Magazine / Fortune (май–июнь 2026)
+
+**Метки:** `pos` · `long` · `infrastructure` · `narrative` · `etf` · `inflow`
+
+**Кластер:** `btc_infrastructure_growth`
+
+**Tension:** США легализовали $90 трлн рынок perps через BTC-первым — vs Hyperliquid и офшор имеют годы форы по ликвидности, а спреды и funding решат реальный приток
+
+**Macro implication:** BTC закрепился как единственный актив с полным стеком американской регулируемой инфраструктуры: spot ETF → корпоративные казначейства → perp futures. Каждый новый слой увеличивает структурный спрос независимо от цикла
+
+**Narrative role:** `complication` — усложняет медвежий нарратив: в момент ETF-оттоков открывается новый $90 трлн канал
+
+**Связи:**
+- confirms: STR-2026-0616-001, STR-2026-0620-001
+- contradicts: STR-2026-0622-005
+- context_chain: STR-2026-0618-002

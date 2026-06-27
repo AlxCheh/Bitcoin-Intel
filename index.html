@@ -3943,28 +3943,72 @@ function synthesizeNarrativeAdvanced(key, cl) {
   else
     keyTakeaway = byWeight.map(s => s.macro_implication).find(Boolean) || '';
 
-  // ── Дедупликация: не показываем одно и то же дважды ─────────────
+  // ── Дедупликация ────────────────────────────────────────────────
   const dedupe = (a, b) => {
     if (!a || !b) return false;
     const wordsA = a.split(' ').filter(w => w.length > 5);
-    const overlap = wordsA.filter(w => b.includes(w)).length;
-    return overlap > 4;
+    return wordsA.filter(w => b.includes(w)).length > 4;
   };
 
-  // narrative = btcImpl (свежий + весомый) если не дублирует marketStructure
-  // иначе marketStructure
-  let narrative = (btcImpl && !dedupe(btcImpl, coreTension)) ? btcImpl : marketStructure;
+  // ── Связки для синтеза ───────────────────────────────────────────
+  const BRIDGES = {
+    'active-complication': [
+      'при этом', 'однако', 'но одновременно', 'в то время как', 'тогда как'
+    ],
+    'active-background': [
+      'на фоне', 'в условиях', 'несмотря на', 'вопреки'
+    ],
+    'tension-complication': [
+      'что усиливается', 'это усугубляется тем что', 'параллельно'
+    ],
+    'structural-background': [
+      'структурно', 'в долгосрочной перспективе', 'фундаментально'
+    ]
+  };
 
-  // takeaway — из complication если не дублирует narrative, иначе из chain[0]
-  let takeawayFull = '';
-  if (anchorComplication && anchorComplication.macro_implication
-      && !dedupe(anchorComplication.macro_implication, narrative)) {
-    takeawayFull = anchorComplication.macro_implication;
-  } else {
-    takeawayFull = chain[0] || narrative;
+  function getBridge(phaseKey, roleKey) {
+    const key = phaseKey + '-' + roleKey;
+    const arr = BRIDGES[key] || BRIDGES['active-complication'];
+    return arr[Math.floor(Math.abs(Math.sin(sigs.length * 7)) * arr.length)];
   }
-  // Обрезаем до одного предложения
-  keyTakeaway = takeawayFull.split(/[.!?]/)[0].trim();
+
+  // ── Синтез narrative из двух частей ─────────────────────────────
+  // Часть A: trigger или топ по weight
+  const partA = (anchorTrigger && anchorTrigger.macro_implication)
+    ? anchorTrigger.macro_implication.split(/[.!?]/)[0].trim()
+    : byWeight.map(s => s.macro_implication).find(Boolean) || '';
+
+  // Часть B: complication или complication с contradicts
+  const compWithContra = complications.find(s =>
+    s.links && s.links.contradicts && s.links.contradicts.length && s.macro_implication
+  ) || anchorComplication;
+
+  const partB = (compWithContra && compWithContra.macro_implication
+      && !dedupe(compWithContra.macro_implication, partA))
+    ? compWithContra.macro_implication.split(/[.!?]/)[0].trim()
+    : '';
+
+  // Склеиваем: A + связка + B
+  let narrative = '';
+  if (partA && partB) {
+    const bridge = getBridge(phase, 'complication');
+    narrative = partA + ' — ' + bridge + ' ' + partB.charAt(0).toLowerCase() + partB.slice(1);
+  } else {
+    narrative = partA || marketStructure;
+  }
+
+  // ── Takeaway: структурный вывод из resolution или btcImpl ────────
+  const takeawaySource = (anchorResolution && anchorResolution.macro_implication)
+    || btcImpl
+    || marketStructure;
+  keyTakeaway = takeawaySource.split(/[.!?]/)[0].trim();
+
+  // Не дублируем narrative
+  if (dedupe(keyTakeaway, narrative)) {
+    keyTakeaway = (btcImpl && !dedupe(btcImpl, narrative))
+      ? btcImpl.split(/[.!?]/)[0].trim()
+      : '';
+  }
 
   // ── signal_strength ──────────────────────────────────────────────
   const totalScore = sigs.reduce((acc, s) => {

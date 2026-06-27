@@ -1,7 +1,7 @@
 {
   "meta": {
     "description": "База артефактов проекта Bitcoin-Intel. Сущности всплывающие при разборе сигналов.",
-    "total": 12,
+    "total": 14,
     "last_updated": "2026-06-26"
   },
   "entities": [
@@ -299,6 +299,57 @@
       },
       "signal_refs": [
         "STR-2026-0626-001"
+      ],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "kalshi",
+      "name": "Kalshi",
+      "type": "exchange",
+      "status": "active",
+      "summary": "Первая в истории США CFTC-regulated биржа perpetual futures — запустила BTCPERP 3 июня 2026, эволюция от prediction market к деривативной бирже",
+      "profile": {
+        "what": "CFTC-regulated derivatives exchange: prediction markets + crypto perpetual futures. Первой в США получила одобрение CFTC на perp контракты (29 мая 2026)",
+        "metrics": [
+          "Оценка $22 млрд (Series F, май 2026) — рост с $2 млрд за год",
+          "Annualized volume $178 млрд (рост с $52 млрд за 6 месяцев)",
+          "Институциональный объём +800% за 6 месяцев",
+          "13 CFTC-approved perp контрактов на старте",
+          "Инвесторы: Coatue, Sequoia, a16z, Paradigm, Morgan Stanley, ARK"
+        ],
+        "links_to": [
+          "bitcoin",
+          "cftc"
+        ],
+        "notable": "Первая компания в истории США с regulated perpetual futures (CFTC Order 40.3, 29 мая 2026). BTC единственный с полным CFTC-одобрением — остальные токены case-by-case"
+      },
+      "signal_refs": [
+        "NAR-2026-0626-001"
+      ],
+      "last_updated": "2026-06-26"
+    },
+    {
+      "id": "hyperliquid",
+      "name": "Hyperliquid",
+      "type": "exchange",
+      "status": "active",
+      "summary": "Крупнейшая децентрализованная perp-биржа — главный офшорный конкурент Kalshi с годами форы по ликвидности и без KYC",
+      "profile": {
+        "what": "DEX perpetual futures без KYC и без экспирации. Работает вне US-юрисдикции, доминирует в офшорном рынке perps. Популярна среди нефтяных трейдеров и крипто-retail",
+        "metrics": [
+          "Капитализация удвоилась за 3 месяца (к маю 2026)",
+          "Офшорный perp рынок: $92.9 трлн годового объёма (2025)",
+          "Глубокая ликвидность, узкие спреды — конкурентное преимущество vs Kalshi",
+          "Нет KYC — доступна американским пользователям через VPN"
+        ],
+        "links_to": [
+          "bitcoin",
+          "kalshi"
+        ],
+        "notable": "Главный бенефициар закрытости US-рынка для perps 2016–2026. Вход Kalshi и Kraken создаёт первую регулируемую конкуренцию — исход зависит от спредов и funding rates"
+      },
+      "signal_refs": [
+        "NAR-2026-0626-001"
       ],
       "last_updated": "2026-06-26"
     }

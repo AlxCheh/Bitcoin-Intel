@@ -6,7 +6,7 @@
     "strategy_pref_obligations_usd": 4100000000,
     "meta_updated": "2026-06-25",
     "_note": "Обновлять strategy_btc_reserve при каждой новой покупке BTC компанией Strategy (после SEC 8-K)",
-    "total": 39
+    "total": 40
   },
   "signals": [
     {
@@ -1518,6 +1518,49 @@
       "cluster": "btc_treasury_competition",
       "tension": "Metaplanet строит регулируемую продуктовую фабрику на BTC-коллатерале при mNAV < 1x и $1.18 млрд нереализованного убытка — vs рынок не знает: это новый моат или leverage в регулируемой обёртке",
       "macro_implication": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход. Если модель Metaplanet работает — BTC становится базовым слоем для целой категории регулируемых финансовых инструментов"
+    },
+    {
+      "id": "NAR-2026-0626-001",
+      "date": "2026-06-03",
+      "cat": "narrative",
+      "catLabel": "📰 Нарратив",
+      "dir": "pos",
+      "horizon": "long",
+      "theme": "infrastructure",
+      "weight": "primary",
+      "actor": "etf",
+      "flow": "inflow",
+      "signal": "Kalshi запустил первые в истории США CFTC-regulated crypto perps — BTCPERP живёт с 3 июня, BTC единственный с полным onshore-стеком",
+      "data": [
+        "BTCPERP (Kalshi) — первый regulated perpetual futures в США, торги с 3 июня 2026",
+        "CFTC Order for Approval 29 мая 2026 (KalshiEX LLC, Regulation 40.3)",
+        "13 CFTC-approved perp контрактов на старте, нулевые комиссии в период запуска",
+        "Офшорный рынок perps: $92.9 трлн объём в 2025 (рост с $28 трлн в 2023)",
+        "Kalshi оценён в $22 млрд (Series F, май 2026), annualized volume $178 млрд",
+        "Kraken: CFTC-regulated perps в течение 30 дней; Robinhood, Gemini — в очереди",
+        "Coinbase: no-action letter для роутинга через бермудскую дочку — не onshore",
+        "Главный офшорный конкурент: Hyperliquid (DEX, no KYC, годы ликвидности форы)",
+        "CFTC: остальные perp контракты — case-by-case, BTC одобрен первым и единственным"
+      ],
+      "context": "Offshore perps существуют с 2016 (BitMEX запустил первый BTC perp). За 10 лет рынок вырос до $92.9 трлн — крупнейший торговый инструмент в крипто, полностью закрытый для американских институтов. CFTC председатель Selig (назначен Трампом) сигнализировал об открытии в марте 2026. Параллельно CFTC одновременно выдал no-action letter Coinbase для роутинга через Бермуды. Структурный контекст: BTC теперь имеет полный стек US-регулируемой инфраструктуры — spot ETF (янв 2024) → корпоративные казначейства → perp futures (июнь 2026). Hyperliquid — главная угроза: DEX с глубокой ликвидностью, без KYC, с годами форы.",
+      "caveat": "Реальный приток капитала onshore определят глубина стакана, спреды и funding rates BTCPERP vs офшор — на старте Kalshi проигрывает Hyperliquid по всем трём. Дискуссия futures vs swaps не закрыта: классификация влияет на розничный доступ, налоги и клиентские защиты. Нулевые комиссии — временная акция. Расширение на другие токены — case-by-case CFTC, временные рамки неизвестны.",
+      "source": "Kalshi / CFTC / CryptoSlate / Bitcoin Magazine / Fortune (май–июнь 2026)",
+      "links": {
+        "confirms": [
+          "STR-2026-0616-001",
+          "STR-2026-0620-001"
+        ],
+        "contradicts": [
+          "STR-2026-0622-005"
+        ],
+        "context_chain": [
+          "STR-2026-0618-002"
+        ]
+      },
+      "narrative_role": "complication",
+      "cluster": "btc_infrastructure_growth",
+      "tension": "США легализовали $90 трлн рынок perps через BTC-первым — vs Hyperliquid и офшор имеют годы форы по ликвидности, а спреды и funding решат реальный приток",
+      "macro_implication": "BTC закрепился как единственный актив с полным стеком американской регулируемой инфраструктуры: spot ETF → корпоративные казначейства → perp futures. Каждый новый слой увеличивает структурный спрос независимо от цикла"
     }
   ]
 }

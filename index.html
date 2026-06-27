@@ -363,6 +363,29 @@ header {
   margin-top: 2px;
 }
 
+
+/* ══ AI NARRATIVE ══ */
+.dash-narrative-takeaway {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--btc);
+  letter-spacing: 0.06em;
+  margin: 6px 0 4px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.ai-badge {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--bg);
+  background: var(--btc);
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 /* ══════════════════════════════════
    ENTITY TOOLTIP
 ══════════════════════════════════ */
@@ -3819,6 +3842,103 @@ function renderDashTop3() {
 }
 
 
+
+// ── AI NARRATIVE SYNTHESIS ────────────────────────────────────────────
+const AI_SYNTH_CACHE = {};  // key → {narrative, tension, macro, ts}
+const AI_SYNTH_TTL = 3600000; // 1 час
+
+const ANALYST_SYSTEM_PROMPT = `Ты профессиональный Bitcoin Macro Analyst. Специализируешься на выявлении структурных изменений в экосистеме Bitcoin.
+
+Твоя задача — НЕ пересказывать поступившие сигналы. Ты анализируешь их как единый организм.
+
+Правила:
+- Запрещено пересказывать сигналы по очереди
+- Запрещено копировать macro_implication дословно
+- Разрешено делать новые выводы и строить причинно-следственные связи
+- Всегда возвращайся к вопросу: что изменилось именно для Bitcoin?
+
+Ответь ТОЛЬКО валидным JSON без markdown-блоков и пояснений:
+{
+  "cluster_summary": "одно предложение — какой процесс развивается",
+  "core_tension": "главное противоречие внутри кластера — сформулируй самостоятельно",
+  "causal_chain": ["причина", "изменение", "следствие", "развитие процесса"],
+  "market_structure": "какое структурное изменение происходит в экосистеме Bitcoin",
+  "signal_strength": "weak|moderate|strong|structural",
+  "confidence": 0,
+  "btc_implication": "что это означает исключительно для Bitcoin",
+  "key_takeaway": "одно предложение которое пользователь должен запомнить"
+}`;
+
+async function synthesizeNarrativeAI(key, cl, fallbackSynthesis) {
+  // Проверяем кэш
+  const cached = AI_SYNTH_CACHE[key];
+  if (cached && (Date.now() - cached.ts < AI_SYNTH_TTL)) {
+    return cached;
+  }
+
+  const sigs = cl.signals;
+
+  // Формируем входные данные для Claude
+  const sigData = sigs.map(s => ({
+    signal: s.signal,
+    tension: s.tension || '',
+    macro_implication: s.macro_implication || '',
+    narrative_role: s.narrative_role || '',
+    weight: s.weight || '',
+    dir: s.dir || '',
+    date: s.date || '',
+    contradicts: (s.links && s.links.contradicts) || []
+  }));
+
+  const userPrompt = `Кластер: ${key}
+Сигналов: ${sigs.length} (pos:${cl.pos||0} neg:${cl.neg||0} neu:${cl.neu||0})
+
+Сигналы:
+${JSON.stringify(sigData, null, 2)}
+
+Проанализируй эти сигналы как единый организм и выдай JSON-ответ.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: ANALYST_SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content && data.content[0] && data.content[0].text;
+    if (!text) throw new Error('empty response');
+
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    const result = {
+      narrative: parsed.market_structure || parsed.cluster_summary || fallbackSynthesis.narrative,
+      tension:   parsed.core_tension || fallbackSynthesis.tension,
+      macro:     parsed.btc_implication || fallbackSynthesis.macro,
+      takeaway:  parsed.key_takeaway || '',
+      strength:  parsed.signal_strength || 'moderate',
+      causal:    parsed.causal_chain || [],
+      confidence: parsed.confidence || 0,
+      ts:        Date.now(),
+      source:    'ai'
+    };
+
+    AI_SYNTH_CACHE[key] = result;
+    return result;
+
+  } catch(e) {
+    console.warn('AI synthesis failed for', key, e);
+    return { ...fallbackSynthesis, source: 'fallback', ts: Date.now() };
+  }
+}
+
+
 // ── ECOSYSTEM RENDER ──────────────────────────────────────────────────
 const ECO_TYPES = [
   { key: 'all',            label: 'ВСЕ' },
@@ -5048,11 +5168,45 @@ function renderDashboard() {
     return item;
   }
 
-  // Рендерим все нарративы
+  // Рендерим нарративы — сначала fallback, потом AI-апгрейд
   shown.forEach(({ key, cl, score, weak }, idx) => {
-    const synthesis = synthesizeNarrative(key, cl);
-    const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
+    const fallback = synthesizeNarrative(key, cl);
+    // Показываем fallback сразу
+    const item = renderNarrativeItem(key, cl, score, weak, idx, fallback);
     listEl.appendChild(item);
+
+    // Апгрейдим через AI асинхронно
+    synthesizeNarrativeAI(key, cl, fallback).then(aiSynth => {
+      if (aiSynth.source === 'ai') {
+        // Обновляем tension и narrative в уже существующем элементе
+        const tensionEl = item.querySelector('.dash-narrative-tension');
+        const macroEl   = item.querySelector('.dash-narrative-macro');
+        if (tensionEl && aiSynth.tension) {
+          tensionEl.innerHTML = highlightEntities(aiSynth.tension);
+        }
+        if (macroEl && aiSynth.narrative) {
+          macroEl.innerHTML = highlightEntities(aiSynth.narrative);
+        }
+        // Добавляем key takeaway если есть
+        if (aiSynth.takeaway) {
+          const existing = item.querySelector('.dash-narrative-takeaway');
+          if (!existing) {
+            const tkEl = document.createElement('div');
+            tkEl.className = 'dash-narrative-takeaway';
+            tkEl.textContent = '→ ' + aiSynth.takeaway;
+            macroEl && macroEl.after(tkEl);
+          }
+        }
+        // Метка AI
+        const scoreEl = item.querySelector('.dash-narrative-score');
+        if (scoreEl && !item.querySelector('.ai-badge')) {
+          const badge = document.createElement('span');
+          badge.className = 'ai-badge';
+          badge.textContent = 'AI';
+          scoreEl.prepend(badge);
+        }
+      }
+    });
   });
 
   } // end if SIGNALS

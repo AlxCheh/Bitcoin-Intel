@@ -1318,7 +1318,12 @@ header {
   color: var(--dim); margin-bottom: 6px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.dash-narrative-cluster-name { color: var(--btc); }
+.dash-narrative-cluster-name {
+  color: var(--btc);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
 .dash-narrative-item.pos .dash-narrative-text { color: var(--grn); }
 .dash-narrative-item.neg .dash-narrative-text { color: var(--red); }
 .dash-narrative-item.neu .dash-narrative-text { color: var(--slate); }
@@ -1326,9 +1331,26 @@ header {
   font-family: var(--sans); font-size: 13px; font-weight: 500;
   color: var(--txt); line-height: 1.4; margin-bottom: 6px;
 }
+.dash-narrative-item {
+  padding: 14px 14px 10px;
+}
 .dash-narrative-tension {
-  font-family: var(--mono); font-size: 9px; color: var(--dim);
-  letter-spacing: 0.03em; margin-bottom: 7px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--txt);
+  line-height: 1.45;
+  border-left: 2px solid var(--btc);
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: rgba(247,147,26,0.04);
+}
+.dash-narrative-macro {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
 }
 .dash-signal.neg { border-left-color: var(--red); }
 .dash-signal.neu { border-left-color: var(--dim); }
@@ -4996,12 +5018,12 @@ function renderDashboard() {
     if (idx > 0) item.style.borderTop = '1px solid var(--line)';
 
     item.innerHTML =
-        '<div class="dash-narrative-cluster" style="margin-bottom:6px">'
+        '<div class="dash-narrative-cluster" style="margin-bottom:8px">'
       +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
-      +   '<span style="color:var(--dim);font-size:8px">' + cnt + '</span>'
+      +   '<span style="color:var(--dim);font-size:8px;margin-left:8px">' + cnt + '</span>'
       + '</div>'
-      + '<div class="dash-narrative-text">' + highlightEntities(macroText) + '</div>'
-      + (tension ? '<div class="dash-narrative-tension">⚡ ' + highlightEntities(tension) + '</div>' : '')
+      + (tension ? '<div class="dash-narrative-tension">' + highlightEntities(tension) + '</div>' : '')
+      + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + '<div class="dash-sum-counts" style="margin:5px 0">'
       +   '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>'
       +   '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>'

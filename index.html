@@ -1403,26 +1403,26 @@ header {
 
     <!-- ══ БЛОК 0: СТАТУС ══ -->
     <div id="dash-status-bar" style="margin:12px 16px;border:1px solid var(--btc);background:var(--bg2)">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)">
-        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--dim)">ТЕКУЩИЙ СТАТУС</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="dash-status-date">—</span>
-      </div>
-      <div style="display:flex;align-items:stretch;min-height:56px">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--dim);padding:8px 14px 0">ТЕКУЩИЙ СТАТУС</div>
+      <div style="display:flex;align-items:stretch">
         <!-- Фаза цикла -->
-        <div style="flex:1;padding:12px 14px;border-right:1px solid var(--line)">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:6px">ФАЗА ЦИКЛА</div>
-          <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--btc)" id="dash-status-phase">—</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px" id="dash-status-ratio">—</div>
+        <div style="flex:1;padding:8px 14px 12px;border-right:1px solid var(--line);text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--dim);margin-bottom:4px">ФАЗА</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--btc)" id="dash-status-phase">—</div>
+        </div>
+        <!-- Ratio -->
+        <div style="flex:1;padding:8px 14px 12px;border-right:1px solid var(--line);text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--dim);margin-bottom:4px">ЦЕНА / COST</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--txt)" id="dash-status-ratio">—</div>
         </div>
         <!-- Фон сигналов -->
-        <div style="flex:1;padding:12px 14px">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:6px">ФОН СИГНАЛОВ</div>
-          <div style="display:flex;align-items:center;gap:8px" id="dash-status-signals">
-            <span style="font-family:var(--mono);font-size:12px;color:var(--grn)" id="dash-status-pos">—↑</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--red)" id="dash-status-neg">—↓</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--dim)" id="dash-status-neu">—→</span>
+        <div style="flex:1;padding:8px 14px 12px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--dim);margin-bottom:4px">СИГНАЛЫ</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--grn)" id="dash-status-pos">—↑</span>
+            <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)" id="dash-status-neg">—↓</span>
+            <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--dim)" id="dash-status-neu">—→</span>
           </div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px" id="dash-status-total">из — сигналов</div>
         </div>
       </div>
     </div>
@@ -3739,13 +3739,6 @@ function toggleNav(id) {
 
 // ── DASH STATUS + TOP3 ────────────────────────────────────────────────
 function renderDashStatus() {
-  // Дата
-  const dateEl = document.getElementById('dash-status-date');
-  if (dateEl) {
-    const now = new Date();
-    dateEl.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
   // Фаза цикла — из переменных (данные уже загружены)
   const statusPhase = document.getElementById('dash-status-phase');
   const statusRatio = document.getElementById('dash-status-ratio');
@@ -3754,7 +3747,7 @@ function renderDashStatus() {
       const { phase } = calcCyclePhase(dashBtcPrice, dashProdCost);
       const ratio = (dashBtcPrice / dashProdCost).toFixed(2);
       statusPhase.textContent = phase;
-      if (statusRatio) statusRatio.textContent = '×' + ratio + ' · Цена / Cost';
+      if (statusRatio) statusRatio.textContent = '×' + ratio;
     } else {
       const phaseEl = document.getElementById('dash-phase');
       const ratioEl = document.getElementById('dash-ratio');
@@ -3777,7 +3770,7 @@ function renderDashStatus() {
   if (elPos) elPos.textContent = pos + '↑';
   if (elNeg) elNeg.textContent = neg + '↓';
   if (elNeu) elNeu.textContent = neu + '→';
-  if (elTotal) elTotal.textContent = 'из ' + total + ' сигналов';
+  // total не отображаем
 
   // ТОП-3 последних сигнала
   renderDashTop3();

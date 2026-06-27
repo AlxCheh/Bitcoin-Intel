@@ -2686,6 +2686,204 @@ function toggleNav(id) {
 
     </div>
 
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">mNAV — механика BTC-казначейств</span>
+        <span class="panel-tag">ИНСТИТУЦИОНАЛЬНЫЙ СЛОЙ</span>
+      </div>
+
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          mNAV (market Net Asset Value) — ключевой показатель для оценки публичных BTC-казначейств. Определяет режим работы всей модели: аккреция или разводнение. Понимание mNAV объясняет почему Strategy, Metaplanet и другие делают те или иные ходы.
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">01</span>
+          <span class="acc-label">Что такое mNAV</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>mNAV показывает насколько рынок оценивает компанию относительно стоимости её Bitcoin-резервов.</p>
+          <div style="background:var(--bg3);border:1px solid var(--btc);padding:12px 14px;margin:10px 0;text-align:center">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-bottom:6px">ФОРМУЛА</div>
+            <div style="font-family:var(--mono);font-size:13px;color:var(--btc)">mNAV = (Капитализация + Долг − Кэш) ÷ Стоимость BTC</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">mNAV &gt; 1x — ПРЕМИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Рынок платит больше чем стоит BTC внутри. Инвесторы верят в модель и будущие покупки. Любая эмиссия акций аккретивна — компания продаёт акции дороже чем стоит её BTC и покупает ещё.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">mNAV = 1x — ПАРИТЕТ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция стоит ровно столько сколько BTC внутри. Нейтральная точка — ни аккреция ни разводнение.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">mNAV &lt; 1x — ДИСКОНТ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция дешевле чем BTC внутри. Эмиссия разводняет — компания продаёт $1 BTC за $0.90. Та же машина работает в обратную сторону. Strategy в июне 2026: 0.83x.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">02</span>
+          <span class="acc-label">Почему возникает премия</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Инвесторы платят премию сверх стоимости BTC по нескольким причинам одновременно:</p>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ЛИКВИДНОСТЬ И ДОСТУПНОСТЬ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Пенсионные фонды, страховые компании и многие институты не могут напрямую купить BTC — но могут купить акцию на бирже. Акция = регулируемый доступ к BTC-экспозиции.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ВСТРОЕННОЕ КРЕДИТНОЕ ПЛЕЧО</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Компания берёт долг и покупает BTC. Акционер получает экспозицию больше чем 1:1 к BTC. При росте BTC акция растёт быстрее — встроенный леверидж без маржин-колла.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ДОВЕРИЕ К МЕНЕДЖМЕНТУ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Рынок платит за то что команда будет продолжать покупать BTC и увеличивать BTC per share. Это опцион на будущие покупки — он стоит денег.</div>
+            </div>
+            <div style="padding:8px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">НАРРАТИВНАЯ ПРЕМИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Strategy в 2021–2024 торговалась по 2–3x mNAV. Часть премии — вера что модель станет стандартом. Когда нарратив ослабевает — премия сжимается.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">03</span>
+          <span class="acc-label">Машина аккреции: как работает при премии</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>При mNAV > 1x включается маховик накопления:</p>
+          <div style="background:var(--bg3);border:1px solid var(--line);padding:12px;margin:10px 0;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            <div style="color:var(--btc);margin-bottom:6px">ЦИКЛ АККРЕЦИИ (mNAV &gt; 1x)</div>
+            <div>1. Акция торгуется с премией к BTC</div>
+            <div>2. Компания выпускает новые акции по рыночной цене</div>
+            <div>3. На привлечённые деньги покупает BTC</div>
+            <div>4. BTC per share растёт — премия сохраняется</div>
+            <div>5. → вернуться к шагу 1</div>
+          </div>
+          <div style="padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+            Strategy провела этот цикл сотни раз в 2021–2024. При каждой эмиссии по 2x mNAV она фактически покупала BTC вдвое дешевле рынка за счёт инвесторов платящих премию.
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">04</span>
+          <span class="acc-label">Дисконт: когда машина ломается</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>При mNAV < 1x та же механика работает против акционеров:</p>
+          <div style="background:var(--bg3);border:1px solid var(--line);padding:12px;margin:10px 0;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            <div style="color:var(--red);margin-bottom:6px">ЦИКЛ РАЗВОДНЕНИЯ (mNAV &lt; 1x)</div>
+            <div>1. Акция торгуется дешевле BTC внутри</div>
+            <div>2. Любая эмиссия продаёт $1 BTC за $0.90</div>
+            <div>3. BTC per share падает — дисконт усиливается</div>
+            <div>4. Новая эмиссия ещё более разводняет</div>
+            <div>5. → спираль вниз</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">BUYBACK КАК ВЫХОД</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">При mNAV < 1x обратный выкуп акций = покупка BTC по дисконту. Metaplanet рассматривал buyback при mNAV 0.90x в июне 2026 именно по этой логике.</div>
+            </div>
+            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ПРОДУКТОВЫЙ БИЗНЕС КАК ВЫХОД</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Metaplanet купил Siiibo Securities: комиссионный доход от BTC-продуктов не зависит от mNAV. Это второй движок независимый от цикла премии.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">05</span>
+          <span class="acc-label">BTC Yield — главный KPI</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>BTC Yield — не процент и не дивиденд. Это рост BTC на одну акцию в процентах за период.</p>
+          <div style="background:var(--bg3);border:1px solid var(--btc);padding:12px 14px;margin:10px 0;text-align:center">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-bottom:6px">ФОРМУЛА</div>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--btc)">BTC Yield = (BTC per share сейчас − BTC per share раньше) ÷ BTC per share раньше</div>
+          </div>
+          <p>Положительный BTC Yield означает что на каждую акцию приходится больше BTC чем раньше — даже если цена BTC упала. Это единственное что важно для долгосрочного держателя акции казначейства.</p>
+          <div style="overflow-x:auto;margin-top:10px">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
+              <tr style="border-bottom:1px solid var(--btc)">
+                <td style="padding:6px 8px;color:var(--dim);font-size:9px">КОМПАНИЯ</td>
+                <td style="padding:6px 8px;color:var(--btc);text-align:center">BTC</td>
+                <td style="padding:6px 8px;color:var(--amber);text-align:center">mNAV</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">BTC YIELD</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Strategy</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">847 363</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">0.83x</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">~15% YTD</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--line)">
+                <td style="padding:6px 8px;color:var(--dim2)">Metaplanet</td>
+                <td style="padding:6px 8px;color:var(--txt);text-align:center">40 177</td>
+                <td style="padding:6px 8px;color:var(--red);text-align:center">&lt;1x</td>
+                <td style="padding:6px 8px;color:var(--grn);text-align:center">2.8% Q1</td>
+              </tr>
+            </table>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+            mNAV может быть ниже 1x, а BTC Yield — положительным одновременно. Strategy в июне 2026: дисконт к NAV, но BTC per share растёт. Это разные измерения разных вещей.
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">06</span>
+          <span class="acc-label">Как читать mNAV при анализе сигналов</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ЭМИССИЯ АКЦИЙ → ПРОВЕРЬ mNAV</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">При mNAV > 1x — бычий сигнал, аккреция. При mNAV < 1x — медвежий, разводнение. Контекст мгновенно меняет интерпретацию одного и того же действия.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ПОКУПКА BTC КОМПАНИЕЙ → СМОТРИ ИСТОЧНИК ФИНАНСИРОВАНИЯ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Долг при mNAV > 1x = аккретивно. Долг при mNAV < 1x = риск. Кэш из операционного дохода = нейтрально при любом mNAV.</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">BUYBACK → СИГНАЛ ДНА ИЛИ УВЕРЕННОСТИ</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Компания выкупает акции при mNAV < 1x = покупает собственный BTC по дисконту. Сильный сигнал уверенности менеджмента в долгосрочной стоимости.</div>
+            </div>
+            <div style="padding:8px 0">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">mNAV ВСЕГО СЕКТОРА → ТЕРМОМЕТР НАРРАТИВА</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Если Strategy, Metaplanet и другие одновременно уходят ниже 1x — рынок разочарован моделью в целом. Если только один — проблема конкретной компании.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ПРИМЕНЕНИЕ: кластеры strategy_model_stress · btc_treasury_competition в базе сигналов
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </section>
 

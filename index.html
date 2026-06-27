@@ -3943,9 +3943,6 @@ function synthesizeNarrativeAdvanced(key, cl) {
   else
     keyTakeaway = byWeight.map(s => s.macro_implication).find(Boolean) || '';
 
-  // Обрезаем до одного предложения
-  keyTakeaway = keyTakeaway.split(/[.!?]/)[0].trim();
-
   // ── Дедупликация: не показываем одно и то же дважды ─────────────
   const dedupe = (a, b) => {
     if (!a || !b) return false;
@@ -3954,10 +3951,20 @@ function synthesizeNarrativeAdvanced(key, cl) {
     return overlap > 4;
   };
 
-  let narrative = marketStructure;
-  if (!dedupe(narrative, btcImpl) && btcImpl && btcImpl !== narrative) {
-    // narrative остаётся как есть — btcImpl идёт в macro
+  // narrative = btcImpl (свежий + весомый) если не дублирует marketStructure
+  // иначе marketStructure
+  let narrative = (btcImpl && !dedupe(btcImpl, coreTension)) ? btcImpl : marketStructure;
+
+  // takeaway — из complication если не дублирует narrative, иначе из chain[0]
+  let takeawayFull = '';
+  if (anchorComplication && anchorComplication.macro_implication
+      && !dedupe(anchorComplication.macro_implication, narrative)) {
+    takeawayFull = anchorComplication.macro_implication;
+  } else {
+    takeawayFull = chain[0] || narrative;
   }
+  // Обрезаем до одного предложения
+  keyTakeaway = takeawayFull.split(/[.!?]/)[0].trim();
 
   // ── signal_strength ──────────────────────────────────────────────
   const totalScore = sigs.reduce((acc, s) => {
@@ -3977,7 +3984,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
   return {
     narrative,
     tension:    coreTension,
-    macro:      btcImpl,
+    macro:      marketStructure,
     takeaway:   keyTakeaway,
     strength,
     causal:     chain,

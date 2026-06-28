@@ -3902,7 +3902,8 @@ function synthesizeNarrativeAdvanced(key, cl) {
     const contraId = sA.links && sA.links.contradicts && sA.links.contradicts[0];
     const sB = contraId ? sigs.find(s => s.id === contraId) : byContra[1];
     if (sB && sB.macro_implication && sB.macro_implication !== sA.macro_implication) {
-      coreTension = sA.macro_implication.split(/\.\s/)[0] + ' — vs — ' + sB.macro_implication.split(/\.\s/)[0];
+      const sAtext = sA.macro_implication.split(/\.\s/)[0];
+      coreTension = sAtext.charAt(0).toUpperCase() + sAtext.slice(1) + ' — vs — ' + sB.macro_implication.split(/\.\s/)[0];
     }
   }
 
@@ -5149,7 +5150,7 @@ function renderDashboard() {
     const label  = CLUSTER_LABELS[key] || key.toUpperCase();
     const cnt    = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
     const macroText = synthesis.narrative || '—';
-    const tension   = synthesis.tension || '';
+    const tension   = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '';
     // synthesis доступен для takeaway и strength
 
     const item = document.createElement('div');

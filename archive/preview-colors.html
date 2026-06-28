@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Варианты цвета · Bitcoin Intel</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --btc: #F7931A; --btc-low: rgba(247,147,26,0.08);
+  --bg:  #0C0F14; --bg2: #111520; --bg3: #171D2B;
+  --line:#242A38; --line2:#2E3648;
+  --txt: #E8EDF5; --dim: #7A8BA0; --dim2:#2D3748;
+  --grn: #22C55E; --red: #EF4444;
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);padding:16px 16px 48px;}
+
+.top-bar{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim);
+  padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+.top-bar span{color:var(--btc);}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:7px 14px;
+  cursor:pointer;border:1px solid var(--line);background:var(--bg3);color:var(--dim);
+  transition:.15s;}
+.tab.active{border-color:var(--btc);color:var(--btc);background:var(--btc-low);}
+
+.variant{display:none;}
+.variant.active{display:block;}
+
+.v-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--btc);margin-bottom:4px;}
+.v-desc{font-family:var(--sans);font-size:11px;color:var(--dim);margin-bottom:14px;line-height:1.5;}
+
+.card{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--line2);
+  margin-bottom:8px;padding:13px 15px;}
+.card.pos{border-left-color:var(--grn);}
+.card.neg{border-left-color:var(--red);}
+.card.neu{border-left-color:var(--dim);}
+
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:6px;flex-wrap:wrap;}
+.card-cat{font-family:var(--mono);font-size:8px;letter-spacing:.08em;color:var(--dim);}
+.card-date{font-family:var(--mono);font-size:8px;color:var(--dim);margin-left:auto;}
+.card-dir{font-family:var(--mono);font-size:8px;}
+.card.pos .card-dir{color:var(--grn);}
+.card.neg .card-dir{color:var(--red);}
+.card.neu .card-dir{color:var(--dim);}
+
+.sig{font-family:var(--sans);font-size:13px;font-weight:500;line-height:1.4;margin-bottom:8px;}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{font-family:var(--mono);font-size:8px;padding:3px 7px;
+  background:var(--bg3);border:1px solid var(--line2);color:var(--dim);}
+.chip.dim{opacity:.5;}
+
+/* Variant A */
+.va .card.pos .sig{color:var(--grn);}
+.va .card.neg .sig{color:var(--red);}
+.va .card.neu .sig{color:var(--txt);}
+/* Variant B */
+.vb .sig{color:#A8C4E0;}
+/* Variant C */
+.vc .sig{color:var(--btc);}
+/* Variant D */
+.vd .sig{color:#C9A84C;}
+/* Variant E */
+.ve .sig{color:var(--txt);background:var(--bg3);border-radius:3px;
+  padding:4px 8px;display:block;margin-left:-8px;margin-right:-8px;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">BITCOIN INTEL · <span>ВАРИАНТЫ ЦВЕТА ЗАГОЛОВКА СИГНАЛА</span></div>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('a',this)">A</div>
+  <div class="tab" onclick="show('b',this)">B</div>
+  <div class="tab" onclick="show('c',this)">C</div>
+  <div class="tab" onclick="show('d',this)">D</div>
+  <div class="tab" onclick="show('e',this)">E</div>
+</div>
+
+<!-- A -->
+<div class="variant va active" id="v-a">
+  <div class="v-label">A — ЦВЕТ ПО НАПРАВЛЕНИЮ</div>
+  <div class="v-desc">Позитив → зелёный · Негатив → красный · Нейтрал → белый</div>
+  <div class="card pos">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-23</span><span class="card-dir">🟢 ПОЗИТИВ</span></div>
+    <div class="sig">Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC</div>
+    <div class="chips"><span class="chip">759 BTC / $50M</span><span class="chip">резерв 19 864 BTC</span><span class="chip dim">⏱ СРЕДНЕСРОК</span></div>
+  </div>
+  <div class="card neg">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-19</span><span class="card-dir">🔴 НЕГАТИВ</span></div>
+    <div class="sig">GBTC возглавил недельный отток $227 млн из BTC-ETF — часть рекордной серии $4,4 млрд за 13 дней</div>
+    <div class="chips"><span class="chip">отток $226,8 млн</span><span class="chip">серия 13 дней</span><span class="chip dim">⏱ КРАТКОСРОК</span></div>
+  </div>
+  <div class="card neu">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-16</span><span class="card-dir">⚪ НЕЙТРАЛ</span></div>
+    <div class="sig">BlackRock запустил BITA — первый Bitcoin ETF с доходностью 15–25% через продажу колл-опционов</div>
+    <div class="chips"><span class="chip">доходность 15–25%</span><span class="chip">активы ~$10,5 млн</span><span class="chip dim">⏱ ДОЛГОСРОК</span></div>
+  </div>
+</div>
+
+<!-- B -->
+<div class="variant vb" id="v-b">
+  <div class="v-label">B — ГОЛУБОЙ #A8C4E0</div>
+  <div class="v-desc">Единый приглушённый голубой. Аналитический, холодный тон.</div>
+  <div class="card pos">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-23</span><span class="card-dir">🟢 ПОЗИТИВ</span></div>
+    <div class="sig">Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC</div>
+    <div class="chips"><span class="chip">759 BTC / $50M</span><span class="chip">резерв 19 864 BTC</span><span class="chip dim">⏱ СРЕДНЕСРОК</span></div>
+  </div>
+  <div class="card neg">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-19</span><span class="card-dir">🔴 НЕГАТИВ</span></div>
+    <div class="sig">GBTC возглавил недельный отток $227 млн из BTC-ETF — часть рекордной серии $4,4 млрд за 13 дней</div>
+    <div class="chips"><span class="chip">отток $226,8 млн</span><span class="chip">серия 13 дней</span><span class="chip dim">⏱ КРАТКОСРОК</span></div>
+  </div>
+  <div class="card neu">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-16</span><span class="card-dir">⚪ НЕЙТРАЛ</span></div>
+    <div class="sig">BlackRock запустил BITA — первый Bitcoin ETF с доходностью 15–25% через продажу колл-опционов</div>
+    <div class="chips"><span class="chip">доходность 15–25%</span><span class="chip">активы ~$10,5 млн</span><span class="chip dim">⏱ ДОЛГОСРОК</span></div>
+  </div>
+</div>
+
+<!-- C -->
+<div class="variant vc" id="v-c">
+  <div class="v-label">C — ОРАНЖЕВЫЙ #F7931A</div>
+  <div class="v-desc">Фирменный биткоин-цвет. Максимальный акцент на заголовке.</div>
+  <div class="card pos">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-23</span><span class="card-dir">🟢 ПОЗИТИВ</span></div>
+    <div class="sig">Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC</div>
+    <div class="chips"><span class="chip">759 BTC / $50M</span><span class="chip">резерв 19 864 BTC</span><span class="chip dim">⏱ СРЕДНЕСРОК</span></div>
+  </div>
+  <div class="card neg">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-19</span><span class="card-dir">🔴 НЕГАТИВ</span></div>
+    <div class="sig">GBTC возглавил недельный отток $227 млн из BTC-ETF — часть рекордной серии $4,4 млрд за 13 дней</div>
+    <div class="chips"><span class="chip">отток $226,8 млн</span><span class="chip">серия 13 дней</span><span class="chip dim">⏱ КРАТКОСРОК</span></div>
+  </div>
+  <div class="card neu">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-16</span><span class="card-dir">⚪ НЕЙТРАЛ</span></div>
+    <div class="sig">BlackRock запустил BITA — первый Bitcoin ETF с доходностью 15–25% через продажу колл-опционов</div>
+    <div class="chips"><span class="chip">доходность 15–25%</span><span class="chip">активы ~$10,5 млн</span><span class="chip dim">⏱ ДОЛГОСРОК</span></div>
+  </div>
+</div>
+
+<!-- D -->
+<div class="variant vd" id="v-d">
+  <div class="v-label">D — ЗОЛОТО #C9A84C</div>
+  <div class="v-desc">Между белым и оранжевым. Ощущение «важного», не агрессивно.</div>
+  <div class="card pos">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-23</span><span class="card-dir">🟢 ПОЗИТИВ</span></div>
+    <div class="sig">Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC</div>
+    <div class="chips"><span class="chip">759 BTC / $50M</span><span class="chip">резерв 19 864 BTC</span><span class="chip dim">⏱ СРЕДНЕСРОК</span></div>
+  </div>
+  <div class="card neg">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-19</span><span class="card-dir">🔴 НЕГАТИВ</span></div>
+    <div class="sig">GBTC возглавил недельный отток $227 млн из BTC-ETF — часть рекордной серии $4,4 млрд за 13 дней</div>
+    <div class="chips"><span class="chip">отток $226,8 млн</span><span class="chip">серия 13 дней</span><span class="chip dim">⏱ КРАТКОСРОК</span></div>
+  </div>
+  <div class="card neu">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-16</span><span class="card-dir">⚪ НЕЙТРАЛ</span></div>
+    <div class="sig">BlackRock запустил BITA — первый Bitcoin ETF с доходностью 15–25% через продажу колл-опционов</div>
+    <div class="chips"><span class="chip">доходность 15–25%</span><span class="chip">активы ~$10,5 млн</span><span class="chip dim">⏱ ДОЛГОСРОК</span></div>
+  </div>
+</div>
+
+<!-- E -->
+<div class="variant ve" id="v-e">
+  <div class="v-label">E — БЕЛЫЙ + ПОДЛОЖКА</div>
+  <div class="v-desc">Текст белый, контраст через тёмный фон под заголовком.</div>
+  <div class="card pos">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-23</span><span class="card-dir">🟢 ПОЗИТИВ</span></div>
+    <div class="sig">Strive (ASST) купила 759 BTC за $50 млн — за неделю больше чем Strategy, резерв 19 864 BTC</div>
+    <div class="chips"><span class="chip">759 BTC / $50M</span><span class="chip">резерв 19 864 BTC</span><span class="chip dim">⏱ СРЕДНЕСРОК</span></div>
+  </div>
+  <div class="card neg">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-19</span><span class="card-dir">🔴 НЕГАТИВ</span></div>
+    <div class="sig">GBTC возглавил недельный отток $227 млн из BTC-ETF — часть рекордной серии $4,4 млрд за 13 дней</div>
+    <div class="chips"><span class="chip">отток $226,8 млн</span><span class="chip">серия 13 дней</span><span class="chip dim">⏱ КРАТКОСРОК</span></div>
+  </div>
+  <div class="card neu">
+    <div class="card-top"><span class="card-cat">🏦 ИНСТИТУЦИОНАЛЫ</span><span class="card-date">2026-06-16</span><span class="card-dir">⚪ НЕЙТРАЛ</span></div>
+    <div class="sig">BlackRock запустил BITA — первый Bitcoin ETF с доходностью 15–25% через продажу колл-опционов</div>
+    <div class="chips"><span class="chip">доходность 15–25%</span><span class="chip">активы ~$10,5 млн</span><span class="chip dim">⏱ ДОЛГОСРОК</span></div>
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -3980,10 +3980,15 @@ function synthesizeNarrativeAdvanced(key, cl) {
     : byWeight.map(s => s.macro_implication).find(Boolean) || '';
 
   // Часть B: complication или complication с contradicts
-  const compWithContra = [...complications].sort((a,b) =>
-    ((b.links&&b.links.contradicts&&b.links.contradicts.length)||0) -
-    ((a.links&&a.links.contradicts&&a.links.contradicts.length)||0)
-  ).find(s => s.macro_implication) || anchorComplication;
+  const compWithContra = [...complications].sort((a,b) => {
+    const ca = (a.links&&a.links.contradicts&&a.links.contradicts.length)||0;
+    const cb = (b.links&&b.links.contradicts&&b.links.contradicts.length)||0;
+    if (cb !== ca) return cb - ca;
+    const wa = WEIGHT_RANK[a.weight]||0;
+    const wb = WEIGHT_RANK[b.weight]||0;
+    if (wb !== wa) return wb - wa;
+    return new Date(b.date) - new Date(a.date);
+  }).find(s => s.macro_implication) || anchorComplication;
 
   const partB = (compWithContra && compWithContra.macro_implication
       && !dedupe(compWithContra.macro_implication, partA))

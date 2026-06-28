@@ -144,3 +144,152 @@ LEGACY_LINKS_ENABLED = True   # False после завершения мигра
 #   "tension"  → есть tension, нет полного narrative      → renderTensionOnly
 #   "full"     → все поля заполнены                       → renderFullCard
 NARRATIVE_RENDER_STATES = ("empty", "tension", "full")
+
+# ─── Error Handling Philosophy (P1 §1) ───────────────────────────────────────
+#
+# FAIL LOUD (raise исключение) когда:
+#   - Входные данные нарушают инвариант (невалидный ID, отсутствует обязательное поле)
+#   - Системная ошибка без обхода (disk full, lock timeout)
+#   - Нарушение архитектурного контракта
+#
+# DEGRADE GRACEFULLY (log WARNING + return default) когда:
+#   - Один сигнал из кластера повреждён → пропустить, синтезировать без него
+#   - synthesis_cache устарел → перестроить на лету
+#   - relationships.json отсутствует → работать с links.* (LEGACY_LINKS_ENABLED)
+#   - Одно необязательное поле невалидно → логировать, использовать NULL_DEFAULT
+#
+# НИКОГДА:
+#   - except: pass  (молчаливое поглощение исключений)
+#   - продолжать запись если файл повреждён при чтении
+
+ERROR_PHILOSOPHY = "fail_loud_on_boundary__degrade_gracefully_inside"
+LOCK_TIMEOUT_SECONDS = 5
+
+# ─── Component Initialization Order (P1 §4) ──────────────────────────────────
+#
+# При запуске любого скрипта соблюдать порядок:
+#   1. assert_deterministic_env()      — проверить PYTHONHASHSEED
+#   2. assert_required_files_exist()   — signals.json, ENTITIES.json
+#   3. load ontology через параметр    — передавать в функции, не singleton
+#   4. Инициализировать компонент
+#   5. EventLog(EVENTS_LOG_PATH)       — готов к записи
+#
+# DEPENDENCY INJECTION RULE:
+#   ✅ def synthesize(cluster, signals, ontology: dict)  — тестируемо
+#   ❌ ontology = json.load(open("ontology.json"))       — глобальный singleton
+
+INITIALIZATION_ORDER = [
+    "assert_deterministic_env",
+    "assert_required_files_exist",
+    "load_ontology_via_parameter",
+    "init_component",
+    "init_event_log",
+]
+
+SYNTHESIS_STORE_PATH = "synthesis_store"
+
+
+def assert_required_files_exist() -> None:
+    """Проверяет наличие критических файлов перед запуском."""
+    missing = [p for p in [SIGNALS_PATH, ENTITIES_PATH] if not os.path.exists(p)]
+    if missing:
+        raise FileNotFoundError(
+            f"Required files missing: {missing}. "
+            f"Run from project root or check file paths in config/settings.py"
+        )
+
+
+# ─── Duplicate Signal Policy (P1 §6) ─────────────────────────────────────────
+#
+# Дубликат по ID → DuplicateSignalError (FAIL LOUD, блокирует запись)
+# Похожий сигнал (date + actor + cluster) → WARNING (не блокирует)
+#
+# Два сигнала про одно событие с разными источниками — ЛЕГАЛЬНЫ.
+# Аналитик осознанно добавляет оба для кросс-верификации.
+
+DUPLICATE_WARNING_FIELDS = ["date", "actor", "cluster"]
+
+# ─── Null Handling Rules (P2 §12) ────────────────────────────────────────────
+#
+# Правило в коде:
+#   signal.get("tension") or ""      — текстовые поля
+#   signal.get("data") or []         — списки
+#   signal.get("confidence") or 0.5  — числа
+#   signal.get("actor") or "unknown" — enum необязательные
+
+NULL_DEFAULTS: dict = {
+    "tension":           "",
+    "context":           "",
+    "caveat":            "",
+    "macro_implication": "",
+    "data":              [],
+    "links": {
+        "confirms":      [],
+        "contradicts":   [],
+        "context_chain": [],
+    },
+    "confidence": 0.5,
+    "actor":      "unknown",
+    "flow":       "neutral",
+    "rationale":  "",
+}
+
+# ─── Data Retention Policy (P2 §11) ──────────────────────────────────────────
+RETAIN_SYNTHESIS_DAYS  = 730   # 2 года — superseded синтезы
+RETAIN_EVENTS_DAYS     = 365   # 1 год — events.jsonl ротация
+RETAIN_SNAPSHOTS_COUNT = 7     # локальных backup снапшотов
+
+SYNTHESIS_RETENTION: dict = {
+    "generated":  30,    # дней; неутверждённые удалять через 30 дней
+    "reviewed":   30,
+    "approved":   None,  # бессрочно
+    "published":  None,  # бессрочно
+    "superseded": RETAIN_SYNTHESIS_DAYS,
+    "archived":   None,  # бессрочно
+}
+
+# ─── Schema Versioning (P2 §14) ──────────────────────────────────────────────
+SIGNAL_SCHEMA_VERSION = "1.0"
+
+# Backward Compatibility:
+#   PATCH: добавить необязательное поле → signal.get("new_field", default)
+#   MINOR: переименование → читать оба: signal.get("new") or signal.get("old")
+#   MAJOR: полная миграция всех файлов перед деплоем
+
+SCHEMA_BACKWARD_COMPAT: dict = {
+    "deprecated_fields": {
+        "links": {
+            "replaced_by": "relationships.json",
+            "flag":        "LEGACY_LINKS_ENABLED",
+        }
+    }
+}
+
+# ─── Uncertainty Handling Rules (P3 §18) ─────────────────────────────────────
+UNCERTAINTY_RULES: dict = {
+    "pos_neg_balance_threshold": 0.6,   # pos/(pos+neg) < 0.6 → contested
+    "contested_strength_penalty": 0.7,  # score × 0.7
+    "multiple_triggers_resolution": "most_recent",
+    "tension_staleness_days": 90,
+    "tension_stale_label": "⚠ Нарратив устарел — tension не обновлялся более 90 дней",
+}
+
+# ─── Idempotency Matrix (P2 §15) ─────────────────────────────────────────────
+# validator.py                → ✅ идемпотентен
+# synthesizer.py              → ✅ идемпотентен (не пишет, только возвращает)
+# synthesis_cache_builder.py  → ✅ идемпотентен (temp→rename)
+# contradiction_detector.py  → ✅ идемпотентен
+# add_signal.py               → ⚠ НЕ идемпотентен (side effect = ожидаемо)
+# history_query.py            → ✅ идемпотентен
+# migrate_relationships.py    → ✅ идемпотентен (пропускает дубликаты)
+# validate_relationships.py   → ✅ идемпотентен
+# quality_report.py           → ✅ идемпотентен
+# backup.py                   → ⚠ создаёт новый снапшот (side effect = ожидаемо)
+
+# ─── Error Exit Codes (P2 §9) ────────────────────────────────────────────────
+ERROR_EXIT_CODES: dict = {
+    "success":              0,
+    "business_logic_error": 1,   # ValidationError, DuplicateSignalError
+    "system_error":         2,   # непредвиденное исключение
+    "data_integrity_error": 3,   # CorruptedFileError, OrphanRelationshipError
+}

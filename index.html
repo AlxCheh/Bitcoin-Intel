@@ -4002,7 +4002,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
   const takeawaySource = (anchorResolution && anchorResolution.macro_implication)
     || btcImpl
     || marketStructure;
-  keyTakeaway = takeawaySource.split(/[.!?]/)[0].trim();
+  keyTakeaway = takeawaySource.split(/\.\s|[!?]/)[0].trim();
 
   // Не дублируем narrative
   if (dedupe(keyTakeaway, narrative)) {

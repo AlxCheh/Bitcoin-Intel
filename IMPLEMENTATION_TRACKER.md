@@ -54,7 +54,7 @@ TD открыто:       10 из 10
 - [x] Обновить §24.2 в BLUEPRINT_ADDENDUM.md
 - [x] Коммит: `fix: replace hash() with seed % len() for deterministic bridge selection`
 
-**Дата закрытия:** `[ ]`
+**Дата закрытия:** `[x] 2026-06-28`
 
 ---
 
@@ -136,15 +136,15 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` §24 (новый подраздел)  
 **Артефакт:** полная спецификация алгоритма с INVERSE_PAIRS
 
-- [ ] Определить `INVERSE_PAIRS` — минимум 15 пар для Bitcoin-домена
-- [ ] Специфицировать формулу: `score = 0.6×inverse + 0.2×subject + 0.2×dir_conflict`
-- [ ] Определить пороги: 1 hit = 0.4, 2 hits = 0.7, 3+ hits = 1.0
-- [ ] Определить порог предложения кандидата: score ≥ 0.5
+- [x] Определить `INVERSE_PAIRS` — 27 пар для Bitcoin-домена
+- [x] Специфицировать формулу: `score = 0.6×inverse + 0.2×subject + 0.2×dir_conflict`
+- [x] Определить пороги: 1 hit = 0.4, 2 hits = 0.7, 3+ hits = 1.0
+- [x] Определить порог предложения кандидата: score ≥ 0.5
 - [x] Написать тест `test_obvious_contradiction()`: score ≥ 0.5 ✓
 - [x] Написать тест `test_no_contradiction()`: score < 0.3 ✓
-- [ ] Написать тест `test_different_subjects()`: score < 0.4 ✓
-- [ ] Верифицировать на 5 реальных парах из базы: `STR-2026-0615-001` vs `STR-2026-0628-001`
-- [ ] Добавить в BLUEPRINT_ADDENDUM.md §24 подраздел «Contradiction Scoring Algorithm»
+- [x] Написать тест `test_different_subjects()`: score < 0.4 ✓
+- [x] Верифицировать на 5 реальных парах из базы
+- [x] Добавить в BLUEPRINT_ADDENDUM.md §24 подраздел «Contradiction Scoring Algorithm»
 - [ ] Коммит: `docs: specify semantic_inverse_score algorithm with INVERSE_PAIRS`
 
 **Дата закрытия:** `[ ]`
@@ -155,11 +155,11 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` ADR-007 (создать) + `infrastructure/relationship_store.py`  
 **Артефакт:** флаг `LEGACY_LINKS_ENABLED` + чеклист завершения миграции
 
-- [ ] Оформить ADR-007: «Переходный период чтения связей»
-- [ ] Специфицировать `RelationshipStore` с `LEGACY_LINKS_ENABLED = True`
-- [ ] Описать логику дедупликации при объединении источников
-- [ ] Создать чеклист завершения переходного периода (5 пунктов)
-- [ ] Определить целевую дату: конец Фазы 0
+- [x] Оформить ADR-007: «Переходный период чтения связей»
+- [x] Специфицировать `RelationshipStore` с `LEGACY_LINKS_ENABLED = True`
+- [x] Описать логику дедупликации при объединении источников
+- [x] Создать чеклист завершения переходного периода (5 пунктов)
+- [x] Определить целевую дату: конец Фазы 0
 - [ ] Коммит: `docs: ADR-007 — relationship migration transitional period`
 
 **Дата закрытия:** `[ ]`

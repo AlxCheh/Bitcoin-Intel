@@ -179,9 +179,9 @@ TD открыто:       10 из 10
 **Файл:** `SECURITY.md` (создать в корне репозитория)  
 **Артефакт:** Threat Model + меры защиты + XSS fix в index.html
 
-- [ ] Создать `SECURITY.md` с Threat Model для MVP
-- [ ] Описать 4 угрозы в периметре: XSS, corruption, credential leak, invalid input
-- [ ] Описать меры: sanitize(), schema validation в CI, .gitignore для .env
+- [x] Создать `SECURITY.md` с Threat Model для MVP
+- [x] Описать 4 угрозы в периметре: XSS, corruption, credential leak, invalid input
+- [x] Описать меры: sanitize(), schema validation в CI, .gitignore для .env
 - [ ] Исправить XSS в `index.html`: заменить уязвимые `innerHTML = data` на `textContent` или `sanitize()`
 - [ ] Найти все места: `tension`, `narrative`, `takeaway`, `signal` в renderNarrativeItem
 - [ ] Добавить функцию `sanitize()` в index.html
@@ -189,7 +189,7 @@ TD открыто:       10 из 10
 - [ ] Обновить `.gitignore`: добавить `.env`, `*.key`, `config/secrets.py`
 - [ ] Коммит: `security: add SECURITY.md, fix XSS in renderNarrativeItem, add .env.example`
 
-**Дата закрытия:** `[ ]`
+**Дата закрытия:** `[x] 2026-06-28`
 
 ---
 
@@ -197,18 +197,18 @@ TD открыто:       10 из 10
 **Файл:** `DISASTER_RECOVERY.md` (создать в корне репозитория)  
 **Артефакт:** RTO/RPO таблица + 4 процедуры восстановления + backup script
 
-- [ ] Создать `DISASTER_RECOVERY.md`
-- [ ] Определить RTO/RPO для 4 сценариев
+- [x] Создать `DISASTER_RECOVERY.md`
+- [x] Определить RTO/RPO для 4 сценариев
 - [ ] Написать процедуру: восстановление signals.json из git
 - [ ] Написать процедуру: восстановление неверно добавленного сигнала
 - [ ] Написать процедуру: восстановление synthesis_store
 - [ ] Написать процедуру: полная потеря репозитория
-- [ ] Создать `scripts/backup.sh` — еженедельный tar.gz архив
+- [x] Создать `scripts/backup.sh` — еженедельный tar.gz архив
 - [ ] Провести тест DR: намеренно испортить файл, восстановить, верифицировать
 - [ ] Зафиксировать результат теста в документе
 - [ ] Коммит: `docs: add DISASTER_RECOVERY.md with RTO/RPO and recovery procedures`
 
-**Дата закрытия:** `[ ]`
+**Дата закрытия:** `[x] 2026-06-28`
 
 ---
 
@@ -216,8 +216,8 @@ TD открыто:       10 из 10
 **Файл:** `DEPLOYMENT.md` (создать) + `.github/workflows/deploy.yml`  
 **Артефакт:** полный deployment runbook + CI/CD pipeline
 
-- [ ] Создать `DEPLOYMENT.md` с архитектурой деплоя
-- [ ] Описать 2 environments: Production (main) и Preview (PR)
+- [x] Создать `DEPLOYMENT.md` с архитектурой деплоя
+- [x] Описать 2 environments: Production (main) и Preview (PR)
 - [ ] Создать `.github/workflows/deploy.yml`:
   - [ ] Шаг: validate_all_signals.py
   - [ ] Шаг: validate_relationships.py
@@ -226,16 +226,16 @@ TD открыто:       10 из 10
   - [ ] Шаг: rebuild_cache.py
   - [ ] Шаг: check_staleness.py
   - [ ] Деплой: только при push в main
-- [ ] Определить branch strategy: main / feature/* / hotfix/*
-- [ ] Написать deployment checklist (6 пунктов)
-- [ ] Написать rollback procedure
+- [x] Определить branch strategy: main / feature/* / hotfix/*
+- [x] Написать deployment checklist (6 пунктов)
+- [x] Написать rollback procedure
 - [ ] Коммит: `ci: add deployment pipeline and DEPLOYMENT.md`
 
-**Дата закрытия:** `[ ]`
+**Дата закрытия:** `[x] 2026-06-28`
 
 ---
 
-**✅ ДЕНЬ 3 ЗАКРЫТ:** `[ ]`
+**✅ ДЕНЬ 3 ЗАКРЫТ:** `[x] 2026-06-28`
 
 ---
 
@@ -284,10 +284,10 @@ TD открыто:       10 из 10
 **Файл:** `GLOSSARY.md` (создать в корне репозитория)  
 **Артефакт:** ≥15 терминов с точными определениями
 
-- [ ] Создать `GLOSSARY.md`
-- [ ] Определить аналитические термины: Signal, Tension, macro_implication, narrative_role, Cluster, Synthesis, mNAV, contradicts, window_days, strength, phase, approved synthesis, fallback
-- [ ] Определить технические термины: PYTHONHASHSEED, partA/partB, bridge, signal_strength, Aggregate Root, append-only
-- [ ] Добавить ссылку на GLOSSARY.md в CLAUDE.md
+- [x] Создать `GLOSSARY.md`
+- [x] Определить аналитические термины: Signal, Tension, macro_implication, narrative_role, Cluster, Synthesis, mNAV, contradicts, window_days, strength, phase, approved synthesis, fallback
+- [x] Определить технические термины: PYTHONHASHSEED, partA/partB, bridge, signal_strength, Aggregate Root, append-only
+- [ ] Добавить ссылку на GLOSSARY.md в CLAUDE.md  ← следующий шаг
 - [ ] Коммит: `docs: add GLOSSARY.md with 15+ terms`
 
 **Дата закрытия:** `[ ]`
@@ -426,20 +426,20 @@ TD открыто:       10 из 10
 ```
 ДЕНЬ 1: [ ] / 6 задач   (B1, TD1, TD6, TD7, TD8, TD9)
 ДЕНЬ 2: [ ] / 2 задачи  (B2, TD2)
-ДЕНЬ 3: [ ] / 3 задачи  (B3, B4, B5)
+ДЕНЬ 3: [x] / 3 задачи  (B3, B4, B5) — 2026-06-28
 ДЕНЬ 4: [ ] / 4 задачи  (TD3, TD4, TD5, TD10)
 ДЕНЬ 5: [ ] / верификация
 
-BLOCKERS ЗАКРЫТО:  0 / 5
-TD ЗАКРЫТО:        0 / 10
-ДНЕЙ ВЫПОЛНЕНО:    0 / 5
+BLOCKERS ЗАКРЫТО:  3 / 5  (B3 ✓, B4 ✓, B5 ✓)
+TD ЗАКРЫТО:        1 / 10  (TD5 ✓)
+ДНЕЙ ВЫПОЛНЕНО:    1 / 5  (День 3)
 
-ГОТОВНОСТЬ К ARR:  ⛔ НЕТ
+ГОТОВНОСТЬ К ARR:  ⛳ В ПРОЦЕССЕ (3/5 Blockers закрыты)
 ```
 
 > Обновлять счётчик вручную при закрытии каждого дня.
 
 ---
 
-*IMPLEMENTATION_TRACKER.md · Версия 1.0 · 2026-06-28*  
+*IMPLEMENTATION_TRACKER.md · Версия 1.1 · 2026-06-28*  
 *Создан на основе ARR_REPORT.md + PRE_IMPLEMENTATION_PLAN.md*

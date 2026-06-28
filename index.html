@@ -3902,7 +3902,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
     const contraId = sA.links && sA.links.contradicts && sA.links.contradicts[0];
     const sB = contraId ? sigs.find(s => s.id === contraId) : byContra[1];
     if (sB && sB.macro_implication && sB.macro_implication !== sA.macro_implication) {
-      coreTension = sA.macro_implication.split('.')[0] + ' — vs — ' + sB.macro_implication.split('.')[0];
+      coreTension = sA.macro_implication.split(/\.\s/)[0] + ' — vs — ' + sB.macro_implication.split(/\.\s/)[0];
     }
   }
 
@@ -3975,7 +3975,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
   // ── Синтез narrative из двух частей ─────────────────────────────
   // Часть A: trigger или топ по weight
   const partA = (anchorTrigger && anchorTrigger.macro_implication)
-    ? anchorTrigger.macro_implication.split(/[.!?]/)[0].trim()
+    ? anchorTrigger.macro_implication.split(/\.\s|[!?]/)[0].trim()
     : byWeight.map(s => s.macro_implication).find(Boolean) || '';
 
   // Часть B: complication или complication с contradicts
@@ -3986,7 +3986,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
 
   const partB = (compWithContra && compWithContra.macro_implication
       && !dedupe(compWithContra.macro_implication, partA))
-    ? compWithContra.macro_implication.split(/[.!?]/)[0].trim()
+    ? compWithContra.macro_implication.split(/\.\s|[!?]/)[0].trim()
     : '';
 
   // Склеиваем: A + связка + B
@@ -3998,18 +3998,17 @@ function synthesizeNarrativeAdvanced(key, cl) {
     narrative = partA || marketStructure;
   }
 
-  // ── Takeaway: структурный вывод из resolution или btcImpl ────────
-  const takeawaySource = (anchorResolution && anchorResolution.macro_implication)
-    || btcImpl
-    || marketStructure;
-  keyTakeaway = takeawaySource.split(/\.\s|[!?]/)[0].trim();
-
-  // Не дублируем narrative
-  if (dedupe(keyTakeaway, narrative)) {
-    keyTakeaway = (btcImpl && !dedupe(btcImpl, narrative))
-      ? btcImpl.split(/[.!?]/)[0].trim()
-      : '';
+  // ── Takeaway: complication → trigger → btcImpl (не дублируем narrative) ──
+  const takeawayCandidates = [anchorComplication, anchorTrigger, anchorResolution, byWeight[0]].filter(Boolean);
+  let takeawaySource = '';
+  for (const cand of takeawayCandidates) {
+    const mac = cand.macro_implication || '';
+    if (mac && !dedupe(mac, narrative) && !dedupe(mac, coreTension)) {
+      takeawaySource = mac; break;
+    }
   }
+  if (!takeawaySource) takeawaySource = btcImpl || marketStructure;
+  keyTakeaway = takeawaySource.split(/\.\s|[!?]/)[0].trim();
 
   // ── signal_strength ──────────────────────────────────────────────
   const totalScore = sigs.reduce((acc, s) => {

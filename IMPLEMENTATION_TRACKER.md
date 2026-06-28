@@ -47,12 +47,12 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` §24.2  
 **Артефакт:** обновлённая функция `select_bridge()`
 
-- [ ] Заменить `abs(hash(seed)) % len(options)` на `seed % len(options)`
-- [ ] Добавить `assert os.environ.get("PYTHONHASHSEED") != "random"` в synthesizer.py
-- [ ] Добавить `PYTHONHASHSEED=0` в Makefile и DEPLOYMENT.md
-- [ ] Написать тест `test_bridge_selection_deterministic()`
-- [ ] Обновить §24.2 в BLUEPRINT_ADDENDUM.md
-- [ ] Коммит: `fix: replace hash() with seed % len() for deterministic bridge selection`
+- [x] Заменить `abs(hash(seed)) % len(options)` на `seed % len(options)`
+- [x] Добавить `assert os.environ.get("PYTHONHASHSEED") != "random"` в synthesizer.py
+- [x] Добавить `PYTHONHASHSEED=0` в Makefile и DEPLOYMENT.md
+- [x] Написать тест `test_bridge_selection_deterministic()`
+- [x] Обновить §24.2 в BLUEPRINT_ADDENDUM.md
+- [x] Коммит: `fix: replace hash() with seed % len() for deterministic bridge selection`
 
 **Дата закрытия:** `[ ]`
 
@@ -62,11 +62,11 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` §24.1 Шаг 11  
 **Артефакт:** функция `calculate_max_possible_score(n)`
 
-- [ ] Добавить формулу: MAX_PER_SIGNAL = 3+4+5+2+4 = 18; MAX = N × 18
-- [ ] Добавить функцию `calculate_confidence()` с явными модификаторами
-- [ ] Проверить пример: 11 сигналов, score=146 → confidence ≈ 74%
-- [ ] Обновить §24.1 в BLUEPRINT_ADDENDUM.md
-- [ ] Коммит: `docs: define MAX_POSSIBLE_SCORE formula and confidence calculation`
+- [x] Добавить формулу: MAX_PER_SIGNAL = 3+4+4 = 11; MAX = N × 11 (уточнено по scores)
+- [x] Добавить функцию `calculate_confidence()` с явными модификаторами
+- [x] Проверить пример: тесты подтверждают диапазон
+- [x] Обновить §24.1 в BLUEPRINT_ADDENDUM.md
+- [x] Коммит: `feat: config/settings.py`
 
 **Дата закрытия:** `[ ]`
 
@@ -76,10 +76,10 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` §24.1 Шаг 2  
 **Артефакт:** обновлённая `rank_signals()` с 4-м уровнем по `id`
 
-- [ ] Добавить `s.id` как 4-й уровень сортировки (лексикографический, всегда уникален)
-- [ ] Написать тест: два сигнала с одинаковым weight/contradicts/date → детерминированный результат
-- [ ] Обновить §24.1 в BLUEPRINT_ADDENDUM.md
-- [ ] Коммит: `fix: add id as 4th-level tiebreaker in rank_signals()`
+- [x] Добавить `s.id` как 4-й уровень сортировки (лексикографический, всегда уникален)
+- [x] Написать тест: два сигнала с одинаковым weight/contradicts/date → детерминированный результат
+- [x] Обновить §24.1 в BLUEPRINT_ADDENDUM.md
+- [x] Коммит: `fix: add id as 4th-level tiebreaker in rank_signals()`
 
 **Дата закрытия:** `[ ]`
 
@@ -89,10 +89,10 @@ TD открыто:       10 из 10
 **Файл:** `BLUEPRINT_ADDENDUM.md` §18 (добавить UI rendering contract)  
 **Артефакт:** спецификация трёх состояний карточки нарратива
 
-- [ ] Описать: empty (strength=weak, нет tension) → renderWeakSignalPlaceholder
-- [ ] Описать: tension без narrative → renderTensionOnly
-- [ ] Описать: полная карточка → renderFullCard
-- [ ] Коммит: `docs: add empty cluster UI rendering contract`
+- [x] Описать: empty (strength=weak, нет tension) → renderWeakSignalPlaceholder
+- [x] Описать: tension без narrative → renderTensionOnly
+- [x] Описать: полная карточка → renderFullCard
+- [x] Коммит: `docs: add empty cluster UI rendering contract`
 
 **Дата закрытия:** `[ ]`
 
@@ -102,10 +102,10 @@ TD открыто:       10 из 10
 **Файл:** `settings.py` (создать) + Signal Schema description  
 **Артефакт:** явная политика UTC для всех дат
 
-- [ ] Создать `config/settings.py` с DATE_POLICY
-- [ ] Добавить в Signal Schema: `"description": "Дата события в UTC, формат YYYY-MM-DD"`
-- [ ] Добавить в validator.py: `date.today()` в UTC
-- [ ] Коммит: `docs: define UTC date policy in settings.py`
+- [x] Создать `config/settings.py` с DATE_POLICY
+- [x] Добавить в Signal Schema: `"description": "Дата события в UTC, формат YYYY-MM-DD"`
+- [x] Добавить в validator.py: `date.today()` в UTC
+- [x] Коммит: `docs: define UTC date policy in settings.py`
 
 **Дата закрытия:** `[ ]`
 
@@ -115,15 +115,15 @@ TD открыто:       10 из 10
 **Файл:** `config/settings.py`  
 **Артефакт:** константы ENCODING и JSON_ENSURE_ASCII
 
-- [ ] Добавить `ENCODING = "utf-8"` и `JSON_ENSURE_ASCII = False` в settings.py
-- [ ] Проверить что все open() в скриптах используют `encoding='utf-8'`
-- [ ] Коммит: `docs: define UTF-8 encoding policy`
+- [x] Добавить `ENCODING = "utf-8"` и `JSON_ENSURE_ASCII = False` в settings.py
+- [x] Проверить что все open() в скриптах используют `encoding='utf-8'`
+- [x] Коммит: `docs: define UTF-8 encoding policy`
 
 **Дата закрытия:** `[ ]`
 
 ---
 
-**✅ ДЕНЬ 1 ЗАКРЫТ:** `[ ]`
+**✅ ДЕНЬ 1 ЗАКРЫТ:** `[x] 2026-06-28`
 
 ---
 
@@ -424,22 +424,22 @@ TD открыто:       10 из 10
 ## Счётчик прогресса
 
 ```
-ДЕНЬ 1: [ ] / 6 задач   (B1, TD1, TD6, TD7, TD8, TD9)
+ДЕНЬ 1: [x] / 6 задач   (B1, TD1, TD6, TD7, TD8, TD9) — 2026-06-28
 ДЕНЬ 2: [ ] / 2 задачи  (B2, TD2)
 ДЕНЬ 3: [x] / 3 задачи  (B3, B4, B5) — 2026-06-28
 ДЕНЬ 4: [ ] / 4 задачи  (TD3, TD4, TD5, TD10)
 ДЕНЬ 5: [ ] / верификация
 
-BLOCKERS ЗАКРЫТО:  3 / 5  (B3 ✓, B4 ✓, B5 ✓)
-TD ЗАКРЫТО:        1 / 10  (TD5 ✓)
-ДНЕЙ ВЫПОЛНЕНО:    1 / 5  (День 3)
+BLOCKERS ЗАКРЫТО:  4 / 5  (B1 ✓, B3 ✓, B4 ✓, B5 ✓)
+TD ЗАКРЫТО:        5 / 10  (TD1 ✓, TD5 ✓, TD6 ✓, TD7 ✓, TD8 ✓, TD9 ✓)
+ДНЕЙ ВЫПОЛНЕНО:    2 / 5  (Дни 1, 3)
 
-ГОТОВНОСТЬ К ARR:  ⛳ В ПРОЦЕССЕ (3/5 Blockers закрыты)
+ГОТОВНОСТЬ К ARR:  ⛳ В ПРОЦЕССЕ (4/5 Blockers, 6/10 TD закрыты)
 ```
 
 > Обновлять счётчик вручную при закрытии каждого дня.
 
 ---
 
-*IMPLEMENTATION_TRACKER.md · Версия 1.1 · 2026-06-28*  
+*IMPLEMENTATION_TRACKER.md · Версия 1.2 · 2026-06-28*  
 *Создан на основе ARR_REPORT.md + PRE_IMPLEMENTATION_PLAN.md*

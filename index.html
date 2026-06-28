@@ -3877,11 +3877,11 @@ function synthesizeNarrativeAdvanced(key, cl) {
   const complications = sigs.filter(s => s.narrative_role === 'complication');
   const resolutions   = sigs.filter(s => s.narrative_role === 'resolution');
 
-  // Самый свежий + весомый в каждой группе
-  const pick = (arr) => arr.sort((a,b) =>
+  // Самый свежий + весомый в каждой группе (копируем массив чтобы не мутировать)
+  const pick = (arr) => arr.length ? [...arr].sort((a,b) =>
     (WEIGHT_RANK[b.weight]||0) - (WEIGHT_RANK[a.weight]||0) ||
     new Date(b.date) - new Date(a.date)
-  )[0];
+  )[0] : null;
 
   const anchorTrigger     = pick(triggers) || byRole[0];
   const anchorComplication = pick(complications) || byContra[0];
@@ -3979,9 +3979,10 @@ function synthesizeNarrativeAdvanced(key, cl) {
     : byWeight.map(s => s.macro_implication).find(Boolean) || '';
 
   // Часть B: complication или complication с contradicts
-  const compWithContra = complications.find(s =>
-    s.links && s.links.contradicts && s.links.contradicts.length && s.macro_implication
-  ) || anchorComplication;
+  const compWithContra = [...complications].sort((a,b) =>
+    ((b.links&&b.links.contradicts&&b.links.contradicts.length)||0) -
+    ((a.links&&a.links.contradicts&&a.links.contradicts.length)||0)
+  ).find(s => s.macro_implication) || anchorComplication;
 
   const partB = (compWithContra && compWithContra.macro_implication
       && !dedupe(compWithContra.macro_implication, partA))

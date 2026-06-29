@@ -1,0 +1,8 @@
+
+
+# CI-generated files — не коммитить
+synthesis_store/
+data/events.jsonl
+__pycache__/
+*.pyc
+.env

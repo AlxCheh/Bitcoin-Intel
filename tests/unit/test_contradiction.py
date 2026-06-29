@@ -113,3 +113,88 @@ def test_suggest_no_self_contradictions():
     result = suggest_fn(signals)
     for item in result:
         assert item.get("from_id") != item.get("to_id"), "Self-contradiction found"
+
+
+def test_precision_on_golden_pairs():
+    """
+    Precision на Golden Dataset >= 60% (B2 ARR v2).
+    Загружает пары из tests/golden/fixtures/contradiction_pairs.json.
+    """
+    import json
+    from pathlib import Path
+    from scripts.contradiction_detector import semantic_inverse_score
+
+    THRESHOLD = 0.5
+    pairs_file = Path("tests/golden/fixtures/contradiction_pairs.json")
+    if not pairs_file.exists():
+        pytest.skip("contradiction_pairs.json not found")
+
+    dataset = json.loads(pairs_file.read_text(encoding="utf-8"))
+    pairs   = dataset.get("pairs", [])
+    assert len(pairs) >= 15, f"Need >= 15 pairs, got {len(pairs)}"
+
+    correct = 0
+    errors  = []
+    for p in pairs:
+        score    = semantic_inverse_score(p["a"], p["b"])
+        predicted = score >= THRESHOLD
+        if predicted == p["expected"]:
+            correct += 1
+        else:
+            errors.append(
+                f"  WRONG: expected={p['expected']}, got={predicted} "
+                f"(score={score:.3f}) — {p.get('note','')}"
+            )
+
+    precision = correct / len(pairs)
+    error_msg = (
+        f"Precision {precision:.1%} below 60% threshold.\n"
+        f"Correct: {correct}/{len(pairs)}\n"
+        + "\n".join(errors[:5])
+    )
+    assert precision >= 0.6, error_msg
+
+
+def test_suggest_contradictions_cli():
+    """
+    B2: suggest_contradictions() возвращает предложения для аналитика.
+    Проверяет что workflow замкнут: детектор → список → аналитик.
+    """
+    from scripts.contradiction_detector import suggest_contradictions
+
+    signals = [
+        {"id": "A", "macro_implication": "ETF-приток создаёт устойчивый структурный спрос на BTC",
+         "dir": "pos", "actor": "etf",
+         "links": {"confirms":[], "contradicts":[], "context_chain":[]}},
+        {"id": "B", "macro_implication": "ETF-отток сигнализирует о выходе капитала из BTC позиций",
+         "dir": "neg", "actor": "etf",
+         "links": {"confirms":[], "contradicts":[], "context_chain":[]}},
+        {"id": "C", "macro_implication": "Lightning Network масштабируется как платёжный слой BTC",
+         "dir": "pos", "actor": "defi",
+         "links": {"confirms":[], "contradicts":[], "context_chain":[]}},
+    ]
+
+    suggestions = suggest_contradictions(signals)
+
+    # Должен найти пару A-B как contradicts
+    found_ab = any(
+        (s.get("from_id") == "A" and s.get("to_id") == "B") or
+        (s.get("from_id") == "B" and s.get("to_id") == "A")
+        for s in suggestions
+    )
+    assert found_ab, (
+        f"Detector must suggest A↔B as contradicts. "
+        f"Got suggestions: {suggestions}"
+    )
+
+    # C не должен быть в contradicts с A (они об одном направлении)
+    ab_scores = [s["score"] for s in suggestions
+                 if "C" not in [s.get("from_id"), s.get("to_id")]]
+    c_scores   = [s["score"] for s in suggestions
+                  if "C" in [s.get("from_id"), s.get("to_id")]]
+    # Пара A-B должна иметь более высокий score чем пары с C
+    if ab_scores and c_scores:
+        assert max(ab_scores) > max(c_scores), (
+            f"A-B contradiction score ({max(ab_scores):.3f}) should exceed "
+            f"C-pair scores ({max(c_scores):.3f})"
+        )

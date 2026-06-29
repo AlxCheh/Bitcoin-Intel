@@ -133,3 +133,99 @@ def safe_read_json(path: str, default: Any = None) -> Any:
         import sys
         print(f"⚠ Повреждён JSON {path}: {e}", file=sys.stderr)
         return default
+
+
+# ─── P1 §3: Corrupted file handling ──────────────────────────────────────────
+
+import sys as _sys
+
+def safe_read_json(path: str, default: Any = None,
+                   raise_on_corrupt: bool = False) -> Any:
+    """
+    Читает JSON файл с защитой от повреждения.
+
+    raise_on_corrupt=False (default): log WARNING + return default
+        → DEGRADE GRACEFULLY (для synthesis_cache, relationships.json)
+    raise_on_corrupt=True: raise CorruptedFileError
+        → FAIL LOUD (для signals.json — без него система не работает)
+
+    Выбор:
+        False — synthesis_cache (можно перестроить), relationships.json (есть fallback)
+        True  — signals.json (критический файл, нет разумного fallback)
+    """
+    if not os.path.exists(path):
+        return default
+    try:
+        with open(path, encoding=ENCODING) as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        from infrastructure.logger import get_logger as _get_logger
+        _logger = _get_logger("file_lock")
+        _logger.warning(f"Corrupted JSON at '{path}': {e}. Returning default.")
+        if raise_on_corrupt:
+            from domain.exceptions import CorruptedFileError
+            raise CorruptedFileError(path, str(e))
+        return default
+
+
+def read_signals(raise_on_corrupt: bool = True) -> list:
+    """
+    Читает signals.json.
+    По умолчанию FAIL LOUD — signals.json критический, нет разумного fallback.
+    """
+    from config.settings import SIGNALS_PATH
+    return safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=raise_on_corrupt)
+
+
+# ─── P1 §5: Graceful shutdown — cleanup temp files on SIGINT/SIGTERM ─────────
+
+import atexit
+import signal
+
+_active_temp_files: set = set()
+
+
+def _cleanup_temp_files(signum=None, frame=None) -> None:
+    """Удаляет незавершённые .tmp файлы при выходе процесса."""
+    for tmp_path in list(_active_temp_files):
+        try:
+            os.unlink(tmp_path)
+        except FileNotFoundError:
+            pass
+    if signum is not None:
+        _sys.exit(128 + signum)
+
+
+atexit.register(_cleanup_temp_files)
+try:
+    signal.signal(signal.SIGINT,  _cleanup_temp_files)
+    signal.signal(signal.SIGTERM, _cleanup_temp_files)
+except (OSError, ValueError):
+    pass  # в некоторых средах (потоки) сигналы недоступны
+
+
+def atomic_write_json_safe(path: str, data: Any, indent: int = 2) -> None:
+    """
+    Расширенная версия atomic_write_json с трекингом temp файла.
+    Гарантирует удаление .tmp при SIGINT/SIGTERM/atexit.
+    Использовать вместо atomic_write_json для критических файлов.
+    """
+    dir_name = os.path.dirname(os.path.abspath(path))
+    os.makedirs(dir_name, exist_ok=True)
+
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix=".tmp")
+    _active_temp_files.add(tmp_path)
+    try:
+        with os.fdopen(fd, "w", encoding=ENCODING) as f:
+            json.dump(data, f, ensure_ascii=JSON_ENSURE_ASCII, indent=indent)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except FileNotFoundError:
+            pass
+        raise
+    finally:
+        _active_temp_files.discard(tmp_path)

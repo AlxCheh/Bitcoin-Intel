@@ -46,6 +46,11 @@ jobs:
           pip install pytest --quiet
           PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
 
+      - name: Security audit
+        run: |
+          pip install pip-audit --quiet
+          pip-audit --requirement requirements.txt || true
+
   synthesize:
     name: Synthesize Narratives
     runs-on: ubuntu-latest

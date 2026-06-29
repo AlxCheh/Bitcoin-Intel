@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Онтология нарративного движка Bitcoin Intel",
+    "note": "MVP: структура определена, наполнение — при переходе на Backend"
+  },
+  "clusters": {
+    "strategy_model_stress": {
+      "label": "Модель Strategy под давлением",
+      "theme": "institutionalization",
+      "description": "Устойчивость модели Strategy под давлением долга"
+    },
+    "etf_institutional_flow": {
+      "label": "ETF и институциональные потоки",
+      "theme": "institutionalization",
+      "description": "Потоки капитала через ETF и институциональные структуры"
+    },
+    "btc_treasury_competition": {
+      "label": "Корпоративное казначейство BTC",
+      "theme": "institutionalization",
+      "description": "Корпоративное накопление BTC выходит за пределы Strategy"
+    },
+    "btc_infrastructure_growth": {
+      "label": "Рост инфраструктуры BTC",
+      "theme": "infrastructure",
+      "description": "Рост инфраструктуры: Lightning, L2, транзакции"
+    },
+    "supply_scarcity": {
+      "label": "Дефицит предложения",
+      "theme": "supply",
+      "description": "Дефицит предложения: потерянные монеты, эмиссия, цикличность"
+    }
+  },
+  "themes": {
+    "institutionalization": "ETF, корпорации, правительства, владение",
+    "infrastructure": "Lightning, Layer 2, майнинг",
+    "macro": "Ставки, ликвидность, макро-давление",
+    "narrative": "Философия, регуляция, нарративы",
+    "supply": "Дефицит, эмиссия, потерянные монеты"
+  },
+  "narrative_roles": {
+    "trigger": "Первый сигнал нового кластера или резкий перелом",
+    "complication": "Добавляет противоречие в существующий нарратив",
+    "resolution": "Закрывает tension предыдущих сигналов",
+    "background": "Структурный контекст без острого события"
+  },
+  "weight_scores": {
+    "onchain": 4,
+    "primary": 3,
+    "market": 2,
+    "media": 1
+  },
+  "freshness_windows": {
+    "fresh_days": 7,
+    "recent_days": 90,
+    "stale_after": 90
+  }
+}

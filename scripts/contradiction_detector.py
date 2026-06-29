@@ -313,7 +313,7 @@ def suggest_contradictions(signals: list) -> list:
             "from_id":   c.signal_a_id,
             "to_id":     c.signal_b_id,
             "score":     c.score,
-            "rationale": c.rationale,
+            "rationale": c.explanation,
         }
         for c in candidates
     ]

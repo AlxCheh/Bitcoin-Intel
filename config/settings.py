@@ -51,7 +51,7 @@ def calculate_max_possible_score(n: int) -> int:
     >>> calculate_max_possible_score(5)
     55
     """
-    return n * MAX_PER_SIGNAL
+    return max(n * MAX_PER_SIGNAL, 1)  # минимум 1 — защита от деления на ноль
 
 def calculate_confidence(score_total: int, n_signals: int,
                           has_contradicts: bool, all_stale: bool,

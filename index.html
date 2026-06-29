@@ -2623,6 +2623,13 @@ function toggleNav(id) {
         </div>
       </div>
 
+      <div style="padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.06em;line-height:1.5">
+          <span style="color:var(--btc)">📡 СИГНАЛ ДНЯ</span> · 29 июня 2015 — Трейс Мейер формулирует семь сетевых эффектов при $250/BTC. Одиннадцать лет спустя — верифицированы.
+        </div>
+        <button onclick="showTab('market',null);setTimeout(()=>{setSigFilter('narrative')},150)" style="flex-shrink:0;background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em;white-space:nowrap">→ СИГНАЛ</button>
+      </div>
+
     </div>
 
     <div class="panel" id="theory-dca" style="scroll-margin-top:8px;margin-top:12px">
@@ -4902,6 +4909,7 @@ function renderSignals() {
       + '<p><span class="lbl">ОГОВОРКИ.</span> ' + highlightEntities(s.caveat) + '</p>'
       + '</div>'
       + '<div class="sig-src">ИСТОЧНИК: ' + s.source + '</div>'
+      + (s.theory_ref ? '<div style="padding:6px 14px 10px;border-top:1px solid var(--line)"><button onclick="showTab(\'theory\',null);setTimeout(()=>{const el=document.getElementById(\'' + s.theory_ref + '\');if(el)el.scrollIntoView({behavior:\'smooth\'})},120)" style="background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em">↗ ТЕОРИЯ · ' + (s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : s.theory_ref.replace('theory-','').toUpperCase()) + '</button></div>' : '')
       + '</div>';
   }
 
@@ -6290,6 +6298,7 @@ function renderAHolders() {
 
 </body>
 </html>
+
 
 
 

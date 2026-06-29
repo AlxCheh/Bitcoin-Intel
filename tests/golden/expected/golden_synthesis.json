@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-06-28",
+    "algorithm_version": "1.0.0",
+    "description": "Ожидаемые результаты синтеза для Golden Dataset. Обновлять при MAJOR изменении алгоритма.",
+    "update_rule": "При MAJOR: запустить rebuild, проверить diff, утвердить вручную перед коммитом"
+  },
+  "strategy_model_stress": {
+    "phase": "tension",
+    "tension_contains": "Strategy",
+    "confidence_min": 0.3,
+    "has_trigger": false,
+    "has_complication": true,
+    "has_resolution": false,
+    "note": "Кластер Strategy — нарастающее противоречие без разрешения"
+  },
+  "etf_institutional_flow": {
+    "phase": "active",
+    "tension_contains": "ETF",
+    "confidence_min": 0.3,
+    "has_trigger": true,
+    "has_complication": false,
+    "has_resolution": false,
+    "note": "ETF кластер — активное движение с триггером"
+  },
+  "btc_infrastructure_growth": {
+    "phase": "structural",
+    "tension_contains": "Lightning",
+    "confidence_min": 0.2,
+    "has_trigger": false,
+    "has_complication": false,
+    "has_resolution": false,
+    "note": "Инфраструктура — фоновый структурный рост"
+  }
+}

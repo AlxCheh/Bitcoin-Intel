@@ -20,7 +20,11 @@ def load_golden_signals() -> list:
     f = FIXTURES / "golden_signals.json"
     if not f.exists():
         pytest.skip("golden_signals.json not found")
-    return json.loads(f.read_text(encoding="utf-8"))
+    data = json.loads(f.read_text(encoding="utf-8"))
+    # Поддержка форматов: {meta, signals:[...]} и просто [...]
+    if isinstance(data, dict):
+        return data.get("signals", [])
+    return data
 
 
 def load_expected_synthesis() -> dict:

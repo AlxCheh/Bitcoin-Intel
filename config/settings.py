@@ -293,3 +293,29 @@ ERROR_EXIT_CODES: dict = {
     "system_error":         2,   # непредвиденное исключение
     "data_integrity_error": 3,   # CorruptedFileError, OrphanRelationshipError
 }
+
+
+# ─── Business Rules (D11) ────────────────────────────────────────────────────
+# Явные бизнес-правила системы. Нарушение → ValidationError.
+
+BUSINESS_RULES = {
+    # Сигнал
+    "signal_id_format":        r"^[A-Z]{2,5}-\d{4}-\d{4}-\d{3}$",
+    "tension_must_start_upper": True,   # tension[0].isupper()
+    "tension_must_have_marker": True,   # содержит vs / несмотря на / при условии
+    "macro_implication_min_len": 50,    # не пересказ события
+    "date_format":             "%Y-%m-%d",
+
+    # Синтез
+    "max_clusters_in_overview": 4,      # MAX_SHOWN
+    "min_score_for_overview":   0,      # SCORE_MIN
+    "window_days":              90,     # WINDOW_DAYS_DEFAULT
+
+    # Связи
+    "contradiction_threshold":  0.5,    # semantic_inverse_score >= 0.5
+    "duplicate_warning_fields": ["date", "actor", "cluster"],
+
+    # Golden Dataset
+    "golden_dataset_min_signals": 15,
+    "golden_dataset_min_clusters": 3,
+}

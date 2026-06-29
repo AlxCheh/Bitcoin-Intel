@@ -5,7 +5,6 @@
     "clusters": 5
   },
   "signals": [
-
     {
       "id": "TEST-TRIGGER-ONLY-001",
       "date": "2026-06-20",
@@ -18,17 +17,23 @@
       "actor": "corporate",
       "flow": "inflow",
       "signal": "Корпорации увеличивают BTC-резервы рекордными темпами",
-      "data": ["$2.1 млрд за квартал", "47 компаний"],
+      "data": [
+        "$2.1 млрд за квартал",
+        "47 компаний"
+      ],
       "context": "Аналог 2020-2021: MicroStrategy запустила волну.",
       "caveat": "Концентрация у 3 игроков создаёт системный риск.",
       "source": "Arkham Intelligence (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "trigger",
       "cluster": "test_trigger_only",
       "tension": "Корпоративное накопление ускоряется vs концентрация у единиц создаёт хрупкость",
       "macro_implication": "BTC-казначейство становится стандартом корпоративного баланса — необратимый структурный сдвиг."
     },
-
     {
       "id": "TEST-CONTRADICTION-001",
       "date": "2026-06-18",
@@ -41,11 +46,20 @@
       "actor": "etf",
       "flow": "inflow",
       "signal": "ETF-приток достиг рекордных $8 млрд за месяц",
-      "data": ["$8 млрд приток", "BlackRock лидирует с $4.2 млрд"],
+      "data": [
+        "$8 млрд приток",
+        "BlackRock лидирует с $4.2 млрд"
+      ],
       "context": "Предыдущий рекорд — $6 млрд в январе 2024.",
       "caveat": "Краткосрочные потоки могут развернуться при изменении аппетита к риску.",
       "source": "Bloomberg ETF (июнь 2026)",
-      "links": {"confirms": [], "contradicts": ["TEST-CONTRADICTION-002"], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [
+          "TEST-CONTRADICTION-002"
+        ],
+        "context_chain": []
+      },
       "narrative_role": "trigger",
       "cluster": "test_contradiction",
       "tension": "ETF-приток рекордный vs исторически оттоки следуют за притоками с лагом 6 недель",
@@ -63,17 +77,25 @@
       "actor": "etf",
       "flow": "outflow",
       "signal": "ETF-отток $3.2 млрд за предыдущие две недели",
-      "data": ["$3.2 млрд отток", "14 торговых дней подряд"],
+      "data": [
+        "$3.2 млрд отток",
+        "14 торговых дней подряд"
+      ],
       "context": "Крупнейший отток с марта 2024.",
       "caveat": "Краткосрочные оттоки не обязательно отражают долгосрочные намерения.",
       "source": "CoinGlass (июнь 2026)",
-      "links": {"confirms": [], "contradicts": ["TEST-CONTRADICTION-001"], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [
+          "TEST-CONTRADICTION-001"
+        ],
+        "context_chain": []
+      },
       "narrative_role": "complication",
       "cluster": "test_contradiction",
       "tension": "Долгосрочный институциональный приток vs краткосрочные оттоки давят на цену",
       "macro_implication": "ETF-потоки волатильны — краткосрочное давление не отменяет долгосрочный тренд."
     },
-
     {
       "id": "TEST-RESOLUTION-001",
       "date": "2026-06-10",
@@ -86,11 +108,20 @@
       "actor": "government",
       "flow": "neutral",
       "signal": "ФРС сохраняет ставку — ликвидность ограничена",
-      "data": ["ставка 5.25%", "без изменений третье заседание подряд"],
+      "data": [
+        "ставка 5.25%",
+        "без изменений третье заседание подряд"
+      ],
       "context": "Исторически высокие ставки сжимают risk-on активы.",
       "caveat": "BTC всё чаще ведёт себя как защитный актив, а не риск-актив.",
       "source": "ФРС (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": ["TEST-RESOLUTION-002"]},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": [
+          "TEST-RESOLUTION-002"
+        ]
+      },
       "narrative_role": "trigger",
       "cluster": "test_resolution",
       "tension": "Жёсткая монетарная политика давит на риск-активы vs BTC декоррелирует от традиционных активов",
@@ -108,11 +139,18 @@
       "actor": "retail",
       "flow": "outflow",
       "signal": "Розничные инвесторы сокращают позиции в BTC на фоне высоких ставок",
-      "data": ["отток розничного капитала -18%", "средний размер кошелька -0.12 BTC"],
+      "data": [
+        "отток розничного капитала -18%",
+        "средний размер кошелька -0.12 BTC"
+      ],
       "context": "Поведение похоже на Q3 2022 перед капитуляцией.",
       "caveat": "Розница продаёт — институционалы покупают. Дивергенция значима.",
       "source": "Glassnode (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "complication",
       "cluster": "test_resolution",
       "tension": "Розница капитулирует vs институционалы используют просадку для накопления",
@@ -130,17 +168,25 @@
       "actor": "government",
       "flow": "neutral",
       "signal": "Сигналы ФРС о возможном снижении ставки в Q3 2026",
-      "data": ["2 члена комитета за снижение", "рынок оценивает вероятность 68%"],
+      "data": [
+        "2 члена комитета за снижение",
+        "рынок оценивает вероятность 68%"
+      ],
       "context": "Последний раз ставки снижали в 2023 — BTC вырос 180% за 12 месяцев.",
       "caveat": "Инфляционные данные могут изменить траекторию.",
       "source": "ФРС (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": ["TEST-RESOLUTION-001"]},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": [
+          "TEST-RESOLUTION-001"
+        ]
+      },
       "narrative_role": "resolution",
       "cluster": "test_resolution",
       "tension": "Разворот монетарной политики vs инфляция ещё не побеждена",
       "macro_implication": "Потенциальное снижение ставок открывает новый цикл ликвидности — исторически лучший сценарий для BTC."
     },
-
     {
       "id": "TEST-STALE-001",
       "date": "2025-12-01",
@@ -153,11 +199,18 @@
       "actor": "retail",
       "flow": "internal",
       "signal": "MVRV достиг исторического максимума — перегрев рынка",
-      "data": ["MVRV 3.8", "исторический максимум Q4 2021 — 4.1"],
+      "data": [
+        "MVRV 3.8",
+        "исторический максимум Q4 2021 — 4.1"
+      ],
       "context": "MVRV > 3.5 исторически предшествует коррекции 40-60%.",
       "caveat": "Институционализация меняет исторические пороги.",
       "source": "Glassnode (декабрь 2025)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "background",
       "cluster": "test_stale",
       "tension": "Перегрев по MVRV vs исторические пороги устарели в эпоху ETF",
@@ -175,17 +228,24 @@
       "actor": "miner",
       "flow": "neutral",
       "signal": "Production Cost достиг $45 000 — ниже текущей цены на 20%",
-      "data": ["Production Cost $45k", "текущая цена $54k", "маржа майнеров 20%"],
+      "data": [
+        "Production Cost $45k",
+        "текущая цена $54k",
+        "маржа майнеров 20%"
+      ],
       "context": "Маржа майнеров сжимается перед халвингом — историческая закономерность.",
       "caveat": "Разные майнеры имеют разную себестоимость.",
       "source": "Hashrate Index (ноябрь 2025)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "background",
       "cluster": "test_stale",
       "tension": "Маржа майнеров сжимается vs сеть продолжает расти по хешрейту",
       "macro_implication": "Давление на майнеров создаёт продавцов — структурный навес предложения."
     },
-
     {
       "id": "TEST-EQUAL-WEIGHT-001",
       "date": "2026-06-20",
@@ -198,11 +258,18 @@
       "actor": "miner",
       "flow": "neutral",
       "signal": "Хешрейт достиг нового исторического максимума 900 EH/s",
-      "data": ["900 EH/s", "+23% за квартал"],
+      "data": [
+        "900 EH/s",
+        "+23% за квартал"
+      ],
       "context": "Каждый новый ATH хешрейта исторически предшествует росту цены через 3-6 месяцев.",
       "caveat": "Корреляция не равна причинности.",
       "source": "Hashrate Index (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "trigger",
       "cluster": "test_equal_weight",
       "tension": "Рекордный хешрейт укрепляет сеть vs энергозатраты создают регуляторное давление",
@@ -220,11 +287,18 @@
       "actor": "miner",
       "flow": "inflow",
       "signal": "Крупные майнеры публично торгуются с рекордными мультипликаторами",
-      "data": ["Marathon P/E 45x", "CleanSpark P/E 38x"],
+      "data": [
+        "Marathon P/E 45x",
+        "CleanSpark P/E 38x"
+      ],
       "context": "Рынок закладывает будущий рост добычи и цены BTC.",
       "caveat": "Мультипликаторы чувствительны к цене BTC.",
       "source": "Bloomberg (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "complication",
       "cluster": "test_equal_weight",
       "tension": "Рынок верит в рост майнеров vs высокие мультипликаторы создают хрупкость",
@@ -242,15 +316,126 @@
       "actor": "miner",
       "flow": "neutral",
       "signal": "Регуляторы США рассматривают ограничения на энергопотребление майнеров",
-      "data": ["3 законопроекта в Конгрессе", "затронет ~30% американского хешрейта"],
+      "data": [
+        "3 законопроекта в Конгрессе",
+        "затронет ~30% американского хешрейта"
+      ],
       "context": "Аналог китайского бана 2021 — тогда хешрейт восстановился за 6 месяцев.",
       "caveat": "Законопроекты могут не пройти — рыночная реакция опережает реальность.",
       "source": "CoinDesk (июнь 2026)",
-      "links": {"confirms": [], "contradicts": [], "context_chain": []},
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
       "narrative_role": "complication",
       "cluster": "test_equal_weight",
       "tension": "Регуляторный риск для майнеров vs децентрализованный хешрейт адаптируется к любым ограничениям",
       "macro_implication": "Регуляторное давление на майнинг в США ускоряет географическую диверсификацию хешрейта."
+    },
+    {
+      "id": "TEST-MACRO-001",
+      "date": "2026-06-01",
+      "cat": "macro",
+      "catLabel": "🏦 МАКРОЭКОНОМИКА",
+      "dir": "neg",
+      "horizon": "short",
+      "theme": "macro",
+      "weight": "market",
+      "actor": "etf",
+      "flow": "outflow",
+      "signal": "ФРС сохраняет ставки на высоком уровне — давление на рисковые активы",
+      "tension": "Высокие ставки ФРС vs растущий институциональный спрос на BTC через ETF",
+      "macro_implication": "Монетарное ужесточение создаёт структурное давление на BTC как рисковый актив, однако не подавляет институциональный спрос через ETF-каналы",
+      "narrative_role": "background",
+      "cluster": "etf_institutional_flow",
+      "source": "ФРС пресс-релиз (июнь 2026)",
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
+      "data": [],
+      "context": "",
+      "caveat": ""
+    },
+    {
+      "id": "TEST-INF-001",
+      "date": "2026-06-08",
+      "cat": "layer2",
+      "catLabel": "🔗 Layer 2",
+      "dir": "pos",
+      "horizon": "long",
+      "theme": "infrastructure",
+      "weight": "onchain",
+      "actor": "defi",
+      "flow": "inflow",
+      "signal": "Lightning Network достигла рекордного объёма каналов — 5000+ BTC в ликвидности",
+      "tension": "Lightning как платёжный слой vs BTC как резервный актив — два трека роста не противоречат",
+      "macro_implication": "BTC масштабируется одновременно как платёжная сеть и резервный актив — инфраструктурный рост подтверждает многофункциональность протокола",
+      "narrative_role": "complication",
+      "cluster": "btc_infrastructure_growth",
+      "source": "1ML Network Statistics (июнь 2026)",
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
+      "data": [],
+      "context": "",
+      "caveat": ""
+    },
+    {
+      "id": "TEST-SUP-001",
+      "date": "2026-06-12",
+      "cat": "onchain",
+      "catLabel": "📊 On-chain",
+      "dir": "pos",
+      "horizon": "long",
+      "theme": "supply",
+      "weight": "onchain",
+      "actor": "retail",
+      "flow": "internal",
+      "signal": "Glassnode: 3.7 млн BTC не двигались более 5 лет — структурный дефицит предложения",
+      "tension": "Потерянные и неактивные монеты vs номинальный circulating supply — реальное предложение значительно ниже",
+      "macro_implication": "Структурный дефицит BTC нарастает независимо от эмиссионного графика: долгосрочные держатели изымают монеты из оборота быстрее чем добывается новые",
+      "narrative_role": "background",
+      "cluster": "supply_scarcity",
+      "source": "Glassnode On-chain Analytics (июнь 2026)",
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
+      "data": [],
+      "context": "",
+      "caveat": ""
+    },
+    {
+      "id": "TEST-NAR-001",
+      "date": "2026-06-14",
+      "cat": "narrative",
+      "catLabel": "📰 Нарратив",
+      "dir": "pos",
+      "horizon": "mid",
+      "theme": "institutionalization",
+      "weight": "primary",
+      "actor": "government",
+      "flow": "inflow",
+      "signal": "Сенат США принял Crypto Market Structure Act — регуляторная ясность для институционалов",
+      "tension": "Регуляторная ясность vs операционные ограничения — легитимность растёт, гибкость снижается",
+      "macro_implication": "Законодательное признание BTC как asset class открывает путь пенсионным фондам и страховым компаниям — новая категория институционального спроса без прецедентов",
+      "narrative_role": "trigger",
+      "cluster": "etf_institutional_flow",
+      "source": "Senate.gov официальный релиз (июнь 2026)",
+      "links": {
+        "confirms": [],
+        "contradicts": [],
+        "context_chain": []
+      },
+      "data": [],
+      "context": "",
+      "caveat": ""
     }
   ]
 }

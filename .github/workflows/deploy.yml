@@ -80,7 +80,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
+          git stash --include-untracked
+          git pull origin main
+          git stash pop
           git add data/synthesis_cache.json || true
           git diff --staged --quiet || git commit -m "chore: update synthesis_cache.json [skip ci]"
           git push

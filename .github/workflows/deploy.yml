@@ -76,7 +76,7 @@ jobs:
               print('  ' + k + ': ' + v.get('strength','?') + ' phase=' + v.get('phase','?'))
           "
 
-- name: Commit synthesis cache
+      - name: Commit synthesis cache
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

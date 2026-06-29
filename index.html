@@ -2627,7 +2627,7 @@ function toggleNav(id) {
         <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.06em;line-height:1.5">
           <span style="color:var(--btc)">📡 СИГНАЛ ДНЯ</span> · 29 июня 2015 — Трейс Мейер формулирует семь сетевых эффектов при $250/BTC. Одиннадцать лет спустя — верифицированы.
         </div>
-        <button onclick="showTab('market',null);setTimeout(()=>{setSigFilter('narrative')},150)" style="flex-shrink:0;background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em;white-space:nowrap">→ СИГНАЛ</button>
+        <button onclick="pendingScrollSignal='NAR-2026-0629-001';showTab('market',null)" style="flex-shrink:0;background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em;white-space:nowrap">→ СИГНАЛ</button>
       </div>
 
     </div>
@@ -4759,6 +4759,7 @@ const DIR_META = {
 };
 
 let sigFilter = 'all';
+let pendingScrollSignal = null;
 let sigActorFilter = 'all';
 let sigMode = 'date'; // 'date' | 'theme'
 
@@ -4892,7 +4893,7 @@ function renderSignals() {
     const actorMeta = s.actor ? ACTOR_META[s.actor] : null;
     const roleColor = {trigger:'var(--btc)', complication:'var(--amber)', resolution:'var(--grn)', background:'var(--slate)'}[s.narrative_role] || 'var(--dim)';
     const roleDot = s.narrative_role ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + roleColor + ';margin-right:2px;vertical-align:middle"></span>' : '';
-    return '<div class="sig-card ' + s.dir + '">'
+    return '<div class="sig-card ' + s.dir + '" id="sig-' + s.id + '">'
       + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span>' + roleDot + '<span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
       + '<div class="sig-signal">' + highlightEntities(s.signal) + '</div>'
       + '<div class="sig-data">' + chips
@@ -4936,6 +4937,15 @@ function renderSignals() {
             + groups[t].map(cardHTML).join('');
         }).join('')
       : '<div style="padding:24px;text-align:center;color:#4A5568;font-family:\'IBM Plex Mono\',monospace;font-size:12px">НЕТ СИГНАЛОВ ПО ВЫБРАННЫМ ФИЛЬТРАМ</div>';
+  }
+
+  if (pendingScrollSignal) {
+    const _target = pendingScrollSignal;
+    pendingScrollSignal = null;
+    requestAnimationFrame(() => {
+      const el = document.getElementById('sig-' + _target);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 }
 

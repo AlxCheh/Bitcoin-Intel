@@ -594,9 +594,7 @@ def main() -> None:
     os.makedirs(os.path.dirname(SYNTHESIS_CACHE_PATH), exist_ok=True)
     atomic_write_json_safe(SYNTHESIS_CACHE_PATH, results)
 
-    print(f"
-✓ Cache written: {SYNTHESIS_CACHE_PATH} "
-          f"({succeeded} clusters, {failed} skipped)")
+    print(f"\n✓ Cache written: {SYNTHESIS_CACHE_PATH} ({succeeded} clusters, {failed} skipped)")
 
     # §9: exit code отражает результат
     sys.exit(

@@ -16,6 +16,13 @@ from pathlib import Path
 from copy import deepcopy
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from datetime import date as _dt, timedelta as _td
+
+# Даты в пределах WINDOW_DAYS_DEFAULT (90 дней)
+_D1 = (_dt.today() - _td(days=5)).isoformat()
+_D2 = (_dt.today() - _td(days=4)).isoformat()
+_D3 = (_dt.today() - _td(days=3)).isoformat()
+_D4 = (_dt.today() - _td(days=2)).isoformat()
 
 
 def make_cluster_signals(cluster_key: str = "test_cluster") -> list[dict]:
@@ -23,7 +30,7 @@ def make_cluster_signals(cluster_key: str = "test_cluster") -> list[dict]:
     return [
         {
             "id": "REG-2026-0101-001",
-            "date": "2026-01-01",
+            "date": _D1,
             "signal": "Базовый триггер кластера",
             "cat": "narrative", "catLabel": "📰 Нарратив",
             "dir": "pos", "horizon": "mid",
@@ -42,7 +49,7 @@ def make_cluster_signals(cluster_key: str = "test_cluster") -> list[dict]:
         },
         {
             "id": "REG-2026-0102-001",
-            "date": "2026-01-02",
+            "date": _D2,
             "signal": "Осложнение нарратива",
             "cat": "narrative", "catLabel": "📰 Нарратив",
             "dir": "neg", "horizon": "short",
@@ -103,7 +110,7 @@ def test_adding_trigger_changes_narrative():
 
     new_trigger = {
         "id": "REG-2026-0103-001",
-        "date": "2026-01-03",
+        "date": _D3,
         "signal": "Новый триггер с более высоким весом",
         "cat": "narrative", "catLabel": "📰 Нарратив",
         "dir": "pos", "horizon": "long",
@@ -140,7 +147,7 @@ def test_high_weight_signal_becomes_anchor():
     # Добавляем сигнал с максимальным весом и contradicts
     anchor_candidate = {
         "id": "REG-2026-0104-001",
-        "date": "2026-01-04",
+        "date": _D4,
         "signal": "Сигнал с максимальным весом и contradicts",
         "cat": "onchain", "catLabel": "📊 On-chain",
         "dir": "neg", "horizon": "short",

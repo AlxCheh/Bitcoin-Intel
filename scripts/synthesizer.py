@@ -113,6 +113,7 @@ class SynthesisResult:
     phase_changed:     bool  = False
     structural_change: dict  = field(default_factory=dict)
     rationale:         str   = ""
+    uncertainty:       dict  = field(default_factory=dict)
     signals_used:      list  = field(default_factory=list)
     signals_ignored:   list  = field(default_factory=list)
     generated_at:      str   = field(
@@ -265,6 +266,98 @@ def deduplicate_signals(signals: list[dict]) -> tuple[list[dict], list[str]]:
 
 
 # ─── Основной синтез ──────────────────────────────────────────────────────────
+
+
+def handle_uncertainty(
+    signals: list[dict],
+    phase: str,
+    ranked: list[tuple],
+) -> dict:
+    """
+    B3 ARR v2: Обрабатывает неопределённые ситуации перед финальным синтезом.
+
+    Три критических ситуации из UNCERTAINTY_RULES (settings.py):
+      1. 50/50 pos/neg → direction = "contested", score penalty 0.7
+      2. Два+ trigger → выбрать более свежий (most_recent)
+      3. Устаревший tension (победитель > 90 дней) → метка STALE
+
+    Возвращает dict с корректировками которые synthesize_cluster применяет.
+    Пустой dict = неопределённости не обнаружено.
+    """
+    from datetime import date as _date
+    from config.settings import UNCERTAINTY_RULES
+
+    adjustments: dict = {}
+
+    # ── 1. Баланс pos/neg → contested ─────────────────────────────────────
+    threshold = UNCERTAINTY_RULES.get("pos_neg_balance_threshold", 0.6)
+    penalty   = UNCERTAINTY_RULES.get("contested_strength_penalty", 0.7)
+
+    pos_count = sum(1 for s in signals if s.get("dir") == "pos")
+    neg_count = sum(1 for s in signals if s.get("dir") == "neg")
+    total_dir = pos_count + neg_count
+
+    if total_dir >= 2:
+        ratio = pos_count / total_dir
+        if (1 - threshold) <= ratio <= threshold:
+            adjustments["direction"]        = "contested"
+            adjustments["score_multiplier"] = penalty
+            logger.info(
+                f"Uncertainty: pos/neg balance {pos_count}/{neg_count} "
+                f"→ contested (penalty ×{penalty})"
+            )
+
+    # ── 2. Несколько trigger → выбрать самый свежий ────────────────────────
+    resolution = UNCERTAINTY_RULES.get("multiple_triggers_resolution", "most_recent")
+    triggers = [s for s in signals if s.get("narrative_role") == "trigger"]
+
+    if len(triggers) > 1 and resolution == "most_recent":
+        triggers_sorted = sorted(
+            triggers,
+            key=lambda s: s.get("date", "1970-01-01"),
+            reverse=True
+        )
+        adjustments["anchor_trigger"]    = triggers_sorted[0]["id"]
+        adjustments["ignored_triggers"]  = [s["id"] for s in triggers_sorted[1:]]
+        logger.info(
+            f"Uncertainty: {len(triggers)} triggers → "
+            f"using most recent {triggers_sorted[0]['id']}, "
+            f"ignoring {adjustments['ignored_triggers']}"
+        )
+
+    # ── 3. Устаревший tension ─────────────────────────────────────────────
+    staleness_days = UNCERTAINTY_RULES.get("tension_staleness_days", 90)
+    stale_label    = UNCERTAINTY_RULES.get(
+        "tension_stale_label",
+        "⚠ Нарратив устарел — tension не обновлялся более 90 дней"
+    )
+
+    # Победитель tension = сигнал с MAX(contradicts)
+    winner = None
+    max_contra = -1
+    for s in signals:
+        n = len(_get_contradicts(s))
+        if n > max_contra and s.get("tension"):
+            max_contra = n
+            winner     = s
+
+    if winner:
+        try:
+            age = (_date.today() - _date.fromisoformat(winner.get("date", "1970-01-01"))).days
+            if age > staleness_days:
+                adjustments["tension_stale"]       = True
+                adjustments["tension_stale_label"] = stale_label
+                adjustments["tension_age_days"]    = age
+                logger.warning(
+                    f"Uncertainty: tension winner {winner['id']} "
+                    f"is {age} days old → STALE label applied"
+                )
+        except ValueError:
+            pass
+
+    return adjustments
+
+
 @measure_performance("synthesize_cluster")
 def synthesize_cluster(
     cluster_key:        str,
@@ -319,6 +412,9 @@ def synthesize_cluster(
 
     # ШАГ 3: Фаза
     phase = _detect_phase(ranked_signals)
+
+    # ШАГ 3.5: Обработка неопределённости (B3 ARR v2)
+    uncertainty = handle_uncertainty(active_signals, phase, ranked)
 
     # ШАГ 4: Разбивка по ролям
     triggers       = [s for s in ranked_signals if s.get("narrative_role") == "trigger"]
@@ -412,6 +508,12 @@ def synthesize_cluster(
         cluster_score.role          += sc.role
         cluster_score.contradiction += sc.contradiction
 
+    # Применить uncertainty adjustments к score_multiplier
+    if uncertainty.get('score_multiplier'):
+        cluster_score.freshness = int(
+            cluster_score.freshness * uncertainty['score_multiplier']
+        )
+
     # ШАГ 12: Rationale
     anchor_id  = (tension_source or anchor_trigger).get("id", "?")
     anchor_obj = tension_source or anchor_trigger
@@ -449,6 +551,7 @@ def synthesize_cluster(
         rationale=rationale,
         signals_used=signals_used,
         signals_ignored=ignored_ids,
+        uncertainty=uncertainty,
     )
 
 
@@ -499,6 +602,7 @@ def _save_synthesis(cluster_key: str, result: SynthesisResult,
         "rationale":        result.rationale,
         "signals_used":     result.signals_used,
         "signals_ignored":  result.signals_ignored,
+        "uncertainty":      result.uncertainty,
         "generated_at":     result.generated_at,
     }
     filepath = store / f"{synthesis_id}.json"

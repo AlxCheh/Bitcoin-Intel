@@ -310,8 +310,8 @@ def suggest_contradictions(signals: list) -> list:
     candidates = find_contradiction_candidates(signals, threshold=PROPOSAL_THRESHOLD)
     return [
         {
-            "from_id":   c.from_id,
-            "to_id":     c.to_id,
+            "from_id":   c.signal_a_id,
+            "to_id":     c.signal_b_id,
             "score":     c.score,
             "rationale": c.rationale,
         }

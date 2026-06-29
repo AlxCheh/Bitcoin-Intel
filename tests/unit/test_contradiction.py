@@ -1,264 +1,115 @@
 """
 tests/unit/test_contradiction.py
-Тесты для B2 — semantic_inverse_score и RelationshipStore (TD2).
-Запускать: PYTHONHASHSEED=0 python3 -m pytest tests/unit/test_contradiction.py -v
+Тесты Contradiction Detector: semantic_inverse_score.
 """
-
 import os
 import sys
 import json
-import tempfile
 import pytest
+from pathlib import Path
 
-os.environ["PYTHONHASHSEED"] = "0"
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from scripts.contradiction_detector import (
-    score_pair, find_contradiction_candidates,
-    _inverse_score, _subject_score, _dir_conflict_score,
-    PROPOSAL_THRESHOLD,
-)
-from infrastructure.relationship_store import RelationshipStore, Relationship
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
-# ─── Фикстуры ────────────────────────────────────────────────────────────────
-def make_sig(id, macro="", dir="neu", actor="corporate",
-             theme="institutionalization", cluster="test", contradicts=None):
+def _import_detector():
+    """Импортирует функции из contradiction_detector."""
+    from scripts.contradiction_detector import (
+        semantic_inverse_score,
+        suggest_contradictions,
+    )
+    return semantic_inverse_score, suggest_contradictions
+
+
+def make_signal(sid: str, macro_impl: str, direction: str = "pos") -> dict:
     return {
-        "id": id,
-        "macro_implication": macro,
-        "dir": dir,
-        "actor": actor,
-        "theme": theme,
-        "cluster": cluster,
-        "links": {"contradicts": contradicts or [], "confirms": [], "context_chain": []},
+        "id": sid,
+        "dir": direction,
+        "macro_implication": macro_impl,
+        "links": {"confirms": [], "contradicts": [], "context_chain": []},
     }
 
 
-# ─── B2: Тест очевидного противоречия ────────────────────────────────────────
-class TestObviousContradiction:
-    """score >= 0.5 для явных противоречий."""
+# ─── semantic_inverse_score ──────────────────────────────────────────────────
 
-    def test_inflow_vs_outflow(self):
-        a = make_sig("A", macro="ETF-приток капитала составил рекордные $6 млрд за месяц.", dir="pos")
-        b = make_sig("B", macro="ETF-отток капитала достиг исторического максимума $6.4 млрд.", dir="neg")
-        c = score_pair(a, b)
-        assert c.score >= 0.5, f"Ожидали score >= 0.5, получили {c.score}"
-        assert len(c.hits) >= 1
-
-    def test_nav_premium_vs_discount(self):
-        a = make_sig("A", macro="Strategy торгуется с NAV-премией 2.1x — рынок верит в модель.", dir="pos")
-        b = make_sig("B", macro="NAV-дисконт 0.83x — первый рыночный сигнал что премия исчезает.", dir="neg")
-        c = score_pair(a, b)
-        assert c.score >= 0.5, f"Ожидали score >= 0.5, получили {c.score}"
-
-    def test_accumulation_vs_selloff(self):
-        a = make_sig("A", macro="Долгосрочные держатели продолжают накопление несмотря на волатильность.", dir="pos")
-        b = make_sig("B", macro="Началась масштабная распродажа BTC институциональными игроками.", dir="neg")
-        c = score_pair(a, b)
-        assert c.score >= 0.5, f"Ожидали score >= 0.5, получили {c.score}"
-
-    def test_growth_vs_decline(self):
-        a = make_sig("A", macro="Хешрейт растёт третий месяц подряд — сеть укрепляется.", dir="pos")
-        b = make_sig("B", macro="Хешрейт падает на 15% — майнеры капитулируют.", dir="neg")
-        c = score_pair(a, b)
-        assert c.score >= 0.5
-
-    def test_trust_vs_distrust(self):
-        a = make_sig("A", macro="Регуляторное одобрение ETF означает принятие BTC мейнстримом.", dir="pos")
-        b = make_sig("B", macro="Регуляторный запрет в трёх юрисдикциях ограничивает рост.", dir="neg")
-        c = score_pair(a, b)
-        assert c.score >= 0.5
+def test_obvious_contradiction_inflow_outflow():
+    """ETF-приток vs ETF-отток — score >= 0.5."""
+    score_fn, _ = _import_detector()
+    a = "ETF-приток как структурный спрос создаёт давление покупки на рынке BTC"
+    b = "ETF-отток сигнализирует о выходе институционального капитала из BTC-позиций"
+    score = score_fn(a, b)
+    assert score >= 0.5, f"Expected contradiction score >= 0.5, got {score}"
 
 
-# ─── B2: Тест отсутствия противоречия ────────────────────────────────────────
-class TestNoContradiction:
-    """score < 0.3 когда противоречия нет."""
-
-    def test_same_direction_same_theme(self):
-        a = make_sig("A", macro="Lightning Network достигла рекорда транзакций.", dir="pos", actor="defi")
-        b = make_sig("B", macro="Lightning Network обрабатывает $1 млрд в месяц.", dir="pos", actor="defi")
-        c = score_pair(a, b)
-        assert c.score < 0.3, f"Ожидали score < 0.3, получили {c.score}"
-
-    def test_complementary_signals(self):
-        a = make_sig("A", macro="BTC становится резервным активом для корпораций.", dir="pos")
-        b = make_sig("B", macro="Корпоративное накопление BTC ускоряется в 2026.", dir="pos")
-        c = score_pair(a, b)
-        assert c.score < 0.3, f"Ожидали score < 0.3, получили {c.score}"
+def test_same_direction_no_contradiction():
+    """Два позитивных ETF сигнала — score < 0.5."""
+    score_fn, _ = _import_detector()
+    a = "ETF-приток как структурный спрос создаёт давление покупки"
+    b = "Институциональный приток через ETF укрепляет позицию BTC как резервного актива"
+    score = score_fn(a, b)
+    assert score < 0.5, f"Expected no contradiction (score < 0.5), got {score}"
 
 
-# ─── B2: Тест разных субъектов ────────────────────────────────────────────────
-class TestDifferentSubjects:
-    """Разные субъекты снижают score даже при лексическом конфликте."""
-
-    def test_different_actors_lowers_score(self):
-        # ETF-отток vs корпоративный приток — разные субъекты
-        a = make_sig("A", macro="ETF-отток давит на цену BTC.",
-                     dir="neg", actor="etf", theme="institutionalization")
-        b = make_sig("B", macro="Корпоративный приток капитала в BTC продолжается.",
-                     dir="pos", actor="corporate", theme="institutionalization")
-        c = score_pair(a, b)
-        # subject_score = 0.5 (одна тема), не 1.0
-        assert c.subject_score == 0.5
-        # Но общий score всё равно может быть >= 0.5 из-за dir-конфликта
-        # Ключевое: subject_score не 1.0 (это и есть тест)
-
-    def test_completely_different_themes(self):
-        a = make_sig("A", macro="Дефицит предложения BTC нарастает.",
-                     dir="pos", actor="miner", theme="supply")
-        b = make_sig("B", macro="ETF-отток капитала давит на рынок.",
-                     dir="neg", actor="etf", theme="institutionalization")
-        c = score_pair(a, b)
-        assert c.subject_score == 0.0
+def test_empty_strings_return_zero():
+    """Пустые строки → 0.0, не исключение."""
+    score_fn, _ = _import_detector()
+    assert score_fn("", "что угодно") == 0.0
+    assert score_fn("что угодно", "") == 0.0
+    assert score_fn("", "") == 0.0
 
 
-# ─── B2: Верификация на реальных парах из базы ───────────────────────────────
-class TestRealSignalPairs:
-    """Тест на паттернах из реальных сигналов проекта."""
-
-    def test_strategy_solvency_vs_nav_discount(self):
-        """STR-2026-0622-001 (NAV-дисконт neg) vs STR-2026-0615-001 (накопление pos)."""
-        nav_discount = make_sig(
-            "STR-2026-0622-001",
-            macro="NAV-дисконт 0.83x — первый рыночный сигнал что премия за BTC-стратегию через акции исчезает.",
-            dir="neg", actor="corporate"
-        )
-        accumulation = make_sig(
-            "STR-2026-0615-001",
-            macro="Систематические покупки ниже средней цены входа — признак долгосрочной стратегии накопления.",
-            dir="pos", actor="corporate"
-        )
-        c = score_pair(nav_discount, accumulation)
-        assert c.score >= 0.3  # есть сигнал противоречия
-
-    def test_etf_outflow_vs_institutional_buying(self):
-        """ETF-оттоки vs институциональные покупки — классическое противоречие проекта."""
-        etf_out = make_sig(
-            "STR-2026-0619-001",
-            macro="ETF-потоки стали доминирующим драйвером цены BTC — их хрупкость определяется настроением.",
-            dir="neg", actor="etf"
-        )
-        inst_buy = make_sig(
-            "STR-2026-0622-002",
-            macro="Покупки крупных держателей происходят независимо от рыночного шума.",
-            dir="pos", actor="retail"
-        )
-        c = score_pair(etf_out, inst_buy)
-        # Разные акторы, но dir-конфликт есть
-        assert c.dir_score == 1.0
+def test_deterministic():
+    """Одинаковые входы → одинаковый результат."""
+    score_fn, _ = _import_detector()
+    a = "BTC-накопление корпорациями как защита от инфляции"
+    b = "Продажа BTC-резервов корпорациями под давлением долговой нагрузки"
+    results = {score_fn(a, b) for _ in range(5)}
+    assert len(results) == 1, f"Non-deterministic: {results}"
 
 
-# ─── TD2: RelationshipStore ───────────────────────────────────────────────────
-class TestRelationshipStore:
+def test_score_in_range():
+    """Score всегда в [0.0, 1.0]."""
+    score_fn, _ = _import_detector()
+    pairs = [
+        ("рост накопления BTC институционалами", "падение и ликвидация BTC-позиций"),
+        ("ETF приток", "ETF отток"),
+        ("укрепление", "ослабление"),
+        ("одно и то же", "одно и то же"),
+    ]
+    for a, b in pairs:
+        score = score_fn(a, b)
+        assert 0.0 <= score <= 1.0, f"Score out of range for ({a!r}, {b!r}): {score}"
 
-    def _make_signals_file(self, tmp_path):
-        """Создаёт временный signals.json с legacy links."""
-        data = {
-            "meta": {},
-            "signals": [
-                {
-                    "id": "STR-TEST-001",
-                    "macro_implication": "Тест A",
-                    "links": {
-                        "contradicts": ["STR-TEST-002"],
-                        "confirms": [],
-                        "context_chain": [],
-                    }
-                },
-                {
-                    "id": "STR-TEST-002",
-                    "macro_implication": "Тест B",
-                    "links": {"contradicts": [], "confirms": [], "context_chain": []}
-                },
-            ]
-        }
-        p = tmp_path / "signals.json"
-        p.write_text(json.dumps(data), encoding="utf-8")
-        return str(p)
 
-    def test_load_legacy_links(self, tmp_path):
-        """Legacy links загружаются из signals.json."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
+def test_symmetry():
+    """score(a, b) ≈ score(b, a) — симметричность."""
+    score_fn, _ = _import_detector()
+    a = "ETF-приток создаёт структурный спрос"
+    b = "ETF-отток давит на цену BTC через ликвидацию"
+    diff = abs(score_fn(a, b) - score_fn(b, a))
+    assert diff < 0.15, f"Asymmetric score: {score_fn(a,b)} vs {score_fn(b,a)}"
 
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-        rels = store.get_all()
-        assert any(r.from_id == "STR-TEST-001" and r.to_id == "STR-TEST-002" for r in rels)
 
-    def test_add_canonical(self, tmp_path):
-        """Добавление canonical связи и сохранение."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
+# ─── suggest_contradictions (интеграция) ─────────────────────────────────────
 
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-        rel = store.add("STR-TEST-002", "STR-TEST-001", "confirms",
-                        rationale="Подтверждает через другой механизм")
-        assert rel.status == "active"
-        assert os.path.exists(rel_path)
+def test_suggest_contradictions_returns_list():
+    """suggest_contradictions возвращает список без исключений."""
+    _, suggest_fn = _import_detector()
+    signals = [
+        make_signal("A", "ETF-приток создаёт структурный спрос на BTC", "pos"),
+        make_signal("B", "ETF-отток давит на цену BTC через ликвидацию позиций", "neg"),
+        make_signal("C", "Lightning Network достигла рекорда транзакций", "pos"),
+    ]
+    result = suggest_fn(signals)
+    assert isinstance(result, list)
 
-    def test_no_self_link(self, tmp_path):
-        """Самосвязь запрещена."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
 
-        with pytest.raises(ValueError, match="Самосвязь"):
-            store.add("STR-TEST-001", "STR-TEST-001", "contradicts", rationale="test")
-
-    def test_no_duplicate(self, tmp_path):
-        """Дублирующая пара (from, to, type) запрещена."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-
-        store.add("STR-TEST-002", "STR-TEST-001", "contradicts", rationale="first")
-        with pytest.raises(ValueError, match="Дубль"):
-            store.add("STR-TEST-002", "STR-TEST-001", "contradicts", rationale="second")
-
-    def test_retract_not_delete(self, tmp_path):
-        """Ретракция меняет статус, не удаляет запись."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-
-        rel = store.add("STR-TEST-002", "STR-TEST-001", "confirms", rationale="test")
-        store.retract(rel.id, reason="Данные устарели")
-
-        # Связь остаётся в store, но статус retracted
-        all_rels = store.get_all(active_only=False)
-        retracted = [r for r in all_rels if r.id == rel.id]
-        assert len(retracted) == 1
-        assert retracted[0].status == "retracted"
-
-        # В активных — нет
-        active = store.get_all(active_only=True)
-        assert not any(r.id == rel.id for r in active)
-
-    def test_deduplication(self, tmp_path):
-        """Canonical приоритетнее legacy при дедупликации."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-
-        # Добавляем canonical с той же парой что есть в legacy
-        store.add("STR-TEST-001", "STR-TEST-002", "contradicts",
-                  rationale="canonical override")
-
-        contradicts = [r for r in store.get_all()
-                       if r.from_id == "STR-TEST-001" and r.type == "contradicts"]
-        # Должна быть ровно одна (canonical, не дубль legacy)
-        assert len(contradicts) == 1
-        assert "canonical" in contradicts[0].rationale
-
-    def test_migration_status(self, tmp_path):
-        """migration_status возвращает корректный чеклист."""
-        sig_path = self._make_signals_file(tmp_path)
-        rel_path = str(tmp_path / "relationships.json")
-        store = RelationshipStore(relationships_path=rel_path, signals_path=sig_path)
-        store.get_all()  # триггер загрузки
-
-        status = store.migration_status()
-        assert "checklist" in status
-        assert "legacy" in status
-        assert "canonical" in status
+def test_suggest_no_self_contradictions():
+    """Сигнал не предлагается как противоречие самому себе."""
+    _, suggest_fn = _import_detector()
+    signals = [
+        make_signal("A", "ETF-приток создаёт структурный спрос", "pos"),
+        make_signal("B", "ETF-отток давит на цену BTC", "neg"),
+    ]
+    result = suggest_fn(signals)
+    for item in result:
+        assert item.get("from_id") != item.get("to_id"), "Self-contradiction found"

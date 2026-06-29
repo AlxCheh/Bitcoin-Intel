@@ -319,3 +319,4 @@ BUSINESS_RULES = {
     "golden_dataset_min_signals": 15,
     "golden_dataset_min_clusters": 3,
 }
+ONTOLOGY_PATH = "ontology.json"   # B1: онтология нарративного движка

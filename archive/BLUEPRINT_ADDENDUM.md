@@ -1872,3 +1872,55 @@ Ontology меняется — нет автоматической проверк
 *BLUEPRINT_ADDENDUM.md · Версия 1.0 · 2026-06-28*  
 *Читать совместно с BLUEPRINT.md*  
 *Следующий ревью: после завершения Фазы 0*
+
+
+---
+
+## §16.4 Immutability Policy (D13)
+
+**Signal** — изменяем до первого утверждённого синтеза, затем immutable.
+
+| Поле | После добавления | После первого синтеза |
+|------|------------------|-----------------------|
+| `id` | immutable | immutable |
+| `tension`, `macro_implication` | изменяем | immutable |
+| `status` | `draft → active` | `active → archived` только |
+| `links.*` | изменяем | изменяем (до Фазы C миграции) |
+
+**Relationship** — append-only после создания. Изменить нельзя, только retract.
+
+| Операция | Разрешена |
+|----------|-----------|
+| Создать | ✅ |
+| Изменить `rationale` | ❌ создать новую с правильным rationale |
+| Удалить | ❌ только `status: retracted` + `retraction_rationale` |
+
+**Synthesis** — immutable после `status: approved`. Новый синтез заменяет старый
+через `on_synthesis_superseded()` — старый помечается `superseded`, не удаляется.
+
+**Cluster** — immutable `id` и `key`. `description` и `status` изменяемы.
+
+---
+
+## §16.5 Cross-Aggregate Consistency (D15)
+
+Система не поддерживает транзакции между агрегатами. Консистентность
+обеспечивается через:
+
+**1. Ordered operations** — операции выполняются в детерминированном порядке:
+```
+add_signal → validate → write signals.json → emit SignalAdded → (lifecycle hooks)
+```
+Если любой шаг падает — предыдущие не откатываются. Атомарность на уровне файла
+гарантирована `atomic_write_json_safe()` (temp → rename).
+
+**2. Eventual consistency** — `synthesis_cache.json` пересчитывается в CI после
+каждого коммита. Окно несогласованности = время выполнения pipeline (~60 сек).
+
+**3. Validate on read** — `validate_relationships.py` проверяет orphan relations
+после каждой миграции. `validate_integrity.py` — целостность всех файлов.
+
+**Известные границы:**
+- Если `signals.json` записан но `events.jsonl` не обновился → audit gap
+- `synthesis_cache.json` может быть старше `signals.json` на время CI pipeline
+- Решение при конфликте: данные в `signals.json` — source of truth, кеш пересчитывается

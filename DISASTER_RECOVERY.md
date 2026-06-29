@@ -191,3 +191,41 @@ echo "✓ Старые архивы очищены"
 ---
 
 *DISASTER_RECOVERY.md · v1.0 · 2026-06-28 · Закрывает BLOCKER B4*
+
+
+---
+
+## Migration Rollback Procedures
+
+### Rollback: links.* → relationships.json (ADR-008)
+
+| Шаг миграции | Rollback действие |
+|--------------|------------------|
+| Фаза A → B (создан relationships.json) | Удалить `data/relationships.json`, убедиться что `LEGACY_LINKS_ENABLED = True` |
+| Фаза B → C (links.* удалены из signals.json) | Восстановить `signals.json` из git: `git show HEAD~1:signals.json > signals.json` |
+
+```bash
+# Полный rollback миграции
+git log --oneline -- signals.json data/relationships.json | head -5
+git show COMMIT_SHA:signals.json > signals.json
+git show COMMIT_SHA:data/relationships.json > data/relationships.json
+python scripts/validate_relationships.py
+```
+
+### Rollback: synthesis_cache.json
+
+```bash
+# Пересчитать кеш с нуля
+PYTHONHASHSEED=0 python3 scripts/synthesizer.py
+python scripts/validate_integrity.py
+```
+
+### Rollback: Schema версии сигналов
+
+```bash
+# При переходе Schema v1 → v2 (MINOR изменение)
+git show COMMIT_SHA:signals.json > signals.json   # восстановить старый формат
+# Откатить SIGNAL_SCHEMA_VERSION в config/settings.py
+git revert COMMIT_SHA --no-edit
+git push origin main
+```

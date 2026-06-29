@@ -282,3 +282,38 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ─── Публичный API для тестов ────────────────────────────────────────────────
+# Тесты импортируют semantic_inverse_score и suggest_contradictions.
+# Эти функции — тонкие обёртки над внутренними score_pair / find_contradiction_candidates.
+
+def semantic_inverse_score(impl_a: str, impl_b: str) -> float:
+    """
+    Публичный API: оценка семантической несовместимости двух macro_implication.
+    Диапазон: 0.0 (совместимы) → 1.0 (прямое противоречие).
+    Threshold для предложения в contradicts: >= PROPOSAL_THRESHOLD (0.5).
+    """
+    if not impl_a or not impl_b:
+        return 0.0
+    sig_a = {"id": "_a", "macro_implication": impl_a, "dir": "pos", "actor": ""}
+    sig_b = {"id": "_b", "macro_implication": impl_b, "dir": "neg", "actor": ""}
+    candidate = score_pair(sig_a, sig_b)
+    return candidate.score
+
+
+def suggest_contradictions(signals: list) -> list:
+    """
+    Публичный API: предлагает пары сигналов как кандидаты на links.contradicts.
+    Возвращает список dict с from_id, to_id, score, rationale.
+    """
+    candidates = find_contradiction_candidates(signals, threshold=PROPOSAL_THRESHOLD)
+    return [
+        {
+            "from_id":   c.from_id,
+            "to_id":     c.to_id,
+            "score":     c.score,
+            "rationale": c.rationale,
+        }
+        for c in candidates
+    ]

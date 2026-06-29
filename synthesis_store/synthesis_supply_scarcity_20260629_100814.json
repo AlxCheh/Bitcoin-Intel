@@ -1,0 +1,23 @@
+{
+  "id": "synthesis_supply_scarcity_20260629_100814",
+  "cluster": "supply_scarcity",
+  "status": "generated",
+  "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
+  "narrative": "Ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float — вопреки тому что ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float",
+  "takeaway": "",
+  "strength": "strong",
+  "confidence": 1.0,
+  "phase": "tension",
+  "score": 26,
+  "signal_count": 2,
+  "anchor_signal_id": "SUP-2026-0625-001",
+  "phase_changed": false,
+  "structural_change": {},
+  "rationale": "Tension from SUP-2026-0625-001 (contradicts: 2, weight: onchain); partA from SUP-2026-0625-001; phase: tension; bridge: 'вопреки тому что'; confidence: 1.00; signals_used: 2; ignored_duplicates: []",
+  "signals_used": [
+    "SUP-2026-0625-001",
+    "SUP-2026-0622-001"
+  ],
+  "signals_ignored": [],
+  "generated_at": "2026-06-29T10:08:14.759551+00:00"
+}

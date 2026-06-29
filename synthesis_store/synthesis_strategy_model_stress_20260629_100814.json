@@ -1,0 +1,33 @@
+{
+  "id": "synthesis_strategy_model_stress_20260629_100814",
+  "cluster": "strategy_model_stress",
+  "status": "generated",
+  "tension": "Сэйлор декларирует финансовую устойчивость — но рынок одновременно ставит NAV-дисконт 0.83x",
+  "narrative": "NAV-дисконт 0.83x — первый рыночный сигнал что премия за BTC-стратегию через акции исчезает — однако расхождение между заявлениями менеджмента и рыночной оценкой — классический сигнал неопределённости",
+  "takeaway": "Расхождение между заявлениями менеджмента и рыночной оценкой — классический сигнал неопределённости",
+  "strength": "strong",
+  "confidence": 1.0,
+  "phase": "active",
+  "score": 113,
+  "signal_count": 9,
+  "anchor_signal_id": "STR-2026-0622-004",
+  "phase_changed": false,
+  "structural_change": {},
+  "rationale": "Tension from STR-2026-0622-004 (contradicts: 2, weight: primary); partA from STR-2026-0622-001; phase: active; bridge: 'однако'; confidence: 1.00; signals_used: 9; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
+  "signals_used": [
+    "STR-2026-0622-004",
+    "STR-2026-0625-001",
+    "STR-2026-0628-001",
+    "STR-2026-0624-002",
+    "STR-2026-0622-001",
+    "STR-2026-0618-001",
+    "STR-2026-0623-001",
+    "STR-2026-0622-002",
+    "STR-2026-0615-001"
+  ],
+  "signals_ignored": [
+    "STR-2026-0622-007",
+    "STR-2026-0622-003"
+  ],
+  "generated_at": "2026-06-29T10:08:14.753222+00:00"
+}

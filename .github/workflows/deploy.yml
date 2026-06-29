@@ -1,0 +1,111 @@
+name: Validate, Synthesize and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHONHASHSEED: "0"
+
+jobs:
+  validate:
+    name: Validate and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate signals.json
+        run: python3 -m json.tool signals.json > /dev/null && echo "OK signals.json"
+
+      - name: Validate ENTITIES.json
+        run: python3 -m json.tool ENTITIES.json > /dev/null && echo "OK ENTITIES.json"
+
+      - name: Check signal IDs unique
+        run: |
+          python3 -c "
+          import json, sys
+          data = json.load(open('signals.json'))
+          signals = data.get('signals', data) if isinstance(data, dict) else data
+          ids = [s['id'] for s in signals]
+          dupes = [i for i in ids if ids.count(i) > 1]
+          if dupes:
+              print('Duplicate IDs: ' + str(set(dupes)))
+              sys.exit(1)
+          print('OK ' + str(len(ids)) + ' unique signal IDs')
+          "
+
+      - name: Run tests
+        run: |
+          pip install pytest --quiet
+          PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
+
+  synthesize:
+    name: Synthesize Narratives
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run synthesizer
+        run: PYTHONHASHSEED=0 python3 scripts/synthesizer.py
+
+      - name: Verify synthesis_cache.json
+        run: |
+          python3 -c "
+          import json, sys
+          data = json.load(open('data/synthesis_cache.json'))
+          print('OK synthesis_cache.json: ' + str(len(data)) + ' clusters')
+          for k, v in data.items():
+              print('  ' + k + ': ' + v.get('strength','?') + ' phase=' + v.get('phase','?'))
+          "
+
+      - name: Commit synthesis cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/synthesis_cache.json synthesis_store/ || true
+          git diff --staged --quiet || git commit -m "chore: update synthesis_cache.json [skip ci]"
+          git push
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: synthesize
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/configure-pages@v4
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

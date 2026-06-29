@@ -4208,6 +4208,7 @@ function closeEntityPopup() {
 // ── SIGNALS BASE (загружается из signals.json) ──
 // Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
 let SIGNALS = [];
+let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 
 let priceChartInited = false;
 function initPriceChart() {
@@ -4724,12 +4725,15 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
-      fetch('ENTITIES.json?v=' + Date.now())
+      fetch('ENTITIES.json?v=' + Date.now()),
+      fetch('data/synthesis_cache.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
+    // Путь 3: загружаем Python-синтез, DEGRADE GRACEFULLY если недоступен
+    try { SYNTHESIS_CACHE = await cacheResp.json(); } catch(e) { SYNTHESIS_CACHE = {}; }
     ENTITIES = entData.entities || [];
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5214,9 +5218,13 @@ function renderDashboard() {
     return item;
   }
 
-  // Рендерим нарративы — advanced детерминированный синтез
+  // Путь 3: используем Python-синтез из synthesis_cache.json
+  // Fallback на браузерный синтез если кеш недоступен или кластер не найден
   shown.forEach(({ key, cl, score, weak }, idx) => {
-    const synthesis = synthesizeNarrativeAdvanced(key, cl);
+    const cached = SYNTHESIS_CACHE[key];
+    const synthesis = (cached && cached.tension)
+      ? cached
+      : synthesizeNarrativeAdvanced(key, cl);
     const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
     listEl.appendChild(item);
   });

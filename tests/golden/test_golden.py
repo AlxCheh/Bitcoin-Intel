@@ -10,8 +10,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-FIXTURES = Path("tests/golden/fixtures")
-EXPECTED = Path("tests/golden/expected")
+FIXTURES = Path(__file__).parent / "fixtures"
+EXPECTED = Path(__file__).parent / "expected"
 
 TENSION_MARKERS = ["vs", "несмотря на", "при условии", "вопреки", " — ", "—"]
 

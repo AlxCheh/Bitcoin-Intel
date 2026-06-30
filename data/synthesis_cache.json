@@ -14,7 +14,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-06-30T03:31:52.379031+00:00"
+      "detected_at": "2026-06-30T03:34:49.746256+00:00"
     },
     "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0622-001; phase: resolution; bridge: 'в результате чего'; confidence: 1.00; signals_used: 10; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -33,8 +33,8 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-06-30T03:31:52.379270+00:00",
-    "synthesis_id": "synthesis_strategy_model_stress_20260630_033152"
+    "generated_at": "2026-06-30T03:34:49.746444+00:00",
+    "synthesis_id": "synthesis_strategy_model_stress_20260630_033449"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -64,8 +64,8 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-06-30T03:31:52.384284+00:00",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260630_033152"
+    "generated_at": "2026-06-30T03:34:49.752843+00:00",
+    "synthesis_id": "synthesis_etf_institutional_flow_20260630_033449"
   },
   "btc_treasury_competition": {
     "tension": "Metaplanet строит регулируемую продуктовую фабрику на BTC-коллатерале при mNAV < 1x и $1.18 млрд нереализованного убытка — vs рынок не знает: это новый моат или leverage в регулируемой обёртке",
@@ -92,8 +92,8 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-06-30T03:31:52.386398+00:00",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260630_033152"
+    "generated_at": "2026-06-30T03:34:49.754891+00:00",
+    "synthesis_id": "synthesis_btc_treasury_competition_20260630_033449"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -114,8 +114,8 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-06-30T03:31:52.388523+00:00",
-    "synthesis_id": "synthesis_supply_scarcity_20260630_033152"
+    "generated_at": "2026-06-30T03:34:49.756706+00:00",
+    "synthesis_id": "synthesis_supply_scarcity_20260630_033449"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -143,7 +143,7 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-06-30T03:31:52.390764+00:00",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260630_033152"
+    "generated_at": "2026-06-30T03:34:49.758604+00:00",
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260630_033449"
   }
 }

@@ -198,3 +198,68 @@ def test_confidence_range():
     assert 0.1 <= result["confidence"] <= 1.0, (
         f"Confidence {result['confidence']} out of range [0.1, 1.0]"
     )
+
+
+def test_resolution_signal_wins_tension_over_complication():
+    """
+    Resolution-сигнал должен стать источником tension даже если
+    у него меньше contradicts чем у существующего complication-anchor.
+
+    Защищает от логического дефекта: phase=resolution говорит что
+    вопрос закрыт, но tension продолжает звучать как открытый.
+    """
+    signals = make_cluster_signals()  # trigger (pos) + complication (neg), 0 contradicts у обоих
+
+    # Усиливаем complication — даём ему contradicts чтобы он выигрывал
+    # по старому правилу MAX(contradicts)
+    strong_complication = deepcopy(signals[1])
+    strong_complication["id"] = "REG-2026-0105-001"
+    strong_complication["links"]["contradicts"] = ["REG-2026-0101-001", "REG-2026-0102-001"]
+
+    resolution_signal = {
+        "id": "REG-2026-0106-001",
+        "date": signals[0]["date"],  # тот же тестовый диапазон дат
+        "signal": "Резолюция кластера",
+        "cat": "narrative", "catLabel": "📰 Нарратив",
+        "dir": "pos", "horizon": "mid",
+        "theme": "institutionalization",
+        "weight": "primary", "actor": "etf", "flow": "inflow",
+        "tension": "Резолюция vs устаревший комплекейшн — цикл закрыт",
+        "macro_implication": (
+            "Противоречие кластера разрешено: структурный спрос подтверждён "
+            "вопреки краткосрочным колебаниям, цикл неопределённости завершён"
+        ),
+        "narrative_role": "resolution",
+        "cluster": "test_cluster",
+        "source": "Test (resolution)",
+        "links": {"confirms": [], "contradicts": [], "context_chain": []},
+        "data": [], "context": "", "caveat": "",
+    }
+
+    all_signals = signals + [strong_complication, resolution_signal]
+    result = run_synthesis(all_signals)
+
+    assert result["tension"] == resolution_signal["tension"], (
+        f"Resolution must win tension even with 0 contradicts vs "
+        f"complication with 2 contradicts. Got: {result['tension']!r}"
+    )
+    assert result["phase"] == "resolution", (
+        f"Phase must be 'resolution' when resolution signal present, got {result['phase']!r}"
+    )
+
+
+def test_no_resolution_keeps_max_contradicts_priority():
+    """
+    Контрольный тест: без resolution-сигнала старое правило
+    MAX(contradicts) продолжает работать как раньше.
+    """
+    signals = make_cluster_signals()
+    strong_complication = deepcopy(signals[1])
+    strong_complication["id"] = "REG-2026-0107-001"
+    strong_complication["links"]["contradicts"] = ["REG-2026-0101-001"]
+
+    all_signals = signals + [strong_complication]
+    result = run_synthesis(all_signals)
+
+    # Без resolution anchor выбирается по MAX(contradicts) как раньше
+    assert result["phase"] != "resolution"

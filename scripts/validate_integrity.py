@@ -30,6 +30,7 @@ def validate() -> bool:
 
     # ── signals.json ─────────────────────────────────────────────────────────
     signals_path = Path("signals.json")
+    signal_ids: set = set()  # используется ниже в M6 (referential integrity)
     try:
         raw     = json.loads(signals_path.read_text(encoding="utf-8"))
         signals = raw.get("signals", raw) if isinstance(raw, dict) else raw
@@ -38,6 +39,7 @@ def validate() -> bool:
             errors.append("signals.json: root must be array or {signals: []}")
         else:
             ids = [s.get("id") for s in signals if s.get("id")]
+            signal_ids = set(ids)
             dupes = [i for i in ids if ids.count(i) > 1]
             if dupes:
                 errors.append(f"signals.json: duplicate IDs: {set(dupes)}")
@@ -61,12 +63,43 @@ def validate() -> bool:
 
     # ── ENTITIES.json ─────────────────────────────────────────────────────────
     entities_path = Path("ENTITIES.json")
+    entity_signal_refs: list[tuple[str, str]] = []  # (entity_id, signal_ref) для M6
     try:
-        entities = json.loads(entities_path.read_text(encoding="utf-8"))
+        entities_raw = json.loads(entities_path.read_text(encoding="utf-8"))
+        # ENTITIES.json — {meta, entities: [...]} (DOC: docs/API.md)
+        entities = entities_raw.get("entities", entities_raw) if isinstance(entities_raw, dict) else entities_raw
         chk = sha256_file(entities_path)
         print(f"✓ ENTITIES.json: {len(entities)} entities | sha256: {chk[:16]}…")
+
+        for e in entities:
+            for ref in e.get("signal_refs", []) or []:
+                entity_signal_refs.append((e.get("id", "?"), ref))
+
     except Exception as e:
         errors.append(f"ENTITIES.json: {e}")
+        entities = []
+
+    # ── M6 (ARR v3): Referential Integrity ENTITIES.json.signal_refs ─────────
+    # Раньше проверялась только целостность relationships.json (orphan from_id/
+    # to_id, см. validate_relationships.py) — signal_refs внутри ENTITIES.json
+    # не проверялись вообще. Если сигнал удалён или его id переименован, а
+    # signal_refs не обновлён — ENTITIES.json молча ссылается в никуда, и это
+    # не заметно ни в одном существующем чеке.
+    if signal_ids and entity_signal_refs:
+        orphan_refs = [
+            (entity_id, ref) for entity_id, ref in entity_signal_refs
+            if ref not in signal_ids
+        ]
+        if orphan_refs:
+            errors.append(
+                "ENTITIES.json: orphan signal_refs (ссылка на несуществующий "
+                "signal id): " + ", ".join(f"{e}→{r}" for e, r in orphan_refs)
+            )
+        else:
+            print(
+                f"✓ ENTITIES.json.signal_refs: {len(entity_signal_refs)} ссылок, "
+                f"все валидны"
+            )
 
     # ── synthesis_cache.json ──────────────────────────────────────────────────
     cache_path = Path("data/synthesis_cache.json")

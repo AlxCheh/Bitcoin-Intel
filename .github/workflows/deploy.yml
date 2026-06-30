@@ -21,10 +21,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      # Единая установка всех dev-зависимостей из requirements.txt — раньше
+      # каждый шаг ставил пакет по отдельности (`pip install flake8`,
+      # `pip install pytest`, `pip install pip-audit`), и requirements.txt
+      # не был реальным единым источником истины: hypothesis там уже был
+      # объявлен (T06), но ни разу не ставился в CI — баг был незаметен,
+      # пока ни один тест её не импортировал. tests/unit/test_confidence_properties.py
+      # (C2 ARR v3) теперь импортирует hypothesis напрямую — без этого шага
+      # CI упал бы с ImportError при первом же запуске.
+      - name: Install dependencies
+        run: pip install -r requirements.txt --quiet
+
       - name: Lint
-        run: |
-          pip install flake8 --quiet
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Validate signals.json
         run: python3 -m json.tool signals.json > /dev/null && echo "OK signals.json"
@@ -46,15 +55,14 @@ jobs:
           print('OK ' + str(len(ids)) + ' unique signal IDs')
           "
 
+      - name: Validate data integrity (M6)
+        run: python3 scripts/validate_integrity.py
+
       - name: Run tests
-        run: |
-          pip install pytest --quiet
-          PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
+        run: PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
 
       - name: Security audit
-        run: |
-          pip install pip-audit --quiet
-          pip-audit --requirement requirements.txt || true
+        run: pip-audit --requirement requirements.txt || true
 
   synthesize:
     name: Synthesize Narratives

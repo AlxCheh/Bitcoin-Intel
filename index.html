@@ -4090,18 +4090,18 @@ function renderEcosystem() {
 
   listEl.innerHTML = filtered.map(e => {
     const metrics = (e.profile?.metrics || []).slice(0, 2);
-    const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || e.status;
-    const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || e.type.toUpperCase();
-    return '<div class="eco-card" data-entity-id="' + e.id + '">'
+    const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || sanitize(e.status);
+    const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || sanitize(e.type).toUpperCase();
+    return '<div class="eco-card" data-entity-id="' + sanitize(e.id) + '">'
       + '<div class="eco-card-head">'
-      +   '<span class="eco-card-name">' + e.name + '</span>'
+      +   '<span class="eco-card-name">' + sanitize(e.name) + '</span>'
       +   '<div class="eco-card-badges">'
       +     '<span class="eco-badge">' + typeLabel + '</span>'
-      +     '<span class="eco-badge ' + e.status + '">' + statusLabel + '</span>'
+      +     '<span class="eco-badge ' + sanitize(e.status) + '">' + statusLabel + '</span>'
       +   '</div>'
       + '</div>'
-      + '<div class="eco-card-summary">' + e.summary + '</div>'
-      + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + m + '</span>').join('') + '</div>' : '')
+      + '<div class="eco-card-summary">' + sanitize(e.summary) + '</div>'
+      + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -4144,14 +4144,36 @@ const TYPE_META = {
   exchange:      'EXCHANGE',
 };
 
+// ── XSS-защита (B2 ARR v3, SECURITY.md T1) ─────────────────────────────────
+// Все поля сигналов (signals.json) и артефактов (ENTITIES.json) — свободный
+// текст, заполняемый аналитиком вручную. Перед вставкой через innerHTML их
+// необходимо экранировать — без этого произвольный <img onerror=...> в любом
+// текстовом поле сигнала выполнился бы в браузере читателя сайта.
+//
+// Единая функция применяется централизованно (без дублирования логики) во
+// всех местах, где данные сигнала/сущности попадают в innerHTML. Санитизация
+// выполняется ДО highlightEntities() — порядок важен, иначе экранируются и
+// собственные <span> теги, которые highlightEntities добавляет для подсветки
+// упомянутых сущностей.
+function sanitize(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function highlightEntities(text) {
-  if (!ENTITIES || !ENTITIES.length) return text;
-  let result = text;
+  if (!ENTITIES || !ENTITIES.length) return sanitize(text);
+  let result = sanitize(text);
   const sorted = [...ENTITIES].sort((a, b) => b.name.length - a.name.length);
   sorted.forEach(e => {
-    const escaped = e.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = sanitize(e.name);
+    const escaped = safeName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp('(' + escaped + ')', 'g');
-    result = result.replace(re, '<span class="entity-link" data-entity-id="' + e.id + '">$1</span>');
+    result = result.replace(re, '<span class="entity-link" data-entity-id="' + sanitize(e.id) + '">$1</span>');
   });
   return result;
 }
@@ -4183,17 +4205,17 @@ function showEntityPopup(id) {
   const metrics = e.profile?.metrics || [];
   const metricsEl = document.getElementById('ep-metrics');
   metricsEl.innerHTML = metrics.length
-    ? metrics.map(m => '<div class="ep-metric">· ' + m + '</div>').join('')
+    ? metrics.map(m => '<div class="ep-metric">· ' + sanitize(m) + '</div>').join('')
     : '';
 
   const notableEl = document.getElementById('ep-notable');
   notableEl.innerHTML = e.profile?.notable
-    ? '<div class="ep-notable">' + e.profile.notable + '</div>'
+    ? '<div class="ep-notable">' + sanitize(e.profile.notable) + '</div>'
     : '';
 
   const refs = e.signal_refs || [];
   document.getElementById('ep-refs').innerHTML = refs.length
-    ? refs.map(r => '<span class="ep-ref">' + r + '</span>').join('')
+    ? refs.map(r => '<span class="ep-ref">' + sanitize(r) + '</span>').join('')
     : '';
 
   document.getElementById('entity-popup').classList.add('visible');
@@ -4837,7 +4859,7 @@ function renderSignals() {
   const catDir = {};
   SIGNALS.forEach(s => {
     const cl = s.cluster || s.theme || s.cat;
-    cats[cl] = DIGEST_CLUSTER_LABELS[cl] || cl.toUpperCase();
+    cats[cl] = DIGEST_CLUSTER_LABELS[cl] || sanitize(cl).toUpperCase();
     catCounts[cl] = (catCounts[cl] || 0) + 1;
     if (!catDir[cl]) catDir[cl] = { pos: 0, neg: 0, neu: 0 };
     catDir[cl][s.dir] = (catDir[cl][s.dir] || 0) + 1;
@@ -4875,8 +4897,8 @@ function renderSignals() {
   fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid #1A1F2A">'
     + '<button class="sig-fbtn' + (sigActorFilter==='all'?' active':'') + '" onclick="setSigActorFilter(\'all\')" style="font-size:10px">ВСЕ АКТОРЫ</button>';
   Object.keys(actors).forEach(a => {
-    const meta = ACTOR_META[a] || { label: a.toUpperCase() };
-    fhtml += '<button class="sig-fbtn' + (sigActorFilter===a?' active':'') + '" onclick="setSigActorFilter(\'' + a + '\')" style="font-size:10px">' + meta.label + '</button>';
+    const meta = ACTOR_META[a] || { label: sanitize(a).toUpperCase() };
+    fhtml += '<button class="sig-fbtn' + (sigActorFilter===a?' active':'') + '" onclick="setSigActorFilter(\'' + sanitize(a) + '\')" style="font-size:10px">' + meta.label + '</button>';
   });
   fhtml += '</div>';
 
@@ -4891,14 +4913,15 @@ function renderSignals() {
 
   function cardHTML(s) {
     const d = DIR_META[s.dir];
-    const chips = s.data.map(x => '<span class="sig-chip">' + x + '</span>').join('');
+    const chips = s.data.map(x => '<span class="sig-chip">' + sanitize(x) + '</span>').join('');
     const horizonLabel = { short: 'SHORT', mid: 'MID', long: 'LONG' }[s.horizon] || '';
     const flowMeta = s.flow && s.flow !== 'neutral' ? FLOW_META[s.flow] : null;
     const actorMeta = s.actor ? ACTOR_META[s.actor] : null;
     const roleColor = {trigger:'var(--btc)', complication:'var(--amber)', resolution:'var(--grn)', background:'var(--slate)'}[s.narrative_role] || 'var(--dim)';
     const roleDot = s.narrative_role ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + roleColor + ';margin-right:2px;vertical-align:middle"></span>' : '';
-    return '<div class="sig-card ' + s.dir + '" id="sig-' + s.id + '">'
-      + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || s.catLabel) + '</span>' + roleDot + '<span>' + s.date + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
+    const safeTheoryRef = sanitize(s.theory_ref || '');
+    return '<div class="sig-card ' + s.dir + '" id="sig-' + sanitize(s.id) + '">'
+      + '<div class="sig-top"><span class="sig-cat">' + (DIGEST_CLUSTER_LABELS[s.cluster || s.theme] || sanitize(s.catLabel)) + '</span>' + roleDot + '<span>' + sanitize(s.date) + '</span><span class="sig-dir">' + d.icon + ' ' + d.label + '</span></div>'
       + '<div class="sig-signal">' + highlightEntities(s.signal) + '</div>'
       + '<div class="sig-data">' + chips
       + (horizonLabel ? '<span class="sig-chip" style="'
@@ -4913,8 +4936,8 @@ function renderSignals() {
       + '<p><span class="lbl">КОНТЕКСТ.</span> ' + highlightEntities(s.context) + '</p>'
       + '<p><span class="lbl">ОГОВОРКИ.</span> ' + highlightEntities(s.caveat) + '</p>'
       + '</div>'
-      + '<div class="sig-src">ИСТОЧНИК: ' + s.source + '</div>'
-      + (s.theory_ref ? '<div style="padding:6px 14px 10px;border-top:1px solid var(--line)"><button onclick="showTab(\'theory\',null);setTimeout(()=>{const el=document.getElementById(\'' + s.theory_ref + '\');if(el)el.scrollIntoView({behavior:\'smooth\'})},120)" style="background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em">↗ ТЕОРИЯ · ' + (s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : s.theory_ref.replace('theory-','').toUpperCase()) + '</button></div>' : '')
+      + '<div class="sig-src">ИСТОЧНИК: ' + sanitize(s.source) + '</div>'
+      + (s.theory_ref ? '<div style="padding:6px 14px 10px;border-top:1px solid var(--line)"><button onclick="showTab(\'theory\',null);setTimeout(()=>{const el=document.getElementById(\'' + safeTheoryRef + '\');if(el)el.scrollIntoView({behavior:\'smooth\'})},120)" style="background:transparent;border:1px solid rgba(247,147,26,0.3);border-radius:3px;color:var(--btc);padding:4px 10px;font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:0.08em">↗ ТЕОРИЯ · ' + (s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : safeTheoryRef.replace('theory-','').toUpperCase()) + '</button></div>' : '')
       + '</div>';
   }
 
@@ -5174,7 +5197,7 @@ function renderDashboard() {
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
     const isHot  = score.total >= SCORE_HOT;
     const bdId   = 'nbd-' + idx;
-    const label  = CLUSTER_LABELS[key] || key.toUpperCase();
+    const label  = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
     const cnt    = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
     const macroText = synthesis.narrative || '—';
     const tension   = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '';
@@ -5192,7 +5215,7 @@ function renderDashboard() {
       + '</div>'
       + (tension ? '<div class="dash-narrative-tension">' + highlightEntities(tension) + '</div>' : '')
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
-      + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + synthesis.takeaway + '</div>' : '')
+      + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
       + '<div class="dash-sum-counts" style="margin:5px 0">'
       +   '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>'
       +   '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>'

@@ -25,7 +25,8 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import (
-    SIGNALS_PATH, ENCODING, ERROR_EXIT_CODES, WINDOW_DAYS_DEFAULT
+    SIGNALS_PATH, ENCODING, ERROR_EXIT_CODES, WINDOW_DAYS_DEFAULT,
+    SYNTHESIS_STORE_PATH, MIN_SYNTHESES_FOR_CALIBRATION
 )
 from infrastructure.file_lock import safe_read_json
 from infrastructure.logger import get_logger, measure_performance
@@ -152,6 +153,26 @@ def compute_quality_report(signals: list[dict],
             "grade": grade,
             "max":   100,
         },
+        "calibration": check_calibration_readiness(),
+    }
+
+
+# ─── Confidence Calibration Readiness (ADR-011, C2 ARR v3) ──────────────────
+
+def check_calibration_readiness() -> dict:
+    """
+    Считает файлы в synthesis_store/ как прокси числа исторических синтезов
+    и сравнивает с MIN_SYNTHESES_FOR_CALIBRATION (ADR-011). Не блокирует
+    CI — это управленческая рекомендация, не ошибка качества данных.
+    """
+    store = Path(SYNTHESIS_STORE_PATH)
+    count = len(list(store.glob("*.json"))) if store.exists() else 0
+    ready = count >= MIN_SYNTHESES_FOR_CALIBRATION
+    return {
+        "synthesis_count": count,
+        "threshold":       MIN_SYNTHESES_FOR_CALIBRATION,
+        "ready":           ready,
+        "remaining":       max(0, MIN_SYNTHESES_FOR_CALIBRATION - count),
     }
 
 
@@ -188,6 +209,22 @@ def _print_report(report: dict) -> None:
 
     print(f"\n  Распределение по dir: {report['distribution']['by_dir']}")
     print(f"  Распределение по role: {report['distribution']['by_narrative_role']}")
+
+    cal = report.get("calibration")
+    if cal:
+        if cal["ready"]:
+            print(
+                f"\n  📐 Calibration: {cal['synthesis_count']}/{cal['threshold']} "
+                f"синтезов накоплено — порог достигнут, см. ADR-011 "
+                f"для проведения калибровки confidence."
+            )
+        else:
+            print(
+                f"\n  📐 Calibration: {cal['synthesis_count']}/{cal['threshold']} "
+                f"синтезов ({cal['remaining']} до порога) — калибровка "
+                f"confidence отложена по ADR-011."
+            )
+
     print(f"{'─'*55}\n")
 
 
@@ -198,7 +235,12 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
-        signals = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
+        raw = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
+        # signals.json — {meta, signals: [...]} (см. docs/API.md, ENTITIES.json
+        # такая же обёртка). raw.get(..., raw) с фоллбэком на сам raw сохраняет
+        # обратную совместимость, если кто-то передаст сырой список напрямую
+        # (как делают golden-фикстуры в tests/).
+        signals = raw.get("signals", raw) if isinstance(raw, dict) else raw
         report  = compute_quality_report(signals, cluster_filter=args.cluster)
 
         if args.format == "json":

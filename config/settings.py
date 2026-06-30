@@ -194,6 +194,14 @@ INITIALIZATION_ORDER = [
 
 SYNTHESIS_STORE_PATH = "synthesis_store"
 
+# ─── Confidence Calibration Gate (ADR-011, C2 ARR v3) ────────────────────────
+# Калибровка confidence на статистически значимой выборке откладывается до
+# накопления этого числа исторических синтезов в synthesis_store/. До этого
+# порога calculate_confidence() остаётся объяснённой эвристикой, проверяемой
+# property-тестами (tests/unit/test_confidence_properties.py), а не
+# статистической моделью. См. ADR-011 для полного обоснования порога.
+MIN_SYNTHESES_FOR_CALIBRATION = 30
+
 
 def assert_required_files_exist() -> None:
     """Проверяет наличие критических файлов перед запуском."""

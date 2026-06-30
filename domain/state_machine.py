@@ -31,7 +31,17 @@ SIGNAL_TRANSITIONS: dict[str, set] = {
 }
 
 SYNTHESIS_TRANSITIONS: dict[str, set] = {
-    "generated":  {"reviewed", "archived"},
+    # "approved" добавлен напрямую из "generated" 2026-06-30 (C3 ARR v3):
+    # scripts/approve_synthesis.py документирует и реализует прямой переход
+    # generated -> approved (см. docstring файла, шаг 4) для текущего формата
+    # одного аналитика — проверка синтеза происходит при чтении show_synthesis()
+    # перед вводом rationale, без отдельного формального шага "reviewed".
+    # "reviewed" сохранён как путь для будущего multi-reviewer процесса
+    # (Backend-фаза, несколько аналитиков) — но не обязателен сейчас.
+    # До этого фикса прямой переход был запрещён, и approve() ВСЕГДА бросал
+    # ForbiddenStateTransitionError — баг был не обнаружен из-за отсутствия
+    # тестов на approve_synthesis.py (см. tests/integration/test_approve_synthesis.py).
+    "generated":  {"reviewed", "approved", "archived"},
     "reviewed":   {"approved", "generated"},   # можно вернуть на доработку
     "approved":   {"published", "archived"},
     "published":  {"superseded"},

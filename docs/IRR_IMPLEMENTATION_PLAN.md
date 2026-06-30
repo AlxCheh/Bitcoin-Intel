@@ -1,6 +1,6 @@
 # IRR Implementation Plan
 ## Реализация Required Actions из IRR_REPORT.md
-## Статус: 5/6 DONE, 1 BLOCKED · Создан: 2026-06-29 · Обновлён: 2026-06-30
+## Статус: 6/6 DONE · Создан: 2026-06-29 · Обновлён: 2026-06-30
 
 > **Основание:** Implementation Review Board, IRR_REPORT.md  
 > **Вердикт:** READY WITH CONDITIONS (6 условий)  
@@ -11,31 +11,13 @@
 ## Чеклист выполнения
 
 - [x] Шаг 1 — README.md (IRB-B1) · 2026-06-30
-- [~] Шаг 2 — Coding Standards (IRB-B2) · 2026-06-30 — CODING_STANDARDS.md и pyproject.toml готовы; **Lint-шаг в deploy.yml заблокирован** (см. ниже)
+- [x] Шаг 2 — Coding Standards (IRB-B2) · 2026-06-30
 - [x] Шаг 3 — requirements.txt (IRB-B3) · 2026-06-30
 - [x] Шаг 4 — docs/ реструктуризация (IRB-B5) · 2026-06-30
 - [x] Шаг 5 — Component README (Condition 5) · 2026-06-30
 - [x] Шаг 6 — CONTRIBUTING.md (Condition 6) · 2026-06-30
 
-### ⚠️ Заблокировано: Lint-шаг в `.github/workflows/deploy.yml`
-
-GitHub API (`PUT /repos/{repo}/contents/.github/workflows/deploy.yml`) возвращает `404 Not Found`
-при попытке записи через текущий Personal Access Token. Причина: токен не имеет scope `workflow` —
-GitHub намеренно блокирует изменение файлов в `.github/workflows/` токенами без этого разрешения
-(стандартное поведение классических PAT с ограниченными scopes).
-
-**Решение (одно из двух):**
-1. Выдать токену scope `workflow` в настройках GitHub → Settings → Developer settings → Personal access tokens, и повторить запись.
-2. Внести изменение вручную через GitHub UI — добавить в `validate` job, сразу после шага `Set up Python`:
-   ```yaml
-   - name: Lint
-     run: |
-       pip install flake8 --quiet
-       flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-   ```
-
-До устранения — Condition 2 (IRB-B2) считается частично выполненной: стандарты задокументированы,
-но линтер физически не подключён к CI.
+Все 6 условий IRR_REPORT.md закрыты. План полностью выполнен.
 
 ---
 
@@ -55,7 +37,7 @@ GitHub намеренно блокирует изменение файлов в 
 
 ---
 
-## Шаг 2 — Coding Standards (IRB-B2) · PARTIAL (CI lint заблокирован)
+## Шаг 2 — Coding Standards (IRB-B2) · DONE
 
 **Файлы:**
 - `docs/CODING_STANDARDS.md` — style guide

@@ -21,7 +21,7 @@ Bitcoin Intel — образовательный ресурс. Данные пу
 
 ---
 
-## T1 — XSS в renderNarrativeItem
+## T1 — XSS в renderNarrativeItem ✅ ИСПРАВЛЕНО (2026-06-30)
 
 ### Уязвимость
 
@@ -55,21 +55,49 @@ function sanitize(str) {
 
 ### Применение
 
-Заменить прямую подстановку на `sanitize()` для всех полей из внешних данных:
+`sanitize()` встроена централизованно — без дублирования вызовов в каждом месте:
 
-| Поле | До | После |
-|------|----|-------|
-| `tension` | `highlightEntities(tension)` | `highlightEntities(sanitize(tension))` |
-| `macroText` | `highlightEntities(macroText)` | `highlightEntities(sanitize(macroText))` |
-| `synthesis.takeaway` | прямая подстановка | `sanitize(synthesis.takeaway)` |
-| `label` из `CLUSTER_LABELS` | прямая подстановка | `sanitize(label)` |
-| `e.profile.notable` | прямая подстановка | `sanitize(e.profile.notable)` |
-| `e.profile.metrics[i]` | прямая подстановка | `sanitize(m)` |
-| `e.signal_refs[i]` | прямая подстановка | `sanitize(r)` |
+1. **`highlightEntities(text)`** теперь сама вызывает `sanitize(text)` первым шагом,
+   до подсветки упомянутых сущностей. Это автоматически закрывает все её вызовы:
+   `s.signal`, `tension`, `synthesis.narrative` (macroText), `s.context`, `s.caveat`.
+2. Поля, которые вставляются в `innerHTML` напрямую (без `highlightEntities`), обёрнуты
+   `sanitize()` явно в каждой точке вставки. Финальный охват — шире изначально
+   специфицированных 7 полей, по итогам полного аудита всех 42 мест `innerHTML =` в
+   `index.html` (B2 ARR v3, docs/ARR_REPORT_v3.md):
 
-> `highlightEntities()` — внутренняя функция проекта, оборачивает известные сущности в `<span>`. Санитизацию проводить **до** передачи в неё, чтобы не экранировать её собственные теги.
+| Поле | Функция/место |
+|------|---------------|
+| `synthesis.takeaway` | `renderNarrativeItem()` |
+| `key` (fallback label кластера) | `renderNarrativeItem()` |
+| `cl` (fallback label кластера) | `renderSignals()` фильтры |
+| `s.source` | `cardHTML()` |
+| `s.data[i]` (chips) | `cardHTML()` |
+| `s.theory_ref` | `cardHTML()` (включая JS-строку внутри `onclick`) |
+| `s.catLabel` (fallback) | `cardHTML()` |
+| `s.id` | `cardHTML()` (атрибут `id`) |
+| `s.actor` (fallback label) | `renderSignals()` фильтры |
+| `e.name`, `e.summary`, `e.id`, `e.status`, `e.type` (fallback) | `renderEcosystem()` |
+| `e.profile.metrics[i]` | `renderEcosystem()`, `showEntityPopup()` |
+| `e.profile.notable` | `showEntityPopup()` |
+| `e.signal_refs[i]` | `showEntityPopup()` |
 
-**Статус:** ⏳ К реализации (см. IMPLEMENTATION_TRACKER.md → B3)
+Поля, отрисовываемые через `.textContent` (`ep-name`, `ep-summary` основной текст),
+не требуют санитизации — браузер не интерпретирует их как HTML по определению API.
+
+Поля с ограниченным набором значений, проверяемым `domain/validator.py` до записи в
+`signals.json` (`dir`, `narrative_role`, `weight`, `cat`, `horizon`, `flow`) используются
+только как CSS-классы или ключи поиска в захардкоженных JS-объектах — не как HTML-контент,
+дополнительная санитизация не требуется.
+
+### Регрессионный тест
+
+Функциональная проверка `sanitize()`/`highlightEntities()` против реального XSS-payload
+(`<img src=x onerror=alert(1)>`) и против легитимного текста с упоминанием сущности —
+выполнена вручную через Node.js при разработке фикса. Автоматизированный JS-тест
+(headless browser / jsdom) — в Technical Debt After MVP, см. `docs/ARR_REPORT_v3.md`,
+проект пока не имеет JS test runner в зависимостях.
+
+**Статус:** ✅ Реализовано — коммит исправления `index.html`, 2026-06-30.
 
 ---
 

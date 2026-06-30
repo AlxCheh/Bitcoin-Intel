@@ -110,6 +110,12 @@ ROLE_SCORE = {
 
 CONTRADICTION_BONUS = 5   # за каждый id в links.contradicts
 
+# ─── Contradiction Detector ──────────────────────────────────────────────────
+# Порог score (semantic_inverse_score / score_pair) для предложения аналитику.
+# Вынесен сюда из scripts/contradiction_detector.py (N2 ARR v3) — единая
+# точка настройки порогов вместе с остальными.
+CONTRADICTION_PROPOSAL_THRESHOLD = 0.5
+
 # ─── Кластер: пороги силы нарратива ─────────────────────────────────────────
 SCORE_HOT      = 20   # 🔥 горячий нарратив
 SCORE_STRONG   = 12   # strong

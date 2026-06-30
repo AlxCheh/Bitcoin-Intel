@@ -89,7 +89,6 @@ Bitcoin-Intel/
 ├── archive/                # Устаревшие версии документов (история, не редактировать)
 │
 ├── CLAUDE.md                # Алгоритм обработки сигнала — главный рабочий документ
-├── STRUCTURE.md             # Архитектура, дизайн-система, навигация сайта
 ├── CHANGELOG.md             # История версий CLAUDE.md
 └── .github/workflows/       # CI: валидация → синтез → деплой на GitHub Pages
 ```
@@ -106,11 +105,12 @@ Bitcoin-Intel/
 | [`docs/spec-pilot.md`](docs/spec-pilot.md) | Алгоритм сборки `index.html` — обязателен перед правкой сайта |
 | [`docs/CODING_STANDARDS.md`](docs/CODING_STANDARDS.md) | Style guide, naming, куда класть новые компоненты |
 | [`docs/API.md`](docs/API.md) | Спецификация backend API |
-| [`docs/SECURITY.md`](SECURITY.md) | Threat model, политика секретов |
-| [`docs/DEPLOYMENT.md`](DEPLOYMENT.md) | CI/CD pipeline, branch strategy, rollback |
+| [`docs/ARR_EXECUTION_STATUS.md`](docs/ARR_EXECUTION_STATUS.md) | Статус выполнения ARR v3 — что закрыто, что осталось осознанно открытым |
+| [`SECURITY.md`](SECURITY.md) | Threat model, политика секретов |
+| [`DEPLOYMENT.md`](DEPLOYMENT.md) | CI/CD pipeline, branch strategy, rollback |
 | [`DISASTER_RECOVERY.md`](DISASTER_RECOVERY.md) | RTO/RPO, backup, runbook |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Commit convention, branch naming, PR process |
-| [`STRUCTURE.md`](STRUCTURE.md) | Архитектура и дизайн-система сайта |
+| [`archive/STRUCTURE.md`](archive/STRUCTURE.md) | Архитектура и дизайн-система сайта (исторический, до перехода на Narrative Intelligence Platform) |
 
 ---
 

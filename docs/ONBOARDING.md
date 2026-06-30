@@ -122,5 +122,5 @@ CI занимает ~2 минуты. Если через 5 минут нет —
 ## Контакты и помощь
 
 При вопросах по алгоритму → CLAUDE.md  
-При вопросах по архитектуре → docs/ARCH_GAP_SPEC.md  
+При вопросах по архитектуре → docs/BLUEPRINT.md и docs/BLUEPRINT_ADDENDUM.md  
 При ошибках CI → GitHub Actions → View workflow run

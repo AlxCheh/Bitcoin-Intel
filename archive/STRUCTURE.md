@@ -1,6 +1,6 @@
 # STRUCTURE.md — Архитектура приложения
 
-> Часть проекта Bitcoin-Intel. Основной файл: [CLAUDE.md](CLAUDE.md)
+> Часть проекта Bitcoin-Intel. Основной файл: [CLAUDE.md](../CLAUDE.md)
 
 ---
 

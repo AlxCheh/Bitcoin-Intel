@@ -1,6 +1,6 @@
 # Coding Standards — Bitcoin Intel
 
-> Обязателен к соблюдению для всех PR. Часть Condition 2 из [`IRR_REPORT.md`](IRR_REPORT.md).
+> Обязателен к соблюдению для всех PR. Часть Condition 2 из [`IRR_REPORT.md`](../archive/IRR_REPORT.md) (закрыто, см. архив).
 
 ---
 
@@ -85,7 +85,7 @@ if not is_valid_transition(current, target):
 Синтезатор и связанные с ним компоненты должны быть **детерминированными**:
 `PYTHONHASHSEED=0` обязателен при запуске `scripts/synthesizer.py` и тестов, которые его вызывают.
 Не использовать `hash()` для выбора между вариантами без фиксированного seed — это нарушение
-архитектурного контракта (см. историю Blocker IRB-B1 в [`ARR_STATUS_REPORT.md`](ARR_STATUS_REPORT.md)).
+архитектурного контракта (см. историю Blocker IRB-B1 в [`ARR_STATUS_REPORT.md`](../archive/ARR_STATUS_REPORT.md)).
 
 ## Логирование
 

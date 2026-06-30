@@ -20,6 +20,7 @@ CLI-инструменты для аналитика и для CI. Каждый 
 | `validate_integrity.py` | Проверка целостности `signals.json`, `ENTITIES.json`, `synthesis_cache.json`, checksums |
 | `validate_relationships.py` | Проверка `relationships.json`: orphan-связи, дубликаты, contradiction-циклы |
 | `migrate_relationships.py` | Разовая миграция `links.*` из `signals.json` в `data/relationships.json` |
+| `cleanup_synthesis_store.py` | Очистка `synthesis_store/` по retention policy (`SYNTHESIS_RETENTION`), dry-run по умолчанию, `--apply` для реального удаления (M1 ARR v3) |
 
 ## Что добавлять сюда
 

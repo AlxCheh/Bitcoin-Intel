@@ -128,6 +128,23 @@ class SynthesisExpired(DomainEvent):
     expired_after_days: int = 0
 
 
+@dataclass
+class SynthesisStoreCleaned(DomainEvent):
+    """
+    Файл синтеза удалён из synthesis_store/ по retention policy (M1 ARR v3).
+    Испускается в: scripts/cleanup_synthesis_store.py, ДО физического
+    удаления файла — Audit Trail не должен лгать о состоянии файловой
+    системы, поэтому событие пишется первым (fail loud, если запись не
+    удалась — файл остаётся на диске).
+    """
+    event_type:      str = "SynthesisStoreCleaned"
+    synthesis_id:    str = ""
+    cluster:         str = ""
+    status:          str = ""
+    age_days:        int = 0
+    retention_days:  int = 0
+
+
 # ─── EventLog ────────────────────────────────────────────────────────────────
 class EventLog:
     """

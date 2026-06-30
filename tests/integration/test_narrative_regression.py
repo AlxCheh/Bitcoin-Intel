@@ -207,13 +207,18 @@ def test_resolution_signal_wins_tension_over_complication():
 
     Защищает от логического дефекта: phase=resolution говорит что
     вопрос закрыт, но tension продолжает звучать как открытый.
+
+    ВАЖНО: каждый тестовый сигнал должен иметь уникальный ключ
+    дедупликации (date, actor, cluster, dir) — иначе deduplicate_signals()
+    выбросит один из них до того как тест дойдёт до tension selection.
     """
-    signals = make_cluster_signals()  # trigger (pos) + complication (neg), 0 contradicts у обоих
+    signals = make_cluster_signals()  # trigger (pos,etf) + complication (neg,etf), 0 contradicts
 
     # Усиливаем complication — даём ему contradicts чтобы он выигрывал
-    # по старому правилу MAX(contradicts)
+    # по старому правилу MAX(contradicts). Уникальный actor чтобы не задедуплицировался.
     strong_complication = deepcopy(signals[1])
-    strong_complication["id"] = "REG-2026-0105-001"
+    strong_complication["id"]     = "REG-2026-0105-001"
+    strong_complication["actor"]  = "corporate"   # уникальный ключ дедупликации
     strong_complication["links"]["contradicts"] = ["REG-2026-0101-001", "REG-2026-0102-001"]
 
     resolution_signal = {
@@ -221,9 +226,9 @@ def test_resolution_signal_wins_tension_over_complication():
         "date": signals[0]["date"],  # тот же тестовый диапазон дат
         "signal": "Резолюция кластера",
         "cat": "narrative", "catLabel": "📰 Нарратив",
-        "dir": "pos", "horizon": "mid",
+        "dir": "neu", "horizon": "mid",           # уникальный dir чтобы не задедуплицировался
         "theme": "institutionalization",
-        "weight": "primary", "actor": "etf", "flow": "inflow",
+        "weight": "primary", "actor": "government", "flow": "inflow",  # уникальный actor
         "tension": "Резолюция vs устаревший комплекейшн — цикл закрыт",
         "macro_implication": (
             "Противоречие кластера разрешено: структурный спрос подтверждён "
@@ -255,7 +260,8 @@ def test_no_resolution_keeps_max_contradicts_priority():
     """
     signals = make_cluster_signals()
     strong_complication = deepcopy(signals[1])
-    strong_complication["id"] = "REG-2026-0107-001"
+    strong_complication["id"]    = "REG-2026-0107-001"
+    strong_complication["actor"] = "corporate"  # уникальный ключ дедупликации
     strong_complication["links"]["contradicts"] = ["REG-2026-0101-001"]
 
     all_signals = signals + [strong_complication]

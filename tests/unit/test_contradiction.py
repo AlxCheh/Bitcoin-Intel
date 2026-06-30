@@ -117,17 +117,27 @@ def test_suggest_no_self_contradictions():
 
 def test_precision_on_golden_pairs():
     """
-    Precision на Golden Dataset >= 60% (B2 ARR v2).
-    Загружает пары из tests/golden/fixtures/contradiction_pairs.json.
+    Precision на Golden Dataset >= 60% (B1 ARR v3 / B2 ARR v2).
+
+    Путь к fixture резолвится от расположения этого тестового файла
+    (Path(__file__)), а НЕ от текущей рабочей директории. Это намеренно:
+    tests/conftest.py содержит autouse-фикстуру isolated_environment,
+    которая на каждом тесте делает monkeypatch.chdir(tmp_path) — относительный
+    путь от cwd в такой ситуации всегда резолвился бы в пустую песочницу и
+    тест молча скипал бы (это и было причиной бага B1 в ARR v3: тест никогда
+    не выполнялся, ни локально, ни в CI). Использование __file__ делает тест
+    независимым от того, кто и откуда его запускает.
     """
     import json
     from pathlib import Path
     from scripts.contradiction_detector import semantic_inverse_score
 
     THRESHOLD = 0.5
-    pairs_file = Path("tests/golden/fixtures/contradiction_pairs.json")
-    if not pairs_file.exists():
-        pytest.skip("contradiction_pairs.json not found")
+    pairs_file = Path(__file__).parent.parent / "golden" / "fixtures" / "contradiction_pairs.json"
+    assert pairs_file.exists(), (
+        f"contradiction_pairs.json must exist at {pairs_file} — "
+        "это не опциональный fixture, а обязательный quality gate (B1 ARR v3)"
+    )
 
     dataset = json.loads(pairs_file.read_text(encoding="utf-8"))
     pairs   = dataset.get("pairs", [])
@@ -198,3 +208,73 @@ def test_suggest_contradictions_cli():
             f"A-B contradiction score ({max(ab_scores):.3f}) should exceed "
             f"C-pair scores ({max(c_scores):.3f})"
         )
+
+
+def test_precision_test_cannot_silently_skip():
+    """
+    Регрессия для B1 ARR v3: исторически этот тест проходил мимо CI, потому
+    что путь к fixture резолвился от cwd, а conftest.py меняет cwd на пустую
+    песочницу для каждого теста (autouse isolated_environment).
+
+    Эта проверка фиксирует инвариант: тест precision обязан читать fixture
+    по абсолютному пути от __file__ и НЕ должен содержать pytest.skip() по
+    причине отсутствия файла — отсутствие fixture обязано быть hard failure,
+    а не тихим пропуском, иначе баг B1 может повториться в будущем для
+    любого нового golden-fixture теста.
+    """
+    import inspect
+    source = inspect.getsource(test_precision_on_golden_pairs)
+    assert "pytest.skip" not in source, (
+        "test_precision_on_golden_pairs не должен скипать при отсутствии "
+        "fixture — отсутствие Golden Dataset обязано проваливать сборку"
+    )
+    assert "__file__" in source, (
+        "Путь к fixture должен резолвиться от __file__, а не от cwd — "
+        "иначе тест снова станет уязвим к chdir в autouse-фикстурах"
+    )
+
+
+def test_score_pair_does_not_double_count_direction():
+    """
+    Регрессия: score_pair() (полный режим для реальных сигналов с известным
+    dir) не должен использовать polarity-сигнал из текста — direction уже
+    достоверно дан полем `dir`. Если бы polarity дублировала dir_score,
+    почти любая pos/neg-пара получала бы завышенный score независимо от
+    реального лексического конфликта (баг, найденный и исправленный при
+    закрытии B1 ARR v3 — изначально давал 406 кандидатов на 45 сигналах
+    вместо ожидаемых единиц-десятков).
+    """
+    from scripts.contradiction_detector import score_pair
+    from config.settings import CONTRADICTION_PROPOSAL_THRESHOLD
+
+    # Два сигнала с противоположным dir, но БЕЗ единого лексического хита
+    # INVERSE_PAIRS и без общего actor/theme — единственный сигнал конфликта
+    # это поле dir.
+    sig_a = {
+        "id": "A", "dir": "pos", "actor": "etf", "theme": "institutionalization",
+        "macro_implication": "Институциональный капитал находит новый канал входа в BTC",
+    }
+    sig_b = {
+        "id": "B", "dir": "neg", "actor": "miner", "theme": "infrastructure",
+        "macro_implication": "Майнеры сокращают операционные расходы перед халвингом",
+    }
+    result = score_pair(sig_a, sig_b)
+    # Только dir_score (0.2 веса) должен сработать — score не должен пересекать
+    # порог предложения аналитику только из-за противоположного dir.
+    assert result.score < CONTRADICTION_PROPOSAL_THRESHOLD, (
+        f"score_pair завысил score ({result.score}) на паре без лексического "
+        f"конфликта и без общего subject — подозрение на дублирование dir "
+        f"через polarity. inverse={result.inverse_score} subject={result.subject_score} "
+        f"dir={result.dir_score}"
+    )
+
+
+def test_contradiction_threshold_sourced_from_settings():
+    """
+    N2 ARR v3: PROPOSAL_THRESHOLD должен быть вынесен в config/settings.py
+    (CONTRADICTION_PROPOSAL_THRESHOLD), а не быть локальной константой
+    только в contradiction_detector.py.
+    """
+    from scripts.contradiction_detector import PROPOSAL_THRESHOLD
+    from config.settings import CONTRADICTION_PROPOSAL_THRESHOLD
+    assert PROPOSAL_THRESHOLD == CONTRADICTION_PROPOSAL_THRESHOLD

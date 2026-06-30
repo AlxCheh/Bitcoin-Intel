@@ -61,6 +61,12 @@ class SynthesisApproved(DomainEvent):
     """
     Аналитик одобрил синтез кластера.
     Испускается в: scripts/approve_synthesis.py
+
+    `rationale` добавлен 2026-06-30 (C3 ARR v3): scripts/approve_synthesis.py
+    всегда передавал rationale в конструктор, но поле отсутствовало в
+    dataclass — это бросало TypeError при КАЖДОМ вызове approve(), сразу
+    после успешного прохождения state machine (см. CHANGELOG / коммит фикса).
+    Без теста на approve_synthesis.py это не было обнаружено.
     """
     event_type:      str = "SynthesisApproved"
     synthesis_id:    str = ""
@@ -68,6 +74,7 @@ class SynthesisApproved(DomainEvent):
     tension:         str = ""
     strength:        str = ""
     confidence:      float = 0.0
+    rationale:       str = ""
     approved_by:     str = "analyst"
     previous_synthesis_id: Optional[str] = None
 

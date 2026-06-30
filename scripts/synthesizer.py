@@ -205,11 +205,33 @@ def _detect_phase(signals: list[dict]) -> str:
 def _select_tension_source(signals: list[dict]) -> Optional[dict]:
     """
     ШАГ 6: выбирает сигнал-источник tension.
-    Приоритет: MAX(contradicts) → MAX(weight) → MAX(date).
+
+    Приоритет:
+      1. Resolution signal (самый свежий) — закрывает цикл кластера,
+         его tension должен звучать первым, перекрывая открытые complications.
+      2. MAX(contradicts) → MAX(weight) → MAX(date) — для active/tension фаз
+         где явного разрешения ещё нет.
+
+    Rationale: если кластер достиг фазы resolution, показывать старый
+    complication-tension вводит пользователя в заблуждение — вопрос
+    уже закрыт, но карточка продолжает заявлять что он открыт.
     """
     candidates = [s for s in signals if s.get("tension")]
     if not candidates:
         return None
+
+    # Приоритет 1: resolution всегда побеждает (самый свежий если их несколько)
+    resolutions = [s for s in candidates if s.get("narrative_role") == "resolution"]
+    if resolutions:
+        resolutions.sort(
+            key=lambda s: datetime.strptime(
+                s.get("date", "2000-01-01"), DATE_FORMAT
+            ).toordinal(),
+            reverse=True,
+        )
+        return resolutions[0]
+
+    # Приоритет 2: обычная логика MAX(contradicts) → MAX(weight) → MAX(date)
     candidates.sort(key=lambda s: (
         -len(_get_contradicts(s)),
         -_weight_score(s.get("weight", "media")),

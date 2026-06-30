@@ -1,429 +1,306 @@
 # ALGORITHM.md — Алгоритм нарративного синтеза
+## Источник истины: `scripts/synthesizer.py`
+## Версия: 2.0 · Обновлено: 2026-06-29
 
-> Как из `signals.json` формируется блок **Главные нарративы** на вкладке Обзор.
-> Версия: 2026-06-27 · Источник: `index.html` → `synthesizeNarrativeAdvanced()`
+> Этот документ описывает **реально исполняемый код**, не архитектурный замысел.
+> При любом расхождении между этим файлом и `scripts/synthesizer.py` — код прав, документ устарел.
+> Каждый раздел ниже сверен построчно с актуальной версией синтезатора.
+
+---
+
+## Зачем нужен синтезатор
+
+`signals.json` — плоский список фактов. Человек видит сигналы, но не видит **общую картину**: какое противоречие сейчас главное в кластере, насколько оно острое, к чему оно ведёт. Синтезатор превращает список сигналов в одну карточку нарратива на кластер — то что показывается в блоке «Главные нарративы» на сайте.
+
+Запуск: `PYTHONHASHSEED=0 python3 scripts/synthesizer.py`. `PYTHONHASHSEED=0` обязателен — без него `select_bridge()` теряет воспроизводимость (хотя формула не зависит от хеша Python, переменная фиксируется для consistency со всей кодовой базой через `assert_deterministic_env()`).
 
 ---
 
 ## Общая схема
 
 ```
-signals.json (40 сигналов)
-        ↓
-[1] ГРУППИРОВКА по полю cluster
-        ↓
-[2] СКОРИНГ каждого кластера (4 оси)
-        ↓
-[3] ФИЛЬТРАЦИЯ — score ≥ 10, топ-4 кластера
-        ↓
-[4] СИНТЕЗ — 7 этапов аналитика
-        ↓
-[5] РЕНДЕР — tension → narrative → takeaway → счётчики
+signals.json
+     │
+     ▼
+группировка по cluster
+     │
+     ▼
+для каждого кластера → synthesize_cluster(cluster_key, signals, previous_synthesis)
+     │                                              │
+     │                              previous_synthesis загружается
+     │                              СНАРУЖИ функции (см. §17 ниже) —
+     │                              синтезатор не читает файлы сам
+     ▼
+SynthesisResult
+     │
+     ▼
+data/synthesis_cache.json  ──→  index.html (блок «Главные нарративы»)
+     │
+     └──→  synthesis_store/synthesis_{cluster}_{timestamp}.json (история)
 ```
 
 ---
 
-## Шаг 1 — Группировка
+## 12 шагов синтеза (`synthesize_cluster`)
 
-Каждый сигнал попадает в кластер через поле `cluster` (fallback: `theme`).
+Перед всеми 12 шагами выполняется **дедупликация** (не пронумерована, идёт первой):
 
-| cluster | Отображается как |
-|---------|-----------------|
-| `strategy_model_stress` | 🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ |
-| `etf_institutional_flow` | 📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК |
-| `btc_treasury_competition` | 🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ |
-| `btc_infrastructure_growth` | 🔗 ИНФРАСТРУКТУРА |
-| `supply_scarcity` | ⬛ ПРЕДЛОЖЕНИЕ |
+### Шаг 0 — Дедупликация (`deduplicate_signals`)
 
----
+Дубликатом считаются сигналы с одинаковым ключом `(date, actor, cluster, dir)`. Из дублирующей группы остаётся сигнал с наибольшим `weight_score`; остальные логируются как `ignored_ids` и не участвуют в синтезе. Это защита от шума — например, если два сигнала за один день про одного актора в одном направлении описывают по сути одно событие.
 
-## Шаг 2 — Скоринг кластера
+### Шаг 1 — Фильтрация по окну и статусу
 
-```
-score = freshness + weight + tension + roles
-```
+Отбрасываются сигналы старше `WINDOW_DAYS_DEFAULT = 90` дней и сигналы со `status: archived`. Повреждённый сигнал (упавший на любой операции) пропускается с `WARNING`, не прерывая обработку остальных (DEGRADE GRACEFULLY). Если после фильтрации не осталось сигналов — `EmptyClusterError`.
 
-### Freshness (свежесть сигналов)
-```
-date ≤ 7 дней   → +3
-date ≤ 30 дней  → +1
-date > 30 дней  → 0
-```
+### Шаг 2 — Ранжирование (`_rank_signals`)
 
-### Weight (достоверность источника)
-```
-onchain  → +4
-primary  → +3
-market   → +2
-media    → +1
+4-уровневый tiebreaker, гарантирующий детерминизм:
+
+1. `score.total` DESC (см. формулу score ниже)
+2. `weight_score` DESC
+3. `date` DESC
+4. `id` ASC — последний уровень, если все остальные равны
+
+### Шаг 3 — Определение фазы (`_detect_phase`)
+
+```python
+if есть resolution:                           → "resolution"
+elif есть trigger И есть complication:        → "active"
+elif complication > trigger:                  → "tension"
+else:                                          → "structural"
 ```
 
-### Tension (острота противоречий)
-```
-links.contradicts непустой → +5 за каждый сигнал
-поле tension непустое      → +2 за каждый сигнал
-```
-> ⚠️ Это самый важный множитель. Сигналы с `contradicts` дают +5 баллов кластеру.
+Фаза влияет на выбор bridge-фразы (Шаг 7–8) и на приоритет в выборе tension (Шаг 6).
 
-### Roles (нарративная роль)
-```
-trigger       → +4
-complication  → +3
-resolution    → +2
-background    → 0
-```
+### Шаг 3.5 — Обработка неопределённости (`handle_uncertainty`)
 
-### Пороги
-```
-score ≥ 35 → STRUCTURAL
-score ≥ 20 → STRONG
-score ≥ 10 → MODERATE
-score < 10 → WEAK (показывается только если нет других)
-```
+Добавлен 2026-06-29 (B3, ARR v2). Три проверки, каждая может добавить запись в `uncertainty: dict`:
 
----
+**1. Баланс pos/neg.** Если `pos/(pos+neg)` находится в диапазоне `[0.4, 0.6]` (порог `pos_neg_balance_threshold = 0.6`) — `uncertainty["direction"] = "contested"`, и `score_multiplier = 0.7` снижает freshness-часть итогового score кластера.
 
-## Шаг 3 — Фильтрация
+**2. Несколько trigger.** Если в кластере больше одного `trigger` — выбирается самый свежий по дате, остальные попадают в `ignored_triggers`.
 
-- Кластеры с score ≥ 10 идут в показ
-- Максимум 4 кластера
-- Если ни один не набрал 10 — показывается 1 лучший с пометкой СЛАБЫЙ СИГНАЛ
+**3. Устаревший tension.** Если у текущего anchor-победителя (по числу contradicts) дата старше `tension_staleness_days = 90` дней — добавляется `tension_stale: True` и `tension_stale_label` с предупреждающим текстом.
 
----
+Все три правила читаются из `UNCERTAINTY_RULES` в `config/settings.py`.
 
-## Шаг 4 — Синтез нарратива (7 этапов)
+### Шаг 4 — Разбивка по ролям
 
-Функция `synthesizeNarrativeAdvanced(key, cl)` реализует логику Bitcoin Macro Analyst.
+Сигналы разбираются на `triggers`, `complications`, `resolutions` (списки, отсортированные по итогам Шага 2). `anchor_trigger` — первый trigger или, если их нет, первый сигнал по рангу вообще. `anchor_complication` и `anchor_resolution` — первые в своих списках или `None`.
 
-### Этап 1 — Главный процесс (phase)
+### Шаг 5 — Contradiction weighting
 
-Определяется по количеству ролей в кластере:
+Не отдельный шаг по факту — бонус за `contradicts` уже учтён в `_score_signal()` при вычислении `score.total` на Шаге 2 (см. формулу score).
+
+### Шаг 6 — Выбор tension (`_select_tension_source`)
+
+**Обновлено 2026-06-29.** Приоритет:
 
 ```
-resolution > 0             → phase: 'resolution'  (противоречие закрыто)
-trigger > 0                → phase: 'active'       (новое событие)
-complication > background  → phase: 'tension'      (нарастает конфликт)
-иначе                      → phase: 'structural'   (фоновый контекст)
+0. Если есть сигнал с narrative_role = "resolution"
+   → он побеждает безусловно (самый свежий, если их несколько),
+     независимо от числа contradicts.
+
+1. Иначе: MAX(contradicts) → MAX(weight) → MAX(date)
 ```
 
-### Этап 2 — Разделение сигналов
+Resolution получил приоритет 0 потому что фаза кластера уже объявляет "вопрос закрыт" (Шаг 3) — продолжать показывать старый tension от complication создавало внутреннее противоречие карточки: phase говорит "разрешено", tension говорит "ещё открыто". Реальный кейс который выявил проблему: `STR-2026-0629-001` (Strategy Digital Credit Capital Framework) не мог стать anchor с 0 contradicts против complication с 4 contradicts, хотя именно он закрывал главный вопрос кластера.
 
-```
-triggers      = сигналы с narrative_role === 'trigger'
-complications = сигналы с narrative_role === 'complication'
-resolutions   = сигналы с narrative_role === 'resolution'
-```
+Текст tension берётся **как есть**, без модификации, только с приведением первой буквы к заглавной (`_capitalize`).
 
-Из каждой группы выбирается **лучший** по весу + свежести.
+### Шаг 7–8 — Narrative (partA + bridge + partB)
 
-### Этап 3 — core_tension (главное противоречие)
-
-Алгоритм поиска по приоритету:
-
-```
-1. Сигнал с max links.contradicts И непустым tension → берём tension
-2. Любой сигнал с непустым tension → берём tension
-3. Fallback: строим из двух противоречащих macro_implication:
-   "<macro_impl_A> — vs — <macro_impl_B>"
+```python
+partA  = anchor_trigger.macro_implication, первое предложение (до ". ")
+bridge = select_bridge(phase, seed=len(active_signals))
+partB  = (anchor_complication или второй сигнал по рангу).macro_implication,
+         первое предложение, первая буква в нижнем регистре
+narrative = f"{partA} — {bridge} {partB}"
 ```
 
-> **Вывод:** чем точнее написан `tension` в сигнале — тем сильнее карточка.
+Bridge-фразы детерминированы: `seed % len(options)`, где `seed = len(active_signals)`. Набор фраз зависит от фазы:
 
-### Этап 4 — Причинно-следственная цепочка
+| Фаза | Bridges |
+|------|---------|
+| `active` | при этом / однако / в то время как / тогда как |
+| `tension` | что усугубляется тем что / несмотря на то что / вопреки тому что |
+| `resolution` | после чего / в результате чего / что означает что |
+| `structural` | на фоне того что / в условиях / в структуре которой |
 
-```
-chain[0] = macro_implication лучшего trigger
-chain[1] = macro_implication лучшего complication (если не дублирует chain[0])
-chain[2] = macro_implication resolution (если есть)
-```
+### Шаг 9 — Takeaway
 
-### Этап 5 — market_structure (основной текст карточки)
+Перебираются кандидаты в порядке: `anchor_complication → anchor_trigger → anchor_resolution → top_weight_signal`. Берётся первое предложение `macro_implication` кандидата, которое ещё не встречается ни в `narrative`, ни в `tension` (чтобы не дублировать текст в карточке).
 
-```
-Приоритет:
-1. resolution.macro_implication
-2. trigger.macro_implication
-3. топ по weight → macro_implication
-```
+### Шаг 10 — Phase changed
 
-### Этап 6 — btc_implication
-
-```
-Из сигналов за последние 30 дней, отсортированных по weight DESC
-→ первый непустой macro_implication
+```python
+phase_changed = previous_synthesis is not None and previous_synthesis["phase"] != phase
 ```
 
-### Этап 7 — key_takeaway (одна мысль)
+### Structural Change Detection (между Шагом 10 и 11, не пронумерован)
 
-```
-Приоритет:
-1. resolution.macro_implication → первое предложение
-2. trigger.macro_implication → первое предложение
-3. top_weight.macro_implication → первое предложение
-```
-
-Обрезается до первого `.!?` — одно чёткое утверждение.
-
----
-
-## Шаг 5 — Рендер карточки
-
-```
-[НАЗВАНИЕ КЛАСТЕРА]  [N сигналов]
-
-▌ core_tension
-  (золотая левая полоса, белый текст — главный крючок)
-
-  market_structure / btc_implication
-  (серый текст — структурный вывод)
-
-→ key_takeaway
-  (оранжевый моно — одна мысль)
-
-🟢 N  🔴 N  ⚪ N        [STRUCTURAL] score: N ▾
-```
-
----
-
-## Что определяет качество нарратива
-
-Алгоритм **выбирает и компонует** из того что написано в сигналах.
-Генерация не происходит — только отбор и сборка.
-
-| Поле сигнала | Роль в нарративе | Влияние на score |
-|-------------|-----------------|-----------------|
-| `tension` | Главный крючок карточки | +2 к кластеру |
-| `macro_implication` | Структурный вывод (narrative + takeaway) | — |
-| `narrative_role` | Приоритет в синтезе | +0..+4 |
-| `links.contradicts` | Активирует tension-логику | +5 к кластеру |
-| `weight` | Приоритет при выборе anchor-сигнала | +1..+4 |
-| `date` | Freshness — сигналы > 30 дней теряют вес | +0..+3 |
-
----
-
-## Правила написания полей для сильного нарратива
-
-### tension — формула противоречия
-```
-✗ «Strategy продолжает покупать BTC»
-✓ «Strategy наращивает долг для покупки BTC vs рынок ставит NAV-дисконт 0.83x»
-
-✗ «ETF показал отток»
-✓ «ETF-оттоки $6.4 млрд как поверхностное давление vs LTH покупают в 10x больше»
-```
-
-### macro_implication — структурный сдвиг, не пересказ
-```
-✗ «Franklin подала заявку на ETF»
-✓ «Пассивный дивидендный поток как источник BTC-спроса — новая категория
-    не зависящая от настроений рынка»
-
-✗ «Metaplanet купила Siiibo»
-✓ «BTC-казначейство эволюционирует от пассивного баланса к операционному движку:
-    коллатерал → лицензия → продукты → комиссионный доход»
-```
-
-### narrative_role — выбирай осознанно
-```
-trigger      → первый сигнал нового процесса (редко, ≤1 на кластер)
-complication → усложняет нарратив противоречием (основная роль)
-resolution   → закрывает противоречие (редко, только при реальном разрешении)
-background   → структурный контекст без острого события
-```
-
-### links.contradicts — заполняй всегда когда есть
-```
-Если сигнал A противоречит сигналу B — оба получают по +5 к score кластера.
-Это самый быстрый способ поднять кластер в нарративах.
-```
-
----
-
-## Текущие кластеры и score (ориентировочно)
-
-| Кластер | Сигналов | Примерный score | Статус |
-|---------|----------|----------------|--------|
-| `strategy_model_stress` | 10 | ~45 | STRUCTURAL 🔥 |
-| `etf_institutional_flow` | 10 | ~38 | STRUCTURAL 🔥 |
-| `btc_treasury_competition` | 8 | ~32 | STRONG |
-| `btc_infrastructure_growth` | 9 | ~28 | STRONG |
-| `supply_scarcity` | 2 | ~12 | MODERATE |
-
----
-
-*Файл обновляется при изменении алгоритма в `index.html`*
-
----
-
-## Правило управления tension кластера
-
-**Tension в золотой полосе карточки — это единственное поле которое алгоритм берёт целиком без изменений.**
-Всё остальное (narrative, takeaway) режется, склеивается, дедуплицируется. Tension идёт как есть.
-
-### Как алгоритм выбирает tension
-
-Приоритет (обновлено 2026-06-29 — добавлен приоритет resolution):
-
-```
-0. Если в кластере есть сигнал с narrative_role=resolution → он побеждает
-   безусловно (самый свежий если их несколько), независимо от contradicts.
-   Rationale: phase=resolution означает что вопрос кластера закрыт —
-   tension не должен продолжать звучать как открытый complication.
-1. Иначе: сигнал с MAX(contradicts) + непустым tension → победитель
-2. При равенстве contradicts → первый найденный с непустым tension
-3. Fallback → любой сигнал с непустым tension
-```
-
-**Почему это правило появилось:** до 2026-06-29 resolution-сигналы участвовали
-в синтезе наравне с остальными, но tension всё равно выбирался по MAX(contradicts).
-Это создавало внутреннее противоречие карточки: phase показывал "resolution"
-(вопрос закрыт), а tension продолжал цитировать старый complication
-(вопрос всё ещё открыт). Реальный кейс: STR-2026-0629-001 (Strategy Digital
-Credit Capital Framework) — первый resolution в базе — не стал anchor
-несмотря на то что закрывал главный вопрос кластера.
-
-### Как сместить tension кластера на нужный сигнал
-
-**Два инструмента:**
-
-**① Добавить contradicts**
-Если хочешь чтобы tension кластера взялся из конкретного сигнала —
-добавь ему в `links.contradicts` больше id чем у текущего победителя.
-
+Если `phase_changed = True`, записывается:
 ```json
-"links": {
-  "contradicts": ["id-1", "id-2", "id-3"]  ← три = победа над двумя
-}
+{"detected": true, "from_phase": "...", "to_phase": "...", "detected_at": "ISO8601"}
 ```
 
-**② Написать сильнее**
-При равном числе contradicts побеждает лучше написанный tension.
+### Шаг 11 — Confidence
 
-### Критерий сильного tension
+```python
+max_score = n_signals * MAX_PER_SIGNAL   # MAX_PER_SIGNAL = 3+4+4 = 11
+raw = score_total / max_score
 
-```
-✗ Описание факта:
-   «Strategy продолжает покупать BTC»
+if n_signals == 1:        raw *= 0.5
+if not has_contradicts:   raw *= 0.8
+if all_stale:              raw *= 0.7
+if not has_tension:        raw *= 0.6
 
-✗ Слабое противопоставление:
-   «Strategy покупает vs рынок падает»
-
-✓ Два конкретных механизма в столкновении:
-   «рекордный BTC-резерв 847 363 BTC vs рекордный двухлетний минимум акции —
-    рынок платит дисконт за дивидендный риск, а не за BTC-актив»
-
-✓ Парадокс:
-   «IBIT — единственный надёжный источник притоков и одновременно
-    крупнейший источник оттоков»
-
-✓ Структурное противоречие:
-   «США легализовали $90 трлн рынок perps через BTC-первым —
-    vs Hyperliquid и офшор имеют годы форы по ликвидности»
+confidence = clamp(raw, 0.1, 1.0)
 ```
 
-### Правило одного победителя на кластер
+`has_contradicts` — есть ли хотя бы один сигнал в кластере с непустым `links.contradicts`. `all_stale` — все сигналы старше `STALE_THRESHOLD = 30` дней. `has_tension` — у anchor-победителя (Шаг 6) есть непустой `tension` (не fallback-конкатенация).
 
-Каждый кластер показывает **один** tension в карточке Обзора.
-Это означает: при добавлении нового сигнала нужно осознанно решить —
+После расчёта confidence к `cluster_score.freshness` применяется `uncertainty["score_multiplier"]` из Шага 3.5, если он был установлен.
 
-> Должен ли этот сигнал стать новым голосом кластера?
+### Шаг 12 — Rationale
 
-Если да → пишем сильный tension + добавляем contradicts больше чем у текущего победителя.
-Если нет → tension можно оставить слабым или пустым.
-
-### Текущие победители по кластерам
-
-| Кластер | Победитель | contradicts | Tension |
-|---------|-----------|-------------|---------|
-| `strategy_model_stress` | STR-2026-0625-001 | 3 | «рекордный BTC-резерв 847 363 BTC vs рекордный двухлетний минимум акции — рынок платит дисконт за дивидендный риск» |
-| `etf_institutional_flow` | STR-2026-0624-004 | 3 | «IBIT — единственный надёжный источник притоков и одновременно крупнейший источник оттоков» |
-| `btc_infrastructure_growth` | NAR-2026-0626-001 | 3 | «США легализовали $90 трлн рынок perps через BTC-первым — vs Hyperliquid и офшор имеют годы форы» |
-| `btc_treasury_competition` | STR-2026-0626-001 | 4 | «Metaplanet строит регулируемую продуктовую фабрику на BTC-коллатерале при mNAV < 1x — рынок не знает: это новый моат или leverage» |
-| `supply_scarcity` | SUP-2026-0625-001 | 2 | «LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке» |
-
-> Обновлять таблицу при каждом изменении contradicts у сигналов.
+Строка-объяснение синтеза, машиночитаемый формат:
+```
+Tension from {anchor_id} (contradicts: N, weight: W); partA from {trigger_id};
+phase: P; bridge: '...'; confidence: C; signals_used: N; ignored_duplicates: [...]
+```
 
 ---
 
-## Правило добавления links.contradicts
-
-### Единственный критерий добавления
-
-`links.contradicts` заполняется **только если** `macro_implication` сигнала A и `macro_implication` сигнала B описывают **несовместимые состояния одной системы**.
-
-Тест: можно ли одновременно быть правым и A, и B?
-- Если **нет** → противоречие реальное → добавить
-- Если **да** → противоречие мнимое → не добавлять
-
-### Что является реальным противоречием
+## Формула Score сигнала (`_score_signal`)
 
 ```
-A: «ETF создаёт постоянный структурный спрос на BTC»
-B: «ETF-оттоки уничтожают ценовую поддержку BTC»
-→ Оба не могут быть правы одновременно в одном горизонте
-→ РЕАЛЬНОЕ противоречие ✓
+score.total = freshness + weight + role + contradiction
 ```
 
+| Компонент | Формула | Значения |
+|-----------|---------|----------|
+| `freshness` | по возрасту сигнала | `fresh` (≤7д) = **3**, `recent` (≤30д) = **1**, `stale` (>30д) = **0** |
+| `weight` | по полю `weight` сигнала | `onchain`=**4**, `primary`=**3**, `market`=**2**, `media`=**1** |
+| `role` | по полю `narrative_role` | `trigger`=**4**, `complication`=**3**, `resolution`=**2**, `background`=**0** |
+| `contradiction` | `len(links.contradicts) × CONTRADICTION_BONUS` | `CONTRADICTION_BONUS = 5` за каждый ID |
+
+**MAX_PER_SIGNAL = 3 + 4 + 4 = 11** (freshness_max + weight_max + role_max; contradiction не ограничен сверху и не входит в максимум — поэтому реальный score может превышать 11 на сигнал).
+
+---
+
+## Пороги силы нарратива кластера (`get_strength`)
+
+| score_total кластера | strength |
+|----------------------|----------|
+| ≥ 20 (`SCORE_HOT`) | 🔥 horizontal в UI как "горячий" |
+| ≥ 12 (`SCORE_STRONG`) | `strong` |
+| ≥ 6 (`SCORE_MODERATE`) | `moderate` |
+| < 6 | `weak` |
+
+---
+
+## Временные окна
+
+| Константа | Значение | Назначение |
+|-----------|----------|-----------|
+| `WINDOW_DAYS_DEFAULT` | 90 дней | старше — не участвует в синтезе (Шаг 1) |
+| `STALE_THRESHOLD` | 30 дней | старше — `freshness=0`, и считается "stale" для confidence |
+| `ARCHIVE_THRESHOLD` | 180 дней | старше — кандидат на авто-архивацию (вне синтезатора) |
+| `tension_staleness_days` (UNCERTAINTY_RULES) | 90 дней | anchor старше — помечается STALE на Шаге 3.5 |
+
+---
+
+## Поля результата (`SynthesisResult`)
+
+Реальная структура dataclass — единственный источник правды для имён полей карточки:
+
+```python
+@dataclass
+class SynthesisResult:
+    cluster:           str
+    tension:           str      # золотая полоса карточки, текст as-is
+    narrative:         str      # partA — bridge partB
+    takeaway:          str      # ключевая мысль, не дублирует tension/narrative
+    strength:          str      # strong | moderate | weak
+    confidence:        float    # [0.1, 1.0]
+    phase:             str      # active | tension | resolution | structural
+    score:             SignalScore
+    anchor_signal_id:  str      # ID сигнала-источника tension
+    signal_count:      int
+    phase_changed:     bool = False
+    structural_change: dict = {}
+    rationale:         str  = ""
+    uncertainty:       dict = {}   # {direction, score_multiplier, tension_stale, ...}
+    signals_used:      list = []
+    signals_ignored:   list = []   # дубликаты, выброшенные на Шаге 0
+    generated_at:      str
 ```
-A: «Lightning масштабирует BTC как платёжную сеть»
-B: «Lightning не находит реальных пользователей — DeFi уходит на Ethereum»
-→ РЕАЛЬНОЕ противоречие ✓
-```
+
+Имён `core_tension`, `market_structure`, `btc_implication` в коде **не существует** — если встретишь их в старой документации, это устаревшие названия из ранней архитектурной версии (до реализации).
+
+---
+
+## §17 — Архитектурный контракт: synthesizer не читает файлы
+
+`synthesize_cluster()` принимает `previous_synthesis: Optional[dict]` как параметр — функция никогда не открывает файлы сама. Загрузка происходит в `main()` через `_load_previous_synthesis(cluster_key)`, которая ищет последний файл `synthesis_store/synthesis_{cluster_key}_*.json` по сортировке имени (timestamp в имени файла).
+
+Это разделяет ответственность: Narrative Synthesis Context вычисляет, Delivery/Orchestration Context (main()) занимается I/O. Нарушение этого контракта было найдено и исправлено в ARR v2 (ранее функция читала файл сама).
+
+---
+
+## Lifecycle после синтеза (`main()`)
 
 ```
-A: «Strategy наращивает BTC-резерв»
-B: «Strategy теряет темп накопления из-за долга»
-→ РЕАЛЬНОЕ противоречие ✓
+для каждого кластера:
+    1. previous = _load_previous_synthesis(cluster_key)
+    2. result   = synthesize_cluster(cluster_key, signals, previous)
+    3. _save_synthesis() → synthesis_store/synthesis_{cluster}_{timestamp}.json
+    4. если previous существовал → on_synthesis_superseded(old_id, new_id)
+       (lifecycle hook, сбой здесь не останавливает синтез — DEGRADE GRACEFULLY)
+    5. результат добавляется в общий dict results[cluster_key]
+
+после всех кластеров:
+    atomic_write_json_safe(SYNTHESIS_CACHE_PATH, results)
+    → data/synthesis_cache.json — читается index.html напрямую
 ```
 
-### Что НЕ является основанием для добавления
+Ошибка одного кластера (`EmptyClusterError` или любое исключение) не прерывает обработку остальных — каждый кластер изолирован в своём `try/except` внутри `main()`.
 
+---
+
+## Чувствительные места — где легко ошибиться при изменении кода
+
+**Дедупликация перед фильтрацией по окну.** Если добавить сигнал который по ключу `(date, actor, cluster, dir)` совпадает с существующим — один из двух тихо исчезнет из синтеза (с WARNING в логах, но не в UI). Это было причиной путаницы 2026-06-29 при тестировании resolution-приоритета.
+
+**`_get_contradicts()` читает только `links.contradicts`**, и только если `LEGACY_LINKS_ENABLED = True` (сейчас так). После миграции на `relationships.json` (Фаза C, см. `ADR-008`) эта функция должна быть переписана — иначе contradiction-bonus в score перестанет работать молча.
+
+**`previous_synthesis` ищется по сортировке имени файла**, не по дате внутри JSON. Если запустить синтез дважды в одну секунду — `_load_previous_synthesis` может выбрать не тот файл (коллизия timestamp в имени). На практике не встречалось, но это слабое место.
+
+**Capitalize применяется только к tension**, не к narrative и takeaway. Если `macro_implication` сигнала начинается со строчной буквы — narrative/takeaway унаследуют это.
+
+---
+
+## Связанные документы
+
+- `config/settings.py` — все константы (`FRESHNESS_SCORE`, `WEIGHT_SCORE`, `ROLE_SCORE`, `UNCERTAINTY_RULES`, пороги)
+- `scripts/contradiction_detector.py` — как заполняется `links.contradicts` (не входит в синтезатор, отдельный компонент)
+- `tests/integration/test_narrative_regression.py` — E2E тесты конкретно этого алгоритма, включая resolution-priority
+- `CLAUDE.md` — как аналитик формулирует `tension` и `macro_implication` при создании сигнала, до того как они попадут в этот алгоритм
+- `docs/ARCH_GAP_SPEC.md` §17 — обоснование архитектурного контракта previous_synthesis как параметра
+
+---
+
+## Как проверить что документ ещё актуален
+
+```bash
+PYTHONHASHSEED=0 python3 -m pytest tests/integration/test_narrative_regression.py -v
 ```
-✗ Сигнал A «нравится больше» как tension для кластера
-✗ Хочется поднять score кластера
-✗ Сигналы близки по теме но не противоречат выводами
-✗ Один сигнал дополняет другой (это context_chain, не contradicts)
-✗ Один сигнал подтверждает другой через другой механизм (это confirms)
-```
 
-### Запрещённое действие
+Если все тесты зелёные — поведение синтезатора соответствует тому что описано выше. Если документ снова разойдётся с кодом (новый ШАГ добавлен, формула изменена) — обновлять этот файл тем же коммитом что меняет `synthesizer.py`, не отдельно.
 
-**Запрещено добавлять `contradicts` с целью сделать сигнал победителем tension.**
+---
 
-Это манипуляция базой данных. Алгоритм использует `contradicts` как прокси для «остроты противоречия» — накручивание этого поля ломает смысл всего кластерного анализа.
-
-### Как правильно сменить tension кластера
-
-Если текущий победитель имеет слабый tension — **переписать его `tension` поле**.
-Не накручивать `contradicts` у другого сигнала.
-
-```
-✗ Неправильно:
-   Добавить сигналу X contradicts: [A, B, C] чтобы он набрал больше баллов
-
-✓ Правильно:
-   Открыть сигнал X который должен победить
-   Переписать поле tension: более острая формулировка «X vs Y»
-   Если у X уже есть реальные contradicts → они сами обеспечат приоритет
-```
-
-### Как проверить себя перед добавлением
-
-Перед тем как добавить id в `links.contradicts` — ответить на вопрос:
-
-> Если оба сигнала правы — это противоречие или дополнение?
-
-- **Противоречие**: A говорит «BTC будет расти», B говорит «BTC будет падать» → contradicts
-- **Дополнение**: A говорит «ETF создаёт спрос», B говорит «LTH не продают» → confirms или отдельные сигналы
-
-### Исправление ошибки в базе (июнь 2026)
-
-В июне 2026 было ошибочно добавлено по 3–4 `contradicts` четырём сигналам с целью
-сменить tension победителей. Это нарушило принцип честности базы.
-
-Затронутые сигналы: STR-2026-0625-001, STR-2026-0624-004, NAR-2026-0626-001, STR-2026-0626-001.
-
-Требует аудита: проверить каждый `contradicts` у этих сигналов на реальность противоречия
-и удалить ложные связи.
-
-
+*ALGORITHM.md v2.0 · Полностью переписан 2026-06-29 на основе построчной сверки с scripts/synthesizer.py*
+*Предыдущая версия (v1.x) описывала более раннюю архитектуру с другими именами полей (core_tension, market_structure, btc_implication) — она устарела и не отражала реализованный код*

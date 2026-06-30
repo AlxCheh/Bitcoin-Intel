@@ -122,11 +122,16 @@ def approve(synthesis_id: str, rationale: str) -> dict:
 
     atomic_write_json_safe(str(synthesis_file), synthesis)
 
-    # Событие
+    # Событие. tension/strength/confidence заполнены из synthesis — данные
+    # уже доступны на этом шаге, без этого audit trail терял контекст
+    # утверждённого решения (C3 ARR v3).
     log = EventLog(EVENTS_LOG_PATH)
     log.emit(SynthesisApproved(
         cluster=synthesis.get("cluster", ""),
         synthesis_id=synthesis_id,
+        tension=synthesis.get("tension", ""),
+        strength=synthesis.get("strength", ""),
+        confidence=synthesis.get("confidence", 0.0),
         approved_by=synthesis["approved_by"],
         rationale=rationale,
     ))

@@ -1,2 +1,18 @@
+# Bitcoin Intel — зависимости
+# Python >= 3.11 required
+#
+# Core: проект не использует внешние зависимости для рантайма —
+# domain/, infrastructure/, scripts/ написаны на stdlib.
 
-hypothesis>=6.100.0  # Property-based testing (T06)
+# Development & Testing
+pytest>=8.0.0,<9.0.0
+hypothesis>=6.100.0,<7.0.0       # Property-based testing (T06)
+flake8>=7.0.0,<8.0.0             # Линтер — критические ошибки в CI (IRB-B2)
+
+# Security
+pip-audit>=2.7.0,<3.0.0          # Аудит зависимостей (SECURITY.md)
+
+# Optional: Backend Phase 4 (раскомментировать при старте Backend спринта)
+# fastapi>=0.111.0,<1.0.0
+# uvicorn>=0.29.0,<1.0.0
+# sqlalchemy>=2.0.0,<3.0.0

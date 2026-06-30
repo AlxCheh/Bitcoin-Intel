@@ -102,9 +102,7 @@ def _print_table(rows: list[dict], columns: list[tuple]) -> None:
     """Печатает таблицу. columns = [(key, label, width), ...]"""
     header = " | ".join(f"{label:<{w}}" for _, label, w in columns)
     sep    = "-" * len(header)
-    print(f"
-{header}
-{sep}")
+    print(f"\n{header}\n{sep}")
     for row in rows:
         line = " | ".join(
             f"{str(row.get(k, ''))[:w]:<{w}}" for k, _, w in columns
@@ -115,8 +113,7 @@ def _print_table(rows: list[dict], columns: list[tuple]) -> None:
 
 def _print_synthesis(s: dict) -> None:
     """Детальный вывод одного синтеза."""
-    print(f"
-{'─'*60}")
+    print(f"\n{'─'*60}")
     print(f"  ID:       {s.get('id', '—')}")
     print(f"  Cluster:  {s.get('cluster', '—')}")
     print(f"  Status:   {s.get('status', '—')}")
@@ -159,8 +156,7 @@ def main() -> None:
             if not clusters:
                 print("synthesis_store пуст или не существует")
                 return
-            print(f"
-Кластеры в synthesis_store ({sum(clusters.values())} синтезов):")
+            print(f"\nКластеры в synthesis_store ({sum(clusters.values())} синтезов):")
             for cluster, count in clusters.items():
                 print(f"  {cluster:<40} {count} синтезов")
             return
@@ -173,8 +169,7 @@ def main() -> None:
             if args.format == "json":
                 print(json.dumps(rows, ensure_ascii=False, indent=2))
             else:
-                print(f"
-Tension history: {args.tension_history} ({len(rows)} записей)")
+                print(f"\nTension history: {args.tension_history} ({len(rows)} записей)")
                 _print_table(rows, [
                     ("date",    "Date",    10),
                     ("status",  "Status",  12),
@@ -203,8 +198,7 @@ Tension history: {args.tension_history} ({len(rows)} записей)")
             if args.format == "json":
                 print(json.dumps(results, ensure_ascii=False, indent=2))
             else:
-                print(f"
-Кластер '{args.cluster}': {len(results)} синтезов")
+                print(f"\nКластер '{args.cluster}': {len(results)} синтезов")
                 for s in results:
                     _print_synthesis(s)
             return

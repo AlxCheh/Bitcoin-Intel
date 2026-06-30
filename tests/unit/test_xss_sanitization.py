@@ -27,11 +27,29 @@ NODE_AVAILABLE = shutil.which("node") is not None
 
 
 def _extract_function(html: str, signature: str) -> str:
-    """Извлекает тело функции `function <signature> {...}` из index.html."""
-    pattern = re.escape(f"function {signature}") + r".*?\n\}"
-    match = re.search(pattern, html, re.DOTALL)
-    assert match, f"Function '{signature}' not found in index.html — was it renamed or removed?"
-    return match.group(0)
+    """
+    Извлекает тело функции `function <signature> {...}` из index.html по
+    балансу фигурных скобок (устойчиво к любому уровню отступа закрывающей
+    скобки — regex с фиксированным отступом однажды уже обрезал
+    synthesizeNarrativeAdvanced на первой вложенной '}' с совпадающим
+    отступом, см. tests/unit/test_uncertainty_indicator.py).
+    """
+    base_name = signature.split("(")[0].strip()
+    start = html.find(f"function {base_name}")
+    assert start != -1, f"Function '{signature}' not found in index.html — was it renamed or removed?"
+    brace_open = html.find("{", start)
+    assert brace_open != -1, f"No opening brace found for '{signature}'"
+    depth = 0
+    i = brace_open
+    while i < len(html):
+        if html[i] == "{":
+            depth += 1
+        elif html[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return html[start:i + 1]
+        i += 1
+    raise AssertionError(f"Unbalanced braces while extracting '{signature}'")
 
 
 def _run_js(js_code: str) -> dict:

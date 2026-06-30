@@ -3869,14 +3869,34 @@ function synthesizeNarrativeAdvanced(key, cl) {
     ((b.links&&b.links.contradicts&&b.links.contradicts.length)||0) -
     ((a.links&&a.links.contradicts&&a.links.contradicts.length)||0)
   );
+  // byTensionPriority: тай-брейк идентичен Python _select_tension_source()
+  // (MAX contradicts → MAX weight → MAX date). До фикса (C1 ARR v3) JS
+  // использовал byContra напрямую как третий fallback для tensionSig — при
+  // равном числе contradicts (типичный случай, т.к. contradicts заполняется
+  // редко) порядок схлопывался к порядку массива сигналов, игнорируя weight.
+  const byTensionPriority = [...sigs].sort((a,b) => {
+    const ca = (a.links&&a.links.contradicts&&a.links.contradicts.length)||0;
+    const cb = (b.links&&b.links.contradicts&&b.links.contradicts.length)||0;
+    if (cb !== ca) return cb - ca;
+    const wa = WEIGHT_RANK[a.weight]||0, wb = WEIGHT_RANK[b.weight]||0;
+    if (wb !== wa) return wb - wa;
+    return new Date(b.date) - new Date(a.date);
+  });
 
   // ── Этап 1: Определяем главный процесс ──────────────────────────
+  // ВАЖНО (C1 ARR v3): формула должна быть идентична Python
+  // scripts/synthesizer.py::_detect_phase() — это единственный путь, где
+  // пользователь может увидеть расхождение между кэшем и live-фоллбэком,
+  // если synthesis_cache.json временно недоступен. До фикса JS объявлял
+  // 'active' при наличии ОДНОГО trigger, а Python требует trigger И
+  // complication одновременно — расхождение покрыто
+  // tests/unit/test_phase_equivalence.py.
   const roleCounts = { trigger:0, complication:0, resolution:0, background:0 };
   sigs.forEach(s => { if (s.narrative_role) roleCounts[s.narrative_role] = (roleCounts[s.narrative_role]||0)+1; });
 
   const phase = roleCounts.resolution > 0 ? 'resolution'
-    : roleCounts.trigger > 0 ? 'active'
-    : roleCounts.complication > roleCounts.background ? 'tension'
+    : (roleCounts.trigger > 0 && roleCounts.complication > 0) ? 'active'
+    : roleCounts.complication > roleCounts.trigger ? 'tension'
     : 'structural';
 
   // ── Этап 2: Фильтруем сигналы по роли ───────────────────────────
@@ -3895,10 +3915,16 @@ function synthesizeNarrativeAdvanced(key, cl) {
   const anchorResolution  = pick(resolutions);
 
   // ── Этап 3: core_tension — из противоречия ───────────────────────
-  // Берём сигнал с максимальным числом contradicts И непустым tension
-  const tensionSig = byContra.find(s => s.tension && s.links && s.links.contradicts && s.links.contradicts.length)
-    || byContra.find(s => s.tension)
-    || byDate.find(s => s.tension);
+  // ВАЖНО (C1 ARR v3): приоритет идентичен Python _select_tension_source():
+  // resolution (самый свежий ПО ДАТЕ, без учёта weight) побеждает всегда →
+  // иначе MAX(contradicts) → MAX(weight) → MAX(date). До фикса JS не давал
+  // resolution приоритет вообще — кластер в фазе resolution мог показать
+  // tension от старого complication, если synthesis_cache.json был
+  // недоступен.
+  const resolutionsByDate = [...resolutions].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const newestResolutionWithTension = resolutionsByDate.find(s => s.tension);
+  const tensionSig = newestResolutionWithTension
+    || byTensionPriority.find(s => s.tension);
 
   let coreTension = tensionSig ? tensionSig.tension : '';
 
@@ -4026,7 +4052,7 @@ function synthesizeNarrativeAdvanced(key, cl) {
   // ── signal_strength ──────────────────────────────────────────────
   const totalScore = sigs.reduce((acc, s) => {
     const days = s.date ? Math.floor((today - new Date(s.date)) / 86400000) : 999;
-    const fresh = days <= 7 ? 3 : days <= 30 ? 1 : 0;
+    const fresh = days <= FRESHNESS_FRESH_DAYS ? 3 : days <= FRESHNESS_RECENT_DAYS ? 1 : 0;
     const w = WEIGHT_RANK[s.weight] || 1;
     const t = ((s.links&&s.links.contradicts&&s.links.contradicts.length) ? 5 : 0) + (s.tension ? 2 : 0);
     const r = ROLE_RANK[s.narrative_role] || 0;
@@ -4038,11 +4064,30 @@ function synthesizeNarrativeAdvanced(key, cl) {
     : totalScore >= 10 ? 'moderate'
     : 'weak';
 
+  // anchor_signal_id — тот же концепт, что Python SynthesisResult.anchor_signal_id:
+  // источник tension, либо anchor trigger если tension нигде не задан (C1 ARR v3).
+  const anchorSignalId = (tensionSig || anchorTrigger || {}).id || '?';
+
+  // N02 ARR v3: rationale раньше существовал только в Python-кеше — в JS
+  // live-фоллбэке anchor-сигнал не объяснялся пользователю вообще. Формат
+  // НЕ идентичен Python rationale (там есть confidence/ignored_duplicates,
+  // которых JS не считает, см. ADR-010) — честно помечено как live-фоллбэк,
+  // а не выдаётся за то же самое вычисление.
+  const anchorObj = tensionSig || anchorTrigger || {};
+  const rationale = anchorObj.id
+    ? 'Tension from ' + anchorObj.id
+      + ' (contradicts: ' + ((anchorObj.links && anchorObj.links.contradicts && anchorObj.links.contradicts.length) || 0)
+      + ', weight: ' + (anchorObj.weight || '?') + '); phase: ' + phase
+      + '; source: live-фоллбэк (synthesis_cache.json недоступен)'
+    : '';
+
   return {
     narrative,
     tension:    coreTension,
     macro:      marketStructure,
     takeaway:   keyTakeaway,
+    anchor_signal_id: anchorSignalId,
+    rationale,
     strength,
     causal:     chain,
     phase,
@@ -4231,6 +4276,15 @@ function closeEntityPopup() {
 // Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
 let SIGNALS = [];
 let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
+
+// M3 ARR v3: единый источник истины для порогов freshness-скоринга —
+// ontology.json (та же логика, что Python config/settings.py STALE_THRESHOLD,
+// см. tests/unit/test_ontology_settings_consistency.py). Дефолты ниже —
+// fallback на случай недоступности ontology.json (DEGRADE GRACEFULLY,
+// см. ERROR_PHILOSOPHY в config/settings.py) и совпадают с текущими
+// значениями ontology.json на момент этого коммита.
+let FRESHNESS_FRESH_DAYS  = 7;
+let FRESHNESS_RECENT_DAYS = 30;
 
 let priceChartInited = false;
 function initPriceChart() {
@@ -4747,15 +4801,28 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
-      fetch('data/synthesis_cache.json?v=' + Date.now())
+      fetch('data/synthesis_cache.json?v=' + Date.now()),
+      fetch('ontology.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
     // Путь 3: загружаем Python-синтез, DEGRADE GRACEFULLY если недоступен
     try { SYNTHESIS_CACHE = await cacheResp.json(); } catch(e) { SYNTHESIS_CACHE = {}; }
+    // M3 ARR v3: единый источник freshness-порогов. Если ontology.json
+    // недоступен или повреждён — остаются дефолты, заданные при объявлении
+    // FRESHNESS_FRESH_DAYS/FRESHNESS_RECENT_DAYS выше (graceful degradation,
+    // не падаем и не блокируем рендер дашборда).
+    try {
+      const ont = await ontResp.json();
+      const fw = ont && ont.freshness_windows;
+      if (fw && Number.isFinite(fw.fresh_days)) FRESHNESS_FRESH_DAYS = fw.fresh_days;
+      if (fw && Number.isFinite(fw.recent_days)) FRESHNESS_RECENT_DAYS = fw.recent_days;
+    } catch(e) {
+      console.warn('ontology.json load error, using default freshness thresholds:', e);
+    }
     ENTITIES = entData.entities || [];
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5159,7 +5226,7 @@ function renderDashboard() {
     signals.forEach(s => {
       // Freshness
       const days = s.date ? Math.floor((today - new Date(s.date)) / 86400000) : 999;
-      freshness += days <= 7 ? 3 : days <= 30 ? 1 : 0;
+      freshness += days <= FRESHNESS_FRESH_DAYS ? 3 : days <= FRESHNESS_RECENT_DAYS ? 1 : 0;
       // Weight
       weight += WEIGHT_RANK[s.weight] || 1;
       // Tension
@@ -5192,6 +5259,69 @@ function renderDashboard() {
 
   // ── Алгоритмический синтез нарратива ───────────────────────────────────
   // Рендер одного нарратива
+  // M4 ARR v3: synthesis_cache.json содержит generated_at для каждого
+  // кластера (пишется scripts/synthesizer.py), но раньше нигде не читалось
+  // на UI — пользователь не мог узнать, что видит устаревший кеш. Эта
+  // функция превращает generated_at в человекочитаемую метку; если синтез
+  // пришёл не из кеша, а из JS live-фоллбэка (synthesizeNarrativeAdvanced,
+  // см. ADR-010) — generated_at отсутствует, и метка явно говорит "live",
+  // а не молчит об источнике.
+  function formatSynthesisFreshness(synthesis) {
+    if (!synthesis || !synthesis.generated_at) {
+      return { label: 'live-расчёт', stale: false, title: 'Кеш недоступен — посчитано прямо в браузере' };
+    }
+    const generated = new Date(synthesis.generated_at);
+    if (isNaN(generated.getTime())) {
+      return { label: 'live-расчёт', stale: false, title: 'Некорректная дата в кеше' };
+    }
+    const ageMs = Date.now() - generated.getTime();
+    const ageMin = Math.floor(ageMs / 60000);
+    const ageHr  = Math.floor(ageMin / 60);
+    const ageDay = Math.floor(ageHr / 24);
+
+    let label;
+    if (ageMin < 1)        label = 'обновлено только что';
+    else if (ageMin < 60)  label = 'обновлено ' + ageMin + ' мин назад';
+    else if (ageHr < 24)   label = 'обновлено ' + ageHr + ' ч назад';
+    else                   label = 'обновлено ' + ageDay + ' дн назад';
+
+    // STALE_THRESHOLD (config/settings.py) = 30 дней — тот же порог, что и
+    // freshness-скоринг сигналов (M3 ARR v3), переиспользован для
+    // согласованности понятия "устарело" по всему дашборду.
+    const stale = ageDay > FRESHNESS_RECENT_DAYS;
+    return { label, stale, title: synthesis.generated_at };
+  }
+
+  // N06 ARR v3: phase раньше существовала только в данных (synthesis.phase),
+  // визуально никак не отличалась на UI — пользователь не мог отличить
+  // "разрешённое противоречие" от "активного конфликта" с первого взгляда.
+  function formatPhaseLabel(phase) {
+    switch (phase) {
+      case 'resolution': return { label: '✓ РАЗРЕШЕНО',      color: 'var(--grn)' };
+      case 'active':     return { label: 'АКТИВНЫЙ КОНФЛИКТ', color: 'var(--btc)' };
+      case 'tension':    return { label: 'ПРОТИВОРЕЧИЕ',      color: 'var(--amber)' };
+      case 'structural': return { label: 'СТРУКТУРНЫЙ ФОН',   color: 'var(--dim)' };
+      default:           return { label: '',                  color: 'var(--dim)' };
+    }
+  }
+
+  // N04 ARR v3: handle_uncertainty() (scripts/synthesizer.py) уже считает
+  // contested-состояние и stale-tension, но раньше эти данные нигде не
+  // отображались — confidence просто тихо занижался без объяснения
+  // причины. Вынесено в чистую функцию для тестируемости (см.
+  // tests/unit/test_uncertainty_indicator.py).
+  function buildUncertaintyWarnings(uncertainty) {
+    const u = uncertainty || {};
+    const warnings = [];
+    if (u.direction === 'contested') {
+      warnings.push('⚠ ПРОТИВОРЕЧИВЫЕ СИГНАЛЫ — почти поровну pos/neg, оценка занижена');
+    }
+    if (u.tension_stale) {
+      warnings.push(u.tension_stale_label || '⚠ Нарратив устарел');
+    }
+    return warnings;
+  }
+
   function renderNarrativeItem(key, cl, score, weak, idx, synthesis) {
     const n      = cl.signals.length;
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
@@ -5202,6 +5332,18 @@ function renderDashboard() {
     const macroText = synthesis.narrative || '—';
     const tension   = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '';
     // synthesis доступен для takeaway и strength
+    const freshness = formatSynthesisFreshness(synthesis);
+    const phaseInfo = formatPhaseLabel(synthesis.phase);
+
+    // N04 ARR v3: handle_uncertainty() (scripts/synthesizer.py) уже считает
+    // contested-состояние и stale-tension, но раньше эти данные нигде не
+    // отображались — confidence просто тихо занижался без объяснения
+    // причины. uncertainty присутствует только когда синтез пришёл из
+    // Python-кеша (JS live-фоллбэк не повторяет handle_uncertainty(), см.
+    // ADR-010 "Дальнейшая работа") — поэтому ?. везде ниже, не считаем
+    // отсутствие uncertainty ошибкой.
+    const uncertainty = synthesis.uncertainty || {};
+    const warnings = buildUncertaintyWarnings(uncertainty).map(sanitize);
 
     const item = document.createElement('div');
     item.className = 'dash-narrative-item ' + dirCls;
@@ -5212,8 +5354,13 @@ function renderDashboard() {
         '<div class="dash-narrative-cluster" style="margin-bottom:8px">'
       +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
       +   '<span style="color:var(--dim);font-size:8px;margin-left:8px">' + cnt + '</span>'
+      +   (phaseInfo.label ? '<span style="color:' + phaseInfo.color + ';font-size:8px;margin-left:8px;font-weight:600">' + phaseInfo.label + '</span>' : '')
+      +   '<span style="color:' + (freshness.stale ? 'var(--red)' : 'var(--dim)') + ';font-size:8px;margin-left:8px" title="' + sanitize(freshness.title) + '">'
+      +     (freshness.stale ? '⚠ ' : '') + sanitize(freshness.label)
+      +   '</span>'
       + '</div>'
-      + (tension ? '<div class="dash-narrative-tension">' + highlightEntities(tension) + '</div>' : '')
+      + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
+      + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightEntities(tension) + '</div>' : '')
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
       + '<div class="dash-sum-counts" style="margin:5px 0">'
@@ -5234,6 +5381,7 @@ function renderDashboard() {
       +   '<div class="dash-breakdown-row"><span>tension</span><span>+' + score.tension + '</span></div>'
       +   '<div class="dash-breakdown-row"><span>roles</span><span>+' + score.roles + '</span></div>'
       +   '<div class="dash-breakdown-row dash-breakdown-total"><span>total</span><span>' + score.total + '</span></div>'
+      +   (synthesis.rationale ? '<div class="dash-breakdown-row" style="display:block;margin-top:4px;padding-top:4px;border-top:1px solid var(--line);color:var(--dim);font-size:9px;line-height:1.5">' + sanitize(synthesis.rationale) + '</div>' : '')
       + '</div>';
 
     item.querySelector('[data-cl]').addEventListener('click', function() { goToDigest(this.dataset.cl); });

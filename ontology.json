@@ -52,7 +52,8 @@
   },
   "freshness_windows": {
     "fresh_days": 7,
-    "recent_days": 90,
-    "stale_after": 90
+    "recent_days": 30,
+    "stale_after": 30,
+    "_note": "Должны совпадать с config/settings.py: fresh_days=7 (scoring <=7), recent_days/stale_after=STALE_THRESHOLD=30 (scoring <=30). НЕ путать с WINDOW_DAYS_DEFAULT=90 — это другой порог: окно включения сигнала в синтез вообще, не freshness-скоринг внутри окна. Расхождение между этим файлом (раньше было 90/90) и реальным порогом в коде (30) обнаружено и исправлено в M3 ARR v3 — см. tests/unit/test_ontology_settings_consistency.py, который теперь предотвращает повторный дрейф."
   }
 }

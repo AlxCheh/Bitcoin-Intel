@@ -866,7 +866,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 | RR-04 | **DOM08: Anti-Corruption Layers** (формальный Context Map) | Описан текстом в §22 ADDENDUM; формальный Map — при масштабировании до 5+ bounded contexts | Ревью импортов в CI (flake8 layer rules) |
 | RR-05 | **SCL06: UI Paging при 500+ сигналах** | Сейчас 48 сигналов. Документация добавлена в Wave 4; реализация при достижении 300+ | Автоматический мониторинг размера signals.json (OP06) |
 | RR-06 | **Confidence калибровка** (ADR-011) | 10/30 синтезов до gate; quality_report.py отслеживает | Инкрементальный счётчик в каждом quality_report run |
-| RR-07 | **PAT в git history** | Токен был, риск компрометации. Ротация токена (OP03 Wave 3) снижает риск | После ротации новый токен — только в GitHub Secrets |
+| RR-07 | **PAT в истории переписки с ассистентом** (формулировка «PAT в git history» была неточной — см. SECURITY.md «Secrets Rotation Policy», OP03: `git rev-list --all` + `git grep` по всему репозиторию не находит реального токена ни в одном блобе) | Токен несколько раз вставлялся открытым текстом в чат в разных сессиях реализации Wave 1–3, риск компрометации. Политика ротации (OP03 Wave 3, SECURITY.md) описывает это явно как триггер внеплановой ротации | После ротации новый токен — только в GitHub Secrets |
 | RR-08 | **JS Fallback без window-filtering** (ADR-010) | Задокументирован в ADR-010 «Дальнейшая работа»; тест держит gap видимым | test_known_gap_js_lacks_window_filtering не удалять |
 
 ---

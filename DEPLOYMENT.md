@@ -12,10 +12,14 @@
 GitHub Repository (AlxCheh/Bitcoin-Intel)
     │
     ├── main branch ──────────────→ GitHub Pages (Production)
-    │                                https://alxcheh.github.io/Bitcoin-Intel
+    │    ▲                          https://alxcheh.github.io/Bitcoin-Intel
+    │    │ PR (validate + review)
     │
-    └── feature/* / hotfix/* ─────→ Preview (Pull Request preview)
-                                     https://alxcheh.github.io/Bitcoin-Intel (PR preview)
+    ├── develop branch ───────────→ Staging (интеграционная ветка,
+    │    ▲                          БЕЗ отдельного живого URL — см. ниже)
+    │    │ PR (validate)
+    │
+    └── feature/* / hotfix/* ─────→ PR в develop (не напрямую в main)
 ```
 
 **Текущий стек:** 100% статика. Нет серверной части, нет базы данных.
@@ -48,10 +52,31 @@ IRP v1 Wave 2 / M03).
 | Данные | `signals.json`, `ENTITIES.json` (публичные, в репозитории) |
 | Кеш браузера | CDN GitHub Pages, TTL ~10 минут |
 
-### Preview (Pull Request)
+### Staging (develop)
 
-На текущем этапе (MVP) preview отсутствует — все изменения идут напрямую в `main`.  
-При появлении нескольких контрибьюторов — создать ветку `develop` и настроить PR preview.
+> ✅ **IRP v1 Wave 2 / M04 (2026-07-01, Вариант B):** ветка `develop`
+> реализована как защищённая интеграционная ветка, без отдельного живого
+> URL превью.
+
+| Параметр | Значение |
+|----------|---------|
+| Живой URL | Нет — GitHub Pages даёт один URL на репозиторий; co-hosting
+    staging на том же сайте (subpath) рассматривался и отклонён как
+    Вариант A: он бы связал деплой prod с состоянием `develop` — если
+    сборка develop падает, это блокирует деплой main, хотя main мог быть
+    в порядке. Риск сочли неоправданным ради живого превью. |
+| Ветка | `develop` |
+| Branch Protection | Require PR + required status check `Validate and Test`, `enforce_admins: true` — тот же уровень защиты, что на `main` (M05) |
+| CI | `validate` job запускается (Contract Tests, тесты, линтер). `synthesize` и `deploy` — НЕ запускаются: оба жёстко привязаны к `if: github.ref == 'refs/heads/main'` в `deploy.yml`, независимо от того что триггеры `push`/`pull_request` теперь включают `develop` |
+| Как смотреть изменения | Локально: `open index.html` после checkout ветки/PR, либо смотреть diff в самом PR — без хостинга |
+
+**Поток разработки:**
+```
+feature/* ──PR──→ develop ──PR──→ main ──auto──→ Production
+           (validate)      (validate)   (deploy)
+```
+Фичи мерджатся в `develop` первыми. Когда `develop` накопил проверенные
+изменения — отдельный PR `develop → main` разворачивает их в prod.
 
 ---
 

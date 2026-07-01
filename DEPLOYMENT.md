@@ -18,9 +18,21 @@ GitHub Repository (AlxCheh/Bitcoin-Intel)
                                      https://alxcheh.github.io/Bitcoin-Intel (PR preview)
 ```
 
-**Текущий стек:** 100% статика. Нет серверной части, нет базы данных, нет CI/CD pipeline.  
-**Деплой:** автоматически при push в `main` через GitHub Pages.  
+**Текущий стек:** 100% статика. Нет серверной части, нет базы данных.
+**CI/CD:** есть, `.github/workflows/deploy.yml` — `validate` → `synthesize` → `deploy`
+(это описание было устаревшим на момент написания раздела; актуализировано
+IRP v1 Wave 2 / M03).
+**Деплой:** автоматически при push в `main`, через GitHub Actions
+(`actions/deploy-pages@v4`), не через встроенный GitHub Pages auto-build.
 **Время деплоя:** ~1–3 минуты после push.
+
+> ✅ **IRP v1 Wave 2 / M03 (2026-07-01):** GitHub Pages Source переключён с
+> `build_type: legacy` на `build_type: workflow` (Settings → Pages → Source
+> → «GitHub Actions»). До этого работали два параллельных механизма деплоя
+> одновременно — встроенный legacy auto-build («pages build and deployment»
+> job) и кастомный `deploy` job в `deploy.yml` — избыточно и было источником
+> «deploy-job стабильно красный» (alarm fatigue) в отдельные периоды.
+> Теперь единственный источник деплоя — `deploy.yml`.
 
 ---
 

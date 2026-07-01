@@ -53,6 +53,11 @@
       "readOnly": true,
       "description": "Заменяет computed_at из §17.3 — так называется поле в реальном коде (synthesizer.py)"
     },
+    "algorithm_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "IRP v1 Wave 3 / REM-M07 (2026-07-01): реализовано как ALGORITHM_VERSION в synthesizer.py и пишется во все НОВЫЕ записи. Не входит в required — 25 исторических записей synthesis_store, созданных до M07, этого поля не содержат и не бэкфиллятся (см. ADR-013, раздел 'Обновление после M07')."
+    },
     "superseded_by": {"type": ["string", "null"]},
     "superseded_at": {"type": ["string", "null"], "format": "date-time"},
     "uncertainty": {

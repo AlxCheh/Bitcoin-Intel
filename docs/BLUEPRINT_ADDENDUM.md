@@ -1920,6 +1920,45 @@ def test_takeaway_does_not_duplicate_narrative(signals):
 - [ ] test_golden.py зелёный на текущем algorithm_version
 - [ ] Процедура обновления при изменении алгоритма задокументирована
 
+### 28.7 add_signal.py
+
+> IRP v1 Wave 3 / REM-M08 (2026-07-01): DoD отсутствовал в этом разделе,
+> хотя скрипт реализован. На момент добавления этого DoD ни один из
+> integration-тестов не покрывает `add_signal()`/`main()` целиком —
+> `tests/integration/test_signal_workflow.py` тестирует только
+> зависимости (`file_lock`, `state_machine`, `exceptions`, `logger`) по
+> отдельности, не сам скрипт. Как и §28.1–28.6, этот чеклист — целевой
+> критерий готовности, не отчёт о текущем состоянии; невыполненные
+> пункты не блокируют Wave 3 (LOW сложность, P2), но должны попасть в
+> backlog отдельной задачей на integration-тест.
+
+- [ ] `validate_signal()` проверяет все поля из `REQUIRED_FIELDS` и все enum
+      (`dir`/`horizon`/`weight`/`narrative_role`/`cat`/`actor`/`flow`) —
+      FAIL LOUD через иерархию `BitcoinIntelError`
+- [ ] Формат `id` проверяется регуляркой `PREFIX-YYYY-MMDD-NNN`
+      (`InvalidSignalIdError` при нарушении)
+- [ ] `tension` проверяется на заглавную букву (правило CLAUDE.md)
+- [ ] `macro_implication` проверяется на минимальную длину (не пересказ
+      события, а структурный вывод)
+- [ ] State Machine: `draft → active` через `domain.state_machine.transition()`;
+      повторное добавление уже-`active` сигнала не падает; любой другой
+      статус — `ArchitecturalViolationError`
+- [ ] Запись в `signals.json` атомарна и под `file_lock` (без гонки при
+      параллельном вызове)
+- [ ] Дубликат `id` — `DuplicateSignalError`, не тихая перезапись
+- [ ] Похожий сигнал по `DUPLICATE_WARNING_FIELDS` — warning в лог,
+      добавление не блокируется
+- [ ] Успешное добавление испускает `EventLog.emit(SignalAdded)` со всеми
+      полями audit trail (`signal_id`, `cluster`, `theme`, `dir`,
+      `narrative_role`, `source`)
+- [ ] `--dry-run` только валидирует, ничего не пишет и не эмитит события
+- [ ] Exit codes соответствуют `ERROR_EXIT_CODES` из §9 (business_logic_error
+      для валидационных и duplicate-ошибок, system_error — для
+      непредвиденных)
+- [ ] Integration тест, вызывающий `add_signal()`/`main()` целиком (happy
+      path + хотя бы одна ошибка каждого типа выше), зелёный — **отсутствует
+      на 2026-07-01**, см. примечание выше
+
 ---
 
 ## Раздел 29. Readiness Assessment

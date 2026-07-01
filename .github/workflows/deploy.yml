@@ -82,6 +82,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Save previous synthesis_cache.json (для нормализованного diff)
+        run: cp data/synthesis_cache.json /tmp/old_synthesis_cache.json || echo '{}' > /tmp/old_synthesis_cache.json
+
       - name: Run synthesizer
         run: PYTHONHASHSEED=0 python3 scripts/synthesizer.py
 
@@ -95,7 +98,21 @@ jobs:
               print('  ' + k + ': ' + v.get('strength','?') + ' phase=' + v.get('phase','?'))
           "
 
+      - name: Check for meaningful diff (игнорируя generated_at/synthesis_id/detected_at)
+        id: diffcheck
+        # Без этого шага любой push создавал бы sync-PR даже без изменений
+        # сигналов, т.к. synthesizer.py всегда пишет текущий timestamp —
+        # см. scripts/cache_diff_check.py. Обнаружено при верификации M05:
+        # без нормализации auto-merge зациклился (PR #10-#17 за ~5 минут).
+        run: |
+          if python3 scripts/cache_diff_check.py /tmp/old_synthesis_cache.json data/synthesis_cache.json; then
+            echo "meaningful=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "meaningful=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Commit synthesis cache via PR (not direct push to main)
+        if: steps.diffcheck.outputs.meaningful == 'true'
         # main защищён Branch Protection (IRP v1 M05, Вариант 3): прямой push
         # запрещён даже для github-actions[bot]. Поэтому: коммит в отдельную
         # ветку → PR → auto-merge после зелёного статус-чека "validate".
@@ -106,18 +123,12 @@ jobs:
         # ВАЖНО: коммит НЕ должен содержать "[skip ci]" — GitHub глушит этим
         # весь workflow, включая "validate" на самом PR (не только push),
         # из-за чего auto-merge зависал бы точно так же, как в случае выше.
-        # Один лишний холостой прогон validate+synthesize+deploy после мерджа
-        # (без diff во второй раз) — приемлемая цена за рабочий auto-merge.
         env:
           GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/synthesis_cache.json || true
-          if git diff --staged --quiet; then
-            echo "Нет изменений в synthesis_cache.json — пропуск PR"
-            exit 0
-          fi
+          git add data/synthesis_cache.json
           BRANCH="bot/sync-synthesis-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update synthesis_cache.json"

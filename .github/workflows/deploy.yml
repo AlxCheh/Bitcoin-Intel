@@ -103,6 +103,11 @@ jobs:
         # штатным GITHUB_TOKEN, не порождают новый workflow run (защита от
         # рекурсии GitHub Actions) — "validate" на этом PR никогда не запустился
         # бы, и auto-merge завис бы навсегда ожидая статус, который не наступит.
+        # ВАЖНО: коммит НЕ должен содержать "[skip ci]" — GitHub глушит этим
+        # весь workflow, включая "validate" на самом PR (не только push),
+        # из-за чего auto-merge зависал бы точно так же, как в случае выше.
+        # Один лишний холостой прогон validate+synthesize+deploy после мерджа
+        # (без diff во второй раз) — приемлемая цена за рабочий auto-merge.
         env:
           GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
         run: |
@@ -115,7 +120,7 @@ jobs:
           fi
           BRANCH="bot/sync-synthesis-${{ github.run_id }}"
           git checkout -b "$BRANCH"
-          git commit -m "chore: update synthesis_cache.json [skip ci]"
+          git commit -m "chore: update synthesis_cache.json"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
           gh pr create --base main --head "$BRANCH" \
             --title "chore: sync synthesis_cache.json ($(date -u +%Y-%m-%d))" \

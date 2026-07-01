@@ -14,7 +14,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-01T10:45:39.703247+00:00"
+      "detected_at": "2026-07-01T11:53:02.370626+00:00"
     },
     "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0622-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.49; signals_used: 10; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -33,8 +33,8 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-01T10:45:39.703520+00:00",
-    "synthesis_id": "synthesis_strategy_model_stress_20260701_104539"
+    "generated_at": "2026-07-01T11:53:02.370870+00:00",
+    "synthesis_id": "synthesis_strategy_model_stress_20260701_115302"
   },
   "etf_institutional_flow": {
     "tension": "Крупнейшие банки США наращивают BTC-позиции через собственные ETF в момент когда рынок корректируется — институциональный спрос структурно расходится с розничным сентиментом",
@@ -66,8 +66,8 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-01T10:45:39.708122+00:00",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260701_104539"
+    "generated_at": "2026-07-01T11:53:02.376326+00:00",
+    "synthesis_id": "synthesis_etf_institutional_flow_20260701_115302"
   },
   "btc_treasury_competition": {
     "tension": "OranjeBTC привлекает банковский долг (Itaú) для покупки BTC на просадке vs модель-прародитель Strategy под тем же долговым давлением сворачивает чистое накопление в пользу управления ликвидностью",
@@ -95,8 +95,8 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-07-01T10:45:39.710423+00:00",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260701_104539"
+    "generated_at": "2026-07-01T11:53:02.378837+00:00",
+    "synthesis_id": "synthesis_btc_treasury_competition_20260701_115302"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -117,8 +117,8 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-01T10:45:39.712564+00:00",
-    "synthesis_id": "synthesis_supply_scarcity_20260701_104539"
+    "generated_at": "2026-07-01T11:53:02.381032+00:00",
+    "synthesis_id": "synthesis_supply_scarcity_20260701_115302"
   },
   "btc_infrastructure_growth": {
     "tension": "Пулы контролируют состав блоков как единственная точка цензуры vs Stratum V2 впервые в production переносит этот контроль к майнеру",
@@ -146,7 +146,7 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-01T10:45:39.714701+00:00",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260701_104539"
+    "generated_at": "2026-07-01T11:53:02.383529+00:00",
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260701_115302"
   }
 }

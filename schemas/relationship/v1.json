@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://bitcoin-intel/schemas/relationship/v1.json",
+  "title": "Relationship",
+  "type": "object",
+  "required": ["id", "from_id", "to_id", "type", "rationale", "created", "created_by"],
+  "properties": {
+    "id": {"type": "string", "format": "uuid", "readOnly": true},
+    "from_id": {"type": "string", "pattern": "^(STR|SUP|INF|MAC|NAR)-"},
+    "to_id": {"type": "string", "pattern": "^(STR|SUP|INF|MAC|NAR)-"},
+    "type": {"type": "string", "enum": ["confirms", "contradicts", "context_chain"]},
+    "rationale": {
+      "type": "string",
+      "minLength": 0,
+      "description": "Объяснение почему это отношение реально. Пусто у записей, мигрированных из legacy links.* (migrate_relationships.py) — исторические связи не имели явного rationale; новые связи, создаваемые вручную, ожидаются с непустым rationale (не enforced схемой, чтобы не блокировать миграцию задним числом)."
+    },
+    "created": {"type": "string", "format": "date-time", "readOnly": true},
+    "created_by": {"type": "string"},
+    "migrated_from": {
+      "type": "string",
+      "description": "Присутствует у записей из migrate_relationships.py (Фаза 0). Не было в исходной §17.2 — добавлено по факту (IRP v1 B2)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "retracted"],
+      "description": "Присутствует у мигрированных записей (migrate_relationships.py). Не было в исходной §17.2 — добавлено по факту (IRP v1 B2)."
+    },
+    "retracted": {"type": ["string", "null"], "format": "date-time"},
+    "retracted_by": {"type": ["string", "null"]},
+    "retraction_reason": {"type": ["string", "null"]}
+  }
+}

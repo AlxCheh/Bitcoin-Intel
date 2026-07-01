@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://bitcoin-intel/schemas/synthesis/v1.json",
+  "title": "Synthesis",
+  "type": "object",
+  "description": "Соответствует реальной форме записей в synthesis_store/*.json на 2026-07-01, а не дословно ADDENDUM §17.3 — см. docs/ADR-013-synthesis-schema-reflects-implementation.md для обоснования расхождения (version/algorithm_version/ontology_version/window_days/computed_at из §17.3 не реализованы; вместо computed_at используется generated_at).",
+  "required": [
+    "id", "cluster", "status", "tension", "narrative", "takeaway",
+    "strength", "signals_used", "generated_at", "phase", "score",
+    "signal_count", "phase_changed", "structural_change", "rationale"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Формат в реальных данных: synthesis_<cluster>_<YYYYMMDD_HHMMSS> (не syn-[a-z_]+-\\d{8}-\\d{3} из §17.3)"
+    },
+    "cluster": {"type": "string"},
+    "status": {
+      "type": "string",
+      "enum": ["generated", "superseded"],
+      "description": "Реальные значения — 'generated' и 'superseded'. 'active' из §17.3 не встречается ни в одной из 25 записей synthesis_store — эта фаза жизненного цикла (review/approve/publish/archive) не реализована. Не путать со status с полем phase (active/resolution/tension/... — фаза нарратива кластера, другое понятие)."
+    },
+    "tension": {"type": "string", "minLength": 30, "pattern": "^[А-ЯA-Z0-9]"},
+    "narrative": {"type": "string", "minLength": 50},
+    "takeaway": {
+      "type": "string",
+      "description": "minLength не задан: легитимно пустая строка при phase='tension' (кластер ещё не имеет полного нарратива, только tension — см. config/settings.py комментарий про renderTensionOnly). Непустой takeaway ожидается при остальных значениях phase, но это не enforced схемой, т.к. добавление условного правила (oneOf по phase) усложнило бы схему сильнее, чем оправдано на этом этапе."
+    },
+    "strength": {
+      "type": "string",
+      "enum": ["structural", "strong", "moderate", "weak"]
+    },
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "phase": {
+      "type": "string",
+      "description": "Фаза нарратива кластера (active/resolution/... — значения определяются synthesizer.py, не зафиксированы отдельным enum здесь, т.к. набор фаз развивается)"
+    },
+    "score": {"type": "number"},
+    "signal_count": {"type": "integer", "minimum": 0},
+    "anchor_signal_id": {"type": ["string", "null"]},
+    "phase_changed": {"type": "boolean"},
+    "structural_change": {
+      "type": "object",
+      "description": "Пусто {} если phase_changed=false. При true содержит detected/from_phase/to_phase/detected_at."
+    },
+    "rationale": {"type": "string"},
+    "signals_used": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "signals_ignored": {"type": "array", "items": {"type": "string"}},
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "Заменяет computed_at из §17.3 — так называется поле в реальном коде (synthesizer.py)"
+    },
+    "superseded_by": {"type": ["string", "null"]},
+    "superseded_at": {"type": ["string", "null"], "format": "date-time"},
+    "uncertainty": {
+      "type": ["object", "null"],
+      "description": "Реально объект вида {direction, score_multiplier, anchor_trigger, ignored_triggers} или null — не строка, как можно было бы предположить по названию. Присутствует не во всех записях (не универсально) — не входит в required."
+    }
+  }
+}

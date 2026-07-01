@@ -288,7 +288,7 @@ class SynthesisResult:
 - `scripts/contradiction_detector.py` — как заполняется `links.contradicts` (не входит в синтезатор, отдельный компонент)
 - `tests/integration/test_narrative_regression.py` — E2E тесты конкретно этого алгоритма, включая resolution-priority
 - `CLAUDE.md` — как аналитик формулирует `tension` и `macro_implication` при создании сигнала, до того как они попадут в этот алгоритм
-- `archive/ARCH_GAP_SPEC.md` §17 — обоснование архитектурного контракта previous_synthesis как параметра (документ закрыт и перенесён в archive, см. редирект `docs/ARCH_GAP_SPEC.md`)
+- `archive/ARCH_GAP_SPEC.md` §17 — обоснование архитектурного контракта previous_synthesis как параметра (документ закрыт и перенесён в archive)
 
 ---
 

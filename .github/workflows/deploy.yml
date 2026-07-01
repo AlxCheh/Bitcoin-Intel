@@ -124,21 +124,13 @@ jobs:
             --body "Автосинтез после коммита ${{ github.sha }}. Auto-merge после зелёного validate."
           gh pr merge "$BRANCH" --auto --squash --delete-branch
 
-      - name: TEMP DEBUG — push captured log to debug branch
+      - name: TEMP DEBUG — post captured log as GitHub issue
         if: always()
         env:
           GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
         run: |
-          cd /tmp
-          git init -q debugrepo
-          cd debugrepo
-          git config user.name "debug-bot"
-          git config user.email "debug@example.com"
-          cp /tmp/synth_debug.log ./debug.log 2>/dev/null || echo "no log captured" > debug.log
-          git add debug.log
-          git commit -q -m "debug log run ${{ github.run_id }}"
-          git branch -M debug-log
-          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" debug-log:refs/heads/debug-log-${{ github.run_id }}
+          { echo '```'; tail -c 40000 /tmp/synth_debug.log 2>/dev/null || echo "no log captured at /tmp/synth_debug.log"; echo '```'; } > /tmp/issue_body.txt
+          gh issue create --title "DEBUG run ${{ github.run_id }}" --body-file /tmp/issue_body.txt || echo "issue create also failed, exit code $?"
 
 
   deploy:

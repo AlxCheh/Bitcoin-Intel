@@ -695,7 +695,7 @@ paths:
 
   /signals:
     get:
-      summary: Список сигналов с фильтрацией
+      summary: Список сигналов с фильтрацией и пагинацией
       parameters:
         - name: cluster
           in: query
@@ -715,17 +715,32 @@ paths:
         - name: include_archived
           in: query
           schema: {type: boolean, default: false}
+        - name: limit
+          in: query
+          description: >-
+            IRP v1 Wave 3 / D01 (2026-07-01). Максимум записей в ответе.
+            Response уже возвращал total/filtered отдельно от signals — это
+            подразумевало пагинацию с самого начала спецификации, просто
+            параметры не были добавлены.
+          schema: {type: integer, default: 50, minimum: 1, maximum: 200}
+        - name: offset
+          in: query
+          description: Смещение от начала отфильтрованной выборки (после cluster/date_from/date_to/narrative_role/window_days/include_archived).
+          schema: {type: integer, default: 0, minimum: 0}
       responses:
         "200":
-          description: Список сигналов
+          description: Список сигналов (одна страница)
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  signals: {type: array, items: {$ref: "#/components/schemas/Signal"}}
-                  total: {type: integer}
-                  filtered: {type: integer}
+                  signals: {type: array, items: {$ref: "#/components/schemas/Signal"}, description: "Не более limit элементов"}
+                  total: {type: integer, description: "Всего сигналов в базе, без учёта фильтров"}
+                  filtered: {type: integer, description: "Сколько прошло фильтры cluster/date_from/date_to/narrative_role/window_days/include_archived, до пагинации"}
+                  limit: {type: integer}
+                  offset: {type: integer}
+                  has_more: {type: boolean, description: "offset + len(signals) < filtered"}
 
     post:
       summary: Добавить сигнал
@@ -772,7 +787,7 @@ paths:
 
   /relationships:
     get:
-      summary: Список связей
+      summary: Список связей (с пагинацией — см. GET /signals, IRP v1 Wave 3 / D01)
       parameters:
         - name: signal_id
           in: query
@@ -781,6 +796,12 @@ paths:
         - name: type
           in: query
           schema: {type: string, enum: [confirms, contradicts, context_chain]}
+        - name: limit
+          in: query
+          schema: {type: integer, default: 50, minimum: 1, maximum: 200}
+        - name: offset
+          in: query
+          schema: {type: integer, default: 0, minimum: 0}
     post:
       summary: Создать связь
       requestBody:

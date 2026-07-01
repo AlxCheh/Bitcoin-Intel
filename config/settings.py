@@ -114,6 +114,9 @@ CONTRADICTION_BONUS = 5   # за каждый id в links.contradicts
 # Порог score (semantic_inverse_score / score_pair) для предложения аналитику.
 # Вынесен сюда из scripts/contradiction_detector.py (N2 ARR v3) — единая
 # точка настройки порогов вместе с остальными.
+# Целевая Precision на этом пороге = 60% (не 85% из BLUEPRINT §10) —
+# см. docs/ADR-012-contradiction-precision-target.md. Пересмотр — при N>=150
+# пар в tests/golden/fixtures/contradiction_pairs.json.
 CONTRADICTION_PROPOSAL_THRESHOLD = 0.5
 
 # ─── Кластер: пороги силы нарратива ─────────────────────────────────────────
@@ -142,7 +145,7 @@ EVENTS_LOG_PATH      = "data/events.jsonl"
 RELATIONSHIPS_PATH   = "data/relationships.json"
 
 # ─── Переходный период: миграция links.* → relationships.json ────────────────
-LEGACY_LINKS_ENABLED = True   # False после завершения миграции (конец Фазы 0)
+LEGACY_LINKS_ENABLED = False  # Фаза 0 завершена 2026-07-01: миграция выполнена (156 relationships), IRP v1 Wave 1 / B2
 
 # ─── Рендер: UI контракты для пустых кластеров ───────────────────────────────
 # Три состояния карточки нарратива (используется в index.html renderNarrativeItem):

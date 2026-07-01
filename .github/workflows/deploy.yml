@@ -71,6 +71,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -94,16 +95,32 @@ jobs:
               print('  ' + k + ': ' + v.get('strength','?') + ' phase=' + v.get('phase','?'))
           "
 
-      - name: Commit synthesis cache
+      - name: Commit synthesis cache via PR (not direct push to main)
+        # main защищён Branch Protection (IRP v1 M05, Вариант 3): прямой push
+        # запрещён даже для github-actions[bot]. Поэтому: коммит в отдельную
+        # ветку → PR → auto-merge после зелёного статус-чека "validate".
+        # Используется SYNTHESIS_BOT_TOKEN (не GITHUB_TOKEN): PR/push, созданные
+        # штатным GITHUB_TOKEN, не порождают новый workflow run (защита от
+        # рекурсии GitHub Actions) — "validate" на этом PR никогда не запустился
+        # бы, и auto-merge завис бы навсегда ожидая статус, который не наступит.
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git stash --include-untracked
-          git pull origin main
-          git stash pop
           git add data/synthesis_cache.json || true
-          git diff --staged --quiet || git commit -m "chore: update synthesis_cache.json [skip ci]"
-          git push
+          if git diff --staged --quiet; then
+            echo "Нет изменений в synthesis_cache.json — пропуск PR"
+            exit 0
+          fi
+          BRANCH="bot/sync-synthesis-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update synthesis_cache.json [skip ci]"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: sync synthesis_cache.json ($(date -u +%Y-%m-%d))" \
+            --body "Автосинтез после коммита ${{ github.sha }}. Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch
 
 
   deploy:

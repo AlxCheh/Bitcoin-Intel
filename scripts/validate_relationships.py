@@ -54,7 +54,8 @@ def validate_relationships(fix: bool = False,
         return True, {"mode": "legacy"}
 
     relationships = safe_read_json(RELATIONSHIPS_PATH, default=[])
-    signals       = safe_read_json(SIGNALS_PATH, default=[]) if sig_file.exists() else []
+    raw           = safe_read_json(SIGNALS_PATH, default=[]) if sig_file.exists() else []
+    signals       = raw.get("signals", raw) if isinstance(raw, dict) else raw
     signal_ids    = {s["id"] for s in signals if "id" in s}
 
     errors:   list[str] = []

@@ -95,6 +95,8 @@ FRESHNESS_SCORE = {
 }
 
 WEIGHT_SCORE = {
+    # Единственный runtime-источник (ADR-014, IRP v1 Wave 3 / REM-M06).
+    # ontology.json.weight_scores — display-only копия, помечена _note.
     "onchain": 4,
     "primary": 3,
     "market":  2,

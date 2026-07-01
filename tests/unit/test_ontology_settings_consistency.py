@@ -32,7 +32,7 @@ ontology.json (`fresh_days: 7, recent_days: 90`).
 import json
 from pathlib import Path
 
-from config.settings import STALE_THRESHOLD
+from config.settings import STALE_THRESHOLD, WEIGHT_SCORE
 
 REPO_ROOT    = Path(__file__).parent.parent.parent
 ONTOLOGY_PATH = REPO_ROOT / "ontology.json"
@@ -105,4 +105,36 @@ def test_js_reads_freshness_thresholds_from_ontology_json():
     assert freshness_var_usages >= 2, (
         f"Ожидалось минимум 2 места использования FRESHNESS_FRESH_DAYS в "
         f"скоринге, найдено {freshness_var_usages}"
+    )
+
+
+# ─── weight_scores (IRP v1 Wave 3 / REM-M06, ADR-014) ──────────────────────────
+
+def test_ontology_weight_scores_matches_settings():
+    """
+    ontology.json.weight_scores — display only (ADR-014), но пока файл не
+    удалён, он должен оставаться синхронным с единственным runtime-источником
+    config/settings.py.WEIGHT_SCORE. Ключ '_note' исключён из сравнения —
+    это не вес, а пометка о том, что секция не используется в вычислениях.
+    """
+    ontology = _load_ontology()
+    ontology_weights = {
+        k: v for k, v in ontology["weight_scores"].items() if k != "_note"
+    }
+    assert ontology_weights == WEIGHT_SCORE, (
+        f"ontology.json.weight_scores={ontology_weights} != "
+        f"config/settings.py.WEIGHT_SCORE={WEIGHT_SCORE} — расхождение "
+        f"единственного не-мёртвого потребителя этих чисел (settings.py) "
+        f"с их display-копией. Обнови ontology.json, либо (лучше, если "
+        f"MVP-этап закончился) удали секцию weight_scores целиком — см. ADR-014."
+    )
+
+
+def test_ontology_weight_scores_has_display_only_note():
+    """weight_scores помечен как не участвующий в рантайм-вычислениях (ADR-014)."""
+    ontology = _load_ontology()
+    assert "_note" in ontology["weight_scores"], (
+        "weight_scores должен содержать '_note', объясняющий что секция "
+        "display only и единственный источник истины — config/settings.py "
+        "(ADR-014, REM-M06)"
     )

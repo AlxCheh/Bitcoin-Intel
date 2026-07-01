@@ -760,8 +760,8 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 | API.md: Pagination для GET | D01 | Technical Writer | 30 мин |
 
 **Definition of Done Wave 3:**
-- [ ] `synthesizer.py` содержит `ALGORITHM_VERSION = "2.1.0"`
-- [ ] `test_algorithm_version_is_semver()` — PASS
+- [x] `synthesizer.py` содержит `ALGORITHM_VERSION = "2.1.0"`
+- [x] `test_algorithm_version_is_semver()` — PASS
 - [ ] ADDENDUM §18.4 описывает реальный файл
 - [ ] ADR-013 создан и ссылается из settings.py и ontology.json
 - [ ] Dependabot PR для outdated зависимостей создаётся автоматически

@@ -21,6 +21,15 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# IRP v1 Wave 3 / REM-M07: версия алгоритма синтеза (MAJOR.MINOR.PATCH).
+# Семантика — ADDENDUM §25.3:
+#   MAJOR — изменение алгоритма выбора tension/causal chain (ревью approved синтезов)
+#   MINOR — новые мосты, новые scoring modifiers (ревью для STRUCTURAL кластеров)
+#   PATCH — bugfix без изменения логики (ревью не требуется)
+# Хранится в каждой записи synthesis_store/*.json и synthesis_cache.json
+# как поле algorithm_version.
+ALGORITHM_VERSION = "2.1.0"
+
 from config.settings import (
     assert_deterministic_env,
     assert_required_files_exist,
@@ -119,6 +128,7 @@ class SynthesisResult:
     generated_at:      str   = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
+    algorithm_version: str   = ALGORITHM_VERSION
 
 
 # ─── Вспомогательные ──────────────────────────────────────────────────────────
@@ -626,6 +636,7 @@ def _save_synthesis(cluster_key: str, result: SynthesisResult,
         "signals_ignored":  result.signals_ignored,
         "uncertainty":      result.uncertainty,
         "generated_at":     result.generated_at,
+        "algorithm_version":result.algorithm_version,
     }
     filepath = store / f"{synthesis_id}.json"
     atomic_write_json_safe(str(filepath), output)
@@ -692,6 +703,7 @@ def main() -> None:
                 "signals_used":     result.signals_used,
                 "signals_ignored":  result.signals_ignored,
                 "generated_at":     result.generated_at,
+                "algorithm_version":result.algorithm_version,
                 "synthesis_id":     synthesis_id,
             }
             print(

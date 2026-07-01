@@ -616,26 +616,69 @@ class ContraCandidate:
 # Финальное решение всегда за аналитиком
 ```
 
-### 18.4 synthesis_cache_builder.py
+### 18.4 Построение synthesis_cache.json
+
+> **IRP v1 Wave 3 / REM-M01 (2026-07-01):** отдельного файла
+> `synthesis_cache_builder.py` в коде не существует и никогда не
+> существовало — этот раздел был написан на этапе проектирования и не
+> обновлён при реализации. Также неточной оказалась и сама стратегия
+> исправления, изначально предложенная в `docs/IRP_v1.md` REM-M01
+> («переименовать в `rebuild_synthesis.py` (функция `build_cache()`)»):
+> функции `build_cache()` с такой сигнатурой в коде нет. `"build_cache"` —
+> это строковая метка декоратора `@measure_performance("build_cache")` на
+> `synthesizer.py::main()`, а `rebuild_synthesis.py` — отдельный, второй
+> инструмент с другим назначением (см. ниже). Раздел переписан под
+> фактическое поведение обоих файлов.
+
+Построение `synthesis_cache.json` из `signals.json` "с нуля" выполняет
+`scripts/synthesizer.py::main()` (декоратор `@measure_performance("build_cache")`
+— отсюда исторически «cache_builder» в названии этого раздела):
 
 ```python
-# Вход
-def build_cache(
-    synthesis_store_path: str,
-    output_path: str = "synthesis_cache.json"
-) -> BuildResult
+# scripts/synthesizer.py
+def main() -> None
+# Параметров нет — пути читаются из config/settings.py
+# (SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH)
 
-# Действие: читает synthesis_store/, находит последний approved синтез
-# каждого кластера, записывает в synthesis_cache.json
+# Действие: для каждого кластера сигналов из signals.json вызывает
+# synthesize_cluster(), пишет каждый результат в synthesis_store/
+# как отдельный файл synthesis_<cluster>_<timestamp>.json, и
+# ПОЛНОСТЬЮ ПЕРЕСТРАИВАЕТ synthesis_cache.json из результатов
+# этого запуска (не читает и не мёржит старый cache).
 
 # Гарантии
-# - Идемпотентен: многократный вызов не меняет результат
-# - Атомарен: пишет во временный файл, потом переименовывает
-# - Не теряет данные: если ни одного approved нет — cluster отсутствует
-#   в cache (не падает)
+# - Детерминирован при PYTHONHASHSEED=0 (см. §25.2)
+# - Атомарен: atomic_write_json_safe пишет во временный файл, потом
+#   переименовывает
+# - DEGRADE GRACEFULLY: ошибка одного кластера (EmptyClusterError или
+#   любое Exception) не останавливает остальные — кластер помечается
+#   failed, попадает в лог, exit code отражает это в конце (§9)
 
-# Ошибки
-# CacheBuilderError — если synthesis_store не существует
+# Понятия "approved синтез" в коде НЕТ — status в synthesis_store
+# принимает только "generated"/"superseded" (см. ADR-013). Раздел
+# спецификации, описывавший approved-фильтрацию, не реализован.
+```
+
+Отдельно, для сценария «пересчитать при MAJOR-смене алгоритма и посмотреть
+diff перед применением» (§25.3), существует **второй, самостоятельный**
+инструмент — `scripts/rebuild_synthesis.py::rebuild()`:
+
+```python
+# scripts/rebuild_synthesis.py
+def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict
+
+# Действие: в отличие от synthesizer.py::main(), ЧИТАЕТ существующий
+# synthesis_cache.json, для каждого (или одного, если задан
+# cluster_filter) кластера пересчитывает синтез текущим алгоритмом и
+# сравнивает с тем, что было (diff по tension/phase/narrative).
+# apply=False (default): только печатает diff, ничего не пишет — можно
+#   запускать многократно без побочных эффектов.
+# apply=True: перезаписывает synthesis_cache.json результатом пересчёта
+#   и дописывает diff-запись в synthesis_store/{cluster}_rebuild_{ts}.json.
+
+# Ошибки: EmptyClusterError на отдельном кластере не останавливает
+# остальные (тот же DEGRADE GRACEFULLY, что в synthesizer.py). Отдельного
+# класса CacheBuilderError в коде нет.
 ```
 
 ---

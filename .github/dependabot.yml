@@ -1,0 +1,52 @@
+# .github/dependabot.yml
+# Bitcoin Intel — IRP v1 Wave 3 / OP04 (2026-07-01)
+#
+# Экосистемы в проекте на 2026-07-01 (проверено, не шаблон "на всякий случай"):
+#   - pip: requirements.txt в корне репозитория. pyproject.toml не объявляет
+#     зависимостей ([tool.flake8]/[tool.black]/[tool.pytest] — конфиги, не
+#     dependency manifest), поэтому pip-экосистема указывает на "/".
+#   - github-actions: .github/workflows/deploy.yml использует
+#     actions/checkout@v4, actions/setup-python@v5, actions/configure-pages@v4,
+#     actions/upload-pages-artifact@v3, actions/deploy-pages@v4.
+#   - npm/yarn/etc НЕ настроены — в репозитории нет package.json.
+#
+# target-branch: develop, не main — по модели M04 (feature -> develop -> main,
+# DEPLOYMENT.md). PR от Dependabot проходит тот же Branch Protection
+# ("Validate and Test" required status check), что и любой другой PR, и
+# требует отдельного promotion PR develop -> main как всё остальное — не
+# исключение для секьюрити-патчей.
+#
+# Обновления версий (Dependabot version updates) — это НЕ замена
+# pip-audit в deploy.yml (сканирование известных CVE в текущих
+# зафиксированных версиях, работает независимо от того, вышла ли новая
+# версия). Dependabot закрывает другую часть DEV10: устаревание версий
+# само по себе, не только уязвимости.
+
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"

@@ -289,6 +289,18 @@ Quality Report ── читает все сущности (нет ownership)
 
 ## Раздел 17. Data Contracts
 
+> ✅ **IRP v1 Wave 2 / REM-B3 (2026-07-01):** схемы ниже реализованы как
+> физические файлы `schemas/signal/v1.json`, `schemas/relationship/v1.json`,
+> `schemas/synthesis/v1.json` и проверяются в CI (`tests/unit/test_contract_schemas.py`,
+> шаг «Contract Tests»). **Реализованные файлы не всегда дословно совпадают
+> с текстом ниже** — расхождения найдены при валидации против реальных
+> production-данных и задокументированы прямо в файлах схем; для
+> `schemas/synthesis/v1.json` расхождение крупное и обосновано отдельно в
+> `docs/ADR-013-synthesis-schema-reflects-implementation.md`. Текст ниже
+> остаётся исходной проектной спецификацией (полезен как целевой ориентир
+> для Wave 3), но при расхождении с кодом или реализованной схемой —
+> приоритет у кода и `schemas/*.json`, не у этого текста.
+
 ### 17.1 Signal Schema (JSON Schema)
 
 ```json

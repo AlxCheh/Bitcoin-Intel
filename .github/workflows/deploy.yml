@@ -58,6 +58,9 @@ jobs:
       - name: Validate data integrity (M6)
         run: python3 scripts/validate_integrity.py
 
+      - name: Contract Tests (JSON Schema — signals/relationships/synthesis)
+        run: PYTHONHASHSEED=0 python3 -m pytest tests/unit/test_contract_schemas.py -v --tb=short
+
       - name: Run tests
         run: PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
 

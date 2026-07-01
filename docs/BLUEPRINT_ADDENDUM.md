@@ -1484,6 +1484,17 @@ def check_major_version_change(old_version: str, new_version: str) -> bool:
 # "11 синтезов созданы алгоритмом v1.x.x — рекомендуется перегенерация"
 ```
 
+### 25.3bis Статус реализации (IRP v1 Wave 3 / REM-M07, 2026-07-01)
+
+`ALGORITHM_VERSION = "2.1.0"` реализован как модульная константа в
+`scripts/synthesizer.py` (не в `config/settings.py` — версия принадлежит
+алгоритму синтеза, а не общей конфигурации). `SynthesisResult.algorithm_version`
+заполняется этим значением по умолчанию и попадает в `synthesis_store/*.json`
+и `synthesis_cache.json` для каждой новой записи. `check_major_version_change()`
+и предупреждение в `quality_report.py` (файл называется так в реализации,
+не `qa_report.py` как в примере кода выше) остаются нереализованными — не
+входили в scope M07, см. `docs/IRP_v1.md` REM-M07.
+
 ---
 
 ## Раздел 26. Golden Dataset

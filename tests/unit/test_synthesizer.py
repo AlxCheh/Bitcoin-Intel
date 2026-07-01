@@ -99,3 +99,25 @@ def test_confidence_deterministic():
     args = (20, 3, True, False, True)
     results = {calculate_confidence(*args) for _ in range(5)}
     assert len(results) == 1
+
+
+# ─── ALGORITHM_VERSION (IRP v1 Wave 3 / REM-M07) ───────────────────────────────
+
+def test_algorithm_version_is_semver():
+    """ALGORITHM_VERSION — строка формата MAJOR.MINOR.PATCH (ADDENDUM §25.3)."""
+    import re
+    from scripts.synthesizer import ALGORITHM_VERSION
+    assert re.match(r"^\d+\.\d+\.\d+$", ALGORITHM_VERSION), (
+        f"ALGORITHM_VERSION='{ALGORITHM_VERSION}' не соответствует semver MAJOR.MINOR.PATCH"
+    )
+
+
+def test_synthesis_result_default_algorithm_version_matches_constant():
+    """SynthesisResult.algorithm_version по умолчанию равен модульной константе."""
+    from scripts.synthesizer import ALGORITHM_VERSION, SynthesisResult, SignalScore
+    result = SynthesisResult(
+        cluster="test", tension="X vs Y", narrative="n", takeaway="t",
+        strength="weak", confidence=0.5, phase="active",
+        score=SignalScore(), anchor_signal_id="X-1", signal_count=1,
+    )
+    assert result.algorithm_version == ALGORITHM_VERSION

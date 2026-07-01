@@ -765,7 +765,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 - [x] ADDENDUM §18.4 описывает реальный файл
 - [x] ADR-014 создан и ссылается из settings.py и ontology.json (в исходном тексте DoD стояло «ADR-013» — номер уже занят Wave 2/B3, см. ADR-014 «Уточнение к IRR/IRP»)
 - [ ] Dependabot PR для outdated зависимостей создаётся автоматически
-- [ ] Secrets rotation policy описана в SECURITY.md
+- [x] Secrets rotation policy описана в SECURITY.md
 
 ---
 

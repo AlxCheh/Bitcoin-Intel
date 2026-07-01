@@ -58,15 +58,25 @@ python3 << 'EOF'
 import json
 
 with open('signals.json', 'r', encoding='utf-8') as f:
-    signals = json.load(f)
+    raw = json.load(f)
+
+# signals.json — это {meta: {...}, signals: [...]}, не плоский список
+is_wrapped = isinstance(raw, dict)
+signals = raw.get('signals', raw) if is_wrapped else raw
 
 target_id = 'STR-2026-0628-002'
 before = len(signals)
 signals = [s for s in signals if s.get('id') != target_id]
 after = len(signals)
 
+if is_wrapped:
+    raw['signals'] = signals
+    output = raw
+else:
+    output = signals
+
 with open('signals.json', 'w', encoding='utf-8') as f:
-    json.dump(signals, f, ensure_ascii=False, indent=2)
+    json.dump(output, f, ensure_ascii=False, indent=2)
 
 print(f"Удалено: {before - after} сигналов. Осталось: {after}")
 EOF
@@ -74,11 +84,29 @@ EOF
 # 3. Удалить из SIGNALS.md вручную — найти блок с id и удалить
 # grep -n "STR-2026-0628-002" SIGNALS.md
 
-# 4. Проверить JSON
+# 4. Удалить связанные relationships (data/relationships.json), если файл существует
+python3 << 'EOF'
+import json, os
+
+target_id = 'STR-2026-0628-002'
+path = 'data/relationships.json'
+if os.path.exists(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        rels = json.load(f)
+    before = len(rels)
+    rels = [r for r in rels if r.get('from_id') != target_id and r.get('to_id') != target_id]
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(rels, f, ensure_ascii=False, indent=2)
+    print(f"Удалено связей: {before - len(rels)}. Осталось: {len(rels)}")
+else:
+    print("data/relationships.json не существует — пропуск (legacy режим)")
+EOF
+
+# 5. Проверить JSON
 python3 -m json.tool signals.json > /dev/null && echo "JSON валиден"
 
-# 5. Закоммитить
-git add signals.json SIGNALS.md
+# 6. Закоммитить
+git add signals.json SIGNALS.md data/relationships.json
 git commit -m "fix: remove erroneous signal STR-2026-0628-002"
 git push origin main
 ```

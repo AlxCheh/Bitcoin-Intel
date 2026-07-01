@@ -1130,77 +1130,118 @@ contradiction_detector.py ↓ читает signals.json, relationships.json
 
 ## Раздел 23. Структура проекта
 
+> ⚠️ **IRP v1 / REM-B1 (2026-07-01):** ниже — два разных дерева. Не перепутать.
+> Разработчик пишет код в **Текущей структуре**. **Целевая структура** — ориентир для Фазы 4, её директорий (`src/`, `application/`) в репозитории сегодня не существует.
+
+### 23.1 🟢 Текущая структура (2026-07-01 — писать код сюда)
+
+```
+Bitcoin-Intel/
+│
+├── data/                          # Хранилище данных (Source of Truth)
+│   ├── relationships.json         # Граф связей (мигрирован из links.*, IRP B2)
+│   ├── synthesis_cache.json       # Актуальный синтез для UI (генерируется)
+│   ├── crosslinks.js
+│   ├── events.jsonl                # Журнал событий (append-only)
+│   └── holders.js
+│
+├── synthesis_store/                # История синтезов (append-only, в корне репо)
+│   └── synthesis_<cluster>_<timestamp>.json
+│
+├── signals.json                    # База сигналов: {meta: {...}, signals: [...]}
+├── ontology.json                   # Онтология (кластеры, правила скоринга)
+├── ENTITIES.json                   # База артефактов (L2, протоколы, компании, фонды)
+│
+├── domain/                         # Бизнес-логика (без src/ — плоско в корне)
+│   ├── validator.py                # Signal Validation
+│   ├── state_machine.py            # Lifecycle сигнала/синтеза
+│   ├── lifecycle.py
+│   ├── events.py
+│   └── exceptions.py
+│
+├── infrastructure/                 # Взаимодействие с внешним миром (без src/)
+│   ├── file_lock.py                # safe_read_json / atomic_write_json_safe
+│   ├── logger.py
+│   └── relationship_store.py
+│
+│   # Прикладной логики (application/) как отдельного слоя нет —
+│   # её код живёт в scripts/ (synthesizer.py, contradiction_detector.py).
+│   # Это сознательное отклонение от целевой структуры, см. 23.2.
+│
+├── scripts/                        # CLI скрипты для аналитика + прикладная логика
+│   ├── add_signal.py               # Добавить сигнал (валидация + запись)
+│   ├── synthesizer.py              # Synthesis Engine (роль application/synthesizer.py)
+│   ├── rebuild_synthesis.py        # Пересборка synthesis_cache.json + store
+│   ├── contradiction_detector.py   # (роль application/contradiction_detector.py)
+│   ├── migrate_relationships.py    # Миграция links.* → relationships.json (Фаза 0, завершена)
+│   ├── validate_relationships.py
+│   ├── validate_integrity.py
+│   ├── quality_report.py
+│   ├── approve_synthesis.py
+│   ├── cleanup_synthesis_store.py
+│   └── history_query.py
+│
+├── tests/
+│   ├── unit/                       # test_validator, test_synthesizer, test_contradiction, ...
+│   ├── integration/                # test_signal_workflow, test_approve_synthesis, ...
+│   ├── golden/
+│   │   ├── fixtures/golden_signals.json
+│   │   ├── expected/golden_synthesis.json
+│   │   └── test_golden.py
+│   └── conftest.py
+│
+├── docs/                           # Документация (ADR — файлы плоско в docs/, не в docs/ADR/)
+│   ├── BLUEPRINT.md
+│   ├── BLUEPRINT_ADDENDUM.md       # Этот файл
+│   ├── ALGORITHM.md
+│   ├── API.md
+│   ├── IRR_REPORT_v1.md
+│   ├── IRP_v1.md
+│   └── ADR-008-*.md, ADR-009-*.md, ADR-010-*.md, ADR-011-*.md, ...
+│
+├── config/
+│   └── settings.py                 # Константы: WINDOW_DAYS, LEGACY_LINKS_ENABLED, etc.
+│
+└── index.html                      # UI (без бизнес-логики синтеза)
+```
+
+### 23.2 🎯 Целевая структура (Фаза 4, ориентировочно ~2028 — НЕ создавать сейчас)
+
 ```
 bitcoin-intel/
 │
-├── data/                          # Хранилище данных (Source of Truth)
-│   ├── signals.json               # База сигналов
-│   ├── entities/
-│   │   └── entities.json          # База сущностей
-│   ├── relationships.json         # Граф связей
-│   ├── ontology.json              # Онтология (кластеры, правила)
-│   ├── synthesis_cache.json       # Актуальный синтез для UI (генерируется)
-│   └── synthesis_store/           # История синтезов (append-only)
-│       ├── 2026-06-28-strategy_model_stress-v001.json
-│       └── ...
+├── data/
+│   ├── signals.json
+│   ├── entities/entities.json
+│   ├── relationships.json
+│   ├── ontology.json
+│   ├── synthesis_cache.json
+│   └── synthesis_store/
 │
-├── src/                           # Исходный код Python
-│   ├── domain/                    # Бизнес-логика (чистая, без зависимостей)
-│   │   ├── models.py              # Dataclass: Signal, Synthesis, Relationship, etc.
-│   │   ├── ontology.py            # Загрузка и валидация онтологии
-│   │   └── scoring.py             # Формулы скоринга (чистые функции)
-│   │
-│   ├── application/               # Прикладная логика (оркестрирует domain)
-│   │   ├── synthesizer.py         # Synthesis Engine — единственная реализация
-│   │   ├── validator.py           # Signal Validation
+├── src/                            # Появляется только при переходе на пакетную структуру
+│   ├── domain/
+│   │   ├── models.py               # Dataclass: Signal, Synthesis, Relationship, etc.
+│   │   ├── ontology.py
+│   │   └── scoring.py
+│   ├── application/                # Выделяется из scripts/ как отдельный слой
+│   │   ├── synthesizer.py
+│   │   ├── validator.py
 │   │   ├── contradiction_detector.py
-│   │   └── cache_builder.py       # Сборка synthesis_cache.json
-│   │
-│   └── infrastructure/            # Взаимодействие с внешним миром
-│       ├── signal_store.py        # Чтение/запись signals.json
-│       ├── relationship_store.py  # Чтение/запись relationships.json
-│       └── synthesis_store.py     # Чтение/запись synthesis_store/
+│   │   └── cache_builder.py
+│   └── infrastructure/
+│       ├── signal_store.py
+│       ├── relationship_store.py
+│       └── synthesis_store.py
 │
-├── scripts/                       # CLI скрипты для аналитика
-│   ├── add_signal.py              # Добавить сигнал (валидация + запись)
-│   ├── generate_synthesis.py      # Сгенерировать черновик синтеза
-│   ├── approve_synthesis.py       # Утвердить синтез
-│   ├── qa_report.py               # Отчёт о качестве базы
-│   ├── migrate_relationships.py   # Миграция links.* → relationships.json
-│   └── rebuild_cache.py           # Пересобрать synthesis_cache.json
-│
-├── tests/                         # Тесты
-│   ├── unit/
-│   │   ├── test_validator.py
-│   │   ├── test_synthesizer.py
-│   │   ├── test_contradiction_detector.py
-│   │   └── test_scoring.py
-│   ├── integration/
-│   │   ├── test_signal_workflow.py
-│   │   └── test_synthesis_workflow.py
-│   ├── golden/                    # Golden Dataset
-│   │   ├── fixtures/              # Эталонные сигналы
-│   │   │   └── golden_signals.json
-│   │   ├── expected/              # Ожидаемые синтезы
-│   │   │   └── golden_synthesis.json
-│   │   └── test_golden.py
-│   └── regression/
-│       └── test_regression.py
-│
-├── docs/                          # Документация
-│   ├── BLUEPRINT.md
-│   ├── BLUEPRINT_ADDENDUM.md      # Этот файл
-│   ├── ALGORITHM.md
-│   ├── SYNTHESIS_ARCHITECTURE.md
-│   └── ADR/                       # Архитектурные решения
-│       ├── ADR-001-synthesizer-python.md
-│       └── ...
-│
+├── scripts/                        # Остаётся тонким CLI-слоем над src/application/
+├── tests/
+├── docs/
+│   └── ADR/                        # ADR переезжают в поддиректорию
 ├── config/
-│   └── settings.py                # Константы: WINDOW_DAYS, EXPIRE_DAYS, etc.
-│
-└── index.html                     # UI (без бизнес-логики синтеза)
+└── index.html
 ```
+
+**Триггер перехода к целевой структуре:** решение принимается отдельным ADR при достижении команды 10+ разработчиков или явном конфликте code ownership в текущей плоской структуре — не автоматически по календарной дате.
 
 ---
 

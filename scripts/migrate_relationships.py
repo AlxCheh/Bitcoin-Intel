@@ -51,7 +51,8 @@ def migrate(dry_run: bool = True) -> dict:
     Returns:
         dict со статистикой: created, skipped_duplicate, signals_processed, errors
     """
-    signals      = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
+    raw = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
+    signals = raw.get("signals", raw) if isinstance(raw, dict) else raw
     existing_rels = safe_read_json(RELATIONSHIPS_PATH, default=[])
 
     # Индекс существующих пар для быстрой проверки дубликатов

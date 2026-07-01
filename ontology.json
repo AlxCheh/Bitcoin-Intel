@@ -45,6 +45,7 @@
     "background": "Структурный контекст без острого события"
   },
   "weight_scores": {
+    "_note": "display only, не используется в вычислениях — единственный источник: config/settings.py WEIGHT_SCORE (IRP v1 Wave 3 / REM-M06, ADR-014)",
     "onchain": 4,
     "primary": 3,
     "market": 2,

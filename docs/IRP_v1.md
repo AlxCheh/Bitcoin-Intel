@@ -766,6 +766,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 - [x] ADR-014 создан и ссылается из settings.py и ontology.json (в исходном тексте DoD стояло «ADR-013» — номер уже занят Wave 2/B3, см. ADR-014 «Уточнение к IRR/IRP»)
 - [x] Dependabot PR для outdated зависимостей создаётся автоматически
 - [x] Secrets rotation policy описана в SECURITY.md
+- [x] `docs/API.md` документирует `limit`/`offset` пагинацию для GET-эндпоинтов Backend-фазы (D01); `docs/BLUEPRINT_ADDENDUM.md` §19 (источник контракта) обновлён синхронно
 
 ---
 

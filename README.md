@@ -129,3 +129,5 @@ Bitcoin-Intel/
 Проект в активной разработке. Образовательный, некоммерческий ресурс о Bitcoin.
 
 <!-- IRP v1 M05: Branch Protection verification 2026-07-01T11:44:42Z -->
+
+<!-- M04 flow test 1782926397 -->

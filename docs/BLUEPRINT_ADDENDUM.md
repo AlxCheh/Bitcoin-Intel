@@ -1871,7 +1871,11 @@ def test_takeaway_does_not_duplicate_narrative(signals):
 Рекомендуемые (не блокируют, но мониторятся):
   ✓ Golden тесты зелёные (или явно утверждены изменения)
   ✓ Regression тесты зелёные
-  ✓ Performance: synthesize(42 signals) < 100ms
+  ✓ Performance: synthesize_cluster() < 100ms на реальных данных signals.json
+  #   (IRP v1 Wave 4 / REM-M09, 2026-07-02: "42 signals" в исходной
+  #   формулировке было числом сигналов в базе на момент написания DoD,
+  #   не инвариантом для захардкоживания в тесте — база растёт, тест
+  #   tests/performance/test_synthesizer_perf.py меряет актуальные данные)
 ```
 
 ---

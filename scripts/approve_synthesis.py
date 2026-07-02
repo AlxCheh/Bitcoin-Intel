@@ -52,8 +52,13 @@ def list_pending(cluster_key: str | None = None) -> list[dict]:
                 if cluster_key is None or s.get("cluster") == cluster_key:
                     s["_file"] = str(f)
                     results.append(s)
-        except Exception:
-            pass
+        except (json.JSONDecodeError, OSError) as e:
+            # Sprint 0 / GH Issue #80 (bandit B110): раньше молча пропускался
+            # (bare except Exception: pass) — битый файл в synthesis_store/
+            # исчезал из списка ожидающих утверждения без единого следа.
+            # DEGRADE GRACEFULLY (§9) требует пропуска, не падения всей функции
+            # из-за одного файла, но деградация должна быть видимой, не тихой.
+            logger.warning(f"Пропущен нечитаемый файл в synthesis_store/: {f} ({e})")
     return results
 
 

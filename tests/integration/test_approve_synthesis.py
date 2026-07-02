@@ -121,6 +121,29 @@ def test_list_pending_skips_corrupt_files_gracefully():
     assert pending[0]["id"] == "synthesis_a_20260630_100001"
 
 
+def test_list_pending_logs_warning_for_corrupt_file(caplog):
+    """
+    Sprint 0 / GH Issue #80 (bandit B110): раньше `except Exception: pass` молча
+    проглатывал битый файл — деградация была невидимой. Проверяем, что теперь
+    пропуск логируется как WARNING с именем файла, не тихо.
+    """
+    import logging
+    from scripts.approve_synthesis import list_pending
+
+    store = Path(SYNTHESIS_STORE_PATH)
+    store.mkdir(exist_ok=True)
+    (store / "synthesis_corrupt_20260630_100000.json").write_text("{not valid json", encoding=ENCODING)
+
+    with caplog.at_level(logging.WARNING, logger="bitcoin_intel.approve_synthesis"):
+        list_pending()
+
+    assert any(
+        "synthesis_corrupt_20260630_100000.json" in record.message
+        for record in caplog.records
+    )
+    assert any(record.levelname == "WARNING" for record in caplog.records)
+
+
 # ─── approve() — happy path ───────────────────────────────────────────────────
 
 def test_approve_valid_transition_updates_status_and_fields():

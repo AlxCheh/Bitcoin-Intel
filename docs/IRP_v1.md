@@ -791,6 +791,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 - [x] `signals.json` size проверяется в CI: WARNING при > 4MB (`scripts/check_signals_size.py`, шаг в `deploy.yml` job `validate`; DoD говорит 4MB, исходная формулировка SCL05 в IRR — 5MB, использован DoD-порог как операционный)
 - [x] Release Strategy секция в DEPLOYMENT.md (по пути исправлено самопротиворечие Branch Strategy vs Environments/Staging, актуализирован устаревший stub GitHub Actions Pipeline)
 - [x] Paging strategy для UI задокументирована (`docs/BLUEPRINT.md` §9 «UI Paging Strategy») — документация решения на порог 300+ сигналов, не реализация; открытый вопрос по режиму `theme` зафиксирован явно, не решён преждевременно
+- [x] `migration/v1_to_v2.py` создан как явный stub (CON06) — CLI-паттерн скопирован с реального прецедента `scripts/migrate_relationships.py`, `--apply` падает `NotImplementedError`, не тихий no-op, т.к. schema v2 не спроектирована. 5 unit-тестов, включая тест-канарейку на `TARGET_SCHEMA_EXISTS`
 
 ---
 

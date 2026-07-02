@@ -789,7 +789,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 - [x] `pytest -m perf` → synthesize_cluster() < 100ms на реальных данных signals.json (49 сигналов на 2026-07-02; см. §28.2 — «42» было масштабом на момент написания, не инвариантом)
 - [x] GitHub Actions scheduled job проверяет freshness synthesis_cache еженедельно (`.github/workflows/synthesis-freshness.yml`, `scripts/check_synthesis_freshness.py`, 7 unit-тестов)
 - [x] `signals.json` size проверяется в CI: WARNING при > 4MB (`scripts/check_signals_size.py`, шаг в `deploy.yml` job `validate`; DoD говорит 4MB, исходная формулировка SCL05 в IRR — 5MB, использован DoD-порог как операционный)
-- [ ] Release Strategy секция в DEPLOYMENT.md
+- [x] Release Strategy секция в DEPLOYMENT.md (по пути исправлено самопротиворечие Branch Strategy vs Environments/Staging, актуализирован устаревший stub GitHub Actions Pipeline)
 
 ---
 

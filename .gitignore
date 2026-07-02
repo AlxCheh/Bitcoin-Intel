@@ -6,3 +6,5 @@ data/events.jsonl
 __pycache__/
 *.pyc
 .env
+.coverage
+.coverage.*

@@ -1,0 +1,73 @@
+name: Quality Dashboard (weekly)
+
+# MON05 (Dashboards — было "Нет"). Найдено при пред-Wave-5 аудите
+# (docs/IRP_v1.md §12) как orphaned FAIL без волны и без Residual Risk;
+# реализовано по решению пользователя.
+#
+# Отдельно от deploy.yml по той же причине, что performance.yml и
+# synthesis-freshness.yml: не должно блокировать push/PR основного пайплайна.
+# Использует тот же bot-PR паттерн, что "Synthesize Narratives" job в
+# deploy.yml (SYNTHESIS_BOT_TOKEN, не GITHUB_TOKEN — иначе PR не порождает
+# новый workflow run, и "Validate and Test" на нём никогда не запустится,
+# auto-merge зависнет, см. M05 в DEPLOYMENT.md).
+
+on:
+  schedule:
+    # 08:00 UTC каждый понедельник — после performance.yml (06:00) и
+    # synthesis-freshness.yml (07:00), чтобы все три не стартовали разом
+    - cron: "0 8 * * 1"
+  workflow_dispatch: {}
+
+env:
+  PYTHONHASHSEED: "0"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dashboard:
+    name: Generate quality dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt --quiet
+
+      - name: Generate dashboard
+        run: python3 scripts/generate_dashboard.py
+
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          if git diff --quiet docs/QUALITY_DASHBOARD.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit dashboard via PR (not direct push to main)
+        if: steps.diffcheck.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/QUALITY_DASHBOARD.md
+          BRANCH="bot/update-dashboard-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update QUALITY_DASHBOARD.md"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: weekly quality dashboard update ($(date -u +%Y-%m-%d))" \
+            --body "Автогенерация docs/QUALITY_DASHBOARD.md (MON05). Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

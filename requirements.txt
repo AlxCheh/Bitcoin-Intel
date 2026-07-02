@@ -6,7 +6,7 @@
 
 # Development & Testing
 pytest>=8.0.0,<9.0.0
-hypothesis>=6.100.0,<7.0.0       # Property-based testing (T06)
+hypothesis>=6.155.7,<7.0.0       # Property-based testing (T06)
 flake8>=7.0.0,<8.0.0             # Линтер — критические ошибки в CI (IRB-B2)
 jsonschema>=4.0.0,<5.0.0         # Contract Tests против schemas/*.json (IRP v1 Wave 2 / REM-B3)
 

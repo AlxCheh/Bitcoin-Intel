@@ -79,6 +79,14 @@ jobs:
       - name: Security audit
         run: pip-audit --requirement requirements.txt || true
 
+      - name: "SAST собственного кода (Sprint 0 / GH Issue #80)"
+        # Non-blocking на старте, как pip-audit — реальный прогон 2026-07-02 дал 0
+        # находок (единственная найденная — B110 bare except в approve_synthesis.py
+        # — исправлена в этом же PR, не отложена). tests/ и archive/ не сканируются:
+        # тестовые моки/фикстуры могут триггерить false-positive
+        # (hardcoded test tokens и т.п.), это шум, не сигнал.
+        run: bandit -r domain/ infrastructure/ scripts/ config/ -f screen || echo "::warning::bandit нашёл находки — см. лог выше"
+
   synthesize:
     name: Synthesize Narratives
     runs-on: ubuntu-latest

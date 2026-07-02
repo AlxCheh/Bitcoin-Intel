@@ -58,6 +58,9 @@ jobs:
       - name: Validate data integrity (M6)
         run: python3 scripts/validate_integrity.py
 
+      - name: signals.json size monitoring (IRP v1 Wave 4 / OP06)
+        run: python3 scripts/check_signals_size.py
+
       - name: Contract Tests (JSON Schema — signals/relationships/synthesis)
         run: PYTHONHASHSEED=0 python3 -m pytest tests/unit/test_contract_schemas.py -v --tb=short
 
@@ -89,7 +92,14 @@ jobs:
         run: cp data/synthesis_cache.json /tmp/old_synthesis_cache.json || echo '{}' > /tmp/old_synthesis_cache.json
 
       - name: Run synthesizer
-        run: PYTHONHASHSEED=0 python3 scripts/synthesizer.py
+        # ENVIRONMENT=production — structured JSON logs (infrastructure/logger.py
+        # StructuredFormatter), не HumanFormatter. До этого CI работал с
+        # ENVIRONMENT по умолчанию ("local") — цветной текст в raw логе раннера,
+        # который никто не парсит. См. scripts/check_error_rate.py (MON07).
+        run: ENVIRONMENT=production PYTHONHASHSEED=0 python3 scripts/synthesizer.py 2> /tmp/synth.log; cat /tmp/synth.log
+
+      - name: Error rate monitoring (MON07)
+        run: python3 scripts/check_error_rate.py /tmp/synth.log
 
       - name: Verify synthesis_cache.json
         run: |

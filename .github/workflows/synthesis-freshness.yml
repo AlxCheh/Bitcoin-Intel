@@ -1,0 +1,44 @@
+name: Synthesis Freshness Check (weekly)
+
+# IRP v1 Wave 4 / OP05 (2026-07-02): MON03 (Alerting при деградации synthesis)
+# + MON04 (synthesis freshness мониторинг — раньше был только индикатор в UI,
+# без автоматического алерта).
+#
+# deploy.yml уже перестраивает synthesis_cache.json почти сразу после каждого
+# push с изменением signals.json ("Synthesize Narratives" job) — эта проверка
+# не дублирует ту логику, а служит канарейкой: ловит случай, когда тот
+# автоматический пайплайн молча ломается (permissions, quota, баг), а не
+# просто "давно не было новых сигналов".
+
+on:
+  schedule:
+    # 07:00 UTC каждый понедельник — на час позже performance.yml,
+    # чтобы оба scheduled job не стартовали в одну минуту
+    - cron: "0 7 * * 1"
+  workflow_dispatch: {}
+
+env:
+  PYTHONHASHSEED: "0"
+
+jobs:
+  freshness:
+    name: Check synthesis_cache.json freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt --quiet
+
+      - name: Check freshness
+        run: python3 scripts/check_synthesis_freshness.py
+
+      # Провал этого workflow не блокирует deploy.yml (не в push/PR
+      # триггерах). Уведомление — стандартный GitHub Actions email/UI для
+      # scheduled workflow failure, без дополнительной интеграции
+      # (Slack/PagerDuty вне scope OP05, тот же принцип что в performance.yml).

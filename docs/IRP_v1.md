@@ -787,9 +787,11 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 
 **Definition of Done Wave 4:**
 - [x] `pytest -m perf` → synthesize_cluster() < 100ms на реальных данных signals.json (49 сигналов на 2026-07-02; см. §28.2 — «42» было масштабом на момент написания, не инвариантом)
-- [ ] GitHub Actions scheduled job проверяет freshness synthesis_cache еженедельно
-- [ ] `signals.json` size проверяется в CI: WARNING при > 4MB
-- [ ] Release Strategy секция в DEPLOYMENT.md
+- [x] GitHub Actions scheduled job проверяет freshness synthesis_cache еженедельно (`.github/workflows/synthesis-freshness.yml`, `scripts/check_synthesis_freshness.py`, 7 unit-тестов)
+- [x] `signals.json` size проверяется в CI: WARNING при > 4MB (`scripts/check_signals_size.py`, шаг в `deploy.yml` job `validate`; DoD говорит 4MB, исходная формулировка SCL05 в IRR — 5MB, использован DoD-порог как операционный)
+- [x] Release Strategy секция в DEPLOYMENT.md (по пути исправлено самопротиворечие Branch Strategy vs Environments/Staging, актуализирован устаревший stub GitHub Actions Pipeline)
+- [x] Paging strategy для UI задокументирована (`docs/BLUEPRINT.md` §9 «UI Paging Strategy») — документация решения на порог 300+ сигналов, не реализация; открытый вопрос по режиму `theme` зафиксирован явно, не решён преждевременно
+- [x] `migration/v1_to_v2.py` создан как явный stub (CON06) — CLI-паттерн скопирован с реального прецедента `scripts/migrate_relationships.py`, `--apply` падает `NotImplementedError`, не тихий no-op, т.к. schema v2 не спроектирована. 5 unit-тестов, включая тест-канарейку на `TARGET_SCHEMA_EXISTS`
 
 ---
 
@@ -871,6 +873,32 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 | RR-07 | **PAT в истории переписки с ассистентом** (формулировка «PAT в git history» была неточной — см. SECURITY.md «Secrets Rotation Policy», OP03: `git rev-list --all` + `git grep` по всему репозиторию не находит реального токена ни в одном блобе) | Токен несколько раз вставлялся открытым текстом в чат в разных сессиях реализации Wave 1–3, риск компрометации. Политика ротации (OP03 Wave 3, SECURITY.md) описывает это явно как триггер внеплановой ротации | После ротации новый токен — только в GitHub Secrets |
 | RR-08 | **JS Fallback без window-filtering** (ADR-010) | Задокументирован в ADR-010 «Дальнейшая работа»; тест держит gap видимым | test_known_gap_js_lacks_window_filtering не удалять |
 
+> ✅ **Проверка перед Wave 5 (2026-07-02) — закрыто:** полный кросс-чек
+> всех 26 FAIL из оригинального `docs/IRR_REPORT_v1.md` против волн 1-4
+> и RR-01–RR-08 нашёл **два FAIL без назначенной волны и без статуса
+> Residual Risk**:
+>
+> - **MON05** — Dashboards (было: «Нет») → реализовано:
+>   `scripts/generate_dashboard.py` рендерит `docs/QUALITY_DASHBOARD.md`
+>   из `compute_quality_report()` (переиспользует существующий
+>   `quality_report.py`, не дублирует логику); еженедельно обновляется
+>   через `.github/workflows/quality-dashboard.yml` (bot-PR паттерн,
+>   как у `synthesize` job). 8 unit-тестов
+> - **MON07** — Error rate monitoring (было: «Только logs в stdout») →
+>   реализовано: `deploy.yml` job `synthesize` теперь запускает
+>   `synthesizer.py` с `ENVIRONMENT=production` (структурированные JSON
+>   логи вместо HumanFormatter, который никто не парсил), новый шаг
+>   `scripts/check_error_rate.py` считает ERROR/CRITICAL записи в логе
+>   этого прогона, non-blocking `::warning::` при находках. 7 unit-тестов.
+>   Явная граница: это проверка одного прогона, не историческая
+>   аналитика/тренды — та часть остаётся Technical Debt After MVP
+>   (нет backend/БД, тот же принцип что MON06)
+>
+> 26 исходных FAIL: 19 закрыты волнами, 5 приняты как RR (AI08→RR-01,
+> TST13/14/15→RR-02, MON06→RR-03), 2 (MON05, MON07) теперь тоже закрыты
+> реализацией — не как Residual Risk. Критерий §11 «Итого FAIL: ≤ 5
+> (только из RR-01–RR-08)» выполняется: 0 неучтённых FAIL.
+
 ---
 
 ## 13. Повторная процедура проверки (Re-IRR Gate)
@@ -887,7 +915,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 | `schemas/*.json` | Три файла существуют, CI Contract Tests green |
 | `tests/golden/expected/golden_synthesis.json` | Файл существует, test_golden.py PASS |
 | `docs/ADR-012-contradiction-precision-target.md` | Файл существует |
-| `docs/ADR-013-scoring-weights-single-source.md` | Файл существует |
+| `docs/ADR-014-single-source-of-truth-scoring-weights.md` | Файл существует (проверка перед Wave 5, 2026-07-02: этот пункт указывал на несуществующий `ADR-013-scoring-weights-single-source.md` — реальный файл создан под другим именем/номером при реализации M06, Wave 3, см. этот же ADR-014 «Уточнение к IRR/IRP») |
 | `DEPLOYMENT.md` | Содержит Staging section, Branch Protection setup |
 | `DISASTER_RECOVERY.md` | S2 скрипт прошёл ручной тест |
 | `.github/workflows/deploy.yml` | Contract Tests шаг присутствует |

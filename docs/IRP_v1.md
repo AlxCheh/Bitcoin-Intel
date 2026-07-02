@@ -786,7 +786,7 @@ REM-B2 → REM-B3 → REM-B3-CI → REM-C1 → Wave 5 Validation
 | migration/v1_to_v2.py stub | MC05 | Staff Backend | 30 мин |
 
 **Definition of Done Wave 4:**
-- [ ] `pytest -m perf` → synthesize < 100ms на 42 сигналах
+- [x] `pytest -m perf` → synthesize_cluster() < 100ms на реальных данных signals.json (49 сигналов на 2026-07-02; см. §28.2 — «42» было масштабом на момент написания, не инвариантом)
 - [ ] GitHub Actions scheduled job проверяет freshness synthesis_cache еженедельно
 - [ ] `signals.json` size проверяется в CI: WARNING при > 4MB
 - [ ] Release Strategy секция в DEPLOYMENT.md

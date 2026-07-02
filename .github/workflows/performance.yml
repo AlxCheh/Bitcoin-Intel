@@ -1,0 +1,40 @@
+name: Performance Baseline (weekly)
+
+# IRP v1 Wave 4 / REM-M09 (2026-07-02): synthesize_cluster() < 100ms —
+# DoD §28.2. Отдельно от основного CI (deploy.yml): perf-тесты не должны
+# блокировать push/PR на флуктуации CI-раннера, но должны ловить реальную
+# деградацию (например, N^2 в scoring при росте signals.json) на регулярной
+# основе. tests/performance/ намеренно не входит в explicit-путь основного
+# workflow (tests/unit/ tests/golden/ tests/integration/) — только сюда.
+
+on:
+  schedule:
+    # 06:00 UTC каждый понедельник
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}  # ручной запуск для проверки без ожидания понедельника
+
+env:
+  PYTHONHASHSEED: "0"
+
+jobs:
+  perf:
+    name: Performance Tests (pytest -m perf)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt --quiet
+
+      - name: Run performance tests
+        run: python3 -m pytest tests/performance/ -m perf -v --tb=short
+
+      # Провал этого workflow не блокирует deploy.yml — он не в push/PR
+      # триггерах основного pipeline. Уведомление о провале — стандартное
+      # GitHub Actions email/UI для scheduled workflow failure, без
+      # дополнительной интеграции (Slack/PagerDuty вне scope REM-M09).

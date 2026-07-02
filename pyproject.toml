@@ -11,3 +11,21 @@ testpaths = ["tests"]
 markers = [
     "perf: performance/timing tests (IRP v1 Wave 4 / REM-M09) — not in main CI, run via `pytest -m perf` or the weekly scheduled workflow",
 ]
+
+[tool.coverage.run]
+# Sprint 0 / GH Issue #77. tests/ и archive/ сами не покрываются (не продакшен-код).
+# migration/v1_to_v2.py — намеренный stub (см. его docstring), 0% ожидаем и корректен,
+# не регрессия: покрывать нечего, пока schema v2 не спроектирована.
+omit = [
+    "tests/*",
+    "archive/*",
+    "migration/v1_to_v2.py",
+]
+
+[tool.coverage.report]
+# Порог не выставлен намеренно на первом проходе (2026-07-02, реальный замер: 47%
+# domain+infrastructure+scripts). Несколько файлов на 0% — уже задокументированные,
+# известные пробелы (add_signal.py — DoD §28.7, IRP Wave 3 / REM-M08; CLI-скрипты
+# без прямых unit-тестов на main()). Жёсткий блокирующий порог на этой базе создал
+# бы шум, не сигнал. Пересмотреть после нескольких недель реальных данных.
+show_missing = true

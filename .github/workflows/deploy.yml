@@ -67,6 +67,15 @@ jobs:
       - name: Run tests
         run: PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ -v --tb=short
 
+      - name: "Coverage report (Sprint 0 / GH Issue #77)"
+        # Non-blocking на старте — см. pyproject.toml [tool.coverage.report] и
+        # docs/SPRINT0_PLAN.md: порог выставляется после нескольких недель
+        # реальных данных, не заранее. Первый замер (2026-07-02): 47%.
+        run: |
+          PYTHONHASHSEED=0 python3 -m pytest tests/unit/ tests/golden/ tests/integration/ \
+            --cov=domain --cov=infrastructure --cov=scripts --cov-report=term-missing -q \
+            || echo "::warning::Coverage run failed to complete — see log above"
+
       - name: Security audit
         run: pip-audit --requirement requirements.txt || true
 

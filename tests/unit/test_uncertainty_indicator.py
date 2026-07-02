@@ -160,7 +160,8 @@ class TestJSFallbackRationale:
     """N02 ARR v3: JS live-фоллбэк теперь тоже объясняет anchor-сигнал."""
 
     @pytest.fixture(scope="class")
-    def synth_source(self):
+    @staticmethod
+    def synth_source():
         html = INDEX_HTML.read_text(encoding="utf-8")
         fresh = re.search(r"let FRESHNESS_FRESH_DAYS\s*=\s*(\d+);", html).group(1)
         recent = re.search(r"let FRESHNESS_RECENT_DAYS\s*=\s*(\d+);", html).group(1)

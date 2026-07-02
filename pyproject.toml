@@ -8,3 +8,6 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "perf: performance/timing tests (IRP v1 Wave 4 / REM-M09) — not in main CI, run via `pytest -m perf` or the weekly scheduled workflow",
+]

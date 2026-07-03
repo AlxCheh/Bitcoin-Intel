@@ -313,26 +313,27 @@
       "name": "Metaplanet",
       "type": "corporate",
       "status": "active",
-      "summary": "Японская публичная компания — крупнейший корпоративный держатель BTC в Азии, строит регулируемую продуктовую фабрику на Bitcoin-коллатерале",
+      "summary": "Японская публичная компания — #3 корпоративный держатель BTC в мире, строит регулируемую продуктовую фабрику на Bitcoin-коллатерале; доходность options-бизнеса под давлением",
       "profile": {
-        "what": "BTC-казначейство + Project Nova: регулируемые BTC-linked продукты через дочернюю Siiibo Securities",
+        "what": "BTC-казначейство + Project Nova: регулируемые BTC-linked продукты через дочернюю Siiibo Securities; монетизация через Bitcoin Income Generation (options-стратегии)",
         "metrics": [
-          "40 177 BTC ($2.41 млрд) — #3 в мире, #1 в Японии",
-          "mNAV < 1x (июнь 2026), акции −47% YTD",
-          "Нереализованный убыток $1.18 млрд, средняя цена входа $89 328",
-          "BTC Yield Q1 2026: 2.8%",
+          "43 000 BTC (~$2.6 млрд) — #3 в мире после Strategy и Twenty One Capital",
+          "Bitcoin Income Generation, Q2 FY2026: 1.747 млрд иен — падение 41% кв/кв, 59% от пика Q4 FY2025",
+          "Цель: 100 000 BTC к концу 2026, 210 000 к концу 2027 («555 Million Plan»)",
+          "Долг + префы: 23% от NAV BTC",
           "TSE: 3350 / OTCQX: MTPLF"
         ],
         "links_to": [
           "bitcoin",
           "siiibo_securities"
         ],
-        "notable": "Первое BTC-казначейство, купившее регуляторную лицензию для упаковки BTC в продукты — Project Nova: BTC-облигации, security tokens, preferred shares"
+        "notable": "Первое BTC-казначейство, купившее регуляторную лицензию для упаковки BTC в продукты — Project Nova: BTC-облигации, security tokens, preferred shares. Темп покупок Q2 2026 на порядок отстаёт от требуемого для годовой цели"
       },
       "signal_refs": [
-        "STR-2026-0626-001"
+        "STR-2026-0626-001",
+        "STR-2026-0702-001"
       ],
-      "last_updated": "2026-06-26"
+      "last_updated": "2026-07-02"
     },
     {
       "id": "siiibo_securities",

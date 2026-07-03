@@ -7,6 +7,8 @@
 
 **Связанные артефакты, учитываемые при кросс-проверке:** BAMS v1.0 (docs/BAMS_v1.0.md, в main), CLAUDE.md v5.9 (уровень реализации: schema signals.json, enum'ы cat/theme/weight/actor/flow), signals.json (49 сигналов на момент ревью).
 
+> Примечание (2026-07-02): после аудита живые документы переведены на неверсионированные имена — docs/BAMS.md, docs/BDKS.md; пути в тексте ревью отражают состояние на момент аудита.
+
 ---
 
 # Часть I. Knowledge Elicitation

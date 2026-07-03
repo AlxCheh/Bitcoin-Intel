@@ -361,6 +361,68 @@ header {
 .eco-archive .eco-list .eco-card { opacity: 0.65; }
 .eco-archive .eco-list .eco-card:hover { opacity: 1; }
 
+/* ══════════════════════════════════
+   REVENUE ENGINES
+══════════════════════════════════ */
+.re-list { padding: 0; }
+.re-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid rgba(247,147,26,0.2);
+  border-right: 1px solid rgba(247,147,26,0.2);
+}
+.re-card:first-child { border-top: 1px solid rgba(247,147,26,0.2); }
+.re-card:last-child { border-bottom: 1px solid rgba(247,147,26,0.2); }
+.re-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.re-card-entity {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.re-card-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt);
+  letter-spacing: 0.02em;
+}
+.re-trend-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  flex-shrink: 0;
+}
+.re-trend-badge.growing   { color: var(--grn); border-color: rgba(90,158,114,0.3); }
+.re-trend-badge.declining { color: var(--red); border-color: rgba(194,96,96,0.3); }
+.re-trend-badge.stable    { color: var(--dim); border-color: var(--line2); }
+.re-trend-badge.stressed  { color: var(--amber); border-color: rgba(200,168,75,0.3); }
+.re-card-summary {
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.45;
+}
+.re-card-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
 
 
 
@@ -3389,6 +3451,14 @@ function toggleNav(id) {
       </details>
     </div>
 
+    <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
+      <div class="panel-head">
+        <span class="panel-title">Доходные движки</span>
+        <span class="panel-tag" id="re-count">—</span>
+      </div>
+      <div class="re-list" id="re-list"></div>
+    </div>
+
     <div class="panel" style="margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Архитектура</span>
@@ -4248,6 +4318,42 @@ document.addEventListener('input', function(ev) {
   if (ev.target && ev.target.id === 'eco-search') setEcoSearch(ev.target.value);
 });
 
+// ── REVENUE ENGINES ─────────────────────────────────────────────────────
+let REVENUE_ENGINES = [];
+
+const RE_TREND_LABEL = { growing: 'GROWING', declining: 'DECLINING', stable: 'STABLE', stressed: 'STRESSED' };
+
+function renderRevenueEngines() {
+  const listEl  = document.getElementById('re-list');
+  const countEl = document.getElementById('re-count');
+  if (!listEl || !countEl) return;
+
+  if (!REVENUE_ENGINES.length) {
+    countEl.textContent = '—';
+    listEl.innerHTML = '<div class="eco-empty">НЕТ ДАННЫХ</div>';
+    return;
+  }
+
+  const sorted = [...REVENUE_ENGINES].sort((a, b) => a.entity_name.localeCompare(b.entity_name, 'ru'));
+  countEl.textContent = sorted.length + ' механизм' + (sorted.length === 1 ? '' : sorted.length < 5 ? 'а' : 'ов');
+
+  listEl.innerHTML = sorted.map(r => {
+    const metrics = (r.metrics || []).slice(0, 2);
+    const trendLabel = RE_TREND_LABEL[r.trend] || sanitize(r.trend || '').toUpperCase();
+    return '<div class="re-card" data-engine-id="' + sanitize(r.id) + '">'
+      + '<div class="re-card-head">'
+      +   '<div>'
+      +     '<div class="re-card-entity">' + sanitize(r.entity_name) + '</div>'
+      +     '<span class="re-card-name">' + sanitize(r.name) + '</span>'
+      +   '</div>'
+      +   '<span class="re-trend-badge ' + sanitize(r.trend || '') + '">' + trendLabel + '</span>'
+      + '</div>'
+      + '<div class="re-card-summary">' + sanitize(r.summary) + '</div>'
+      + (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
 // ── ENTITIES BASE ──────────────────────────────────────────────────────
 let ENTITIES = [];
 
@@ -4887,11 +4993,12 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
-      fetch('ontology.json?v=' + Date.now())
+      fetch('ontology.json?v=' + Date.now()),
+      fetch('REVENUE_ENGINES.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -4910,6 +5017,13 @@ async function loadSignals() {
       console.warn('ontology.json load error, using default freshness thresholds:', e);
     }
     ENTITIES = entData.entities || [];
+    try {
+      const reData = await reResp.json();
+      REVENUE_ENGINES = reData.engines || [];
+    } catch(e) {
+      console.warn('REVENUE_ENGINES.json load error, panel stays empty:', e);
+      REVENUE_ENGINES = [];
+    }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
       SIGNALS = data;
@@ -5612,7 +5726,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
-  if (id === 'tech')       renderEcosystem();
+  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); }
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

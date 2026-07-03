@@ -323,6 +323,44 @@ header {
   color: var(--dim);
 }
 
+.eco-search-wrap { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.eco-search {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--line2);
+  border-radius: 4px;
+  color: var(--txt);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--mono);
+  outline: none;
+  box-sizing: border-box;
+}
+.eco-search::placeholder { color: var(--dim); }
+.eco-search:focus { border-color: rgba(247,147,26,0.45); }
+
+.eco-archive { border-top: 1px solid var(--line); }
+.eco-archive-summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.eco-archive-summary::-webkit-details-marker { display: none; }
+.eco-archive-summary::before { content: '▶'; font-size: 8px; transition: transform 0.15s; }
+.eco-archive[open] .eco-archive-summary::before { transform: rotate(90deg); }
+.eco-archive .eco-list .eco-card { opacity: 0.65; }
+.eco-archive .eco-list .eco-card:hover { opacity: 1; }
+
 
 
 
@@ -3340,8 +3378,15 @@ function toggleNav(id) {
         <span class="panel-title">Экосистема Bitcoin</span>
         <span class="panel-tag" id="eco-count">—</span>
       </div>
+      <div class="eco-search-wrap">
+        <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
+      </div>
       <div class="eco-tabs" id="eco-tabs"></div>
       <div class="eco-list" id="eco-list"></div>
+      <details class="eco-archive" id="eco-archive">
+        <summary class="eco-archive-summary">Архив <span id="eco-archive-count">(0)</span></summary>
+        <div class="eco-list" id="eco-archive-list"></div>
+      </details>
     </div>
 
     <div class="panel" style="margin-top:12px">
@@ -4104,51 +4149,82 @@ const ECO_TYPES = [
   { key: 'infrastructure', label: 'ИНФРА' },
   { key: 'corporate',      label: 'КОРП' },
   { key: 'fund',           label: 'ФОНДЫ' },
+  { key: 'exchange',       label: 'БИРЖИ' },
 ];
 
+const ECO_TYPE_LABEL = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' };
+const ECO_STATUS_LABEL = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' };
+
 let ecoFilter = 'all';
+let ecoSearch = '';
+
+function ecoCardHtml(e) {
+  const metrics = (e.profile?.metrics || []).slice(0, 2);
+  const statusLabel = ECO_STATUS_LABEL[e.status] || sanitize(e.status);
+  const typeLabel = ECO_TYPE_LABEL[e.type] || sanitize(e.type).toUpperCase();
+  return '<div class="eco-card" data-entity-id="' + sanitize(e.id) + '">'
+    + '<div class="eco-card-head">'
+    +   '<span class="eco-card-name">' + sanitize(e.name) + '</span>'
+    +   '<div class="eco-card-badges">'
+    +     '<span class="eco-badge">' + typeLabel + '</span>'
+    +     '<span class="eco-badge ' + sanitize(e.status) + '">' + statusLabel + '</span>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="eco-card-summary">' + sanitize(e.summary) + '</div>'
+    + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+    + '</div>';
+}
+
+function ecoMatchesSearch(e, q) {
+  if (!q) return true;
+  return e.name.toLowerCase().includes(q) || (e.summary || '').toLowerCase().includes(q);
+}
 
 function renderEcosystem() {
-  const tabsEl  = document.getElementById('eco-tabs');
-  const listEl  = document.getElementById('eco-list');
-  const countEl = document.getElementById('eco-count');
+  const tabsEl     = document.getElementById('eco-tabs');
+  const listEl     = document.getElementById('eco-list');
+  const countEl    = document.getElementById('eco-count');
+  const archiveEl  = document.getElementById('eco-archive');
+  const archiveList = document.getElementById('eco-archive-list');
+  const archiveCount = document.getElementById('eco-archive-count');
   if (!tabsEl || !listEl || !ENTITIES.length) return;
 
-  // Определяем какие типы реально есть
-  const presentTypes = new Set(ENTITIES.map(e => e.type));
-  const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
+  const q = ecoSearch.trim().toLowerCase();
+  const active = ENTITIES.filter(e => e.status !== 'closed');
+  const closed = ENTITIES.filter(e => e.status === 'closed');
 
+  // Табы по типам считаем от активных сущностей — архив фильтр по типу не уважает
+  const presentTypes = new Set(active.map(e => e.type));
+  const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
   tabsEl.innerHTML = tabs.map(t =>
     '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" data-eco-filter="' + t.key + '">' + t.label + '</button>'
   ).join('');
 
-  const filtered = ecoFilter === 'all'
-    ? ENTITIES
-    : ENTITIES.filter(e => e.type === ecoFilter);
+  const filtered = active
+    .filter(e => ecoFilter === 'all' || e.type === ecoFilter)
+    .filter(e => ecoMatchesSearch(e, q))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
   countEl.textContent = filtered.length + ' объект' + (filtered.length === 1 ? '' : filtered.length < 5 ? 'а' : 'ов');
 
-  if (!filtered.length) {
-    listEl.innerHTML = '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
-    return;
-  }
+  listEl.innerHTML = filtered.length
+    ? filtered.map(ecoCardHtml).join('')
+    : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
 
-  listEl.innerHTML = filtered.map(e => {
-    const metrics = (e.profile?.metrics || []).slice(0, 2);
-    const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || sanitize(e.status);
-    const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || sanitize(e.type).toUpperCase();
-    return '<div class="eco-card" data-entity-id="' + sanitize(e.id) + '">'
-      + '<div class="eco-card-head">'
-      +   '<span class="eco-card-name">' + sanitize(e.name) + '</span>'
-      +   '<div class="eco-card-badges">'
-      +     '<span class="eco-badge">' + typeLabel + '</span>'
-      +     '<span class="eco-badge ' + sanitize(e.status) + '">' + statusLabel + '</span>'
-      +   '</div>'
-      + '</div>'
-      + '<div class="eco-card-summary">' + sanitize(e.summary) + '</div>'
-      + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
-      + '</div>';
-  }).join('');
+  // Архив: все закрытые, только поиск, без фильтра по типу
+  const filteredClosed = closed
+    .filter(e => ecoMatchesSearch(e, q))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+  if (archiveEl && archiveList && archiveCount) {
+    archiveCount.textContent = '(' + filteredClosed.length + ')';
+    archiveList.innerHTML = filteredClosed.length
+      ? filteredClosed.map(ecoCardHtml).join('')
+      : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
+    archiveEl.style.display = closed.length ? '' : 'none';
+    // При поиске, который что-то находит в архиве — разворачиваем автоматически
+    if (q && filteredClosed.length) archiveEl.open = true;
+  }
 }
 
 function setEcoFilter(key) {
@@ -4156,10 +4232,20 @@ function setEcoFilter(key) {
   renderEcosystem();
 }
 
+function setEcoSearch(value) {
+  ecoSearch = value;
+  renderEcosystem();
+}
+
 // Делегирование для eco-tabs
 document.addEventListener('click', function(ev) {
   const tab = ev.target.closest('[data-eco-filter]');
   if (tab) setEcoFilter(tab.getAttribute('data-eco-filter'));
+});
+
+// Живой поиск по экосистеме
+document.addEventListener('input', function(ev) {
+  if (ev.target && ev.target.id === 'eco-search') setEcoSearch(ev.target.value);
 });
 
 // ── ENTITIES BASE ──────────────────────────────────────────────────────

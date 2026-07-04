@@ -121,3 +121,87 @@ def test_synthesis_result_default_algorithm_version_matches_constant():
         score=SignalScore(), anchor_signal_id="X-1", signal_count=1,
     )
     assert result.algorithm_version == ALGORITHM_VERSION
+
+
+# ─── _get_contradicts / relationships.json (bugfix 2026-07-04, ALGORITHM_VERSION 2.1.1) ──
+#
+# КОНТЕКСТ: до этой правки _get_contradicts() при LEGACY_LINKS_ENABLED=False
+# безусловно возвращала [] — relationships.json существовал (мигрирован IRP v1
+# Wave 1 / REM-B2, 2026-07-01), но никогда не читался. Contradiction bonus был
+# равен 0 для всех сигналов с даты миграции. Обнаружено вручную при инженерной
+# сверке (не автоматикой) — эти тесты закрывают тот пробел покрытия.
+
+def test_load_contradicts_map_filters_by_type_and_status(tmp_path, monkeypatch):
+    """_load_contradicts_map() берёт только type=contradicts, исключая retracted."""
+    import json as _json
+    from scripts import synthesizer as _syn
+
+    rel_path = tmp_path / "relationships.json"
+    rel_path.write_text(_json.dumps([
+        {"from_id": "A-1", "to_id": "B-1", "type": "contradicts", "status": "active"},
+        {"from_id": "A-1", "to_id": "C-1", "type": "confirms",    "status": "active"},
+        {"from_id": "A-2", "to_id": "D-1", "type": "contradicts", "status": "retracted"},
+    ]), encoding="utf-8")
+
+    monkeypatch.setattr(_syn, "RELATIONSHIPS_PATH", str(rel_path))
+    result = _syn._load_contradicts_map()
+
+    assert result == {"A-1": {"B-1"}}, (
+        "Должен остаться только type=contradicts + status!=retracted; "
+        f"получено {result}"
+    )
+
+
+def test_get_contradicts_reads_relationships_when_legacy_disabled(monkeypatch):
+    """LEGACY_LINKS_ENABLED=False → читает contradicts_map, не links.* сигнала."""
+    from scripts import synthesizer as _syn
+
+    monkeypatch.setattr(_syn, "LEGACY_LINKS_ENABLED", False)
+    signal = {"id": "STR-2026-0701-002", "links": {"contradicts": ["IGNORED"]}}
+    contradicts_map = {"STR-2026-0701-002": {"STR-2026-0623-006"}}
+
+    result = _syn._get_contradicts(signal, contradicts_map)
+
+    assert result == ["STR-2026-0623-006"], (
+        "При LEGACY_LINKS_ENABLED=False должен игнорировать links.* сигнала "
+        f"и брать из contradicts_map; получено {result}"
+    )
+
+
+def test_get_contradicts_falls_back_to_links_when_legacy_enabled(monkeypatch):
+    """LEGACY_LINKS_ENABLED=True → читает links.contradicts сигнала, игнорируя map."""
+    from scripts import synthesizer as _syn
+
+    monkeypatch.setattr(_syn, "LEGACY_LINKS_ENABLED", True)
+    signal = {"id": "X-1", "links": {"contradicts": ["Y-1"]}}
+
+    result = _syn._get_contradicts(signal, contradicts_map={"X-1": {"Z-1"}})
+
+    assert result == ["Y-1"], (
+        "При LEGACY_LINKS_ENABLED=True должен игнорировать contradicts_map "
+        f"и брать из links.*; получено {result}"
+    )
+
+
+def test_get_contradicts_empty_map_returns_empty_list(monkeypatch):
+    """Сигнал без записи в contradicts_map → пустой список, не ошибка."""
+    from scripts import synthesizer as _syn
+
+    monkeypatch.setattr(_syn, "LEGACY_LINKS_ENABLED", False)
+    signal = {"id": "NO-RELATIONSHIPS-1"}
+
+    assert _syn._get_contradicts(signal, contradicts_map={}) == []
+
+
+def test_get_contradicts_result_is_sorted_deterministic(monkeypatch):
+    """Результат — sorted list, не произвольный порядок set() (детерминизм)."""
+    from scripts import synthesizer as _syn
+
+    monkeypatch.setattr(_syn, "LEGACY_LINKS_ENABLED", False)
+    signal = {"id": "A-1"}
+    contradicts_map = {"A-1": {"Z-1", "B-1", "M-1"}}
+
+    result = _syn._get_contradicts(signal, contradicts_map)
+
+    assert result == sorted(result), "Должен быть отсортирован для детерминизма"
+    assert result == ["B-1", "M-1", "Z-1"]

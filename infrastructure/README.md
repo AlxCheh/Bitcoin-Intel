@@ -12,7 +12,6 @@
 |------|-----------|
 | `file_lock.py` | Атомарная запись с блокировкой (fcntl advisory lock + temp file → `os.replace()`). Решает race condition между параллельными `synthesizer.py` и `add_signal.py` |
 | `logger.py` | Централизованное логирование: человекочитаемый вывод локально, JSON-строки в production |
-| `relationship_store.py` | Хранилище связей между сигналами. Переходный период (ADR-007): читает и из `links.*` внутри `signals.json` (legacy), и из `data/relationships.json` (canonical) |
 
 ## Что добавлять сюда
 
@@ -30,10 +29,11 @@
 `infrastructure/{механизм}.py`, например `infrastructure/cache.py`. Имя описывает
 техническую возможность, а не предметную область — предметная область остаётся в `domain/`.
 
-## Переходный период `relationship_store.py`
+## `data/relationships.json` — прямой доступ, без общего слоя абстракции (ADR-016)
 
-`LEGACY_LINKS_ENABLED` в `config/settings.py` управляет тем, читаются ли связи из
-устаревшего `links.*` внутри `signals.json`. После завершения миграции
-(`scripts/migrate_relationships.py`) флаг переключается в `False`, и `relationship_store.py`
-читает только `data/relationships.json`. Не удалять ветку legacy-чтения до подтверждённого
-завершения миграции на всех окружениях.
+Связи между сигналами читаются/пишутся напрямую (`safe_read_json`/`atomic_write_json_safe`)
+в каждом скрипте, которому это нужно (`scripts/migrate_relationships.py`,
+`scripts/validate_relationships.py`, `scripts/synthesizer.py::_load_contradicts_map()`) —
+единого хранилища-обёртки нет. Ранее специфицированный `RelationshipStore`
+(`infrastructure/relationship_store.py`) удалён (ADR-016) — не использовался нигде в
+реальном пайплайне и писал несовместимый с реальным форматом файл.

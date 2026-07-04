@@ -83,7 +83,10 @@ class SynthesisApproved(DomainEvent):
 class RelationshipRetracted(DomainEvent):
     """
     Связь между сигналами ретрактирована.
-    Испускается в: infrastructure/relationship_store.py
+    Ранее: «Испускается в infrastructure/relationship_store.py» — этот файл удалён
+    (ADR-016, нигде не использовался). Событие пока нигде не эмиттируется в реальном
+    пайплайне (см. domain/lifecycle.py::on_relationship_retracted — вызывающих нет);
+    остаётся как корректно специфицированная, но не подключённая возможность.
     """
     event_type:    str = "RelationshipRetracted"
     relationship_id: str = ""

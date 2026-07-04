@@ -41,6 +41,9 @@ jobs:
       - name: Validate ENTITIES.json
         run: python3 -m json.tool ENTITIES.json > /dev/null && echo "OK ENTITIES.json"
 
+      - name: Validate REVENUE_ENGINES.json
+        run: python3 -m json.tool REVENUE_ENGINES.json > /dev/null && echo "OK REVENUE_ENGINES.json"
+
       - name: Check signal IDs unique
         run: |
           python3 -c "

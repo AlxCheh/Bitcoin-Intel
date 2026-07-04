@@ -323,6 +323,106 @@ header {
   color: var(--dim);
 }
 
+.eco-search-wrap { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.eco-search {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--line2);
+  border-radius: 4px;
+  color: var(--txt);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--mono);
+  outline: none;
+  box-sizing: border-box;
+}
+.eco-search::placeholder { color: var(--dim); }
+.eco-search:focus { border-color: rgba(247,147,26,0.45); }
+
+.eco-archive { border-top: 1px solid var(--line); }
+.eco-archive-summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.eco-archive-summary::-webkit-details-marker { display: none; }
+.eco-archive-summary::before { content: '▶'; font-size: 8px; transition: transform 0.15s; }
+.eco-archive[open] .eco-archive-summary::before { transform: rotate(90deg); }
+.eco-archive .eco-list .eco-card { opacity: 0.65; }
+.eco-archive .eco-list .eco-card:hover { opacity: 1; }
+
+/* ══════════════════════════════════
+   REVENUE ENGINES
+══════════════════════════════════ */
+.re-list { padding: 0; }
+.re-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid rgba(247,147,26,0.2);
+  border-right: 1px solid rgba(247,147,26,0.2);
+}
+.re-card:first-child { border-top: 1px solid rgba(247,147,26,0.2); }
+.re-card:last-child { border-bottom: 1px solid rgba(247,147,26,0.2); }
+.re-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.re-card-entity {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.re-card-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt);
+  letter-spacing: 0.02em;
+}
+.re-trend-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  flex-shrink: 0;
+}
+.re-trend-badge.growing   { color: var(--grn); border-color: rgba(90,158,114,0.3); }
+.re-trend-badge.declining { color: var(--red); border-color: rgba(194,96,96,0.3); }
+.re-trend-badge.stable    { color: var(--dim); border-color: var(--line2); }
+.re-trend-badge.stressed  { color: var(--amber); border-color: rgba(200,168,75,0.3); }
+.re-card-summary {
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.45;
+}
+.re-card-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
 
 
 
@@ -3340,8 +3440,23 @@ function toggleNav(id) {
         <span class="panel-title">Экосистема Bitcoin</span>
         <span class="panel-tag" id="eco-count">—</span>
       </div>
+      <div class="eco-search-wrap">
+        <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
+      </div>
       <div class="eco-tabs" id="eco-tabs"></div>
       <div class="eco-list" id="eco-list"></div>
+      <details class="eco-archive" id="eco-archive">
+        <summary class="eco-archive-summary">Архив <span id="eco-archive-count">(0)</span></summary>
+        <div class="eco-list" id="eco-archive-list"></div>
+      </details>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
+      <div class="panel-head">
+        <span class="panel-title">Доходные движки</span>
+        <span class="panel-tag" id="re-count">—</span>
+      </div>
+      <div class="re-list" id="re-list"></div>
     </div>
 
     <div class="panel" style="margin-top:12px">
@@ -4104,55 +4219,91 @@ const ECO_TYPES = [
   { key: 'infrastructure', label: 'ИНФРА' },
   { key: 'corporate',      label: 'КОРП' },
   { key: 'fund',           label: 'ФОНДЫ' },
+  { key: 'exchange',       label: 'БИРЖИ' },
 ];
 
+const ECO_TYPE_LABEL = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' };
+const ECO_STATUS_LABEL = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' };
+
 let ecoFilter = 'all';
+let ecoSearch = '';
+
+function ecoCardHtml(e) {
+  const metrics = (e.profile?.metrics || []).slice(0, 2);
+  const statusLabel = ECO_STATUS_LABEL[e.status] || sanitize(e.status);
+  const typeLabel = ECO_TYPE_LABEL[e.type] || sanitize(e.type).toUpperCase();
+  return '<div class="eco-card" data-entity-id="' + sanitize(e.id) + '">'
+    + '<div class="eco-card-head">'
+    +   '<span class="eco-card-name">' + sanitize(e.name) + '</span>'
+    +   '<div class="eco-card-badges">'
+    +     '<span class="eco-badge">' + typeLabel + '</span>'
+    +     '<span class="eco-badge ' + sanitize(e.status) + '">' + statusLabel + '</span>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="eco-card-summary">' + sanitize(e.summary) + '</div>'
+    + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+    + '</div>';
+}
+
+function ecoMatchesSearch(e, q) {
+  if (!q) return true;
+  return e.name.toLowerCase().includes(q) || (e.summary || '').toLowerCase().includes(q);
+}
 
 function renderEcosystem() {
-  const tabsEl  = document.getElementById('eco-tabs');
-  const listEl  = document.getElementById('eco-list');
-  const countEl = document.getElementById('eco-count');
+  const tabsEl     = document.getElementById('eco-tabs');
+  const listEl     = document.getElementById('eco-list');
+  const countEl    = document.getElementById('eco-count');
+  const archiveEl  = document.getElementById('eco-archive');
+  const archiveList = document.getElementById('eco-archive-list');
+  const archiveCount = document.getElementById('eco-archive-count');
   if (!tabsEl || !listEl || !ENTITIES.length) return;
 
-  // Определяем какие типы реально есть
-  const presentTypes = new Set(ENTITIES.map(e => e.type));
-  const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
+  const q = ecoSearch.trim().toLowerCase();
+  const active = ENTITIES.filter(e => e.status !== 'closed');
+  const closed = ENTITIES.filter(e => e.status === 'closed');
 
+  // Табы по типам считаем от активных сущностей — архив фильтр по типу не уважает
+  const presentTypes = new Set(active.map(e => e.type));
+  const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
   tabsEl.innerHTML = tabs.map(t =>
     '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" data-eco-filter="' + t.key + '">' + t.label + '</button>'
   ).join('');
 
-  const filtered = ecoFilter === 'all'
-    ? ENTITIES
-    : ENTITIES.filter(e => e.type === ecoFilter);
+  const filtered = active
+    .filter(e => ecoFilter === 'all' || e.type === ecoFilter)
+    .filter(e => ecoMatchesSearch(e, q))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
   countEl.textContent = filtered.length + ' объект' + (filtered.length === 1 ? '' : filtered.length < 5 ? 'а' : 'ов');
 
-  if (!filtered.length) {
-    listEl.innerHTML = '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
-    return;
-  }
+  listEl.innerHTML = filtered.length
+    ? filtered.map(ecoCardHtml).join('')
+    : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
 
-  listEl.innerHTML = filtered.map(e => {
-    const metrics = (e.profile?.metrics || []).slice(0, 2);
-    const statusLabel = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' }[e.status] || sanitize(e.status);
-    const typeLabel = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' }[e.type] || sanitize(e.type).toUpperCase();
-    return '<div class="eco-card" data-entity-id="' + sanitize(e.id) + '">'
-      + '<div class="eco-card-head">'
-      +   '<span class="eco-card-name">' + sanitize(e.name) + '</span>'
-      +   '<div class="eco-card-badges">'
-      +     '<span class="eco-badge">' + typeLabel + '</span>'
-      +     '<span class="eco-badge ' + sanitize(e.status) + '">' + statusLabel + '</span>'
-      +   '</div>'
-      + '</div>'
-      + '<div class="eco-card-summary">' + sanitize(e.summary) + '</div>'
-      + (metrics.length ? '<div class="eco-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
-      + '</div>';
-  }).join('');
+  // Архив: все закрытые, только поиск, без фильтра по типу
+  const filteredClosed = closed
+    .filter(e => ecoMatchesSearch(e, q))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+  if (archiveEl && archiveList && archiveCount) {
+    archiveCount.textContent = '(' + filteredClosed.length + ')';
+    archiveList.innerHTML = filteredClosed.length
+      ? filteredClosed.map(ecoCardHtml).join('')
+      : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
+    archiveEl.style.display = closed.length ? '' : 'none';
+    // При поиске, который что-то находит в архиве — разворачиваем автоматически
+    if (q && filteredClosed.length) archiveEl.open = true;
+  }
 }
 
 function setEcoFilter(key) {
   ecoFilter = key;
+  renderEcosystem();
+}
+
+function setEcoSearch(value) {
+  ecoSearch = value;
   renderEcosystem();
 }
 
@@ -4161,6 +4312,47 @@ document.addEventListener('click', function(ev) {
   const tab = ev.target.closest('[data-eco-filter]');
   if (tab) setEcoFilter(tab.getAttribute('data-eco-filter'));
 });
+
+// Живой поиск по экосистеме
+document.addEventListener('input', function(ev) {
+  if (ev.target && ev.target.id === 'eco-search') setEcoSearch(ev.target.value);
+});
+
+// ── REVENUE ENGINES ─────────────────────────────────────────────────────
+let REVENUE_ENGINES = [];
+
+const RE_TREND_LABEL = { growing: 'GROWING', declining: 'DECLINING', stable: 'STABLE', stressed: 'STRESSED' };
+
+function renderRevenueEngines() {
+  const listEl  = document.getElementById('re-list');
+  const countEl = document.getElementById('re-count');
+  if (!listEl || !countEl) return;
+
+  if (!REVENUE_ENGINES.length) {
+    countEl.textContent = '—';
+    listEl.innerHTML = '<div class="eco-empty">НЕТ ДАННЫХ</div>';
+    return;
+  }
+
+  const sorted = [...REVENUE_ENGINES].sort((a, b) => a.entity_name.localeCompare(b.entity_name, 'ru'));
+  countEl.textContent = sorted.length + ' механизм' + (sorted.length === 1 ? '' : sorted.length < 5 ? 'а' : 'ов');
+
+  listEl.innerHTML = sorted.map(r => {
+    const metrics = (r.metrics || []).slice(0, 2);
+    const trendLabel = RE_TREND_LABEL[r.trend] || sanitize(r.trend || '').toUpperCase();
+    return '<div class="re-card" data-engine-id="' + sanitize(r.id) + '">'
+      + '<div class="re-card-head">'
+      +   '<div>'
+      +     '<div class="re-card-entity">' + sanitize(r.entity_name) + '</div>'
+      +     '<span class="re-card-name">' + sanitize(r.name) + '</span>'
+      +   '</div>'
+      +   '<span class="re-trend-badge ' + sanitize(r.trend || '') + '">' + trendLabel + '</span>'
+      + '</div>'
+      + '<div class="re-card-summary">' + sanitize(r.summary) + '</div>'
+      + (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
 
 // ── ENTITIES BASE ──────────────────────────────────────────────────────
 let ENTITIES = [];
@@ -4801,11 +4993,12 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
-      fetch('ontology.json?v=' + Date.now())
+      fetch('ontology.json?v=' + Date.now()),
+      fetch('REVENUE_ENGINES.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -4824,6 +5017,13 @@ async function loadSignals() {
       console.warn('ontology.json load error, using default freshness thresholds:', e);
     }
     ENTITIES = entData.entities || [];
+    try {
+      const reData = await reResp.json();
+      REVENUE_ENGINES = reData.engines || [];
+    } catch(e) {
+      console.warn('REVENUE_ENGINES.json load error, panel stays empty:', e);
+      REVENUE_ENGINES = [];
+    }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
       SIGNALS = data;
@@ -5526,7 +5726,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
-  if (id === 'tech')       renderEcosystem();
+  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); }
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

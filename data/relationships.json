@@ -250,7 +250,10 @@
     "created": "2026-07-01T10:08:47.949030+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "Тест BAMS Р7: оба сигнала истинны одновременно (смена аллокации капитала vs расхождение заявлений менеджмента/рынка) — не взаимоисключающие состояния. Ретрактировано при ревизии contradiction cycles 2026-07-04."
   },
   {
     "id": "e5f308ec-b273-4a81-b26e-15bf69f4c1cd",
@@ -294,7 +297,10 @@
     "created": "2026-07-01T10:08:47.949196+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "Тест BAMS Р7: описывают один и тот же факт (NAV-дисконт 0.83x) под разными углами, не несовместимые состояния — переклассифицировано в context_chain. Ретрактировано при ревизии contradiction cycles 2026-07-04."
   },
   {
     "id": "2c11edab-d4e2-40a0-8435-30ec0b642fa6",
@@ -371,7 +377,10 @@
     "created": "2026-07-01T10:08:47.949309+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "См. обратное направление той же пары — тот же вывод теста Р7."
   },
   {
     "id": "6bd48e1f-abc2-4302-969a-92726e1acf4e",
@@ -382,7 +391,10 @@
     "created": "2026-07-01T10:08:47.949323+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "См. обратное направление той же пары — тот же вывод теста Р7."
   },
   {
     "id": "1ace8ebf-dea6-48a2-aab2-577f5fdeb3f1",
@@ -525,7 +537,10 @@
     "created": "2026-07-01T10:08:47.949516+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "Тест BAMS Р7: описывают совместимую диверсификацию платёжной инфраструктуры BTC (Lightning + on-chain протоколы + institutional base-BTC) — не взаимоисключающие состояния. Ретрактировано при ревизии contradiction cycles 2026-07-04."
   },
   {
     "id": "d67359f9-3f5d-4224-9f30-47dbbcc6e61d",
@@ -723,7 +738,10 @@
     "created": "2026-07-01T10:08:47.949789+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
-    "status": "active"
+    "status": "retracted",
+    "retracted": "2026-07-04T18:30:33.797700+00:00",
+    "retracted_by": "analyst",
+    "retraction_rationale": "См. обратное направление той же пары — тот же вывод теста Р7."
   },
   {
     "id": "c71f8be1-b02d-47bc-ba03-2a0dc492ec3a",
@@ -1768,6 +1786,16 @@
     "created": "2026-07-04T18:06:02.072954+00:00",
     "created_by": "migrate_relationships.py",
     "migrated_from": "links.*",
+    "status": "active"
+  },
+  {
+    "id": "77dd483c-6539-45fd-a866-4b26bd52faaa",
+    "from_id": "STR-2026-0622-004",
+    "to_id": "STR-2026-0622-001",
+    "type": "context_chain",
+    "rationale": "Без понимания NAV-дисконта 0.83x, впервые зафиксированного в STR-2026-0622-001, тезис STR-2026-0622-004 (расхождение заявлений Сэйлора и рыночной оценки) не имеет смысла — тот же дисконт упоминается как аргумент против декларации устойчивости.",
+    "created": "2026-07-04T18:30:33.797700+00:00",
+    "created_by": "analyst",
     "status": "active"
   }
 ]

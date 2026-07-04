@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #   PATCH — bugfix без изменения логики (ревью не требуется)
 # Хранится в каждой записи synthesis_store/*.json и synthesis_cache.json
 # как поле algorithm_version.
-ALGORITHM_VERSION = "2.1.0"
+ALGORITHM_VERSION = "2.1.1"
 
 from config.settings import (
     assert_deterministic_env,
@@ -38,7 +38,7 @@ from config.settings import (
     get_strength,
     FRESHNESS_SCORE, WEIGHT_SCORE, ROLE_SCORE, CONTRADICTION_BONUS,
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
-    SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH,
+    SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH, RELATIONSHIPS_PATH,
     LEGACY_LINKS_ENABLED, ENCODING, JSON_ENSURE_ASCII, DATE_FORMAT,
     ERROR_EXIT_CODES, NULL_DEFAULTS,
 )
@@ -160,16 +160,56 @@ def _role_score(role: str) -> int:
     return ROLE_SCORE.get(role, 0)
 
 
-def _get_contradicts(signal: dict) -> list:
-    """Читает contradicts из links.* (legacy) или relationships (новый путь)."""
+def _load_contradicts_map() -> dict:
+    """
+    Строит {signal_id: {id сигналов с которыми противоречит}} из relationships.json.
+
+    Тот же фильтр, что scripts/validate_relationships.py (§6 Contradiction cycles):
+    type == "contradicts" и status != "retracted".
+
+    Вызывается ОДИН РАЗ в main() и передаётся в synthesize_cluster() как параметр —
+    §17: synthesize_cluster() не читает файлы сам. DEGRADE GRACEFULLY: файл
+    отсутствует/повреждён → safe_read_json возвращает [], map пустой — синтез
+    продолжается с contradiction_bonus=0 для всех, не падает.
+    """
+    relationships = safe_read_json(RELATIONSHIPS_PATH, default=[])
+    contradicts_map: dict = {}
+    for rel in relationships:
+        if rel.get("type") == "contradicts" and rel.get("status") != "retracted":
+            from_id = rel.get("from_id", "")
+            to_id   = rel.get("to_id", "")
+            if from_id and to_id:
+                contradicts_map.setdefault(from_id, set()).add(to_id)
+    return contradicts_map
+
+
+def _get_contradicts(signal: dict, contradicts_map: dict) -> list:
+    """
+    Возвращает id сигналов, с которыми signal противоречит.
+
+    LEGACY_LINKS_ENABLED=True  → links.contradicts сигнала (путь до Фазы 0)
+    LEGACY_LINKS_ENABLED=False → contradicts_map из relationships.json (текущий
+                                   путь; миграция IRP v1 Wave 1 / REM-B2 завершена
+                                   2026-07-01)
+
+    ИСПРАВЛЕННЫЙ БАГ (2026-07-04): до этой правки функция при
+    LEGACY_LINKS_ENABLED=False безусловно возвращала [] — relationships.json уже
+    существовал (156 записей после миграции), но никогда не читался. Contradiction
+    bonus в score был равен 0 для всех сигналов с 2026-07-01 — anchor/tension
+    selection по MAX(contradicts) фактически не работал ни для одного кластера,
+    молча деградировав до freshness+weight+role. Риск был предугадан заранее (см.
+    ALGORITHM.md, «Чувствительные места», запись до миграции) но не устранён
+    синхронно с флагом. Тестового покрытия на эту комбинацию не было — обнаружено
+    вручную при инженерной сверке (IRP Wave 2-5), не автоматикой.
+    """
     if LEGACY_LINKS_ENABLED:
         return (signal.get("links") or {}).get("contradicts", []) or []
-    return []
+    return sorted(contradicts_map.get(signal.get("id", ""), set()))
 
 
-def _score_signal(signal: dict) -> SignalScore:
+def _score_signal(signal: dict, contradicts_map: dict) -> SignalScore:
     age         = _age_days(signal.get("date", "2000-01-01"))
-    contradicts = _get_contradicts(signal)
+    contradicts = _get_contradicts(signal, contradicts_map)
     return SignalScore(
         freshness=_freshness(age),
         weight=_weight_score(signal.get("weight", "media")),
@@ -178,7 +218,7 @@ def _score_signal(signal: dict) -> SignalScore:
     )
 
 
-def _rank_signals(signals: list[dict]) -> list[tuple[dict, SignalScore]]:
+def _rank_signals(signals: list[dict], contradicts_map: dict) -> list[tuple[dict, SignalScore]]:
     """
     Ранжирует сигналы по importance DESC.
     4-уровневый tiebreaker (TD6):
@@ -187,7 +227,7 @@ def _rank_signals(signals: list[dict]) -> list[tuple[dict, SignalScore]]:
       3. date DESC
       4. id ASC — гарантирует детерминизм
     """
-    scored = [(s, _score_signal(s)) for s in signals]
+    scored = [(s, _score_signal(s, contradicts_map)) for s in signals]
     scored.sort(key=lambda x: (
         -x[1].total,
         -_weight_score(x[0].get("weight", "media")),
@@ -212,7 +252,7 @@ def _detect_phase(signals: list[dict]) -> str:
     return "structural"
 
 
-def _select_tension_source(signals: list[dict]) -> Optional[dict]:
+def _select_tension_source(signals: list[dict], contradicts_map: dict) -> Optional[dict]:
     """
     ШАГ 6: выбирает сигнал-источник tension.
 
@@ -243,7 +283,7 @@ def _select_tension_source(signals: list[dict]) -> Optional[dict]:
 
     # Приоритет 2: обычная логика MAX(contradicts) → MAX(weight) → MAX(date)
     candidates.sort(key=lambda s: (
-        -len(_get_contradicts(s)),
+        -len(_get_contradicts(s, contradicts_map)),
         -_weight_score(s.get("weight", "media")),
         -(datetime.strptime(
             s.get("date", "2000-01-01"), DATE_FORMAT
@@ -304,6 +344,7 @@ def handle_uncertainty(
     signals: list[dict],
     phase: str,
     ranked: list[tuple],
+    contradicts_map: dict,
 ) -> dict:
     """
     B3 ARR v2: Обрабатывает неопределённые ситуации перед финальным синтезом.
@@ -368,7 +409,7 @@ def handle_uncertainty(
     winner = None
     max_contra = -1
     for s in signals:
-        n = len(_get_contradicts(s))
+        n = len(_get_contradicts(s, contradicts_map))
         if n > max_contra and s.get("tension"):
             max_contra = n
             winner     = s
@@ -395,22 +436,30 @@ def synthesize_cluster(
     cluster_key:        str,
     signals:            list[dict],
     previous_synthesis: Optional[dict] = None,   # §17: передаётся снаружи
+    contradicts_map:    Optional[dict] = None,    # §17: передаётся снаружи, см. _load_contradicts_map()
 ) -> SynthesisResult:
     """
     12-шаговый алгоритм синтеза нарратива для кластера.
 
-    §17: previous_synthesis передаётся как параметр — synthesizer не читает
-    файлы сам. Это гарантирует соблюдение архитектурного контракта:
-    Delivery Context не записывает, Synthesis Context не читает файлы напрямую.
+    §17: previous_synthesis и contradicts_map передаются как параметры —
+    synthesizer не читает файлы сам. Это гарантирует соблюдение архитектурного
+    контракта: Delivery Context не записывает, Synthesis Context не читает
+    файлы напрямую.
 
     Args:
         cluster_key:        ключ кластера
         signals:            список сигналов кластера
         previous_synthesis: dict предыдущего синтеза или None (загружает caller)
+        contradicts_map:    dict {signal_id: {ids противоречий}} из
+                             relationships.json или None → {} (загружает caller
+                             через _load_contradicts_map(), см. main())
 
     Raises:
         EmptyClusterError: если нет активных сигналов в окне WINDOW_DAYS_DEFAULT
     """
+    if contradicts_map is None:
+        contradicts_map = {}
+
     logger.debug(
         f"Synthesizing cluster '{cluster_key}' ({len(signals)} signals)",
         extra={"cluster": cluster_key}
@@ -438,7 +487,7 @@ def synthesize_cluster(
         raise EmptyClusterError(cluster_key, WINDOW_DAYS_DEFAULT)
 
     # ШАГ 2: Ранжирование
-    ranked         = _rank_signals(active_signals)
+    ranked         = _rank_signals(active_signals, contradicts_map)
     ranked_signals = [s for s, _ in ranked]
     signals_used   = [s.get("id", "") for s in ranked_signals]
 
@@ -446,7 +495,7 @@ def synthesize_cluster(
     phase = _detect_phase(ranked_signals)
 
     # ШАГ 3.5: Обработка неопределённости (B3 ARR v2)
-    uncertainty = handle_uncertainty(active_signals, phase, ranked)
+    uncertainty = handle_uncertainty(active_signals, phase, ranked, contradicts_map)
 
     # ШАГ 4: Разбивка по ролям
     triggers       = [s for s in ranked_signals if s.get("narrative_role") == "trigger"]
@@ -460,7 +509,7 @@ def synthesize_cluster(
     # ШАГ 5: Contradiction weighting (учтён в _score_signal)
 
     # ШАГ 6: Tension
-    tension_source = _select_tension_source(ranked_signals)
+    tension_source = _select_tension_source(ranked_signals, contradicts_map)
     if tension_source:
         tension = _capitalize(tension_source.get("tension", "") or "")
     else:
@@ -519,7 +568,7 @@ def synthesize_cluster(
     # ШАГ 11: Confidence
     all_scores   = [sc for _, sc in ranked]
     total_score  = sum(sc.total for sc in all_scores)
-    has_contradicts = any(_get_contradicts(s) for s in active_signals)
+    has_contradicts = any(_get_contradicts(s, contradicts_map) for s in active_signals)
     all_stale    = all(
         _age_days(s.get("date", "2000-01-01")) > STALE_THRESHOLD
         for s in active_signals
@@ -551,7 +600,7 @@ def synthesize_cluster(
     anchor_obj = tension_source or anchor_trigger
     rationale  = (
         f"Tension from {anchor_id} "
-        f"(contradicts: {len(_get_contradicts(anchor_obj))}, "
+        f"(contradicts: {len(_get_contradicts(anchor_obj, contradicts_map))}, "
         f"weight: {anchor_obj.get('weight','?')}); "
         f"partA from {anchor_trigger.get('id','?')}; "
         f"phase: {phase}; bridge: '{bridge}'; "
@@ -668,12 +717,19 @@ def main() -> None:
     failed     = 0
     ts         = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
+    # §17: загружаем relationships вне synthesize_cluster(), один раз на весь прогон
+    contradicts_map = _load_contradicts_map()
+
     for cluster_key, signals in clusters.items():
         try:
             # §17: загружаем previous_synthesis вне synthesize_cluster()
             previous = _load_previous_synthesis(cluster_key)
 
-            result = synthesize_cluster(cluster_key, signals, previous_synthesis=previous)
+            result = synthesize_cluster(
+                cluster_key, signals,
+                previous_synthesis=previous,
+                contradicts_map=contradicts_map,
+            )
 
             # Сохранить в synthesis_store/
             synthesis_id = f"synthesis_{cluster_key}_{ts}"

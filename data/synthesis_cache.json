@@ -4,19 +4,19 @@
     "narrative": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — в то время как заголовочная метрика накопления и операционное здоровье модели впервые расходятся в одном отчётном периоде у Metaplanet — компания растёт в ранге корпоративных держателей BTC даже когда собственный доходный движок, который должен эту стратегию финансировать, слабеет",
     "takeaway": "Заголовочная метрика накопления и операционное здоровье модели впервые расходятся в одном отчётном периоде у Metaplanet — компания растёт в ранге корпоративных держателей BTC даже когда собственный доходный движок, который должен эту стратегию финансировать, слабеет",
     "strength": "strong",
-    "confidence": 0.553,
+    "confidence": 0.538,
     "phase": "active",
-    "score": 76,
+    "score": 74,
     "signal_count": 10,
     "anchor_signal_id": "STR-2026-0702-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from STR-2026-0702-001 (contradicts: 0, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'в то время как'; confidence: 0.55; signals_used: 10; ignored_duplicates: ['STR-2026-0623-002']",
+    "rationale": "Tension from STR-2026-0702-001 (contradicts: 0, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'в то время как'; confidence: 0.54; signals_used: 10; ignored_duplicates: ['STR-2026-0623-002']",
     "signals_used": [
-      "STR-2026-0626-001",
       "STR-2026-0702-001",
       "STR-2026-0701-002",
       "STR-2026-0630-001",
+      "STR-2026-0626-001",
       "STR-2026-0623-003",
       "INF-2026-0625-002",
       "STR-2026-0623-006",
@@ -27,18 +27,18 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-07-03T19:12:19.519607+00:00",
+    "generated_at": "2026-07-04T04:50:08.588356+00:00",
     "algorithm_version": "2.1.0",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260703_191219"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260704_045008"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
     "narrative": "NAV-дисконт 0.83x — первый рыночный сигнал что премия за BTC-стратегию через акции исчезает — что означает что крупнейшее корпоративное BTC-казначейство переходит от фазы накопления к фазе защиты позиции: дивиденды съедают резерв, ATM при mNAV < 1x разводняет акционеров, STRC не работает — структурный спрос на BTC от Strategy временно заморожен",
     "takeaway": "Крупнейшее корпоративное BTC-казначейство переходит от фазы накопления к фазе защиты позиции: дивиденды съедают резерв, ATM при mNAV < 1x разводняет акционеров, STRC не работает — структурный спрос на BTC от Strategy временно заморожен",
     "strength": "strong",
-    "confidence": 0.469,
+    "confidence": 0.456,
     "phase": "resolution",
-    "score": 71,
+    "score": 69,
     "signal_count": 11,
     "anchor_signal_id": "STR-2026-0629-001",
     "phase_changed": true,
@@ -46,12 +46,12 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-03T19:12:19.523025+00:00"
+      "detected_at": "2026-07-04T04:50:08.591745+00:00"
     },
-    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0622-001; phase: resolution; bridge: 'что означает что'; confidence: 0.47; signals_used: 11; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
+    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0622-001; phase: resolution; bridge: 'что означает что'; confidence: 0.46; signals_used: 11; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
-      "STR-2026-0628-001",
       "STR-2026-0629-001",
+      "STR-2026-0628-001",
       "STR-2026-0624-002",
       "STR-2026-0622-004",
       "STR-2026-0622-001",
@@ -66,9 +66,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-03T19:12:19.523129+00:00",
+    "generated_at": "2026-07-04T04:50:08.591853+00:00",
     "algorithm_version": "2.1.0",
-    "synthesis_id": "synthesis_strategy_model_stress_20260703_191219"
+    "synthesis_id": "synthesis_strategy_model_stress_20260704_045008"
   },
   "etf_institutional_flow": {
     "tension": "Крупнейшие банки США наращивают BTC-позиции через собственные ETF в момент когда рынок корректируется — институциональный спрос структурно расходится с розничным сентиментом",
@@ -100,9 +100,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-03T19:12:19.525323+00:00",
+    "generated_at": "2026-07-04T04:50:08.593860+00:00",
     "algorithm_version": "2.1.0",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260703_191219"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260704_045008"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -123,23 +123,23 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-03T19:12:19.526967+00:00",
+    "generated_at": "2026-07-04T04:50:08.595438+00:00",
     "algorithm_version": "2.1.0",
-    "synthesis_id": "synthesis_supply_scarcity_20260703_191219"
+    "synthesis_id": "synthesis_supply_scarcity_20260704_045008"
   },
   "btc_infrastructure_growth": {
     "tension": "Ionic меняет волатильный BTC-майнинг (доход −82% г/г) на 10-летний AI-лизинг с фиксированной рентой $1,95 млрд — предсказуемость побеждает апсайд от роста хешрейта и цены BTC",
     "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — тогда как бывшая майнинговая инфраструктура получает публичную рыночную оценку как AI-актив, а не как BTC-прокси — хешрейт перестаёт быть единственным способом монетизировать дешёвую электроэнергию, что дальше ослабляет связь между ростом сети майнинга и ценой BTC",
     "takeaway": "Бывшая майнинговая инфраструктура получает публичную рыночную оценку как AI-актив, а не как BTC-прокси — хешрейт перестаёт быть единственным способом монетизировать дешёвую электроэнергию, что дальше ослабляет связь между ростом сети майнинга и ценой BTC",
     "strength": "strong",
-    "confidence": 0.469,
+    "confidence": 0.463,
     "phase": "active",
-    "score": 71,
+    "score": 70,
     "signal_count": 11,
     "anchor_signal_id": "INF-2026-0629-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0629-001 (contradicts: 0, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'тогда как'; confidence: 0.47; signals_used: 11; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0629-001 (contradicts: 0, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'тогда как'; confidence: 0.46; signals_used: 11; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0629-001",
       "INF-2026-0625-001",
@@ -147,15 +147,15 @@
       "STR-2026-0622-006",
       "INF-2026-0623-001",
       "INF-2026-0609-001",
-      "NAR-2026-0626-001",
       "INF-2026-0621-001",
+      "NAR-2026-0626-001",
       "INF-2026-0618-001",
       "INF-2026-0622-001",
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-03T19:12:19.528750+00:00",
+    "generated_at": "2026-07-04T04:50:08.597241+00:00",
     "algorithm_version": "2.1.0",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260703_191219"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260704_045008"
   }
 }

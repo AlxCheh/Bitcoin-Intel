@@ -882,6 +882,26 @@ header {
 .panel-body p + p { margin-top: 10px; }
 .panel-body strong { color: var(--txt); font-weight: 600; }
 
+/* ── МИНИ-ОГЛАВЛЕНИЕ ВКЛАДКИ (tech) ── */
+.toc-box {
+  margin: 12px 16px 0;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.toc-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  border-bottom: 1px solid var(--line);
+  transition: color 0.15s, background 0.15s;
+}
+.toc-item:last-child { border-bottom: none; }
+.toc-item:hover { color: var(--btc); background: var(--bg3); }
+.toc-arrow { color: var(--btc); font-size: 9px; }
+
 /* ── СВОРАЧИВАЕМЫЕ ПАНЕЛИ (eco-panel, revenue-engines-panel, treasury-panel) ── */
 .panel-head.collapsible { cursor: pointer; user-select: none; }
 .panel-head.collapsible:hover { background: var(--bg3); filter: brightness(1.15); }
@@ -3481,6 +3501,14 @@ function toggleNav(id) {
       <span class="sh-title">⚙️ Технологии <span>Bitcoin</span></span>
     </div>
 
+    <div class="toc-box">
+      <div class="toc-item" data-toc-target="eco-panel"><span class="toc-arrow">▸</span>Экосистема Bitcoin</div>
+      <div class="toc-item" data-toc-target="revenue-engines-panel"><span class="toc-arrow">▸</span>Доходные движки</div>
+      <div class="toc-item" data-toc-target="treasury-panel"><span class="toc-arrow">▸</span>Топ-100 держателей BTC</div>
+      <div class="toc-item" data-toc-target="architecture-panel"><span class="toc-arrow">▸</span>Архитектура</div>
+      <div class="toc-item" data-toc-target="protocols-panel"><span class="toc-arrow">▸</span>Протоколы</div>
+    </div>
+
     <div class="panel" style="margin-top:12px" id="eco-panel">
       <div class="panel-head collapsible" data-collapse-target="eco-panel">
         <span class="panel-title">Экосистема Bitcoin</span>
@@ -3535,7 +3563,7 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="panel" style="margin-top:12px" id="architecture-panel">
       <div class="panel-head">
         <span class="panel-title">Архитектура</span>
         <span class="panel-tag">БАЗА</span>
@@ -3618,7 +3646,7 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <div class="panel" style="margin-top:12px">
+    <div class="panel" style="margin-top:12px" id="protocols-panel">
       <div class="panel-head">
         <span class="panel-title">Протоколы</span>
         <span class="panel-tag">МЕХАНИКА</span>
@@ -4517,6 +4545,16 @@ document.addEventListener('input', function(ev) {
 document.addEventListener('click', function(ev) {
   const th = ev.target.closest('.th-table th[data-sort]');
   if (th) setThSort(th.getAttribute('data-sort'));
+});
+
+// ── МИНИ-ОГЛАВЛЕНИЕ ВКЛАДКИ tech ────────────────────────────────────────
+document.addEventListener('click', function(ev) {
+  const item = ev.target.closest('.toc-item[data-toc-target]');
+  if (!item) return;
+  const panel = document.getElementById(item.getAttribute('data-toc-target'));
+  if (!panel) return;
+  panel.classList.remove('collapsed');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 // ── СВОРАЧИВАЕМЫЕ ПАНЕЛИ ────────────────────────────────────────────────

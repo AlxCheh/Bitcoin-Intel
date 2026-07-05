@@ -2419,52 +2419,7 @@ function toggleNav(id) {
       <span class="sh-title">⚡ Теория <span>Bitcoin</span></span>
     </div>
 
-    <div style="margin-top:12px;border:1px solid var(--btc);background:var(--bg2)">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--btc);background:var(--bg3)">
-        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--btc);letter-spacing:0.08em">СОДЕРЖАНИЕ</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em">4 МАТЕРИАЛА</span>
-      </div>
-      <div onclick="document.getElementById('theory-money').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">01</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Что такое деньги</div>
-          <div style="font-size:10px;color:var(--dim)">Функции, свойства, история от бартера до Bitcoin</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('theory-network').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">02</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Семь сетевых эффектов</div>
-          <div style="font-size:10px;color:var(--dim)">Почему Bitcoin побеждает структурно</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('theory-dca').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">03</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Стратегия DCA</div>
-          <div style="font-size:10px;color:var(--dim)">Как накапливать без эмоций и таймирования</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('theory-mnav').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">04</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">mNAV — механика BTC-казначейств</div>
-          <div style="font-size:10px;color:var(--dim)">Премия, дисконт, аккреция, BTC Yield</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-    </div>
+    <div id="theory-toc"></div>
 
     <div class="panel" id="theory-money" style="scroll-margin-top:8px;margin-top:12px">
       <div class="panel-head">
@@ -3481,72 +3436,7 @@ function toggleNav(id) {
       <span class="sh-title">⚙️ Технологии <span>Bitcoin</span></span>
     </div>
 
-    <div style="margin-top:12px;border:1px solid var(--btc);background:var(--bg2)">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--btc);background:var(--bg3)">
-        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--btc);letter-spacing:0.08em">СОДЕРЖАНИЕ</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em">6 МАТЕРИАЛОВ</span>
-      </div>
-      <div onclick="document.getElementById('treasury-panel').classList.remove('collapsed');document.getElementById('treasury-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">01</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Топ-100 держателей BTC</div>
-          <div style="font-size:10px;color:var(--dim)">Рейтинг публичных компаний по резервам BTC</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('revenue-engines-panel').classList.remove('collapsed');document.getElementById('revenue-engines-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">02</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Доходные движки</div>
-          <div style="font-size:10px;color:var(--dim)">Как компании зарабатывают на BTC-резервах</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('eco-panel').classList.remove('collapsed');document.getElementById('eco-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">03</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Экосистема Bitcoin</div>
-          <div style="font-size:10px;color:var(--dim)">L2, протоколы, компании, фонды</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('protocols-panel').classList.remove('collapsed');document.getElementById('protocols-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">04</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Протоколы</div>
-          <div style="font-size:10px;color:var(--dim)">Proof-of-Work, Lightning Network</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('bitcoin-functions-panel').classList.remove('collapsed');document.getElementById('bitcoin-functions-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">05</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Функции Bitcoin</div>
-          <div style="font-size:10px;color:var(--dim)">Практические возможности протокола</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-      <div onclick="document.getElementById('architecture-panel').classList.remove('collapsed');document.getElementById('architecture-panel').scrollIntoView({behavior:'smooth'})"
-           style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background 0.12s"
-           onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">06</span>
-        <div style="flex:1">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">Архитектура</div>
-          <div style="font-size:10px;color:var(--dim)">Блокчейн, ключи и адреса, модель UTXO</div>
-        </div>
-        <span style="color:var(--dim);font-size:14px">›</span>
-      </div>
-    </div>
+    <div id="tech-toc"></div>
 
     <div class="panel" style="margin-top:12px" id="treasury-panel">
       <div class="panel-head collapsible" data-collapse-target="treasury-panel">
@@ -6109,6 +5999,68 @@ function showTab(id, btn, keepCluster) {
 renderSubnav('live', 'home');
 
 // загрузка сигналов из signals.json
+// ── ШАБЛОН ОГЛАВЛЕНИЯ ВКЛАДКИ («СОДЕРЖАНИЕ») ────────────────────────────
+// Общий рендер для любой вкладки: рамка var(--btc), шапка СОДЕРЖАНИЕ +
+// счётчик, пронумерованные строки (заголовок+подзаголовок+стрелка),
+// клик — scrollIntoView, снимает .collapsed если панель была свёрнута.
+// Единственное место, где эта разметка теперь пишется — не копировать
+// inline-стилями в новые вкладки, добавлять сюда данные и вызывать renderTOC().
+function ruPlural(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
+function renderTOC(containerId, items) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const n = items.length;
+  const label = n + ' ' + ruPlural(n, 'МАТЕРИАЛ', 'МАТЕРИАЛА', 'МАТЕРИАЛОВ');
+
+  let html = '<div style="margin-top:12px;border:1px solid var(--btc);background:var(--bg2)">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--btc);background:var(--bg3)">'
+    + '<span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--btc);letter-spacing:0.08em">СОДЕРЖАНИЕ</span>'
+    + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em">' + label + '</span>'
+    + '</div>';
+
+  html += items.map(function(item, i) {
+    const num = String(i + 1).padStart(2, '0');
+    const isLast = i === items.length - 1;
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid var(--line);';
+    return '<div onclick="document.getElementById(\'' + item.target + '\').classList.remove(\'collapsed\');'
+      + 'document.getElementById(\'' + item.target + '\').scrollIntoView({behavior:\'smooth\'})" '
+      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;' + borderStyle + 'cursor:pointer;transition:background 0.12s" '
+      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
+      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
+      + '<div style="flex:1">'
+      + '<div style="font-family:var(--mono);font-size:11px;color:var(--txt);margin-bottom:2px">' + sanitize(item.title) + '</div>'
+      + '<div style="font-size:10px;color:var(--dim)">' + sanitize(item.subtitle) + '</div>'
+      + '</div>'
+      + '<span style="color:var(--dim);font-size:14px">›</span>'
+      + '</div>';
+  }).join('');
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+renderTOC('theory-toc', [
+  { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
+  { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
+  { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
+  { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' }
+]);
+
+renderTOC('tech-toc', [
+  { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' },
+  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' },
+  { target: 'eco-panel', title: 'Экосистема Bitcoin', subtitle: 'L2, протоколы, компании, фонды' },
+  { target: 'protocols-panel', title: 'Протоколы', subtitle: 'Proof-of-Work, Lightning Network' },
+  { target: 'bitcoin-functions-panel', title: 'Функции Bitcoin', subtitle: 'Практические возможности протокола' },
+  { target: 'architecture-panel', title: 'Архитектура', subtitle: 'Блокчейн, ключи и адреса, модель UTXO' }
+]);
+
 loadSignals();
 
 // ── ACCORDION ──

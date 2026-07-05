@@ -5522,6 +5522,28 @@ function renderDashboard() {
     return warnings;
   }
 
+  // Разворот карточки нарратива: список сигналов signals_used/signals_ignored,
+  // каждый id кликабелен — переход во вкладку Дайджест + скролл к карточке
+  // сигнала (переиспользует существующий pendingScrollSignal-паттерн, см.
+  // cardHTML() и блок экосистемы). Резолвит id → короткий текст signal из
+  // глобального SIGNALS для читаемости (голый id бесполезен для читателя).
+  function renderSignalRefList(ids, title) {
+    if (!ids || !ids.length) return '';
+    const rows = ids.map(function(id) {
+      const sig = SIGNALS.find(function(s) { return s.id === id; });
+      const label = sig ? sanitize(sig.signal).slice(0, 50) + (sig.signal.length > 50 ? '…' : '') : '(сигнал не найден)';
+      return '<div onclick="pendingScrollSignal=\'' + id + '\';showTab(\'market\',null)" '
+        + 'style="cursor:pointer;padding:3px 0;color:var(--dim);font-size:9px;line-height:1.4" '
+        + 'onmouseover="this.style.color=\'var(--btc)\'" onmouseout="this.style.color=\'var(--dim)\'">'
+        + '↗ <span style="font-family:var(--mono)">' + sanitize(id) + '</span> — ' + label
+        + '</div>';
+    }).join('');
+    return '<div class="dash-breakdown-row" style="display:block;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
+      + '<div style="color:var(--dim);font-size:9px;font-weight:600;letter-spacing:.05em;margin-bottom:3px">' + title + ' (' + ids.length + ')</div>'
+      + rows
+      + '</div>';
+  }
+
   function renderNarrativeItem(key, cl, score, weak, idx, synthesis) {
     const n      = cl.signals.length;
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
@@ -5582,6 +5604,8 @@ function renderDashboard() {
       +   '<div class="dash-breakdown-row"><span>roles</span><span>+' + score.roles + '</span></div>'
       +   '<div class="dash-breakdown-row dash-breakdown-total"><span>total</span><span>' + score.total + '</span></div>'
       +   (synthesis.rationale ? '<div class="dash-breakdown-row" style="display:block;margin-top:4px;padding-top:4px;border-top:1px solid var(--line);color:var(--dim);font-size:9px;line-height:1.5">' + sanitize(synthesis.rationale) + '</div>' : '')
+      +   renderSignalRefList(synthesis.signals_used, 'ИСПОЛЬЗОВАНО')
+      +   renderSignalRefList(synthesis.signals_ignored, 'НЕ УЧТЕНО')
       + '</div>';
 
     item.querySelector('[data-cl]').addEventListener('click', function() { goToDigest(this.dataset.cl); });

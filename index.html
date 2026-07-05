@@ -4322,7 +4322,7 @@ function renderEcosystem() {
     .filter(e => ecoMatchesSearch(e, q))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
-  countEl.textContent = filtered.length + ' объект' + (filtered.length === 1 ? '' : filtered.length < 5 ? 'а' : 'ов');
+  countEl.textContent = filtered.length + ' ' + ruPlural(filtered.length, 'ОБЪЕКТ', 'ОБЪЕКТА', 'ОБЪЕКТОВ');
 
   listEl.innerHTML = filtered.length
     ? filtered.map(ecoCardHtml).join('')
@@ -4382,7 +4382,7 @@ function renderRevenueEngines() {
   }
 
   const sorted = [...REVENUE_ENGINES].sort((a, b) => a.entity_name.localeCompare(b.entity_name, 'ru'));
-  countEl.textContent = sorted.length + ' механизм' + (sorted.length === 1 ? '' : sorted.length < 5 ? 'а' : 'ов');
+  countEl.textContent = sorted.length + ' ' + ruPlural(sorted.length, 'МЕХАНИЗМ', 'МЕХАНИЗМА', 'МЕХАНИЗМОВ');
 
   listEl.innerHTML = sorted.map(r => {
     const metrics = (r.metrics || []).slice(0, 2);
@@ -4468,7 +4468,7 @@ function renderBitcoinFunctions() {
     listEl.innerHTML = '';
     return;
   }
-  countEl.textContent = BITCOIN_FUNCTIONS.length + (BITCOIN_FUNCTIONS.length === 1 ? ' функция' : ' функций');
+  countEl.textContent = BITCOIN_FUNCTIONS.length + ' ' + ruPlural(BITCOIN_FUNCTIONS.length, 'ФУНКЦИЯ', 'ФУНКЦИИ', 'ФУНКЦИЙ');
   listEl.innerHTML = BITCOIN_FUNCTIONS.map(renderFunctionCard).join('');
 }
 
@@ -4511,7 +4511,7 @@ function renderTreasuryHolders() {
     return thSortDir * (av - bv);
   });
 
-  countEl.textContent = filtered.length + ' из ' + TREASURY_HOLDERS.length;
+  countEl.textContent = filtered.length + ' ИЗ ' + TREASURY_HOLDERS.length;
 
   const snapDate = TREASURY_META.snapshot_date ? sanitize(TREASURY_META.snapshot_date) : '—';
   const totalPct = TREASURY_META.total_top100_btc ? (TREASURY_META.total_top100_btc / supplyCap * 100).toFixed(2) : '—';

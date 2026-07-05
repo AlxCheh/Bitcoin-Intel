@@ -28,28 +28,28 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-07-05T10:36:46.639928+00:00",
+    "generated_at": "2026-07-05T16:44:22.016876+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260705_103646"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260705_164421"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
-    "narrative": "Падение STRC ниже номинала — первый признак что дивидендная машина Strategy испытывает давление — что означает что дивидендная машина Strategy сжимает пространство для BTC-накопления: модель «занять → купить BTC → рост акции» работала в условиях премии к NAV — при дисконте 0.83x и 14 месяцах дивидендного покрытия она требует паузы или перестройки",
+    "narrative": "Падение STRC ниже номинала — первый признак что дивидендная машина Strategy испытывает давление — после чего дивидендная машина Strategy сжимает пространство для BTC-накопления: модель «занять → купить BTC → рост акции» работала в условиях премии к NAV — при дисконте 0.83x и 14 месяцах дивидендного покрытия она требует паузы или перестройки",
     "takeaway": "BTC-казначейство Strategy эволюционировало от накопительной догмы к управляемому балансовому инструменту: BTC теперь официально выполняет функцию кредитного коллатерала, резервного актива и источника ликвидности одновременно — корпоративная BTC-модель достигла зрелости",
     "strength": "strong",
-    "confidence": 0.777,
+    "confidence": 0.765,
     "phase": "resolution",
-    "score": 94,
-    "signal_count": 11,
+    "score": 101,
+    "signal_count": 12,
     "anchor_signal_id": "STR-2026-0629-001",
     "phase_changed": true,
     "structural_change": {
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-05T10:36:46.688812+00:00"
+      "detected_at": "2026-07-05T16:44:22.020355+00:00"
     },
-    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'что означает что'; confidence: 0.78; signals_used: 11; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
+    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.77; signals_used: 12; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
       "STR-2026-0625-001",
       "STR-2026-0628-001",
@@ -58,6 +58,7 @@
       "STR-2026-0629-001",
       "STR-2026-0622-004",
       "STR-2026-0622-001",
+      "NAR-2026-0702-001",
       "STR-2026-0701-001",
       "STR-2026-0623-001",
       "STR-2026-0622-002",
@@ -67,9 +68,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-05T10:36:46.689003+00:00",
+    "generated_at": "2026-07-05T16:44:22.020464+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260705_103646"
+    "synthesis_id": "synthesis_strategy_model_stress_20260705_164421"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -101,9 +102,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-05T10:36:46.735237+00:00",
+    "generated_at": "2026-07-05T16:44:22.022410+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260705_103646"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260705_164421"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -125,9 +126,9 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-05T10:36:46.737027+00:00",
+    "generated_at": "2026-07-05T16:44:22.024024+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260705_103646"
+    "synthesis_id": "synthesis_supply_scarcity_20260705_164421"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -157,8 +158,8 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-05T10:36:46.738957+00:00",
+    "generated_at": "2026-07-05T16:44:22.025809+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260705_103646"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260705_164421"
   }
 }

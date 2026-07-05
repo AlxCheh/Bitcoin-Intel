@@ -872,6 +872,7 @@ header {
   border: 1px solid rgba(247,147,26,0.3);
   padding: 1px 6px;
 }
+.panel-head-right { display: flex; align-items: center; gap: 8px; }
 .panel-body { padding: 14px; }
 .panel-body p {
   font-size: 13px;
@@ -889,7 +890,6 @@ header {
   font-size: 10px;
   color: var(--dim);
   transition: transform 0.2s;
-  margin-left: 8px;
 }
 .panel.collapsed > *:not(.panel-head) { display: none; }
 .panel.collapsed .panel-collapse-arrow { transform: rotate(-90deg); }
@@ -3441,8 +3441,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="treasury-panel">
       <div class="panel-head collapsible" data-collapse-target="treasury-panel">
         <span class="panel-title">Топ-100 держателей BTC</span>
-        <span class="panel-tag" id="th-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
+        <span class="panel-head-right"><span class="panel-tag" id="th-count">—</span><span class="panel-collapse-arrow">▾</span></span>
       </div>
       <div class="th-meta" id="th-meta">—</div>
       <div class="th-search-wrap">
@@ -3478,8 +3477,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
       <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
         <span class="panel-title">Доходные движки</span>
-        <span class="panel-tag" id="re-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
+        <span class="panel-head-right"><span class="panel-tag" id="re-count">—</span><span class="panel-collapse-arrow">▾</span></span>
       </div>
       <div class="re-list" id="re-list"></div>
     </div>
@@ -3487,8 +3485,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="eco-panel">
       <div class="panel-head collapsible" data-collapse-target="eco-panel">
         <span class="panel-title">Экосистема Bitcoin</span>
-        <span class="panel-tag" id="eco-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
+        <span class="panel-head-right"><span class="panel-tag" id="eco-count">—</span><span class="panel-collapse-arrow">▾</span></span>
       </div>
       <div class="eco-search-wrap">
         <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
@@ -3504,7 +3501,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="protocols-panel">
       <div class="panel-head">
         <span class="panel-title">Протоколы</span>
-        <span class="panel-tag">МЕХАНИКА</span>
+        <span class="panel-head-right"><span class="panel-tag">МЕХАНИКА</span></span>
       </div>
       <div class="acc-item">
         <div class="acc-head" onclick="toggleAcc(this)">
@@ -3570,8 +3567,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="bitcoin-functions-panel">
       <div class="panel-head collapsible" data-collapse-target="bitcoin-functions-panel">
         <span class="panel-title">Функции Bitcoin</span>
-        <span class="panel-tag" id="bf-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
+        <span class="panel-head-right"><span class="panel-tag" id="bf-count">—</span><span class="panel-collapse-arrow">▾</span></span>
       </div>
       <div id="bf-list"></div>
     </div>
@@ -3579,7 +3575,7 @@ function toggleNav(id) {
     <div class="panel" style="margin-top:12px" id="architecture-panel">
       <div class="panel-head">
         <span class="panel-title">Архитектура</span>
-        <span class="panel-tag">БАЗА</span>
+        <span class="panel-head-right"><span class="panel-tag">БАЗА</span></span>
       </div>
       <div class="acc-item">
         <div class="acc-head" onclick="toggleAcc(this)">

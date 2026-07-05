@@ -3506,6 +3506,7 @@ function toggleNav(id) {
       <div class="toc-item" data-toc-target="revenue-engines-panel"><span class="toc-arrow">▸</span>Доходные движки</div>
       <div class="toc-item" data-toc-target="eco-panel"><span class="toc-arrow">▸</span>Экосистема Bitcoin</div>
       <div class="toc-item" data-toc-target="protocols-panel"><span class="toc-arrow">▸</span>Протоколы</div>
+      <div class="toc-item" data-toc-target="bitcoin-functions-panel"><span class="toc-arrow">▸</span>Функции Bitcoin</div>
       <div class="toc-item" data-toc-target="architecture-panel"><span class="toc-arrow">▸</span>Архитектура</div>
     </div>
 
@@ -3636,6 +3637,15 @@ function toggleNav(id) {
           <p>Открываешь канал (1 on-chain транзакция) → тысячи мгновенных платежей → закрываешь (1 on-chain). Комиссии — доли цента. Скорость — мгновенно.</p>
         </div>
       </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="bitcoin-functions-panel">
+      <div class="panel-head collapsible" data-collapse-target="bitcoin-functions-panel">
+        <span class="panel-title">Функции Bitcoin</span>
+        <span class="panel-tag" id="bf-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
+      </div>
+      <div id="bf-list"></div>
     </div>
 
     <div class="panel" style="margin-top:12px" id="architecture-panel">
@@ -4467,7 +4477,78 @@ function renderRevenueEngines() {
   }).join('');
 }
 
-// ── ТОП-100 ДЕРЖАТЕЛЕЙ BTC ─────────────────────────────────────────────
+// ── ФУНКЦИИ BITCOIN ─────────────────────────────────────────────────────
+let BITCOIN_FUNCTIONS = [];
+
+function renderToolBlock(tool) {
+  let html = '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">';
+  html += '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--txt);letter-spacing:.03em">🛠 ' + sanitize(tool.name) + '</div>';
+  if (tool.important_note) {
+    html += '<div style="margin-top:6px;padding:8px 10px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.6">' + sanitize(tool.important_note) + '</div>';
+  }
+  if (tool.how_it_works) {
+    html += '<p style="margin-top:8px;font-size:12px;color:var(--txt);line-height:1.6">' + sanitize(tool.how_it_works) + '</p>';
+  }
+  if (tool.requirements && tool.requirements.length) {
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--dim)">Нужно:</div>';
+    html += '<ul style="margin:4px 0 0;padding-left:18px;font-size:12px;color:var(--txt);line-height:1.7">'
+      + tool.requirements.map(function(r){ return '<li>' + sanitize(r) + '</li>'; }).join('')
+      + '</ul>';
+  }
+  if (tool.steps && tool.steps.length) {
+    html += '<ol style="margin:8px 0 0;padding-left:18px;font-size:12px;color:var(--txt);line-height:1.8">'
+      + tool.steps.map(function(s){ return '<li style="margin-bottom:4px">' + sanitize(s) + '</li>'; }).join('')
+      + '</ol>';
+  }
+  if (tool.limitation) {
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--dim);font-style:italic">⚠ ' + sanitize(tool.limitation) + '</div>';
+  }
+  if (tool.description) {
+    html += '<p style="margin-top:8px;font-size:12px;color:var(--txt);line-height:1.6">' + sanitize(tool.description) + '</p>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderFunctionCard(fn) {
+  let html = '<div class="acc-item">';
+  html += '<div class="acc-head" onclick="toggleAcc(this)">';
+  html += '<span class="acc-icon">' + sanitize(fn.icon || '⚙') + '</span>';
+  html += '<span class="acc-label">' + sanitize(fn.name) + '</span>';
+  html += '<span class="acc-arrow">▼</span>';
+  html += '</div>';
+  html += '<div class="acc-body">';
+  if (fn.hook) {
+    html += '<p style="font-style:italic;color:var(--btc);font-size:12px">' + sanitize(fn.hook) + '</p>';
+  }
+  if (fn.story && fn.story.length) {
+    html += fn.story.map(function(p){ return '<p style="margin-top:8px">' + sanitize(p) + '</p>'; }).join('');
+  }
+  if (fn.explanation) {
+    html += '<p style="margin-top:10px;font-weight:600;color:var(--txt)">' + sanitize(fn.explanation) + '</p>';
+  }
+  if (fn.tools && fn.tools.length) {
+    html += '<div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.05em">КАК ИСПОЛЬЗОВАТЬ</div>';
+    html += fn.tools.map(renderToolBlock).join('');
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function renderBitcoinFunctions() {
+  const countEl = document.getElementById('bf-count');
+  const listEl = document.getElementById('bf-list');
+  if (!countEl || !listEl) return;
+  if (!BITCOIN_FUNCTIONS.length) {
+    countEl.textContent = '—';
+    listEl.innerHTML = '';
+    return;
+  }
+  countEl.textContent = BITCOIN_FUNCTIONS.length + (BITCOIN_FUNCTIONS.length === 1 ? ' функция' : ' функций');
+  listEl.innerHTML = BITCOIN_FUNCTIONS.map(renderFunctionCard).join('');
+}
+
+
 let TREASURY_HOLDERS = [];
 let TREASURY_META = {};
 let thSearch = '';
@@ -5214,13 +5295,14 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
       fetch('ontology.json?v=' + Date.now()),
       fetch('REVENUE_ENGINES.json?v=' + Date.now()),
-      fetch('TREASURY_HOLDERS.json?v=' + Date.now())
+      fetch('TREASURY_HOLDERS.json?v=' + Date.now()),
+      fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5254,6 +5336,13 @@ async function loadSignals() {
       console.warn('TREASURY_HOLDERS.json load error, panel stays empty:', e);
       TREASURY_HOLDERS = [];
       TREASURY_META = {};
+    }
+    try {
+      const bfData = await bfResp.json();
+      BITCOIN_FUNCTIONS = bfData.functions || [];
+    } catch(e) {
+      console.warn('BITCOIN_FUNCTIONS.json load error, panel stays empty:', e);
+      BITCOIN_FUNCTIONS = [];
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5981,7 +6070,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
-  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); }
+  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

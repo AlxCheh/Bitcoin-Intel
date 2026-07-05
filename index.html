@@ -882,6 +882,52 @@ header {
 .panel-body p + p { margin-top: 10px; }
 .panel-body strong { color: var(--txt); font-weight: 600; }
 
+/* ── СВОРАЧИВАЕМЫЕ ПАНЕЛИ (eco-panel, revenue-engines-panel, treasury-panel) ── */
+.panel-head.collapsible { cursor: pointer; user-select: none; }
+.panel-head.collapsible:hover { background: var(--bg3); filter: brightness(1.15); }
+.panel-collapse-arrow {
+  font-size: 10px;
+  color: var(--dim);
+  transition: transform 0.2s;
+  margin-left: 8px;
+}
+.panel.collapsed > *:not(.panel-head) { display: none; }
+.panel.collapsed .panel-collapse-arrow { transform: rotate(-90deg); }
+
+/* ── ТОП-100 ДЕРЖАТЕЛЕЙ BTC ── */
+.th-meta {
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  border-bottom: 1px solid var(--line);
+  line-height: 1.6;
+}
+.th-meta b { color: var(--btc); }
+.th-search-wrap { padding: 10px 14px 0; }
+.th-search {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg1); border: 1px solid var(--line); color: var(--txt);
+  font-family: var(--sans); font-size: 12px;
+  padding: 7px 10px;
+}
+.th-table-wrap { overflow-x: auto; padding: 10px 14px 14px; }
+.th-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
+.th-table th {
+  text-align: left; padding: 6px 8px;
+  color: var(--dim); font-size: 9px; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer; white-space: nowrap;
+}
+.th-table th:hover { color: var(--btc); }
+.th-table th.sorted { color: var(--btc); }
+.th-table td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; }
+.th-table td.th-name { white-space: normal; font-family: var(--sans); font-size: 12px; }
+.th-table td.th-btc { color: var(--btc); font-weight: 700; text-align: right; }
+.th-table td.th-pct, .th-table td.th-mnav, .th-table td.th-rank { text-align: right; color: var(--dim); }
+.th-table tr:hover td { background: var(--bg3); }
+.th-empty { padding: 20px 14px; text-align: center; color: var(--dim); font-family: var(--mono); font-size: 11px; }
+
 
 /* ── INSTRUMENT STICKY HEADER ── */
 
@@ -3436,9 +3482,10 @@ function toggleNav(id) {
     </div>
 
     <div class="panel" style="margin-top:12px" id="eco-panel">
-      <div class="panel-head">
+      <div class="panel-head collapsible" data-collapse-target="eco-panel">
         <span class="panel-title">Экосистема Bitcoin</span>
         <span class="panel-tag" id="eco-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
       </div>
       <div class="eco-search-wrap">
         <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
@@ -3452,11 +3499,40 @@ function toggleNav(id) {
     </div>
 
     <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
-      <div class="panel-head">
+      <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
         <span class="panel-title">Доходные движки</span>
         <span class="panel-tag" id="re-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
       </div>
       <div class="re-list" id="re-list"></div>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="treasury-panel">
+      <div class="panel-head collapsible" data-collapse-target="treasury-panel">
+        <span class="panel-title">Топ-100 держателей BTC</span>
+        <span class="panel-tag" id="th-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
+      </div>
+      <div class="th-meta" id="th-meta">—</div>
+      <div class="th-search-wrap">
+        <input type="text" class="th-search" id="th-search" placeholder="Поиск по компании или тикеру...">
+      </div>
+      <div class="th-table-wrap">
+        <table class="th-table">
+          <thead>
+            <tr>
+              <th data-sort="rank">#</th>
+              <th data-sort="name">Компания</th>
+              <th data-sort="country">Страна</th>
+              <th data-sort="ticker">Тикер</th>
+              <th data-sort="btc" class="sorted">BTC</th>
+              <th data-sort="pct">% supply</th>
+              <th data-sort="mnav">mNAV</th>
+            </tr>
+          </thead>
+          <tbody id="th-tbody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="panel" style="margin-top:12px">
@@ -4354,6 +4430,104 @@ function renderRevenueEngines() {
   }).join('');
 }
 
+// ── ТОП-100 ДЕРЖАТЕЛЕЙ BTC ─────────────────────────────────────────────
+let TREASURY_HOLDERS = [];
+let TREASURY_META = {};
+let thSearch = '';
+let thSortKey = 'btc';
+let thSortDir = -1; // -1 desc, 1 asc
+
+function thMatchesSearch(h, q) {
+  if (!q) return true;
+  return h.name.toLowerCase().includes(q) || (h.ticker || '').toLowerCase().includes(q);
+}
+
+function renderTreasuryHolders() {
+  const countEl = document.getElementById('th-count');
+  const metaEl  = document.getElementById('th-meta');
+  const tbody   = document.getElementById('th-tbody');
+  if (!countEl || !metaEl || !tbody) return;
+
+  if (!TREASURY_HOLDERS.length) {
+    countEl.textContent = '—';
+    metaEl.textContent = 'Нет данных';
+    tbody.innerHTML = '<tr><td colspan="7" class="th-empty">НЕТ ДАННЫХ</td></tr>';
+    return;
+  }
+
+  const supplyCap = TREASURY_META.supply_cap || 21000000;
+  const q = thSearch.trim().toLowerCase();
+  const filtered = TREASURY_HOLDERS.filter(h => thMatchesSearch(h, q));
+
+  const sorted = [...filtered].sort((a, b) => {
+    let av, bv;
+    if (thSortKey === 'pct') { av = a.btc; bv = b.btc; }
+    else { av = a[thSortKey]; bv = b[thSortKey]; }
+    if (typeof av === 'string') return thSortDir * av.localeCompare(bv, 'ru');
+    av = (av === null || av === undefined) ? -Infinity : av;
+    bv = (bv === null || bv === undefined) ? -Infinity : bv;
+    return thSortDir * (av - bv);
+  });
+
+  countEl.textContent = filtered.length + ' из ' + TREASURY_HOLDERS.length;
+
+  const snapDate = TREASURY_META.snapshot_date ? sanitize(TREASURY_META.snapshot_date) : '—';
+  const totalPct = TREASURY_META.total_top100_btc ? (TREASURY_META.total_top100_btc / supplyCap * 100).toFixed(2) : '—';
+  metaEl.innerHTML = 'Снимок: <b>' + snapDate + '</b> · Источник: ' + sanitize(TREASURY_META.source || '—')
+    + ' · Топ-100: <b>' + (TREASURY_META.total_top100_btc || 0).toLocaleString('ru-RU') + ' BTC</b> (' + totalPct + '% supply)'
+    + (TREASURY_META.total_all_public_btc ? ' · Все публичные держатели (' + (TREASURY_META.public_holders_count || '?') + '): ' + TREASURY_META.total_all_public_btc.toLocaleString('ru-RU') + ' BTC' : '');
+
+  tbody.innerHTML = sorted.length ? sorted.map(h => {
+    const pct = (h.btc / supplyCap * 100);
+    const pctStr = pct >= 0.01 ? pct.toFixed(3) + '%' : '<0.01%';
+    return '<tr>'
+      + '<td class="th-rank">' + h.rank + '</td>'
+      + '<td class="th-name">' + sanitize(h.name) + '</td>'
+      + '<td>' + sanitize(h.country || '—') + '</td>'
+      + '<td>' + sanitize(h.ticker || '—') + '</td>'
+      + '<td class="th-btc">' + h.btc.toLocaleString('ru-RU') + '</td>'
+      + '<td class="th-pct">' + pctStr + '</td>'
+      + '<td class="th-mnav">' + (h.mnav != null ? h.mnav.toFixed(2) + 'x' : '—') + '</td>'
+      + '</tr>';
+  }).join('') : '<tr><td colspan="7" class="th-empty">НИЧЕГО НЕ НАЙДЕНО</td></tr>';
+
+  document.querySelectorAll('.th-table th[data-sort]').forEach(th => {
+    th.classList.toggle('sorted', th.getAttribute('data-sort') === thSortKey);
+  });
+}
+
+function setThSearch(value) {
+  thSearch = value;
+  renderTreasuryHolders();
+}
+
+function setThSort(key) {
+  if (thSortKey === key) {
+    thSortDir *= -1;
+  } else {
+    thSortKey = key;
+    thSortDir = (key === 'name' || key === 'country' || key === 'ticker') ? 1 : -1;
+  }
+  renderTreasuryHolders();
+}
+
+document.addEventListener('input', function(ev) {
+  if (ev.target && ev.target.id === 'th-search') setThSearch(ev.target.value);
+});
+document.addEventListener('click', function(ev) {
+  const th = ev.target.closest('.th-table th[data-sort]');
+  if (th) setThSort(th.getAttribute('data-sort'));
+});
+
+// ── СВОРАЧИВАЕМЫЕ ПАНЕЛИ ────────────────────────────────────────────────
+document.addEventListener('click', function(ev) {
+  const head = ev.target.closest('.panel-head.collapsible');
+  if (!head) return;
+  const targetId = head.getAttribute('data-collapse-target');
+  const panel = targetId ? document.getElementById(targetId) : head.closest('.panel');
+  if (panel) panel.classList.toggle('collapsed');
+});
+
 // ── ENTITIES BASE ──────────────────────────────────────────────────────
 let ENTITIES = [];
 
@@ -4993,12 +5167,13 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
       fetch('ontology.json?v=' + Date.now()),
-      fetch('REVENUE_ENGINES.json?v=' + Date.now())
+      fetch('REVENUE_ENGINES.json?v=' + Date.now()),
+      fetch('TREASURY_HOLDERS.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5023,6 +5198,15 @@ async function loadSignals() {
     } catch(e) {
       console.warn('REVENUE_ENGINES.json load error, panel stays empty:', e);
       REVENUE_ENGINES = [];
+    }
+    try {
+      const thData = await thResp.json();
+      TREASURY_HOLDERS = thData.holders || [];
+      TREASURY_META = thData.meta || {};
+    } catch(e) {
+      console.warn('TREASURY_HOLDERS.json load error, panel stays empty:', e);
+      TREASURY_HOLDERS = [];
+      TREASURY_META = {};
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5750,7 +5934,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
-  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); }
+  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); }
   if (id === 'emission')  renderEmission();
   if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();

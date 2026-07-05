@@ -1449,7 +1449,7 @@ header {
 }
 .dash-cycle-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 10px; }
 .dash-cycle-phase { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--grn); letter-spacing: 0.04em; margin-bottom: 6px; }
-.dash-cycle.warn .dash-cycle-phase { color: var(--yel); }
+.dash-cycle.warn .dash-cycle-phase { color: var(--amber); }
 .dash-cycle.danger .dash-cycle-phase { color: var(--red); }
 .dash-cycle-sub { font-family: var(--sans); font-size: 11px; color: var(--dim); line-height: 1.4; margin-bottom: 14px; }
 .dash-cycle-track { display: flex; gap: 5px; margin-bottom: 6px; }
@@ -1475,7 +1475,7 @@ header {
 .dash-m-cell { flex: 1; background: var(--bg2); padding: 12px 10px; text-align: center; }
 .dash-m-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
 .dash-m-val.dash-m-up { color: var(--grn); }
-.dash-m-val.dash-m-warn { color: var(--yel); }
+.dash-m-val.dash-m-warn { color: var(--amber); }
 .dash-m-val.dash-m-neg { color: var(--red); }
 .dash-m-lbl { font-family: var(--mono); font-size: 7px; letter-spacing: 0.08em; color: var(--dim); }
 .dash-m-est { color: var(--btc); }
@@ -3886,7 +3886,7 @@ function toggleNav(id) {
         </tbody>
       </table>
       </div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line1)">
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
         Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
       </div>
     </div>
@@ -3897,13 +3897,13 @@ function toggleNav(id) {
         <span class="panel-title">Корректировка сложности</span>
         <span class="panel-tag">⛏️ МАЙНИНГ · Июнь 2026</span>
       </div>
-      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line1);line-height:1.6">
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line);line-height:1.6">
         ~13 июня 2026 ожидается одна из крупнейших отрицательных корректировок сложности в истории Bitcoin.
         Майнеры отключают оборудование из-за падения доходности — это классический сигнал капитуляции.
       </div>
       <!-- Current event metrics -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line1)">
-        <div style="padding:12px 14px;border-right:1px solid var(--line1)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
+        <div style="padding:12px 14px;border-right:1px solid var(--line)">
           <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
           <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:700">−10.3%</div>
           <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">est. · блок 953,568</div>
@@ -3952,7 +3952,7 @@ function toggleNav(id) {
           </tr>
         </tbody>
       </table>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line1)">
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
         Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
       </div>
     </div>
@@ -5602,7 +5602,7 @@ function renderDashboard() {
     const gapCls = gap < 0 ? 'dash-m-neg' : gap < 15 ? 'dash-m-warn' : 'dash-m-up';
     if (gapEl) {
       gapEl.textContent = gapStr;
-      gapEl.style.color = gap < 0 ? 'var(--red)' : gap < 15 ? 'var(--yel)' : 'var(--grn)';
+      gapEl.style.color = gap < 0 ? 'var(--red)' : gap < 15 ? 'var(--amber)' : 'var(--grn)';
     }
     if (gapAux) {
       gapAux.textContent = gapStr;

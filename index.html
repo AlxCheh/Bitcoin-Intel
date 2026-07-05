@@ -932,7 +932,7 @@ header {
   padding: 7px 10px;
 }
 .th-table-wrap { overflow-x: auto; padding: 10px 14px 14px; }
-.th-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
+.th-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
 .th-table th {
   text-align: left; padding: 6px 8px;
   color: var(--dim); font-size: 9px; letter-spacing: 0.05em;
@@ -941,7 +941,7 @@ header {
 }
 .th-table th:hover { color: var(--btc); }
 .th-table th.sorted { color: var(--btc); }
-.th-table td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; }
+.th-table td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .th-table td.th-name { white-space: normal; font-family: var(--sans); font-size: 12px; }
 .th-table td.th-btc { color: var(--btc); font-weight: 700; text-align: right; }
 .th-table td.th-pct, .th-table td.th-mnav, .th-table td.th-rank { text-align: right; color: var(--dim); }
@@ -3547,6 +3547,15 @@ function toggleNav(id) {
       </div>
       <div class="th-table-wrap">
         <table class="th-table">
+          <colgroup>
+            <col style="width:6%">
+            <col style="width:40%">
+            <col style="width:10%">
+            <col style="width:12%">
+            <col style="width:14%">
+            <col style="width:10%">
+            <col style="width:8%">
+          </colgroup>
           <thead>
             <tr>
               <th data-sort="rank">#</th>

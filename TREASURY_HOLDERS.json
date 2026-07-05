@@ -1,0 +1,814 @@
+{
+  "meta": {
+    "source": "BitcoinTreasuries.net",
+    "snapshot_date": "2026-07-05",
+    "btc_price_at_snapshot": 63132,
+    "total_top100_btc": 1264867,
+    "total_all_public_btc": 1267720,
+    "public_holders_count": 198,
+    "supply_cap": 21000000,
+    "update_policy": "Ручной снапшот — обновляется по запросу пользователя, не автоматизирован (см. CLAUDE.md / решение от 2026-07-05)"
+  },
+  "holders": [
+    {
+      "rank": 1,
+      "name": "Strategy",
+      "country": "US",
+      "ticker": "MSTR",
+      "btc": 847363,
+      "mnav": 1.07
+    },
+    {
+      "rank": 2,
+      "name": "Twenty One Capital",
+      "country": "US",
+      "ticker": "XXI",
+      "btc": 43514,
+      "mnav": 0.83
+    },
+    {
+      "rank": 3,
+      "name": "Metaplanet Inc.",
+      "country": "JP",
+      "ticker": "MPJPY",
+      "btc": 43000,
+      "mnav": 0.83
+    },
+    {
+      "rank": 4,
+      "name": "MARA Holdings, Inc.",
+      "country": "US",
+      "ticker": "MARA",
+      "btc": 36303,
+      "mnav": null
+    },
+    {
+      "rank": 5,
+      "name": "Bitcoin Standard Treasury Company",
+      "country": "US",
+      "ticker": "BSTR",
+      "btc": 30021,
+      "mnav": null
+    },
+    {
+      "rank": 6,
+      "name": "Bullish",
+      "country": "US",
+      "ticker": "BLSH",
+      "btc": 24300,
+      "mnav": null
+    },
+    {
+      "rank": 7,
+      "name": "Strive",
+      "country": "US",
+      "ticker": "ASST",
+      "btc": 19864,
+      "mnav": 1.28
+    },
+    {
+      "rank": 8,
+      "name": "SpaceX",
+      "country": "US",
+      "ticker": "SPCX",
+      "btc": 18712,
+      "mnav": null
+    },
+    {
+      "rank": 9,
+      "name": "Coinbase Global, Inc.",
+      "country": "US",
+      "ticker": "COIN",
+      "btc": 16492,
+      "mnav": null
+    },
+    {
+      "rank": 10,
+      "name": "Riot Platforms, Inc.",
+      "country": "US",
+      "ticker": "RIOT",
+      "btc": 15680,
+      "mnav": null
+    },
+    {
+      "rank": 11,
+      "name": "CleanSpark, Inc.",
+      "country": "US",
+      "ticker": "CLSK",
+      "btc": 13470,
+      "mnav": null
+    },
+    {
+      "rank": 12,
+      "name": "Tesla, Inc.",
+      "country": "US",
+      "ticker": "TSLA",
+      "btc": 11509,
+      "mnav": null
+    },
+    {
+      "rank": 13,
+      "name": "Hut 8 Mining Corp",
+      "country": "US",
+      "ticker": "HUT",
+      "btc": 10278,
+      "mnav": null
+    },
+    {
+      "rank": 14,
+      "name": "Trump Media & Technology Group Corp.",
+      "country": "US",
+      "ticker": "DJT",
+      "btc": 9542,
+      "mnav": null
+    },
+    {
+      "rank": 15,
+      "name": "Block, Inc.",
+      "country": "US",
+      "ticker": "XYZ",
+      "btc": 9032,
+      "mnav": null
+    },
+    {
+      "rank": 16,
+      "name": "American Bitcoin Corp",
+      "country": "US",
+      "ticker": "ABTC",
+      "btc": 7500,
+      "mnav": null
+    },
+    {
+      "rank": 17,
+      "name": "GD Culture Group",
+      "country": "US",
+      "ticker": "GDC",
+      "btc": 7500,
+      "mnav": null
+    },
+    {
+      "rank": 18,
+      "name": "Galaxy Digital Holdings Ltd",
+      "country": "US",
+      "ticker": "GLXY",
+      "btc": 6894,
+      "mnav": null
+    },
+    {
+      "rank": 19,
+      "name": "Next Technology Holding Inc.",
+      "country": "CN",
+      "ticker": "NXTT",
+      "btc": 5833,
+      "mnav": null
+    },
+    {
+      "rank": 20,
+      "name": "ProCap Financial",
+      "country": "US",
+      "ticker": "BRR",
+      "btc": 5405,
+      "mnav": null
+    },
+    {
+      "rank": 21,
+      "name": "Gemini Space Station Inc",
+      "country": "US",
+      "ticker": "GEMI",
+      "btc": 4619,
+      "mnav": null
+    },
+    {
+      "rank": 22,
+      "name": "Nakamoto Inc",
+      "country": "US",
+      "ticker": "NAKA",
+      "btc": 4467,
+      "mnav": 0.86
+    },
+    {
+      "rank": 23,
+      "name": "Boyaa Interactive International Limited",
+      "country": "HK",
+      "ticker": "0434",
+      "btc": 4091,
+      "mnav": null
+    },
+    {
+      "rank": 24,
+      "name": "OranjeBTC",
+      "country": "BR",
+      "ticker": "OBTC3",
+      "btc": 3898,
+      "mnav": 0.86
+    },
+    {
+      "rank": 25,
+      "name": "Bitcoin Group SE",
+      "country": "DE",
+      "ticker": "ADE",
+      "btc": 3605,
+      "mnav": null
+    },
+    {
+      "rank": 26,
+      "name": "Capital B",
+      "country": "FR",
+      "ticker": "ALCPB",
+      "btc": 3139,
+      "mnav": 0.6
+    },
+    {
+      "rank": 27,
+      "name": "Empery Digital",
+      "country": "US",
+      "ticker": "EMPD",
+      "btc": 2914,
+      "mnav": null
+    },
+    {
+      "rank": 28,
+      "name": "DDC Enterprise Limited",
+      "country": "US",
+      "ticker": "DDC",
+      "btc": 2899,
+      "mnav": 2.8
+    },
+    {
+      "rank": 29,
+      "name": "The Smarter Web Company PLC",
+      "country": "GB",
+      "ticker": "SWC",
+      "btc": 2878,
+      "mnav": 0.73
+    },
+    {
+      "rank": 30,
+      "name": "Keel Infrastructure Corp",
+      "country": "US",
+      "ticker": "KEEL",
+      "btc": 2469,
+      "mnav": null
+    },
+    {
+      "rank": 31,
+      "name": "DeFi Technologies",
+      "country": "CA",
+      "ticker": "DEFI",
+      "btc": 2452,
+      "mnav": null
+    },
+    {
+      "rank": 32,
+      "name": "BitGo Holdings, Inc.",
+      "country": "US",
+      "ticker": "BTGO",
+      "btc": 2449,
+      "mnav": null
+    },
+    {
+      "rank": 33,
+      "name": "Microcloud Hologram",
+      "country": "KY",
+      "ticker": "HOLO",
+      "btc": 2353,
+      "mnav": null
+    },
+    {
+      "rank": 34,
+      "name": "Canaan Inc.",
+      "country": "SG",
+      "ticker": "CAN",
+      "btc": 1867,
+      "mnav": null
+    },
+    {
+      "rank": 35,
+      "name": "BitFuFu Inc.",
+      "country": "SG",
+      "ticker": "FUFU",
+      "btc": 1855,
+      "mnav": null
+    },
+    {
+      "rank": 36,
+      "name": "NEXON Co., Ltd.",
+      "country": "JP",
+      "ticker": "3659",
+      "btc": 1717,
+      "mnav": null
+    },
+    {
+      "rank": 37,
+      "name": "Cipher Mining",
+      "country": "US",
+      "ticker": "CIFR",
+      "btc": 1500,
+      "mnav": null
+    },
+    {
+      "rank": 38,
+      "name": "Remixpoint",
+      "country": "JP",
+      "ticker": "3825",
+      "btc": 1491,
+      "mnav": null
+    },
+    {
+      "rank": 39,
+      "name": "Anap Holdings Inc.",
+      "country": "JP",
+      "ticker": "3189",
+      "btc": 1423,
+      "mnav": null
+    },
+    {
+      "rank": 40,
+      "name": "Treasury",
+      "country": "NL",
+      "ticker": "TRSR",
+      "btc": 1111,
+      "mnav": null
+    },
+    {
+      "rank": 41,
+      "name": "KULR Technology Group",
+      "country": "US",
+      "ticker": "KULR",
+      "btc": 1083,
+      "mnav": 1.81
+    },
+    {
+      "rank": 42,
+      "name": "Cango Inc",
+      "country": "US",
+      "ticker": "CANG",
+      "btc": 1065,
+      "mnav": null
+    },
+    {
+      "rank": 43,
+      "name": "H100 Group",
+      "country": "SE",
+      "ticker": "H100",
+      "btc": 1051,
+      "mnav": null
+    },
+    {
+      "rank": 44,
+      "name": "ZOOZ Power",
+      "country": "IL",
+      "ticker": "ZOOZ",
+      "btc": 1046,
+      "mnav": 0.81
+    },
+    {
+      "rank": 45,
+      "name": "Nano Labs",
+      "country": "CN",
+      "ticker": "NA",
+      "btc": 1000,
+      "mnav": null
+    },
+    {
+      "rank": 46,
+      "name": "USBC, Inc.",
+      "country": "US",
+      "ticker": "USBC",
+      "btc": 1000,
+      "mnav": 0.09
+    },
+    {
+      "rank": 47,
+      "name": "Apimeds Pharmaceuticals US, Inc.",
+      "country": "US",
+      "ticker": "APUS",
+      "btc": 1000,
+      "mnav": null
+    },
+    {
+      "rank": 48,
+      "name": "CIMG Inc",
+      "country": "HK",
+      "ticker": "CIMG",
+      "btc": 938,
+      "mnav": null
+    },
+    {
+      "rank": 49,
+      "name": "Hyperscale Data",
+      "country": "US",
+      "ticker": "GPUS",
+      "btc": 849,
+      "mnav": null
+    },
+    {
+      "rank": 50,
+      "name": "Ming Shing Group",
+      "country": "HK",
+      "ticker": "MSW",
+      "btc": 833,
+      "mnav": null
+    },
+    {
+      "rank": 51,
+      "name": "Yueda Digital Holdings",
+      "country": "CN",
+      "ticker": "YDKG",
+      "btc": 819,
+      "mnav": null
+    },
+    {
+      "rank": 52,
+      "name": "SOS Limited",
+      "country": "CN",
+      "ticker": "SOS",
+      "btc": 803,
+      "mnav": null
+    },
+    {
+      "rank": 53,
+      "name": "Figma Inc",
+      "country": "US",
+      "ticker": "FIG",
+      "btc": 767,
+      "mnav": null
+    },
+    {
+      "rank": 54,
+      "name": "Convano Inc",
+      "country": "JP",
+      "ticker": "6574",
+      "btc": 763,
+      "mnav": null
+    },
+    {
+      "rank": 55,
+      "name": "Aker ASA",
+      "country": "NO",
+      "ticker": "AKER",
+      "btc": 754,
+      "mnav": null
+    },
+    {
+      "rank": 56,
+      "name": "Bitcoin Treasury Corp",
+      "country": "CA",
+      "ticker": "BTCT",
+      "btc": 752,
+      "mnav": 0.69
+    },
+    {
+      "rank": 57,
+      "name": "Satsuma Technology",
+      "country": "GB",
+      "ticker": "SATS",
+      "btc": 668,
+      "mnav": null
+    },
+    {
+      "rank": 58,
+      "name": "Sequans Communications S.A.",
+      "country": "FR",
+      "ticker": "SQNS",
+      "btc": 658,
+      "mnav": null
+    },
+    {
+      "rank": 59,
+      "name": "Phoenix Group PLC",
+      "country": "AE",
+      "ticker": "PHX",
+      "btc": 641,
+      "mnav": null
+    },
+    {
+      "rank": 60,
+      "name": "Exodus Movement, Inc",
+      "country": "US",
+      "ticker": "EXOD",
+      "btc": 628,
+      "mnav": null
+    },
+    {
+      "rank": 61,
+      "name": "Alliance Resource Partners, L.P.",
+      "country": "US",
+      "ticker": "ARLP",
+      "btc": 618,
+      "mnav": null
+    },
+    {
+      "rank": 62,
+      "name": "Méliuz",
+      "country": "BR",
+      "ticker": "MLIZY",
+      "btc": 605,
+      "mnav": null
+    },
+    {
+      "rank": 63,
+      "name": "MercadoLibre, Inc.",
+      "country": "AR",
+      "ticker": "MELI",
+      "btc": 570,
+      "mnav": null
+    },
+    {
+      "rank": 64,
+      "name": "bitmax",
+      "country": "KR",
+      "ticker": "377030",
+      "btc": 551,
+      "mnav": null
+    },
+    {
+      "rank": 65,
+      "name": "Core Scientific",
+      "country": "US",
+      "ticker": "CORZ",
+      "btc": 547,
+      "mnav": null
+    },
+    {
+      "rank": 66,
+      "name": "Samara Asset Group",
+      "country": "MT",
+      "ticker": "SRAG",
+      "btc": 540,
+      "mnav": null
+    },
+    {
+      "rank": 67,
+      "name": "Figure Technology Solutions, Inc",
+      "country": "US",
+      "ticker": "FIGR",
+      "btc": 527,
+      "mnav": null
+    },
+    {
+      "rank": 68,
+      "name": "DigitalX",
+      "country": "AU",
+      "ticker": "DCC",
+      "btc": 504,
+      "mnav": null
+    },
+    {
+      "rank": 69,
+      "name": "3U Holding AG",
+      "country": "DE",
+      "ticker": "UUU",
+      "btc": 427,
+      "mnav": null
+    },
+    {
+      "rank": 70,
+      "name": "Neptune Digital Assets",
+      "country": "CA",
+      "ticker": "NDA",
+      "btc": 420,
+      "mnav": null
+    },
+    {
+      "rank": 71,
+      "name": "Virtu Financial, Inc.",
+      "country": "US",
+      "ticker": "VIRT",
+      "btc": 410,
+      "mnav": null
+    },
+    {
+      "rank": 72,
+      "name": "DMG Blockchain Solutions Inc.",
+      "country": "CA",
+      "ticker": "DMGI",
+      "btc": 393,
+      "mnav": null
+    },
+    {
+      "rank": 73,
+      "name": "Net Holding A.S.",
+      "country": "TR",
+      "ticker": "NTHOL",
+      "btc": 352,
+      "mnav": null
+    },
+    {
+      "rank": 74,
+      "name": "Consensus Mining & Seigniorage",
+      "country": "US",
+      "ticker": "CMSG",
+      "btc": 350,
+      "mnav": null
+    },
+    {
+      "rank": 75,
+      "name": "LM Funding America",
+      "country": "US",
+      "ticker": "LMFA",
+      "btc": 334,
+      "mnav": null
+    },
+    {
+      "rank": 76,
+      "name": "Angel Studios, Inc.",
+      "country": "US",
+      "ticker": "ANGX",
+      "btc": 303,
+      "mnav": null
+    },
+    {
+      "rank": 77,
+      "name": "POP Culture Group Co., Ltd.",
+      "country": "CN",
+      "ticker": "CPOP",
+      "btc": 300,
+      "mnav": null
+    },
+    {
+      "rank": 78,
+      "name": "Bitplanet",
+      "country": "KR",
+      "ticker": "049470",
+      "btc": 300,
+      "mnav": null
+    },
+    {
+      "rank": 79,
+      "name": "S-Science",
+      "country": "JP",
+      "ticker": "5721",
+      "btc": 296,
+      "mnav": null
+    },
+    {
+      "rank": 80,
+      "name": "The9 Limited",
+      "country": "CN",
+      "ticker": "NCTY",
+      "btc": 285,
+      "mnav": null
+    },
+    {
+      "rank": 81,
+      "name": "LQWD Technologies Corp.",
+      "country": "CA",
+      "ticker": "LQWD",
+      "btc": 267,
+      "mnav": 0.81
+    },
+    {
+      "rank": 82,
+      "name": "Coinshares International Limited",
+      "country": "JE",
+      "ticker": "CS",
+      "btc": 236,
+      "mnav": null
+    },
+    {
+      "rank": 83,
+      "name": "WEMADE",
+      "country": "KR",
+      "ticker": "112040",
+      "btc": 223,
+      "mnav": null
+    },
+    {
+      "rank": 84,
+      "name": "Vanadi Coffee, SA",
+      "country": "ES",
+      "ticker": "VANA",
+      "btc": 223,
+      "mnav": null
+    },
+    {
+      "rank": 85,
+      "name": "Rumble Inc.",
+      "country": "CA",
+      "ticker": "RUM",
+      "btc": 211,
+      "mnav": null
+    },
+    {
+      "rank": 86,
+      "name": "BitMine Immersion Technologies, Inc.",
+      "country": "US",
+      "ticker": "BMNR",
+      "btc": 204,
+      "mnav": null
+    },
+    {
+      "rank": 87,
+      "name": "Parataxis Korea",
+      "country": "KR",
+      "ticker": "288330",
+      "btc": 200,
+      "mnav": null
+    },
+    {
+      "rank": 88,
+      "name": "BTCS S.A.",
+      "country": "PL",
+      "ticker": "36C",
+      "btc": 199,
+      "mnav": null
+    },
+    {
+      "rank": 89,
+      "name": "Fold Holdings Inc.",
+      "country": "US",
+      "ticker": "FLD",
+      "btc": 192,
+      "mnav": null
+    },
+    {
+      "rank": 90,
+      "name": "Coinsilium",
+      "country": "GI",
+      "ticker": "COIN",
+      "btc": 182,
+      "mnav": null
+    },
+    {
+      "rank": 91,
+      "name": "Matador Technologies Inc",
+      "country": "CA",
+      "ticker": "MATA",
+      "btc": 176,
+      "mnav": null
+    },
+    {
+      "rank": 92,
+      "name": "Bitcoin Treasury Capital",
+      "country": "SE",
+      "ticker": "BTCB",
+      "btc": 172,
+      "mnav": null
+    },
+    {
+      "rank": 93,
+      "name": "K33 AB",
+      "country": "NO",
+      "ticker": "K33",
+      "btc": 168,
+      "mnav": null
+    },
+    {
+      "rank": 94,
+      "name": "B HODL",
+      "country": "GB",
+      "ticker": "HODL",
+      "btc": 166,
+      "mnav": null
+    },
+    {
+      "rank": 95,
+      "name": "The Brooker Group",
+      "country": "TH",
+      "ticker": "BTC",
+      "btc": 165,
+      "mnav": null
+    },
+    {
+      "rank": 96,
+      "name": "FRMO Corp.",
+      "country": "US",
+      "ticker": "FRMO",
+      "btc": 159,
+      "mnav": null
+    },
+    {
+      "rank": 97,
+      "name": "HIVE Digital Technologies",
+      "country": "CA",
+      "ticker": "HIVE",
+      "btc": 150,
+      "mnav": null
+    },
+    {
+      "rank": 98,
+      "name": "Sixty-Six Capital Inc",
+      "country": "CA",
+      "ticker": "SIX",
+      "btc": 149,
+      "mnav": null
+    },
+    {
+      "rank": 99,
+      "name": "Vaultz Capital",
+      "country": "GB",
+      "ticker": "V3TC",
+      "btc": 135,
+      "mnav": null
+    },
+    {
+      "rank": 100,
+      "name": "Horizon Kinetics Holding Corp",
+      "country": "US",
+      "ticker": "HKHC",
+      "btc": 132,
+      "mnav": null
+    }
+  ]
+}

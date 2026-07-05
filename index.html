@@ -3502,37 +3502,11 @@ function toggleNav(id) {
     </div>
 
     <div class="toc-box">
-      <div class="toc-item" data-toc-target="eco-panel"><span class="toc-arrow">▸</span>Экосистема Bitcoin</div>
-      <div class="toc-item" data-toc-target="revenue-engines-panel"><span class="toc-arrow">▸</span>Доходные движки</div>
       <div class="toc-item" data-toc-target="treasury-panel"><span class="toc-arrow">▸</span>Топ-100 держателей BTC</div>
-      <div class="toc-item" data-toc-target="architecture-panel"><span class="toc-arrow">▸</span>Архитектура</div>
+      <div class="toc-item" data-toc-target="revenue-engines-panel"><span class="toc-arrow">▸</span>Доходные движки</div>
+      <div class="toc-item" data-toc-target="eco-panel"><span class="toc-arrow">▸</span>Экосистема Bitcoin</div>
       <div class="toc-item" data-toc-target="protocols-panel"><span class="toc-arrow">▸</span>Протоколы</div>
-    </div>
-
-    <div class="panel" style="margin-top:12px" id="eco-panel">
-      <div class="panel-head collapsible" data-collapse-target="eco-panel">
-        <span class="panel-title">Экосистема Bitcoin</span>
-        <span class="panel-tag" id="eco-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
-      </div>
-      <div class="eco-search-wrap">
-        <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
-      </div>
-      <div class="eco-tabs" id="eco-tabs"></div>
-      <div class="eco-list" id="eco-list"></div>
-      <details class="eco-archive" id="eco-archive">
-        <summary class="eco-archive-summary">Архив <span id="eco-archive-count">(0)</span></summary>
-        <div class="eco-list" id="eco-archive-list"></div>
-      </details>
-    </div>
-
-    <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
-      <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
-        <span class="panel-title">Доходные движки</span>
-        <span class="panel-tag" id="re-count">—</span>
-        <span class="panel-collapse-arrow">▾</span>
-      </div>
-      <div class="re-list" id="re-list"></div>
+      <div class="toc-item" data-toc-target="architecture-panel"><span class="toc-arrow">▸</span>Архитектура</div>
     </div>
 
     <div class="panel" style="margin-top:12px" id="treasury-panel">
@@ -3569,6 +3543,98 @@ function toggleNav(id) {
           </thead>
           <tbody id="th-tbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="revenue-engines-panel">
+      <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
+        <span class="panel-title">Доходные движки</span>
+        <span class="panel-tag" id="re-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
+      </div>
+      <div class="re-list" id="re-list"></div>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="eco-panel">
+      <div class="panel-head collapsible" data-collapse-target="eco-panel">
+        <span class="panel-title">Экосистема Bitcoin</span>
+        <span class="panel-tag" id="eco-count">—</span>
+        <span class="panel-collapse-arrow">▾</span>
+      </div>
+      <div class="eco-search-wrap">
+        <input type="text" class="eco-search" id="eco-search" placeholder="Поиск по названию или описанию...">
+      </div>
+      <div class="eco-tabs" id="eco-tabs"></div>
+      <div class="eco-list" id="eco-list"></div>
+      <details class="eco-archive" id="eco-archive">
+        <summary class="eco-archive-summary">Архив <span id="eco-archive-count">(0)</span></summary>
+        <div class="eco-list" id="eco-archive-list"></div>
+      </details>
+    </div>
+
+    <div class="panel" style="margin-top:12px" id="protocols-panel">
+      <div class="panel-head">
+        <span class="panel-title">Протоколы</span>
+        <span class="panel-tag">МЕХАНИКА</span>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">⛏</span>
+          <span class="acc-label">Proof-of-Work</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body open">
+          <p>Чтобы добавить блок, майнер находит <strong>nonce</strong> — число, при котором SHA-256 хэш начинается с нужного количества нулей. Это чистый перебор: миллиарды хэшей в секунду.</p>
+          <p>Сеть автоматически регулирует сложность каждые <strong>2016 блоков (~2 недели)</strong>, чтобы среднее время блока оставалось 10 минут независимо от мощности майнеров.</p>
+          <div class="code">
+            <div><span class="c-cmt">// Упрощённый PoW</span></div>
+            <div><span class="c-key">while</span> <span class="c-val">True</span>:</div>
+            <div>&nbsp; hash = <span class="c-str">SHA256</span>(block + nonce)</div>
+            <div>&nbsp; <span class="c-key">if</span> hash.startswith(<span class="c-str">"0000"</span>):</div>
+            <div>&nbsp; &nbsp; <span class="c-op">return</span> nonce <span class="c-cmt">// Найдено!</span></div>
+            <div>&nbsp; nonce <span class="c-op">+=</span> <span class="c-val">1</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">🔐</span>
+          <span class="acc-label">SECP256k1 криптография</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Bitcoin использует <strong>эллиптические кривые</strong>: y² = x³ + 7. Приватный ключ — случайное 256-битное число. Публичный ключ — точка на кривой.</p>
+          <p>Умножение точки — односторонняя функция: из приватного легко получить публичный, но не наоборот. Подпись транзакции доказывает владение без раскрытия ключа.</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">📜</span>
+          <span class="acc-label">Скрипты Bitcoin</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Каждый UTXO заперт <strong>скриптом блокировки</strong>. Транзакция предоставляет скрипт разблокировки. Это стэковый язык программирования.</p>
+          <div class="code">
+            <div><span class="c-cmt">// P2PKH — стандартный адрес 1...</span></div>
+            <div><span class="c-key">Lock:</span>   OP_DUP OP_HASH160 <span class="c-str">&lt;pubKeyHash&gt;</span></div>
+            <div>&nbsp; &nbsp; &nbsp; &nbsp; OP_EQUALVERIFY OP_CHECKSIG</div>
+            <div><span class="c-key">Unlock:</span> <span class="c-str">&lt;sig&gt;</span> <span class="c-str">&lt;pubKey&gt;</span></div>
+          </div>
+          <p style="margin-top:10px">Типы: <strong>P2PKH</strong> (1...) · <strong>P2SH</strong> (3..., мультисиг) · <strong>SegWit</strong> (bc1...) · <strong>Taproot</strong> (bc1p..., приватность)</p>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">⚡</span>
+          <span class="acc-label">Lightning Network</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Основная цепь обрабатывает ~7 транзакций в секунду. <strong>Lightning</strong> — второй уровень: платёжные каналы вне блокчейна.</p>
+          <p>Открываешь канал (1 on-chain транзакция) → тысячи мгновенных платежей → закрываешь (1 on-chain). Комиссии — доли цента. Скорость — мгновенно.</p>
+        </div>
       </div>
     </div>
 
@@ -3651,72 +3717,6 @@ function toggleNav(id) {
             </div>
             <div class="utxo-fee-note">Комиссия майнеру: 0.0001 BTC · разница входов и выходов</div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-top:12px" id="protocols-panel">
-      <div class="panel-head">
-        <span class="panel-title">Протоколы</span>
-        <span class="panel-tag">МЕХАНИКА</span>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">⛏</span>
-          <span class="acc-label">Proof-of-Work</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body open">
-          <p>Чтобы добавить блок, майнер находит <strong>nonce</strong> — число, при котором SHA-256 хэш начинается с нужного количества нулей. Это чистый перебор: миллиарды хэшей в секунду.</p>
-          <p>Сеть автоматически регулирует сложность каждые <strong>2016 блоков (~2 недели)</strong>, чтобы среднее время блока оставалось 10 минут независимо от мощности майнеров.</p>
-          <div class="code">
-            <div><span class="c-cmt">// Упрощённый PoW</span></div>
-            <div><span class="c-key">while</span> <span class="c-val">True</span>:</div>
-            <div>&nbsp; hash = <span class="c-str">SHA256</span>(block + nonce)</div>
-            <div>&nbsp; <span class="c-key">if</span> hash.startswith(<span class="c-str">"0000"</span>):</div>
-            <div>&nbsp; &nbsp; <span class="c-op">return</span> nonce <span class="c-cmt">// Найдено!</span></div>
-            <div>&nbsp; nonce <span class="c-op">+=</span> <span class="c-val">1</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">🔐</span>
-          <span class="acc-label">SECP256k1 криптография</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Bitcoin использует <strong>эллиптические кривые</strong>: y² = x³ + 7. Приватный ключ — случайное 256-битное число. Публичный ключ — точка на кривой.</p>
-          <p>Умножение точки — односторонняя функция: из приватного легко получить публичный, но не наоборот. Подпись транзакции доказывает владение без раскрытия ключа.</p>
-        </div>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">📜</span>
-          <span class="acc-label">Скрипты Bitcoin</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Каждый UTXO заперт <strong>скриптом блокировки</strong>. Транзакция предоставляет скрипт разблокировки. Это стэковый язык программирования.</p>
-          <div class="code">
-            <div><span class="c-cmt">// P2PKH — стандартный адрес 1...</span></div>
-            <div><span class="c-key">Lock:</span>   OP_DUP OP_HASH160 <span class="c-str">&lt;pubKeyHash&gt;</span></div>
-            <div>&nbsp; &nbsp; &nbsp; &nbsp; OP_EQUALVERIFY OP_CHECKSIG</div>
-            <div><span class="c-key">Unlock:</span> <span class="c-str">&lt;sig&gt;</span> <span class="c-str">&lt;pubKey&gt;</span></div>
-          </div>
-          <p style="margin-top:10px">Типы: <strong>P2PKH</strong> (1...) · <strong>P2SH</strong> (3..., мультисиг) · <strong>SegWit</strong> (bc1...) · <strong>Taproot</strong> (bc1p..., приватность)</p>
-        </div>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">⚡</span>
-          <span class="acc-label">Lightning Network</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Основная цепь обрабатывает ~7 транзакций в секунду. <strong>Lightning</strong> — второй уровень: платёжные каналы вне блокчейна.</p>
-          <p>Открываешь канал (1 on-chain транзакция) → тысячи мгновенных платежей → закрываешь (1 on-chain). Комиссии — доли цента. Скорость — мгновенно.</p>
         </div>
       </div>
     </div>

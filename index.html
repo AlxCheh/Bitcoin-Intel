@@ -1807,99 +1807,6 @@ header {
 </section>
 
 <!-- ══════════════════════════════════════
-     BASICS
-══════════════════════════════════════ -->
-<section class="section" id="tab-basics" style="display:none!important">
-  <div class="page">
-
-    <div class="sh">
-      <span class="sh-title">📖 Основы <span>Bitcoin</span></span>
-    </div>
-
-    <!-- BLOCKCHAIN -->
-    <div class="panel" style="margin-top:12px">
-      <div class="panel-head">
-        <span class="panel-title">Блокчейн</span>
-        <span class="panel-tag">СТРУКТУРА</span>
-      </div>
-      <div class="panel-body">
-        <p>Блокчейн — публичная база данных всех транзакций. Это книга учёта, в которую все могут заглянуть, но никто не может изменить прошлое.</p>
-        <p>Каждый блок содержит транзакции, временну́ю метку и хэш предыдущего блока. Изменить один блок — значит пересчитать всю последующую цепочку.</p>
-      </div>
-      <div class="code" style="margin:0;border:none;border-top:1px solid var(--line)">
-        <div><span class="c-cmt">// Структура блока</span></div>
-        <div><span class="c-key">Block</span> <span class="c-val">#850001</span> {</div>
-        <div>&nbsp; <span class="c-key">prev_hash</span>  <span class="c-str">"0000000000abc4f2..."</span></div>
-        <div>&nbsp; <span class="c-key">merkle_root</span> <span class="c-str">"d4e5f6a2..."</span></div>
-        <div>&nbsp; <span class="c-key">timestamp</span>  <span class="c-val">2024-04-20 14:32:07</span></div>
-        <div>&nbsp; <span class="c-key">nonce</span>      <span class="c-val">3,942,891</span></div>
-        <div>&nbsp; <span class="c-key">tx_count</span>   <span class="c-val">2,834</span></div>
-        <div>}</div>
-      </div>
-    </div>
-
-    <!-- KEYS -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Ключи и адреса</span>
-        <span class="panel-tag">КРИПТОГРАФИЯ</span>
-      </div>
-      <div class="panel-body">
-        <p><strong>Приватный ключ</strong> — секретное 256-битное число. Тот, кто знает ключ, контролирует монеты.</p>
-        <p><strong>Публичный ключ</strong> генерируется из приватного через эллиптические кривые. Обратная операция вычислительно невозможна.</p>
-        <p><strong>Адрес</strong> — хэш публичного ключа. Его даёшь другим для получения платежей.</p>
-      </div>
-      <div class="code" style="margin:0;border:none;border-top:1px solid var(--line)">
-        <div><span class="c-cmt">// Цепочка генерации</span></div>
-        <div><span class="c-key">privKey</span> <span class="c-op">→ SECP256k1 →</span> <span class="c-key">pubKey</span></div>
-        <div><span class="c-key">pubKey</span>  <span class="c-op">→ SHA256 + RIPEMD160 →</span> <span class="c-key">addr</span></div>
-        <div style="margin-top:6px"><span class="c-val">"1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf"</span></div>
-      </div>
-    </div>
-
-    <!-- UTXO -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Модель UTXO</span>
-        <span class="panel-tag">ТРАНЗАКЦИИ</span>
-      </div>
-      <div class="panel-body">
-        <p>Bitcoin не хранит «баланс». Вместо этого — <strong>UTXO</strong> (Unspent Transaction Outputs): набор «монеток», адресованных твоему ключу. При трате ты уничтожаешь старые UTXO и создаёшь новые.</p>
-      </div>
-      <div class="utxo-diagram">
-        <div class="utxo-section-label">Входы — тратим</div>
-        <div class="utxo-row-item">
-          <div class="utxo-box">
-            <div class="utxo-addr">tx001:0 · Alice</div>
-            <div class="utxo-amt">1.5 BTC</div>
-          </div>
-          <div class="utxo-arrow-sym">→</div>
-          <div class="utxo-box" style="border-color:rgba(247,147,26,0.3);background:var(--btc-low)">
-            <div class="utxo-addr">Транзакция</div>
-            <div class="utxo-amt" style="font-size:10px;color:var(--dim)">Alice → Bob</div>
-          </div>
-        </div>
-        <div class="utxo-section-label">Выходы — создаём</div>
-        <div class="utxo-row-item">
-          <div class="utxo-box" style="border-color:rgba(90,158,114,0.25)">
-            <div class="utxo-addr">Bob</div>
-            <div class="utxo-amt grn">0.8 BTC</div>
-          </div>
-        </div>
-        <div class="utxo-row-item" style="margin-top:5px">
-          <div class="utxo-box">
-            <div class="utxo-addr">Alice · сдача</div>
-            <div class="utxo-amt">0.6999 BTC</div>
-          </div>
-        </div>
-        <div class="utxo-fee-note">Комиссия майнеру: 0.0001 BTC · разница входов и выходов</div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
      LIGHTNING
 ══════════════════════════════════════ -->
 <section class="section" id="tab-lightning">
@@ -2493,7 +2400,7 @@ function toggleNav(id) {
             </div>
             <div style="padding:8px 0">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.08em;margin-bottom:3px">ВЕРИФИЦИРУЕМОСТЬ</div>
-              <div style="font-size:11px;color:var(--dim);line-height:1.5">Любой может в любой момент проверить сколько BTC существует, кому принадлежит и когда были созданы. Золото — нет: мы не знаем сколько золота в астероиде Psyche 16.</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.5">Любой может в любой момент проверить сколько BTC существует, кому принадлежит и когда были созданы — без обращения к банку или регулятору. Это возможно благодаря децентрализации: у сети нет единой точки доверия, проверку не нужно принимать на слово от посредника. Золото — нет: мы не знаем сколько золота в астероиде Psyche 16.</div>
             </div>
           </div>
         </div>
@@ -3290,27 +3197,6 @@ function toggleNav(id) {
       <div id="emission-speed-wrap"></div>
       <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
         Осталось добыть: ~2,086,170 BTC (9.9%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     MACRO / НАРРАТИВ
-══════════════════════════════════════ -->
-<section class="section" id="tab-narrative" style="display:none!important">
-  <div class="page">
-    <div class="sh">
-      <span class="sh-title">📰 Нарратив <span>Bitcoin</span></span>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Ключевые события · 2009–2024</span>
-        <span class="panel-tag">ХРОНОЛОГИЯ</span>
-      </div>
-      <div id="narrative-table-wrap"></div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
-        Каждый кризис парадоксально укреплял структуру владения — появлялись новые категории держателей.
       </div>
     </div>
   </div>
@@ -5895,14 +5781,12 @@ const TAB_META = {
   analytics:   { cluster: 'LIVE',      tab: 'analytics' },
   pools:       { cluster: 'LIVE',      tab: 'pools' },
   market:      { cluster: 'LIVE',      tab: 'digests' },
-  basics:      { cluster: 'ECOSYSTEM', tab: 'basics' },
   tech:        { cluster: 'ECOSYSTEM', tab: 'tech' },
   lightning:   { cluster: 'ECOSYSTEM', tab: 'lightning' },
   instruments: { cluster: 'ECOSYSTEM', tab: 'instruments' },
   history:     { cluster: 'MACRO',     tab: 'history' },
   holders:     { cluster: 'MACRO',     tab: 'holders' },
   emission:    { cluster: 'MACRO',     tab: 'emission' },
-  narrative:   { cluster: 'MACRO',     tab: 'narrative' },
   signals:     { cluster: 'ANALYSIS',  tab: 'signals' },
   base:        { cluster: 'ANALYSIS',  tab: 'base' },
   aholders:  { cluster: 'ANALYSIS', tab: 'holders' }
@@ -5927,8 +5811,8 @@ const CLUSTERS = {
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
-  basics:'knowledge', tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
-  history:'macro', holders:'macro', emission:'macro', narrative:'macro',
+  tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
+  history:'macro', holders:'macro', emission:'macro',
   signals:'analysis', base:'analysis', aholders:'analysis'
 };
 
@@ -5988,7 +5872,6 @@ function showTab(id, btn, keepCluster) {
   if (id === 'holders')   renderHolders();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();
-  if (id === 'narrative') renderNarrative();
   if (id === 'signals')   renderPresetSignals();
   if (id === 'aholders')  renderAHolders();
 }
@@ -6749,22 +6632,6 @@ function renderEmission() {
   });
   sp += '</tbody></table>';
   document.getElementById('emission-speed-wrap').innerHTML = sp;
-}
-
-function renderNarrative() {
-  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr>'
-          + '<th>Дата</th><th>Событие</th><th>Категория</th><th>Эффект на структуру</th>'
-          + '</tr></thead><tbody>';
-  HOLDERS_DATA.narratives.forEach(n => {
-    tbl += '<tr>'
-         + '<td class="td-btc" style="white-space:nowrap">' + n.date + '</td>'
-         + '<td style="font-size:12px">' + n.event + '</td>'
-         + '<td style="white-space:nowrap;font-size:11px">' + n.category_label + '</td>'
-         + '<td style="font-size:11px;color:var(--dim)">' + n.effect + '</td>'
-         + '</tr>';
-  });
-  tbl += '</tbody></table></div>';
-  document.getElementById('narrative-table-wrap').innerHTML = tbl;
 }
 
 // ══════════════════════════════════════════════════════

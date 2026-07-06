@@ -3139,6 +3139,8 @@ function toggleNav(id) {
       </table>
     </div>
 
+    <div id="theory-topics-container"></div>
+
   </div>
 </section>
 
@@ -4289,6 +4291,57 @@ function renderRevenueEngines() {
   }).join('');
 }
 
+// ── ДОПОЛНИТЕЛЬНЫЕ ПАНЕЛИ ТЕОРИИ (data-driven, SBBA-IRP Wave 2) ─────────
+// Контент уточняется правкой THEORY_TOPICS.json — не index.html — по мере
+// появления новых сигналов темы macro/narrative (см. docs/SBBA_IRP_v1.md,
+// REM-OG2). Переиспользует acc-item/panel разметку остальных панелей theory,
+// но собирается из JSON, а не пишется вручную HTML-ом на каждую тему.
+let THEORY_TOPICS = [];
+
+function renderTheoryItem(item) {
+  let html = '<div class="acc-item">';
+  html += '<div class="acc-head" onclick="toggleAcc(this)">';
+  html += '<span class="acc-icon">' + sanitize(item.icon) + '</span>';
+  html += '<span class="acc-label">' + sanitize(item.label) + '</span>';
+  html += '<span class="acc-arrow">▼</span>';
+  html += '</div>';
+  html += '<div class="acc-body">';
+  if (item.paragraphs && item.paragraphs.length) {
+    html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
+  }
+  if (item.highlight) {
+    html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
+      + sanitize(item.highlight) + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function renderTheoryTopic(topic) {
+  let html = '<div class="panel" id="' + sanitize(topic.id) + '" style="scroll-margin-top:8px;margin-top:12px">';
+  html += '<div class="panel-head">';
+  html += '<span class="panel-title">' + sanitize(topic.panel_title) + '</span>';
+  html += '<span class="panel-tag">' + sanitize(topic.panel_tag) + '</span>';
+  html += '</div>';
+  if (topic.intro) {
+    html += '<div style="padding:12px 14px;border-bottom:1px solid var(--line)">'
+      + '<div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">' + sanitize(topic.intro) + '</div>'
+      + '</div>';
+  }
+  if (topic.items && topic.items.length) {
+    html += topic.items.map(renderTheoryItem).join('');
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderTheoryTopics() {
+  const el = document.getElementById('theory-topics-container');
+  if (!el) return;
+  if (!THEORY_TOPICS.length) { el.innerHTML = ''; return; }
+  el.innerHTML = THEORY_TOPICS.map(renderTheoryTopic).join('');
+}
+
 // ── ФУНКЦИИ BITCOIN ─────────────────────────────────────────────────────
 let BITCOIN_FUNCTIONS = [];
 
@@ -5097,14 +5150,15 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
       fetch('ontology.json?v=' + Date.now()),
       fetch('REVENUE_ENGINES.json?v=' + Date.now()),
       fetch('TREASURY_HOLDERS.json?v=' + Date.now()),
-      fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now())
+      fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now()),
+      fetch('THEORY_TOPICS.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5145,6 +5199,13 @@ async function loadSignals() {
     } catch(e) {
       console.warn('BITCOIN_FUNCTIONS.json load error, panel stays empty:', e);
       BITCOIN_FUNCTIONS = [];
+    }
+    try {
+      const ttData = await ttResp.json();
+      THEORY_TOPICS = ttData.topics || [];
+    } catch(e) {
+      console.warn('THEORY_TOPICS.json load error, panels stay empty:', e);
+      THEORY_TOPICS = [];
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5870,6 +5931,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
+  if (id === 'theory')    renderTheoryTopics();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();
   if (id === 'signals')   renderPresetSignals();
@@ -5930,7 +5992,9 @@ renderTOC('theory-toc', [
   { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
   { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
   { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
-  { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' }
+  { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' },
+  { target: 'theory-macro', title: 'Макроэкономика и Bitcoin', subtitle: 'Канал воздействия: ставки → ликвидность → BTC' },
+  { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' }
 ]);
 
 renderTOC('tech-toc', [

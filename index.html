@@ -563,8 +563,7 @@ header {
 #tab-holders .sh,
 #tab-history .sh,
 #tab-signals .sh,
-#tab-base .sh,
-#tab-aholders .sh {
+#tab-base .sh {
   background: linear-gradient(135deg, rgba(247,147,26,0.28) 0%, rgba(247,147,26,0.12) 60%, transparent 100%);
   border-bottom: 1px solid rgba(247,147,26,0.6);
 }
@@ -3292,33 +3291,6 @@ function toggleNav(id) {
 </section>
 
 <!-- ══════════════════════════════════════
-     ANALYSIS / HOLDERS (визуализация)
-══════════════════════════════════════ -->
-<section class="section" id="tab-aholders">
-  <div class="page">
-    <div class="sh">
-      <span class="sh-title">📊 Холдеры <span>визуализация</span></span>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Динамика категорий · 2009–2024</span>
-        <span class="panel-tag">ON-CHAIN · АНАЛИЗ</span>
-      </div>
-      <div id="aholders-chart-wrap" style="padding:14px">
-        <canvas id="holdersChart" height="220"></canvas>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Институциональная доля</span>
-        <span class="panel-tag">ТРЕНД</span>
-      </div>
-      <div id="aholders-institutional-wrap"></div>
-    </div>
-  </div>
-</section>
-
-
 <section class="section" id="tab-tech">
   <div class="page">
 
@@ -5850,8 +5822,7 @@ const TAB_META = {
   holders:     { cluster: 'MACRO',     tab: 'holders' },
   emission:    { cluster: 'MACRO',     tab: 'emission' },
   signals:     { cluster: 'ANALYSIS',  tab: 'signals' },
-  base:        { cluster: 'ANALYSIS',  tab: 'base' },
-  aholders:  { cluster: 'ANALYSIS', tab: 'holders' }
+  base:        { cluster: 'ANALYSIS',  tab: 'base' }
 };
 
 // ── Инициализация крошки ──
@@ -5869,13 +5840,13 @@ const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
   macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['emission','ЭМИССИЯ'],['holders','ХОЛДЕРЫ'],['history','ИСТОРИЯ']] },
-  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE'],['aholders','HOLDERS']] }
+  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','BASE']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
   tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
   history:'macro', holders:'macro', emission:'macro',
-  signals:'analysis', base:'analysis', aholders:'analysis'
+  signals:'analysis', base:'analysis'
 };
 
 let activeCluster = 'live';
@@ -5936,7 +5907,6 @@ function showTab(id, btn, keepCluster) {
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();
   if (id === 'signals')   renderPresetSignals();
-  if (id === 'aholders')  renderAHolders();
 }
 
 // инициализация подвкладок при загрузке
@@ -6861,61 +6831,6 @@ function resetAnalysis() {
   document.getElementById('sig-input').value = '';
   analysisResult = null;
   currentStepIdx = 0;
-}
-
-// ══════════════════════════════════════════════════════
-// ANALYSIS / HOLDERS — визуализация
-// ══════════════════════════════════════════════════════
-
-function renderAHolders() {
-  const labels = HOLDERS_DATA.snapshots.map(s => s.date);
-  const getVals = key => HOLDERS_DATA.snapshots.map(s => s.categories[key] ? s.categories[key].pct : null);
-
-  const datasets = [
-    { label: 'Individuals',   data: getVals('individuals'),  borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.08)', fill: true },
-    { label: 'Lost & Satoshi',data: getVals('lost_satoshi'), borderColor: '#7A8BA0', backgroundColor: 'transparent' },
-    { label: 'Governments',   data: getVals('governments'),  borderColor: '#C26060', backgroundColor: 'transparent' },
-    { label: 'Companies',     data: getVals('companies'),    borderColor: '#3B82F6', backgroundColor: 'transparent' },
-    { label: 'ETFs & Funds',  data: getVals('etfs'),         borderColor: '#5A9E72', backgroundColor: 'transparent' }
-  ].map(d => ({ ...d, borderWidth: 1.5, tension: 0.3, pointRadius: 3, spanGaps: false }));
-
-  const ctx = document.getElementById('holdersChart');
-  if (ctx && ctx.getContext) {
-    new Chart(ctx.getContext('2d'), {
-      type: 'line',
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 }, boxWidth: 10 } }
-        },
-        scales: {
-          x: { ticks: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#242A38' } },
-          y: { ticks: { color: '#7A8BA0', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' }, grid: { color: '#242A38' } }
-        }
-      }
-    });
-  }
-
-  // Институциональная доля по снэпшотам
-  let inst = '<table class="dtable"><thead><tr><th>Дата</th><th>Companies</th><th>ETFs</th><th>Governments</th><th>Итого</th></tr></thead><tbody>';
-  HOLDERS_DATA.snapshots.forEach(s => {
-    const c = s.categories;
-    const gov = c.governments ? c.governments.pct : 0;
-    const com = c.companies   ? c.companies.pct   : 0;
-    const etf = c.etfs        ? c.etfs.pct         : 0;
-    const total = +(gov + com + etf).toFixed(1);
-    if (total === 0 && !c.governments) return;
-    inst += '<tr>'
-          + '<td class="td-btc">' + s.date + '</td>'
-          + '<td>' + (com ? com + '%' : '—') + '</td>'
-          + '<td>' + (etf ? etf + '%' : '—') + '</td>'
-          + '<td>' + (gov ? gov + '%' : '—') + '</td>'
-          + '<td style="color:var(--btc);font-weight:600">' + total + '%</td>'
-          + '</tr>';
-  });
-  inst += '</tbody></table>';
-  document.getElementById('aholders-institutional-wrap').innerHTML = inst;
 }
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──

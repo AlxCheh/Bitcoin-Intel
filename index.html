@@ -891,19 +891,15 @@ header {
    найденные при аудите несовпадения (цвет левой рамки шапки, цвет
    акцента flow-блока) сохранены как модификаторы, не унифицированы
    молча — это отдельное решение (Фаза 2). */
-.instrument-card { margin: 12px 16px 20px; background: var(--bg2); border: 1px solid var(--btc); }
+.instrument-card { margin: 12px 0 20px; background: var(--bg2); border: 1px solid var(--btc); }
 .instrument-head {
   margin: 0; cursor: pointer; user-select: none;
-  border-top: 1px solid var(--btc); border-bottom: 1px solid var(--line);
-  background: var(--bg2);
+  border-bottom: 1px solid var(--btc);
+  background: var(--bg3);
   position: sticky; top: var(--inst-sticky-top, 52px); z-index: 201;
 }
-.instrument-head.accent-grey { border-left: 3px solid var(--line2); }
-.instrument-head.accent-btc  { border-left: 3px solid var(--btc); }
 .instrument-ticker-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 7px; gap: 10px; }
-.instrument-ticker { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.2em; }
-.instrument-ticker.plain { color: var(--txt); }
-.instrument-ticker.glow  { color: var(--btc); text-shadow: 0 0 12px rgba(247,147,26,0.35); }
+.instrument-ticker { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.2em; color: var(--btc); }
 .instrument-ticker-meta { display: flex; align-items: center; gap: 10px; }
 .instrument-tag { font-family: var(--mono); font-size: 8px; color: var(--dim); letter-spacing: 0.08em; }
 .instrument-arrow { font-family: var(--mono); font-size: 10px; color: var(--dim); transition: transform 0.2s; }
@@ -2040,9 +2036,9 @@ header {
 
     <!-- MSTR -->
     <div class="instrument-card" id="instrument-mstr">
-      <div class="instrument-head accent-grey" id="mstr-head" onclick="toggleInstrument('mstr')">
+      <div class="instrument-head" id="mstr-head" onclick="toggleInstrument('mstr')">
         <div class="instrument-ticker-row">
-          <span class="instrument-ticker plain">MSTR</span>
+          <span class="instrument-ticker">MSTR</span>
           <div class="instrument-ticker-meta">
             <span class="instrument-tag">COMMON STOCK · NASDAQ</span>
             <span id="mstr-arrow" class="instrument-arrow">▼</span>
@@ -2227,9 +2223,9 @@ header {
 
     <!-- STRC -->
     <div class="instrument-card" id="instrument-strc">
-      <div class="instrument-head accent-btc" id="strc-head" onclick="toggleInstrument('strc')">
+      <div class="instrument-head" id="strc-head" onclick="toggleInstrument('strc')">
         <div class="instrument-ticker-row">
-          <span class="instrument-ticker glow">STRC</span>
+          <span class="instrument-ticker">STRC</span>
           <div class="instrument-ticker-meta">
             <span class="instrument-tag">PERPETUAL PREFERRED</span>
             <span id="strc-arrow" class="instrument-arrow">▼</span>

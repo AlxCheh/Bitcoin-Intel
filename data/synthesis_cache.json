@@ -28,38 +28,39 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-07-06T04:18:40.248987+00:00",
+    "generated_at": "2026-07-07T03:32:23.813597+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260706_041840"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260707_033223"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
-    "narrative": "Падение STRC ниже номинала — первый признак что дивидендная машина Strategy испытывает давление — после чего дивидендная машина Strategy сжимает пространство для BTC-накопления: модель «занять → купить BTC → рост акции» работала в условиях премии к NAV — при дисконте 0.83x и 14 месяцах дивидендного покрытия она требует паузы или перестройки",
+    "narrative": "Падение STRC ниже номинала — первый признак что дивидендная машина Strategy испытывает давление — в результате чего дивидендная машина Strategy сжимает пространство для BTC-накопления: модель «занять → купить BTC → рост акции» работала в условиях премии к NAV — при дисконте 0.83x и 14 месяцах дивидендного покрытия она требует паузы или перестройки",
     "takeaway": "BTC-казначейство Strategy эволюционировало от накопительной догмы к управляемому балансовому инструменту: BTC теперь официально выполняет функцию кредитного коллатерала, резервного актива и источника ликвидности одновременно — корпоративная BTC-модель достигла зрелости",
     "strength": "strong",
-    "confidence": 0.765,
+    "confidence": 0.755,
     "phase": "resolution",
-    "score": 101,
-    "signal_count": 12,
+    "score": 108,
+    "signal_count": 13,
     "anchor_signal_id": "STR-2026-0629-001",
     "phase_changed": true,
     "structural_change": {
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-06T04:18:40.252375+00:00"
+      "detected_at": "2026-07-07T03:32:23.817103+00:00"
     },
-    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.77; signals_used: 12; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
+    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.76; signals_used: 13; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
       "STR-2026-0625-001",
       "STR-2026-0628-001",
       "STR-2026-0624-002",
       "STR-2026-0618-001",
-      "STR-2026-0629-001",
+      "STR-2026-0706-001",
       "STR-2026-0622-004",
       "STR-2026-0622-001",
       "NAR-2026-0702-001",
       "STR-2026-0701-001",
+      "STR-2026-0629-001",
       "STR-2026-0623-001",
       "STR-2026-0622-002",
       "STR-2026-0615-001"
@@ -68,9 +69,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-06T04:18:40.252479+00:00",
+    "generated_at": "2026-07-07T03:32:23.817226+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260706_041840"
+    "synthesis_id": "synthesis_strategy_model_stress_20260707_033223"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -79,7 +80,7 @@
     "strength": "strong",
     "confidence": 1.0,
     "phase": "active",
-    "score": 119,
+    "score": 117,
     "signal_count": 11,
     "anchor_signal_id": "NAR-2026-0628-001",
     "phase_changed": false,
@@ -102,23 +103,23 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-06T04:18:40.254412+00:00",
+    "generated_at": "2026-07-07T03:32:23.819374+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260706_041840"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260707_033223"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
     "narrative": "Ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float — несмотря на то что ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float",
     "takeaway": "",
     "strength": "strong",
-    "confidence": 0.886,
+    "confidence": 0.841,
     "phase": "tension",
-    "score": 39,
+    "score": 37,
     "signal_count": 4,
     "anchor_signal_id": "SUP-2026-0625-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from SUP-2026-0625-001 (contradicts: 2, weight: onchain); partA from SUP-2026-0625-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.89; signals_used: 4; ignored_duplicates: []",
+    "rationale": "Tension from SUP-2026-0625-001 (contradicts: 2, weight: onchain); partA from SUP-2026-0625-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.84; signals_used: 4; ignored_duplicates: []",
     "signals_used": [
       "SUP-2026-0625-001",
       "SUP-2026-0702-001",
@@ -126,28 +127,28 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-06T04:18:40.256130+00:00",
+    "generated_at": "2026-07-07T03:32:23.821175+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260706_041840"
+    "synthesis_id": "synthesis_supply_scarcity_20260707_033223"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
     "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — при этом bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "takeaway": "Bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "strength": "strong",
-    "confidence": 0.697,
+    "confidence": 0.682,
     "phase": "active",
-    "score": 92,
+    "score": 90,
     "signal_count": 12,
     "anchor_signal_id": "INF-2026-0609-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'при этом'; confidence: 0.70; signals_used: 12; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'при этом'; confidence: 0.68; signals_used: 12; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0609-001",
       "INF-2026-0625-001",
-      "INF-2026-0629-001",
       "INF-2026-0624-001",
+      "INF-2026-0629-001",
       "STR-2026-0622-006",
       "INF-2026-0623-001",
       "INF-2026-0621-001",
@@ -158,8 +159,8 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-06T04:18:40.258078+00:00",
+    "generated_at": "2026-07-07T03:32:23.823234+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260706_041840"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260707_033223"
   }
 }

@@ -29,9 +29,9 @@
     "signals_ignored": [
       "STR-2026-0623-002"
     ],
-    "generated_at": "2026-07-07T03:41:19.495491+00:00",
+    "generated_at": "2026-07-07T09:35:07.876956+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260707_034119"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260707_093507"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
@@ -48,7 +48,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-07T03:41:19.498978+00:00"
+      "detected_at": "2026-07-07T09:35:07.880421+00:00"
     },
     "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.76; signals_used: 13; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -70,9 +70,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-07T03:41:19.499104+00:00",
+    "generated_at": "2026-07-07T09:35:07.880545+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260707_034119"
+    "synthesis_id": "synthesis_strategy_model_stress_20260707_093507"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -104,9 +104,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-07T03:41:19.501275+00:00",
+    "generated_at": "2026-07-07T09:35:07.882631+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260707_034119"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260707_093507"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -128,9 +128,9 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-07T03:41:19.503044+00:00",
+    "generated_at": "2026-07-07T09:35:07.884330+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260707_034119"
+    "synthesis_id": "synthesis_supply_scarcity_20260707_093507"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -160,8 +160,29 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-07T03:41:19.505253+00:00",
+    "generated_at": "2026-07-07T09:35:07.886242+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260707_034119"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260707_093507"
+  },
+  "leverage_deleveraging_cycle": {
+    "tension": "BTC отскочил на слабом jobs-репорте и снёс $450 млн шортов vs та же неделя уже снесла лонги на падении к $58,293 — рынок дважды подряд принудительно чистит leverage в противоположные стороны",
+    "narrative": "Некрупные макро-катализаторы способны быстро и полностью развернуть контролирующую сторону leverage в обе стороны за считанные дни — рынок BTC сейчас структурно хрупок и держится на быстро пересобирающемся плечевом позиционировании, а не на устойчивом направленном тренде — в условиях некрупные макро-катализаторы способны быстро и полностью развернуть контролирующую сторону leverage в обе стороны за считанные дни — рынок BTC сейчас структурно хрупок и держится на быстро пересобирающемся плечевом позиционировании, а не на устойчивом направленном тренде",
+    "takeaway": "",
+    "strength": "moderate",
+    "confidence": 0.327,
+    "phase": "structural",
+    "score": 9,
+    "signal_count": 1,
+    "anchor_signal_id": "MAC-2026-0706-001",
+    "phase_changed": false,
+    "structural_change": {},
+    "rationale": "Tension from MAC-2026-0706-001 (contradicts: 0, weight: market); partA from MAC-2026-0706-001; phase: structural; bridge: 'в условиях'; confidence: 0.33; signals_used: 1; ignored_duplicates: []",
+    "signals_used": [
+      "MAC-2026-0706-001"
+    ],
+    "signals_ignored": [],
+    "generated_at": "2026-07-07T09:35:07.887739+00:00",
+    "algorithm_version": "2.1.1",
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260707_093507"
   }
 }

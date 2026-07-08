@@ -952,6 +952,21 @@ header {
 .th-table tr:hover td { background: var(--bg3); }
 .th-empty { padding: 20px 14px; text-align: center; color: var(--dim); font-family: var(--mono); font-size: 11px; }
 
+/* ── HOLDERS SNAPSHOT TABLE — визуал как у .th-table (Топ-100), пока без сортировки/поиска ── */
+.htable { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
+.htable th {
+  text-align: center; padding: 6px 8px;
+  color: var(--dim); font-size: 9px; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.htable th:first-child, .htable th:nth-child(2) { text-align: left; }
+.htable td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; text-align: center; }
+.htable td:first-child, .htable td:nth-child(2) { text-align: left; }
+.htable td.htable-btc { color: var(--btc); font-weight: 700; }
+.htable td.htable-dim { color: var(--dim); }
+.htable tr:hover td { background: var(--bg3); }
+
 
 /* ── INSTRUMENT STICKY HEADER ── */
 
@@ -6610,20 +6625,20 @@ function renderHolders() {
   ];
 
   // Таблица снэпшотов
-  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr><th>Дата</th><th>Событие</th>';
+  let tbl = '<div style="overflow-x:auto"><table class="htable"><thead><tr><th>Дата</th><th>Событие</th>';
   cats.forEach(c => tbl += '<th>' + c.label + '</th>');
   tbl += '<th>Total Mined</th></tr></thead><tbody>';
 
   HOLDERS_DATA.snapshots.forEach(s => {
-    tbl += '<tr><td class="td-btc" style="white-space:nowrap">' + s.date + '</td>';
-    tbl += '<td style="font-size:11px;color:var(--dim)">' + s.event + '</td>';
+    tbl += '<tr><td class="htable-btc">' + s.date + '</td>';
+    tbl += '<td class="htable-dim" style="white-space:normal">' + s.event + '</td>';
     cats.forEach(c => {
       const v = s.categories[c.key];
       tbl += v
-        ? '<td style="white-space:nowrap">' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
-        : '<td style="color:var(--dim)">—</td>';
+        ? '<td>' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
+        : '<td class="htable-dim">—</td>';
     });
-    tbl += '<td style="color:var(--btc)">' + s.total_mined.toLocaleString() + '</td></tr>';
+    tbl += '<td class="htable-btc">' + s.total_mined.toLocaleString() + '</td></tr>';
   });
   tbl += '</tbody></table></div>';
   document.getElementById('holders-table-wrap').innerHTML = tbl;

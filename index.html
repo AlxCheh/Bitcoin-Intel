@@ -117,6 +117,7 @@ header {
 .nav-crumb {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 11px 16px;
   background: var(--bg2);
@@ -126,17 +127,22 @@ header {
   touch-action: pan-y;
   user-select: none;
 }
-.crumb-tab { color: var(--txt); }
-.crumb-link { cursor: pointer; transition: color 0.15s, opacity 0.15s; }
-.crumb-link:hover { color: var(--btc) !important; opacity: 1 !important; }
+.crumb-prompt { color: var(--grn); font-weight: 700; margin-right: 4px; }
+.crumb-dim { color: rgba(90,158,114,0.55); }
+.crumb-active { color: var(--grn); font-weight: 700; }
+.crumb-link { cursor: pointer; transition: color 0.15s; }
+.crumb-link:hover { color: var(--grn) !important; }
 @keyframes crumb-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 .crumb-cursor {
   display: inline-block;
-  color: var(--btc);
+  color: var(--grn);
   font-family: var(--mono);
   font-size: 11px;
   animation: crumb-blink 1s steps(1) infinite;
 }
+.crumb-dots { display: flex; gap: 4px; flex-shrink: 0; }
+.crumb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--line2); }
+.crumb-dot.on { background: var(--grn); }
 
 .subnav {
   display: flex;
@@ -1578,14 +1584,11 @@ header {
 
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
-  <span style="color:var(--dim);opacity:0.5">[</span>
-  <span class="crumb-link" style="color:var(--dim);opacity:0.5" onclick="selectCluster('live')" title="LIVE">~</span>
-  <span style="color:var(--dim);opacity:0.5"> / </span>
-  <span id="crumb-cluster" class="crumb-link" style="font-family:var(--mono);color:var(--dim);opacity:0.5;font-size:11px" onclick="selectCluster(this.dataset.cluster)"></span>
-  <span style="color:var(--dim);opacity:0.5"> / </span>
-  <span id="crumb-tab" style="font-family:var(--mono);color:var(--txt);font-size:11px">home</span>
-  <span class="crumb-cursor">_</span>
-  <span style="color:var(--dim);opacity:0.5">]</span>
+  <span>
+    <span class="crumb-prompt">$</span>
+    <span class="crumb-link crumb-dim" onclick="selectCluster('live')" title="LIVE">~</span><span class="crumb-dim">/</span><span id="crumb-cluster" class="crumb-link crumb-dim" onclick="selectCluster(this.dataset.cluster)"></span><span class="crumb-dim">/</span><span id="crumb-tab" class="crumb-active">home</span><span class="crumb-cursor">_</span>
+  </span>
+  <span class="crumb-dots" id="crumb-dots"></span>
 </div>
 <nav class="subnav" id="subnav"></nav>
 
@@ -5816,9 +5819,20 @@ function selectCluster(key) {
   document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('cbar-' + key).classList.add('active');
   renderSubnav(key);
+  renderCrumbDots(key);
   // открыть первую вкладку кластера
   showTab(CLUSTERS[key].tabs[0][0], null, true);
 }
+
+// точки-индикаторы кластера в хлебной крошке
+function renderCrumbDots(activeKey) {
+  const el = document.getElementById('crumb-dots');
+  if (!el) return;
+  el.innerHTML = Object.keys(CLUSTERS).map(k =>
+    '<span class="crumb-dot' + (k === activeKey ? ' on' : '') + '"></span>'
+  ).join('');
+}
+renderCrumbDots('live');
 
 // ── Свайп по хлебной крошке — переключение между кластерами ──
 (function() {

@@ -123,6 +123,8 @@ header {
   border-bottom: 1px solid var(--line);
   font-family: var(--mono);
   font-size: 11px;
+  touch-action: pan-y;
+  user-select: none;
 }
 .crumb-tab { color: var(--txt); }
 .crumb-link { cursor: pointer; transition: color 0.15s, opacity 0.15s; }
@@ -5817,6 +5819,34 @@ function selectCluster(key) {
   // открыть первую вкладку кластера
   showTab(CLUSTERS[key].tabs[0][0], null, true);
 }
+
+// ── Свайп по хлебной крошке — переключение между кластерами ──
+(function() {
+  const crumb = document.querySelector('.nav-crumb');
+  if (!crumb) return;
+  const SWIPE_THRESHOLD = 50;
+  let startX = null, startY = null, swiped = false;
+
+  crumb.addEventListener('pointerdown', function(e) {
+    startX = e.clientX; startY = e.clientY; swiped = false;
+  });
+  crumb.addEventListener('pointermove', function(e) {
+    if (startX === null || swiped) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      swiped = true;
+      const keys = Object.keys(CLUSTERS);
+      const idx = keys.indexOf(activeCluster);
+      const nextIdx = dx < 0
+        ? (idx + 1) % keys.length
+        : (idx - 1 + keys.length) % keys.length;
+      selectCluster(keys[nextIdx]);
+    }
+  });
+  crumb.addEventListener('pointerup', function() { startX = null; startY = null; });
+  crumb.addEventListener('pointercancel', function() { startX = null; startY = null; });
+})();
 
 // отрисовать подвкладки активного кластера, подсветить activeId
 function renderSubnav(key, activeId) {

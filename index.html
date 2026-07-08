@@ -960,10 +960,8 @@ header {
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
-.htable th:nth-child(2) { min-width: 100px; }
 .htable td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; text-align: center; }
-.htable td:first-child, .htable td:nth-child(2) { text-align: left; }
-.htable td:nth-child(2) { min-width: 100px; }
+.htable td:first-child { text-align: left; }
 .htable td.htable-btc { color: var(--btc); font-weight: 700; }
 .htable td.htable-dim { color: var(--dim); }
 .htable tr:hover td { background: var(--bg3); }
@@ -6625,22 +6623,33 @@ function renderHolders() {
     { key: 'not_mined',    label: 'Not Yet Mined' }
   ];
 
-  // Таблица снэпшотов
-  let tbl = '<div style="overflow-x:auto"><table class="htable"><thead><tr><th>Дата</th><th>Событие</th>';
-  cats.forEach(c => tbl += '<th>' + c.label + '</th>');
-  tbl += '<th>Total Mined</th></tr></thead><tbody>';
+  // Таблица снэпшотов — транспонирована: бывшие названия столбцов теперь строки,
+  // бывшие строки (даты) теперь столбцы, от 2024 года на уменьшение
+  const snapsDesc = [...HOLDERS_DATA.snapshots].reverse();
 
-  HOLDERS_DATA.snapshots.forEach(s => {
-    tbl += '<tr><td class="htable-btc">' + s.date + '</td>';
-    tbl += '<td class="htable-dim" style="white-space:normal">' + s.event + '</td>';
-    cats.forEach(c => {
+  let tbl = '<div style="overflow-x:auto"><table class="htable"><thead><tr><th></th>';
+  snapsDesc.forEach(s => tbl += '<th>' + s.date + '</th>');
+  tbl += '</tr></thead><tbody>';
+
+  tbl += '<tr><td class="htable-dim">Событие</td>';
+  snapsDesc.forEach(s => tbl += '<td class="htable-dim" style="white-space:normal">' + s.event + '</td>');
+  tbl += '</tr>';
+
+  cats.forEach(c => {
+    tbl += '<tr><td>' + c.label + '</td>';
+    snapsDesc.forEach(s => {
       const v = s.categories[c.key];
       tbl += v
         ? '<td>' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
         : '<td class="htable-dim">—</td>';
     });
-    tbl += '<td class="htable-btc">' + s.total_mined.toLocaleString() + '</td></tr>';
+    tbl += '</tr>';
   });
+
+  tbl += '<tr><td class="htable-btc">Total Mined</td>';
+  snapsDesc.forEach(s => tbl += '<td class="htable-btc">' + s.total_mined.toLocaleString() + '</td>');
+  tbl += '</tr>';
+
   tbl += '</tbody></table></div>';
   document.getElementById('holders-table-wrap').innerHTML = tbl;
 

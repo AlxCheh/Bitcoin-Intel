@@ -1406,15 +1406,22 @@ header {
 .dash-breakdown-total { color: var(--txt); border-top: 1px solid var(--line2); margin-top: 4px; padding-top: 4px; }
 
 .sig-card {
+  position: relative;
   background: var(--bg2);
   border: 1px solid var(--btc);
-  border-left: 3px solid var(--line2);
   margin-bottom: 10px;
-  padding: 13px 15px;
+  padding: 13px 15px 13px 19px;
 }
-.sig-card.neg { border-left-color: var(--red); }
-.sig-card.pos { border-left-color: var(--grn); }
-.sig-card.neu { border-left-color: var(--slate); }
+.sig-card::before {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px; bottom: 3px;
+  width: 3px;
+  background: var(--line2);
+}
+.sig-card.neg::before { background: var(--red); }
+.sig-card.pos::before { background: var(--grn); }
+.sig-card.neu::before { background: var(--slate); }
 .sig-top {
   display: flex;
   align-items: center;

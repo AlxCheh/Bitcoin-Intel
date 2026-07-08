@@ -1053,20 +1053,6 @@ header {
   background: var(--bg2);
   border: 1px solid var(--btc);
 }
-.chart-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--btc);
-  background: var(--bg3);
-}
-.chart-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--btc);
-  text-transform: uppercase;
-}
 .chart-meta {
   font-family: var(--mono);
   font-size: 9px;
@@ -1662,8 +1648,8 @@ header {
 
     <!-- ══ БЛОК 2: КЛЮЧЕВЫЕ МЕТРИКИ (вариант C) ══ -->
     <div style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
-      <div class="chart-head" style="margin:0">
-        <span class="chart-title">Ключевые метрики</span>
+      <div class="panel-head" style="margin:0">
+        <span class="panel-title">Ключевые метрики</span>
         <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
       </div>
 
@@ -1770,8 +1756,8 @@ header {
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="price-chart-wrap" style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
-      <div class="chart-head" style="margin:0">
-        <span class="chart-title">График BTC / USD</span>
+      <div class="panel-head" style="margin:0">
+        <span class="panel-title">График BTC / USD</span>
         <span class="chart-meta">ЦЕНА · ИСТОРИЯ</span>
       </div>
       <div id="terminal-price-chart"></div>
@@ -1779,8 +1765,8 @@ header {
 
     <!-- ══ БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ ══ -->
     <div class="dash-narratives" id="dash-narratives-wrap">
-      <div class="chart-head" style="margin:0">
-        <span class="chart-title">Главные нарративы</span>
+      <div class="panel-head" style="margin:0">
+        <span class="panel-title">Главные нарративы</span>
         <span id="dash-narratives-total" class="chart-meta"></span>
       </div>
       <div id="dash-narratives-list"></div>
@@ -1788,8 +1774,8 @@ header {
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
     <div class="dash-summary">
-      <div class="chart-head" style="margin:-16px -14px 12px">
-        <span class="chart-title">Общий фон</span>
+      <div class="panel-head" style="margin:-16px -14px 12px">
+        <span class="panel-title">Общий фон</span>
         <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
       </div>
       <div class="dash-summary-body">
@@ -1803,8 +1789,8 @@ header {
 
     <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
     <div class="dash-cycle">
-      <div class="chart-head" style="margin:-16px -16px 16px">
-        <span class="chart-title">Фаза цикла</span>
+      <div class="panel-head" style="margin:-16px -16px 16px">
+        <span class="panel-title">Фаза цикла</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span id="dash-ratio" style="font-family:var(--mono);font-size:9px;color:var(--btc)">—</span>
           <span class="chart-meta">BITCOIN 2026</span>
@@ -1835,8 +1821,8 @@ header {
 
     <!-- ══ БЛОК 5: ПОСЛЕДНИЕ БЛОКИ ══ -->
     <div class="terminal" style="margin:0 0 16px;border:1px solid var(--btc)">
-      <div class="chart-head" style="margin:-0px -0px 0px;border-bottom:none">
-        <span class="chart-title">Последние блоки</span>
+      <div class="panel-head" style="margin:-0px -0px 0px;border-bottom:none">
+        <span class="panel-title">Последние блоки</span>
         <span class="terminal-title chart-meta" id="block-title">загрузка...</span>
       </div>
       <div class="terminal-body" style="padding:0">
@@ -3556,8 +3542,8 @@ function toggleNav(id) {
     <div class="chart-panel" style="margin-top:12px" id="diff-block">
 
       <!-- Header -->
-      <div class="chart-head">
-        <span class="chart-title">Сложность сети</span>
+      <div class="panel-head">
+        <span class="panel-title">Сложность сети</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:9px;font-family:var(--mono);color:var(--btc)" id="diff-change">—</span>
           <span class="chart-meta" id="diff-next-label">РЕТАРГЕТ —</span>
@@ -3670,8 +3656,8 @@ function toggleNav(id) {
 
     <!-- HASHRATE CHART -->
     <div class="chart-panel">
-      <div class="chart-head">
-        <span class="chart-title">Хешрейт сети</span>
+      <div class="panel-head">
+        <span class="panel-title">Хешрейт сети</span>
         <span class="chart-meta">EH/s · 2016–2025</span>
       </div>
       <div class="chart-inner">
@@ -3681,8 +3667,8 @@ function toggleNav(id) {
 
     <!-- SUPPLY CHART -->
     <div class="chart-panel">
-      <div class="chart-head">
-        <span class="chart-title">Эмиссия Bitcoin</span>
+      <div class="panel-head">
+        <span class="panel-title">Эмиссия Bitcoin</span>
         <span class="chart-meta">BTC В ОБРАЩЕНИИ (МЛН)</span>
       </div>
       <div class="chart-inner">

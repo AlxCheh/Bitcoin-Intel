@@ -2499,26 +2499,7 @@ function toggleNav(id) {
         </div>
       </div>
 
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">06</span>
-          <span class="acc-label">Хозяева и рабы денег</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Деньги — инструмент для обмена человеческим временем: заработанные часы труда конвертируются в товар, который можно обменять на чужое время позже. Тот, кто контролирует эмиссию этого инструмента, получает власть перераспределять чужое время в свою пользу — печатая новые единицы, он обесценивает уже заработанные другими.</p>
-          <p>Исторический пример: в колониальной Африке европейцы расплачивались с местными стеклянными бусами (aggry beads) — предметом, который выглядел ценным, но не был редким по-настоящему. Это позволило веками изымать реальные активы в обмен на подделку денег, что автор напрямую связывает с последующей трагедией работорговли — те же бусы стали известны как «бусы рабов».</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
-            Порча денежной системы ведёт к нравственному упадку и социальному коллапсу — единственное противоядие, по мысли автора, это не поддающиеся порче деньги. Bitcoin предлагается как такой актив: эмиссия зафиксирована математически, ни один «хозяин» не может её изменить.
-          </div>
-        </div>
-      </div>
-
-      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
-          ИСТОЧНИК (п. 06): Robert Breedlove · «Masters and Slaves of Money» · 5 июля 2020 · <a href="https://breedlove22.medium.com/masters-and-slaves-of-money-255ecc93404f" target="_blank" style="color:var(--btc);text-decoration:none">medium.com/@breedlove22</a>
-        </div>
-      </div>
+      <div id="theory-money-essays"></div>
 
       <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
         <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
@@ -4283,6 +4264,7 @@ function renderRevenueEngines() {
 // REM-OG2). Переиспользует acc-item/panel разметку остальных панелей theory,
 // но собирается из JSON, а не пишется вручную HTML-ом на каждую тему.
 let THEORY_TOPICS = [];
+let THEORY_ESSAYS = [];
 
 function renderTheoryItem(item) {
   let html = '<div class="acc-item">';
@@ -4326,6 +4308,49 @@ function renderTheoryTopics() {
   if (!el) return;
   if (!THEORY_TOPICS.length) { el.innerHTML = ''; return; }
   el.innerHTML = THEORY_TOPICS.map(renderTheoryTopic).join('');
+}
+
+// ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
+// панелях (не создают новых панелей). Реестр в THEORY_ESSAYS.json, не в
+// index.html — добавление нового материала = запись в файл, без правки HTML.
+function renderEssayItem(item) {
+  let html = '<div class="acc-item">';
+  html += '<div class="acc-head" onclick="toggleAcc(this)">';
+  html += '<span class="acc-icon">' + sanitize(item.icon) + '</span>';
+  html += '<span class="acc-label">' + sanitize(item.label) + '</span>';
+  html += '<span class="acc-arrow">▼</span>';
+  html += '</div>';
+  html += '<div class="acc-body">';
+  if (item.paragraphs && item.paragraphs.length) {
+    html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
+  }
+  if (item.highlight) {
+    html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
+      + sanitize(item.highlight) + '</div>';
+  }
+  html += '</div></div>';
+  if (item.source) {
+    const s = item.source;
+    html += '<div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">'
+      + 'ИСТОЧНИК (' + sanitize(item.icon) + '): ' + sanitize(s.author) + ' · «' + sanitize(s.title) + '» · ' + sanitize(s.date)
+      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:none">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
+      + '</div></div>';
+  }
+  return html;
+}
+
+function renderTheoryEssays() {
+  if (!THEORY_ESSAYS.length) return;
+  const byPanel = {};
+  THEORY_ESSAYS.forEach(function(item) {
+    (byPanel[item.target_panel] = byPanel[item.target_panel] || []).push(item);
+  });
+  Object.keys(byPanel).forEach(function(panelId) {
+    const el = document.getElementById(panelId + '-essays');
+    if (!el) return;
+    el.innerHTML = byPanel[panelId].map(renderEssayItem).join('');
+  });
 }
 
 // ── ФУНКЦИИ BITCOIN ─────────────────────────────────────────────────────
@@ -5136,7 +5161,7 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
@@ -5144,7 +5169,8 @@ async function loadSignals() {
       fetch('REVENUE_ENGINES.json?v=' + Date.now()),
       fetch('TREASURY_HOLDERS.json?v=' + Date.now()),
       fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now()),
-      fetch('THEORY_TOPICS.json?v=' + Date.now())
+      fetch('THEORY_TOPICS.json?v=' + Date.now()),
+      fetch('THEORY_ESSAYS.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5192,6 +5218,13 @@ async function loadSignals() {
     } catch(e) {
       console.warn('THEORY_TOPICS.json load error, panels stay empty:', e);
       THEORY_TOPICS = [];
+    }
+    try {
+      const teData = await teResp.json();
+      THEORY_ESSAYS = teData.items || [];
+    } catch(e) {
+      console.warn('THEORY_ESSAYS.json load error, panels stay empty:', e);
+      THEORY_ESSAYS = [];
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5945,6 +5978,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
+  if (id === 'theory') renderTheoryEssays();
   if (id === 'macrocontext') renderTheoryTopics();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();

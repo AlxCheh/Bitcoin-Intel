@@ -1804,9 +1804,10 @@ header {
 <section class="section" id="tab-lightning">
   <div class="page">
 
+    <div id="lightning-toc"></div>
 
     <!-- ЧТО ТАКОЕ LIGHTNING -->
-    <div class="panel" style="margin-top:12px">
+    <div class="panel" id="lightning-what" style="scroll-margin-top:8px;margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Что такое Lightning Network</span>
         <span class="panel-tag">🔗 LAYER 2</span>
@@ -1825,7 +1826,7 @@ header {
     </div>
 
     <!-- КАК ЭТО РАБОТАЕТ -->
-    <div class="panel">
+    <div class="panel" id="lightning-routing" style="scroll-margin-top:8px">
       <div class="panel-head">
         <span class="panel-title">Как работает маршрутизация</span>
         <span class="panel-tag">МЕХАНИКА</span>
@@ -1866,7 +1867,7 @@ header {
     </div>
 
     <!-- КАК ПОДКЛЮЧИТЬСЯ -->
-    <div class="panel">
+    <div class="panel" id="lightning-connect" style="scroll-margin-top:8px">
       <div class="panel-head">
         <span class="panel-title">Как подключиться к Lightning</span>
         <span class="panel-tag">ПРАКТИКА</span>
@@ -1927,7 +1928,7 @@ header {
     </div>
 
     <!-- СРАВНЕНИЕ ПУТЕЙ -->
-    <div class="panel">
+    <div class="panel" id="lightning-comparison" style="scroll-margin-top:8px">
       <div class="panel-head">
         <span class="panel-title">Сравнение подходов</span>
         <span class="panel-tag">ВЫБОР</span>
@@ -1955,7 +1956,7 @@ header {
     </div>
 
     <!-- ОГОВОРКИ -->
-    <div class="panel">
+    <div class="panel" id="lightning-risks" style="scroll-margin-top:8px">
       <div class="panel-head">
         <span class="panel-title">Ограничения и риски</span>
         <span class="panel-tag">ОГОВОРКИ</span>
@@ -5914,6 +5915,14 @@ renderTOC('macrocontext-toc', [
   { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' },
   { target: 'theory-macro', title: 'Макроэкономика и Bitcoin', subtitle: 'Канал воздействия: ставки → ликвидность → BTC' },
   { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' }
+]);
+
+renderTOC('lightning-toc', [
+  { target: 'lightning-what', title: 'Что такое Lightning Network', subtitle: 'Layer 2, платёжные каналы, зачем нужен второй уровень' },
+  { target: 'lightning-routing', title: 'Как работает маршрутизация', subtitle: 'Каналы, HTLC, ликвидность' },
+  { target: 'lightning-connect', title: 'Как подключиться к Lightning', subtitle: 'Кастодиан, non-custodial, своя нода — 3 пути' },
+  { target: 'lightning-comparison', title: 'Сравнение подходов', subtitle: 'Плюсы и минусы каждого варианта подключения' },
+  { target: 'lightning-risks', title: 'Ограничения и риски', subtitle: 'Что важно знать перед использованием' }
 ]);
 
 renderTOC('tech-toc', [

@@ -964,6 +964,9 @@ header {
 .htable td:first-child { text-align: left; }
 .htable td.htable-btc { color: var(--btc); font-weight: 700; }
 .htable td.htable-dim { color: var(--dim); }
+.htable td.htable-event { max-width: 140px; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+.htable-pct-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.htable-pct { color: var(--dim); font-size: 10px; margin-left: auto; }
 .htable tr:hover td { background: var(--bg3); }
 
 
@@ -6632,7 +6635,7 @@ function renderHolders() {
   tbl += '</tr></thead><tbody>';
 
   tbl += '<tr><td class="htable-dim">Событие</td>';
-  snapsDesc.forEach(s => tbl += '<td class="htable-dim" style="white-space:normal">' + s.event + '</td>');
+  snapsDesc.forEach(s => tbl += '<td class="htable-dim htable-event" title="' + s.event.replace(/"/g,'&quot;') + '">' + s.event + '</td>');
   tbl += '</tr>';
 
   cats.forEach(c => {
@@ -6640,7 +6643,7 @@ function renderHolders() {
     snapsDesc.forEach(s => {
       const v = s.categories[c.key];
       tbl += v
-        ? '<td>' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
+        ? '<td><div class="htable-pct-row"><span>' + v.btc.toLocaleString() + '</span><span class="htable-pct">' + v.pct + '%</span></div></td>'
         : '<td class="htable-dim">—</td>';
     });
     tbl += '</tr>';

@@ -125,6 +125,16 @@ header {
   font-size: 11px;
 }
 .crumb-tab { color: var(--txt); }
+.crumb-link { cursor: pointer; transition: color 0.15s, opacity 0.15s; }
+.crumb-link:hover { color: var(--btc) !important; opacity: 1 !important; }
+@keyframes crumb-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.crumb-cursor {
+  display: inline-block;
+  color: var(--btc);
+  font-family: var(--mono);
+  font-size: 11px;
+  animation: crumb-blink 1s steps(1) infinite;
+}
 
 .subnav {
   display: flex;
@@ -1566,12 +1576,14 @@ header {
 
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
-  <span style="color:var(--dim);opacity:0.5">[ ~</span>
+  <span style="color:var(--dim);opacity:0.5">[</span>
+  <span class="crumb-link" style="color:var(--dim);opacity:0.5" onclick="selectCluster('live')" title="LIVE">~</span>
   <span style="color:var(--dim);opacity:0.5"> / </span>
-  <span id="crumb-cluster" style="font-family:var(--mono);color:var(--dim);opacity:0.5;font-size:11px"></span>
+  <span id="crumb-cluster" class="crumb-link" style="font-family:var(--mono);color:var(--dim);opacity:0.5;font-size:11px" onclick="selectCluster(this.dataset.cluster)"></span>
   <span style="color:var(--dim);opacity:0.5"> / </span>
   <span id="crumb-tab" style="font-family:var(--mono);color:var(--txt);font-size:11px">home</span>
-  <span style="color:var(--dim);opacity:0.5"> ]</span>
+  <span class="crumb-cursor">_</span>
+  <span style="color:var(--dim);opacity:0.5">]</span>
 </div>
 <nav class="subnav" id="subnav"></nav>
 
@@ -5763,30 +5775,18 @@ function goToDigest(clusterKey) {
 }
 
 // ── TABS ──
-const TAB_META = {
-  home:        { cluster: 'LIVE',      tab: 'home' },
-  analytics:   { cluster: 'LIVE',      tab: 'analytics' },
-  pools:       { cluster: 'LIVE',      tab: 'pools' },
-  market:      { cluster: 'LIVE',      tab: 'digests' },
-  tech:        { cluster: 'ECOSYSTEM', tab: 'tech' },
-  lightning:   { cluster: 'ECOSYSTEM', tab: 'lightning' },
-  instruments: { cluster: 'ECOSYSTEM', tab: 'instruments' },
-  history:     { cluster: 'MACRO',     tab: 'history' },
-  holders:     { cluster: 'MACRO',     tab: 'holders' },
-  emission:    { cluster: 'MACRO',     tab: 'emission' },
-  macrocontext:{ cluster: 'MACRO',     tab: 'macrocontext' },
-  signals:     { cluster: 'ANALYSIS',  tab: 'signals' },
-  base:        { cluster: 'ANALYSIS',  tab: 'base' }
-};
 
 // ── Инициализация крошки ──
 function updateCrumb(id) {
-  const meta = TAB_META[id];
-  if (!meta) return;
+  const clusterKey = TAB_TO_CLUSTER[id];
+  if (!clusterKey) return;
   const clusterEl = document.getElementById('crumb-cluster');
   const tabEl     = document.getElementById('crumb-tab');
-  if (clusterEl) clusterEl.textContent = meta.cluster.toLowerCase();
-  if (tabEl)     tabEl.textContent     = meta.tab;
+  if (clusterEl) {
+    clusterEl.textContent = CLUSTERS[clusterKey].label.toLowerCase();
+    clusterEl.dataset.cluster = clusterKey;
+  }
+  if (tabEl) tabEl.textContent = id;
 }
 
 
@@ -5799,7 +5799,7 @@ const CLUSTERS = {
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
   tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
-  history:'macro', holders:'macro', emission:'macro', macrocontext:'macro',
+  theory:'macro', history:'macro', holders:'macro', emission:'macro', macrocontext:'macro',
   signals:'analysis', base:'analysis'
 };
 
@@ -5841,8 +5841,7 @@ function showTab(id, btn, keepCluster) {
   renderSubnav(activeCluster, id);
 
   // крошки
-  const meta = TAB_META[id];
-  if (meta) {
+  if (TAB_TO_CLUSTER[id]) {
     updateCrumb(id);
   }
 

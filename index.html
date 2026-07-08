@@ -3127,31 +3127,6 @@ function toggleNav(id) {
 <!-- ══════════════════════════════════════
      MACRO / ХОЛДЕРЫ
 ══════════════════════════════════════ -->
-<section class="section" id="tab-holders">
-  <div class="page">
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Структура владения · 2009–2024</span>
-        <span class="panel-tag">📊 ON-CHAIN</span>
-      </div>
-      <div id="holders-table-wrap"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Ключевые тренды</span>
-        <span class="panel-tag">ДИНАМИКА</span>
-      </div>
-      <div id="holders-trends"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Три волны институционализации</span>
-        <span class="panel-tag">🏦 ИНСТИТУЦИОНАЛЫ</span>
-      </div>
-      <div id="holders-waves"></div>
-    </div>
-  </div>
-</section>
 
 <!-- ══════════════════════════════════════
      MACRO / ЭМИССИЯ
@@ -3244,6 +3219,38 @@ function toggleNav(id) {
 <!-- ══════════════════════════════════════
      ANALYSIS / BASE
 ══════════════════════════════════════ -->
+<section class="section" id="tab-holders">
+  <div class="page">
+
+    <div id="holders-toc"></div>
+
+    <div class="panel" id="holders-structure" style="scroll-margin-top:64px">
+      <div class="panel-head">
+        <span class="panel-title">Структура владения · 2009–2024</span>
+        <span class="panel-tag">📊 ON-CHAIN</span>
+      </div>
+      <div id="holders-table-wrap"></div>
+    </div>
+    <div class="panel" id="holders-trends-panel" style="scroll-margin-top:64px">
+      <div class="panel-head">
+        <span class="panel-title">Ключевые тренды</span>
+        <span class="panel-tag">ДИНАМИКА</span>
+      </div>
+      <div id="holders-trends"></div>
+    </div>
+    <div class="panel" id="holders-waves-panel" style="scroll-margin-top:64px">
+      <div class="panel-head">
+        <span class="panel-title">Три волны институционализации</span>
+        <span class="panel-tag">🏦 ИНСТИТУЦИОНАЛЫ</span>
+      </div>
+      <div id="holders-waves"></div>
+    </div>
+
+    <div style="height:650px" aria-hidden="true"></div>
+
+  </div>
+</section>
+
 <section class="section" id="tab-base">
   <div class="page">
     <div class="panel">
@@ -5798,14 +5805,14 @@ function updateCrumb(id) {
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
-  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['emission','ЭМИССИЯ'],['holders','ХОЛДЕРЫ'],['history','ИСТОРИЯ']] },
-  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['base','АРХИВ']] }
+  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['emission','ЭМИССИЯ'],['history','ИСТОРИЯ']] },
+  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','АРХИВ']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
   tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
-  theory:'macro', history:'macro', holders:'macro', emission:'macro', macrocontext:'macro',
-  signals:'analysis', base:'analysis'
+  theory:'macro', history:'macro', emission:'macro', macrocontext:'macro',
+  signals:'analysis', holders:'analysis', base:'analysis'
 };
 
 let activeCluster = 'live';
@@ -5983,6 +5990,12 @@ renderTOC('tech-toc', [
   { target: 'protocols-panel', title: 'Протоколы', subtitle: 'Proof-of-Work, Lightning Network' },
   { target: 'bitcoin-functions-panel', title: 'Функции Bitcoin', subtitle: 'Практические возможности протокола' },
   { target: 'architecture-panel', title: 'Архитектура', subtitle: 'Блокчейн, ключи и адреса, модель UTXO' }
+]);
+
+renderTOC('holders-toc', [
+  { target: 'holders-structure', title: 'Структура владения · 2009–2024', subtitle: 'On-chain распределение по категориям держателей' },
+  { target: 'holders-trends-panel', title: 'Ключевые тренды', subtitle: 'Динамика перераспределения владения' },
+  { target: 'holders-waves-panel', title: 'Три волны институционализации', subtitle: 'Корпорации, ETF, государства' }
 ]);
 
 loadSignals();

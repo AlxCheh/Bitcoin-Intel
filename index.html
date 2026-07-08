@@ -960,9 +960,10 @@ header {
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
-.htable th:first-child, .htable th:nth-child(2) { text-align: left; }
+.htable th:nth-child(2) { min-width: 100px; }
 .htable td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; text-align: center; }
 .htable td:first-child, .htable td:nth-child(2) { text-align: left; }
+.htable td:nth-child(2) { min-width: 100px; }
 .htable td.htable-btc { color: var(--btc); font-weight: 700; }
 .htable td.htable-dim { color: var(--dim); }
 .htable tr:hover td { background: var(--bg3); }

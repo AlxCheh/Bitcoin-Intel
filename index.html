@@ -964,6 +964,9 @@ header {
 .htable td:first-child { text-align: left; }
 .htable td.htable-btc { color: var(--btc); font-weight: 700; }
 .htable td.htable-dim { color: var(--dim); }
+.htable td.htable-event { max-width: 140px; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+.htable-pct-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.htable-pct { color: var(--dim); font-size: 10px; margin-left: auto; }
 .htable tr:hover td { background: var(--bg3); }
 
 
@@ -1019,6 +1022,22 @@ header {
   margin-top: 12px;
 }
 .acc-body p strong { color: var(--txt); font-weight: 600; }
+
+/* ── ТОЧЕЧНЫЕ СВЯЗИ МЕЖДУ ПУНКТАМИ (Вариант C) ── */
+.crosslink {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; padding: 8px 10px;
+  background: var(--bg3); border: 1px solid var(--line); border-left: 2px solid var(--btc);
+  cursor: pointer; transition: border-color 0.15s;
+}
+.crosslink:hover { border-color: var(--btc); }
+.crosslink-arrow { color: var(--btc); font-size: 12px; flex-shrink: 0; }
+.crosslink-text { font-size: 11px; color: var(--dim); line-height: 1.4; }
+.crosslink-target {
+  font-family: var(--mono); font-size: 10px; color: var(--btc);
+  border: 1px solid rgba(247,147,26,0.3); padding: 1px 6px;
+  white-space: nowrap; margin-left: auto; flex-shrink: 0;
+}
 
 /* ══════════════════════════════════
    CODE BLOCK
@@ -2493,8 +2512,15 @@ function toggleNav(id) {
           <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
             «Каждый покупает Bitcoin по той цене, которую заслужил» — Тони, 21ideas.org
           </div>
+          <div class="crosslink" onclick="document.getElementById('theory-dca').scrollIntoView({behavior:'smooth'})">
+            <span class="crosslink-arrow">↳</span>
+            <span class="crosslink-text">Та же асимметрия объясняет, почему тайминг рынка проигрывает регулярному накоплению</span>
+            <span class="crosslink-target">DCA · 01</span>
+          </div>
         </div>
       </div>
+
+      <div id="theory-money-essays"></div>
 
       <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
         <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
@@ -2789,6 +2815,11 @@ function toggleNav(id) {
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
             Увеличивай долю BTC по мере роста убеждённости и горизонта инвестирования. DCA позволяет наращивать позицию постепенно не беспокоясь о точке входа.
+          </div>
+          <div class="crosslink" onclick="document.getElementById('theory-money').scrollIntoView({behavior:'smooth'})">
+            <span class="crosslink-arrow">↳</span>
+            <span class="crosslink-text">Логика 1%-правила опирается на дефицитность как одно из шести свойств денег</span>
+            <span class="crosslink-target">Деньги · 02</span>
           </div>
         </div>
       </div>
@@ -4259,6 +4290,7 @@ function renderRevenueEngines() {
 // REM-OG2). Переиспользует acc-item/panel разметку остальных панелей theory,
 // но собирается из JSON, а не пишется вручную HTML-ом на каждую тему.
 let THEORY_TOPICS = [];
+let THEORY_ESSAYS = [];
 
 function renderTheoryItem(item) {
   let html = '<div class="acc-item">';
@@ -4302,6 +4334,57 @@ function renderTheoryTopics() {
   if (!el) return;
   if (!THEORY_TOPICS.length) { el.innerHTML = ''; return; }
   el.innerHTML = THEORY_TOPICS.map(renderTheoryTopic).join('');
+}
+
+// ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
+// панелях (не создают новых панелей). Реестр в THEORY_ESSAYS.json, не в
+// index.html — добавление нового материала = запись в файл, без правки HTML.
+function renderEssayItem(item) {
+  let html = '<div class="acc-item">';
+  html += '<div class="acc-head" onclick="toggleAcc(this)">';
+  html += '<span class="acc-icon">' + sanitize(item.icon) + '</span>';
+  html += '<span class="acc-label">' + sanitize(item.label) + '</span>';
+  html += '<span class="acc-arrow">▼</span>';
+  html += '</div>';
+  html += '<div class="acc-body">';
+  if (item.paragraphs && item.paragraphs.length) {
+    html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
+  }
+  if (item.highlight) {
+    html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
+      + sanitize(item.highlight) + '</div>';
+  }
+  if (item.crosslink) {
+    const cl = item.crosslink;
+    html += '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})">'
+      + '<span class="crosslink-arrow">↳</span>'
+      + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
+      + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
+      + '</div>';
+  }
+  html += '</div></div>';
+  if (item.source) {
+    const s = item.source;
+    html += '<div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">'
+      + 'ИСТОЧНИК (' + sanitize(item.icon) + '): ' + sanitize(s.author) + ' · «' + sanitize(s.title) + '» · ' + sanitize(s.date)
+      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:none">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
+      + '</div></div>';
+  }
+  return html;
+}
+
+function renderTheoryEssays() {
+  if (!THEORY_ESSAYS.length) return;
+  const byPanel = {};
+  THEORY_ESSAYS.forEach(function(item) {
+    (byPanel[item.target_panel] = byPanel[item.target_panel] || []).push(item);
+  });
+  Object.keys(byPanel).forEach(function(panelId) {
+    const el = document.getElementById(panelId + '-essays');
+    if (!el) return;
+    el.innerHTML = byPanel[panelId].map(renderEssayItem).join('');
+  });
 }
 
 // ── ФУНКЦИИ BITCOIN ─────────────────────────────────────────────────────
@@ -5112,7 +5195,7 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
@@ -5120,7 +5203,8 @@ async function loadSignals() {
       fetch('REVENUE_ENGINES.json?v=' + Date.now()),
       fetch('TREASURY_HOLDERS.json?v=' + Date.now()),
       fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now()),
-      fetch('THEORY_TOPICS.json?v=' + Date.now())
+      fetch('THEORY_TOPICS.json?v=' + Date.now()),
+      fetch('THEORY_ESSAYS.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5168,6 +5252,13 @@ async function loadSignals() {
     } catch(e) {
       console.warn('THEORY_TOPICS.json load error, panels stay empty:', e);
       THEORY_TOPICS = [];
+    }
+    try {
+      const teData = await teResp.json();
+      THEORY_ESSAYS = teData.items || [];
+    } catch(e) {
+      console.warn('THEORY_ESSAYS.json load error, panels stay empty:', e);
+      THEORY_ESSAYS = [];
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -5921,6 +6012,7 @@ function showTab(id, btn, keepCluster) {
     }
   }
   if (id === 'holders')   renderHolders();
+  if (id === 'theory') renderTheoryEssays();
   if (id === 'macrocontext') renderTheoryTopics();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
   if (id === 'emission')  renderEmission();
@@ -6632,7 +6724,7 @@ function renderHolders() {
   tbl += '</tr></thead><tbody>';
 
   tbl += '<tr><td class="htable-dim">Событие</td>';
-  snapsDesc.forEach(s => tbl += '<td class="htable-dim" style="white-space:normal">' + s.event + '</td>');
+  snapsDesc.forEach(s => tbl += '<td class="htable-dim htable-event" title="' + s.event.replace(/"/g,'&quot;') + '">' + s.event + '</td>');
   tbl += '</tr>';
 
   cats.forEach(c => {
@@ -6640,7 +6732,7 @@ function renderHolders() {
     snapsDesc.forEach(s => {
       const v = s.categories[c.key];
       tbl += v
-        ? '<td>' + v.pct + '% <span style="color:var(--dim);font-size:10px">· ' + v.btc.toLocaleString() + '</span></td>'
+        ? '<td><div class="htable-pct-row"><span>' + v.btc.toLocaleString() + '</span><span class="htable-pct">' + v.pct + '%</span></div></td>'
         : '<td class="htable-dim">—</td>';
     });
     tbl += '</tr>';

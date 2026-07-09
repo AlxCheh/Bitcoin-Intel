@@ -1023,6 +1023,22 @@ header {
 }
 .acc-body p strong { color: var(--txt); font-weight: 600; }
 
+/* ── ТОЧЕЧНЫЕ СВЯЗИ МЕЖДУ ПУНКТАМИ (Вариант C) ── */
+.crosslink {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; padding: 8px 10px;
+  background: var(--bg3); border: 1px solid var(--line); border-left: 2px solid var(--btc);
+  cursor: pointer; transition: border-color 0.15s;
+}
+.crosslink:hover { border-color: var(--btc); }
+.crosslink-arrow { color: var(--btc); font-size: 12px; flex-shrink: 0; }
+.crosslink-text { font-size: 11px; color: var(--dim); line-height: 1.4; }
+.crosslink-target {
+  font-family: var(--mono); font-size: 10px; color: var(--btc);
+  border: 1px solid rgba(247,147,26,0.3); padding: 1px 6px;
+  white-space: nowrap; margin-left: auto; flex-shrink: 0;
+}
+
 /* ══════════════════════════════════
    CODE BLOCK
 ══════════════════════════════════ */
@@ -2496,6 +2512,11 @@ function toggleNav(id) {
           <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
             «Каждый покупает Bitcoin по той цене, которую заслужил» — Тони, 21ideas.org
           </div>
+          <div class="crosslink" onclick="document.getElementById('theory-dca').scrollIntoView({behavior:'smooth'})">
+            <span class="crosslink-arrow">↳</span>
+            <span class="crosslink-text">Та же асимметрия объясняет, почему тайминг рынка проигрывает регулярному накоплению</span>
+            <span class="crosslink-target">DCA · 01</span>
+          </div>
         </div>
       </div>
 
@@ -2794,6 +2815,11 @@ function toggleNav(id) {
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
             Увеличивай долю BTC по мере роста убеждённости и горизонта инвестирования. DCA позволяет наращивать позицию постепенно не беспокоясь о точке входа.
+          </div>
+          <div class="crosslink" onclick="document.getElementById('theory-money').scrollIntoView({behavior:'smooth'})">
+            <span class="crosslink-arrow">↳</span>
+            <span class="crosslink-text">Логика 1%-правила опирается на дефицитность как одно из шести свойств денег</span>
+            <span class="crosslink-target">Деньги · 02</span>
           </div>
         </div>
       </div>
@@ -4327,6 +4353,14 @@ function renderEssayItem(item) {
   if (item.highlight) {
     html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
       + sanitize(item.highlight) + '</div>';
+  }
+  if (item.crosslink) {
+    const cl = item.crosslink;
+    html += '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})">'
+      + '<span class="crosslink-arrow">↳</span>'
+      + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
+      + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
+      + '</div>';
   }
   html += '</div></div>';
   if (item.source) {

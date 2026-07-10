@@ -3108,7 +3108,7 @@ function toggleNav(id) {
       <div class="halving-info">
         <div class="halving-label">Текущая награда майнера</div>
         <div class="halving-val">3.125 <span style="font-size:13px;color:var(--dim)">BTC/блок</span></div>
-        <div class="halving-sub">Следующий халвинг ~2028 → 1.5625 BTC</div>
+        <div class="halving-sub">Следующий халвинг ~апрель 2028 → 1.5625 BTC</div>
       </div>
     </div>
 
@@ -3117,25 +3117,35 @@ function toggleNav(id) {
         <span class="panel-title">Таблица халвингов</span>
         <span class="panel-tag">ЭМИССИЯ</span>
       </div>
+      <div style="overflow-x:auto">
       <table class="dtable">
         <thead>
           <tr>
             <th>Год</th>
             <th>Блок</th>
             <th>Награда</th>
+            <th>BTC/день</th>
+            <th>BTC/месяц</th>
+            <th>BTC/год</th>
             <th>Статус</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>2009</td><td class="td-dim">#0</td><td class="td-btc">50 BTC</td><td class="td-dim">Genesis</td></tr>
-          <tr><td>2012</td><td class="td-dim">#210 000</td><td class="td-btc">25 BTC</td><td class="td-dim">1-й</td></tr>
-          <tr><td>2016</td><td class="td-dim">#420 000</td><td class="td-btc">12.5 BTC</td><td class="td-dim">2-й</td></tr>
-          <tr><td>2020</td><td class="td-dim">#630 000</td><td class="td-btc">6.25 BTC</td><td class="td-dim">3-й</td></tr>
-          <tr><td>2024</td><td class="td-dim">#840 000</td><td class="td-btc">3.125 BTC</td><td><span class="badge">ТЕКУЩИЙ</span></td></tr>
-          <tr><td class="td-dim">~2028</td><td class="td-dim">#1 050 000</td><td class="td-dim">1.5625 BTC</td><td class="td-dim">5-й</td></tr>
+          <tr><td>2009</td><td class="td-dim">#0</td><td class="td-btc">50 BTC</td><td class="td-dim">7 200</td><td class="td-dim">~219 168</td><td class="td-dim">~2 629 800</td><td class="td-dim">Genesis</td></tr>
+          <tr><td>2012</td><td class="td-dim">#210 000</td><td class="td-btc">25 BTC</td><td class="td-dim">3 600</td><td class="td-dim">~109 584</td><td class="td-dim">~1 314 900</td><td class="td-dim">1-й</td></tr>
+          <tr><td>2016</td><td class="td-dim">#420 000</td><td class="td-btc">12.5 BTC</td><td class="td-dim">1 800</td><td class="td-dim">~54 792</td><td class="td-dim">~657 450</td><td class="td-dim">2-й</td></tr>
+          <tr><td>2020</td><td class="td-dim">#630 000</td><td class="td-btc">6.25 BTC</td><td class="td-dim">900</td><td class="td-dim">~27 396</td><td class="td-dim">~328 725</td><td class="td-dim">3-й</td></tr>
+          <tr><td>2024</td><td class="td-dim">#840 000</td><td class="td-btc">3.125 BTC</td><td class="td-btc"><strong>450</strong></td><td class="td-btc"><strong>~13 698</strong></td><td class="td-btc"><strong>~164 363</strong></td><td><span class="badge">ТЕКУЩИЙ</span></td></tr>
+          <tr><td class="td-dim">~апр. 2028</td><td class="td-dim">#1 050 000</td><td class="td-dim">1.5625 BTC</td><td class="td-grn"><strong>225</strong></td><td class="td-grn"><strong>~6 849</strong></td><td class="td-grn"><strong>~82 181</strong></td><td class="td-dim">5-й</td></tr>
+          <tr><td class="td-dim">~2032</td><td class="td-dim">#1 260 000</td><td class="td-dim">0.78125 BTC</td><td class="td-dim">112,5</td><td class="td-dim">~3 425</td><td class="td-dim">~41 091</td><td class="td-dim">6-й</td></tr>
         </tbody>
       </table>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
+        Расчёт: 144 блока/сутки (среднее ~10 мин/блок) × награда за блок. Даты будущих халвингов — оценка по текущему блоку и среднему интервалу, сместится вместе с хешрейтом сети.
+      </div>
     </div>
+
 
     <div class="panel">
       <div class="panel-head">

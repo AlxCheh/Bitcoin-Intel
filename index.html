@@ -2003,7 +2003,7 @@ header {
         <span class="panel-tag">ВЫБОР</span>
       </div>
       <div style="padding:12px 14px;overflow-x:auto">
-        <table class="dtable" style="min-width:420px">
+        <table class="dtable zebra">
           <thead>
             <tr>
               <th>Параметр</th>
@@ -2013,11 +2013,11 @@ header {
             </tr>
           </thead>
           <tbody>
-            <tr><td>Сложность</td><td class="grn">Минимальная</td><td>Средняя</td><td style="color:var(--red)">Высокая</td></tr>
-            <tr><td>Ваши ключи</td><td style="color:var(--red)">Нет</td><td class="grn">Да</td><td class="grn">Да</td></tr>
-            <tr><td>Входящая ликвидность</td><td class="grn">Автоматически</td><td class="grn">Через LSP</td><td>Вручную</td></tr>
-            <tr><td>Приватность</td><td style="color:var(--red)">Нет (KYC)</td><td>Частичная</td><td class="grn">Максимальная</td></tr>
-            <tr><td>Стоимость</td><td class="grn">Бесплатно</td><td>~0.4% за канал</td><td>$100–300 железо</td></tr>
+            <tr><td>Сложность</td><td class="td-grn">Минимальная</td><td>Средняя</td><td style="color:var(--red)">Высокая</td></tr>
+            <tr><td>Ваши ключи</td><td style="color:var(--red)">Нет</td><td class="td-grn">Да</td><td class="td-grn">Да</td></tr>
+            <tr><td>Входящая ликвидность</td><td class="td-grn">Автоматически</td><td class="td-grn">Через LSP</td><td>Вручную</td></tr>
+            <tr><td>Приватность</td><td style="color:var(--red)">Нет (KYC)</td><td>Частичная</td><td class="td-grn">Максимальная</td></tr>
+            <tr><td>Стоимость</td><td class="td-grn">Бесплатно</td><td>~0.4% за канал</td><td>$100–300 железо</td></tr>
             <tr><td>Подходит для</td><td>Знакомства</td><td>Ежедневного использования</td><td>Маршрутизации и суверенитета</td></tr>
           </tbody>
         </table>
@@ -2473,49 +2473,23 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-              <tr style="border-bottom:1px solid var(--btc)">
-                <td style="padding:6px 8px;color:var(--dim);font-size:9px">СВОЙСТВО</td>
-                <td style="padding:6px 8px;color:var(--btc);text-align:center">BTC</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">ЗОЛОТО</td>
-                <td style="padding:6px 8px;color:var(--dim);text-align:center">ФИАТ</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Редкость</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Делимость</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Транспортабельность</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Верифицируемость</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Прочность</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 8px;color:var(--dim2);font-size:9px">Цензуроустойчивость</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">✓✓</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">~</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">✗</td>
-              </tr>
+            <table class="dtable zebra">
+              <thead>
+                <tr>
+                  <th>Свойство</th>
+                  <th style="color:var(--btc)">BTC</th>
+                  <th style="color:var(--amber)">Золото</th>
+                  <th>Фиат</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-dim">Редкость</td><td class="td-grn">✓✓</td><td class="td-grn">✓</td><td style="color:var(--red)">✗</td></tr>
+                <tr><td class="td-dim">Делимость</td><td class="td-grn">✓✓</td><td style="color:var(--amber)">~</td><td class="td-grn">✓</td></tr>
+                <tr><td class="td-dim">Транспортабельность</td><td class="td-grn">✓✓</td><td style="color:var(--red)">✗</td><td class="td-grn">✓</td></tr>
+                <tr><td class="td-dim">Верифицируемость</td><td class="td-grn">✓✓</td><td style="color:var(--amber)">~</td><td style="color:var(--amber)">~</td></tr>
+                <tr><td class="td-dim">Прочность</td><td class="td-grn">✓✓</td><td class="td-grn">✓</td><td style="color:var(--amber)">~</td></tr>
+                <tr><td class="td-dim">Цензуроустойчивость</td><td class="td-grn">✓✓</td><td style="color:var(--amber)">~</td><td style="color:var(--red)">✗</td></tr>
+              </tbody>
             </table>
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
@@ -2729,37 +2703,21 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Вместо одного крупного входа — серия равных покупок через фиксированные интервалы. Цена каждой покупки разная, итоговая средняя цена входа сглаживается.</p>
           <div style="overflow-x:auto;margin-top:10px">
-            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-              <tr style="border-bottom:1px solid var(--btc)">
-                <td style="padding:6px 8px;color:var(--dim);font-size:9px">МЕСЯЦ</td>
-                <td style="padding:6px 8px;color:var(--btc);text-align:center">ЦЕНА BTC</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">СУММА</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">КУПЛЕНО BTC</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Янв</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">$100K</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.005</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Фев</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">$80K</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00625</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Мар</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">$60K</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00833</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 8px;color:var(--dim2)">Апр</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">$90K</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">$500</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">0.00556</td>
-              </tr>
+            <table class="dtable zebra">
+              <thead>
+                <tr>
+                  <th>Месяц</th>
+                  <th style="color:var(--btc)">Цена BTC</th>
+                  <th style="color:var(--amber)">Сумма</th>
+                  <th style="color:var(--grn)">Куплено BTC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-dim">Янв</td><td>$100K</td><td style="color:var(--amber)">$500</td><td class="td-grn">0.005</td></tr>
+                <tr><td class="td-dim">Фев</td><td>$80K</td><td style="color:var(--amber)">$500</td><td class="td-grn">0.00625</td></tr>
+                <tr><td class="td-dim">Мар</td><td>$60K</td><td style="color:var(--amber)">$500</td><td class="td-grn">0.00833</td></tr>
+                <tr><td class="td-dim">Апр</td><td>$90K</td><td style="color:var(--amber)">$500</td><td class="td-grn">0.00556</td></tr>
+              </tbody>
             </table>
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-family:var(--mono);font-size:10px;color:var(--dim)">
@@ -2814,37 +2772,21 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Портфель из 1% BTC и 99% кэша превосходит традиционные активы по соотношению риск/доходность — даже если BTC упадёт на 99%, максимальные потери ограничены 1%.</p>
           <div style="overflow-x:auto;margin-top:10px">
-            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-              <tr style="border-bottom:1px solid var(--btc)">
-                <td style="padding:6px 8px;color:var(--dim);font-size:9px">АКТИВ</td>
-                <td style="padding:6px 8px;color:var(--btc);text-align:center">ДОХОДНОСТЬ</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">МАКС. УБЫТОК</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Облигации</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">6%</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">-8%</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Золото</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">7.5%</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">-33%</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Акции</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">8%</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">-40%</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">BTC</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">200%</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">-80%</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 8px;color:var(--btc)">1% BTC + 99% кэш</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">8%+</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">-1%</td>
-              </tr>
+            <table class="dtable zebra">
+              <thead>
+                <tr>
+                  <th>Актив</th>
+                  <th style="color:var(--btc)">Доходность</th>
+                  <th style="color:var(--red)">Макс. убыток</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-dim">Облигации</td><td>6%</td><td style="color:var(--red)">-8%</td></tr>
+                <tr><td class="td-dim">Золото</td><td>7.5%</td><td style="color:var(--red)">-33%</td></tr>
+                <tr><td class="td-dim">Акции</td><td>8%</td><td style="color:var(--red)">-40%</td></tr>
+                <tr><td class="td-dim">BTC</td><td class="td-grn">200%</td><td style="color:var(--red)">-80%</td></tr>
+                <tr class="current"><td>1% BTC + 99% кэш</td><td>8%+</td><td>-1%</td></tr>
+              </tbody>
             </table>
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
@@ -3048,25 +2990,19 @@ function toggleNav(id) {
           </div>
           <p>Положительный BTC Yield означает что на каждую акцию приходится больше BTC чем раньше — даже если цена BTC упала. Это единственное что важно для долгосрочного держателя акции казначейства.</p>
           <div style="overflow-x:auto;margin-top:10px">
-            <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-              <tr style="border-bottom:1px solid var(--btc)">
-                <td style="padding:6px 8px;color:var(--dim);font-size:9px">КОМПАНИЯ</td>
-                <td style="padding:6px 8px;color:var(--btc);text-align:center">BTC</td>
-                <td style="padding:6px 8px;color:var(--amber);text-align:center">mNAV</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">BTC YIELD</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Strategy</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">847 363</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">0.83x</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">~15% YTD</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--line)">
-                <td style="padding:6px 8px;color:var(--dim2)">Metaplanet</td>
-                <td style="padding:6px 8px;color:var(--txt);text-align:center">40 177</td>
-                <td style="padding:6px 8px;color:var(--red);text-align:center">&lt;1x</td>
-                <td style="padding:6px 8px;color:var(--grn);text-align:center">2.8% Q1</td>
-              </tr>
+            <table class="dtable zebra">
+              <thead>
+                <tr>
+                  <th>Компания</th>
+                  <th style="color:var(--btc)">BTC</th>
+                  <th style="color:var(--amber)">mNAV</th>
+                  <th style="color:var(--grn)">BTC Yield</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-dim">Strategy</td><td>847 363</td><td style="color:var(--red)">0.83x</td><td class="td-grn">~15% YTD</td></tr>
+                <tr><td class="td-dim">Metaplanet</td><td>40 177</td><td style="color:var(--red)">&lt;1x</td><td class="td-grn">2.8% Q1</td></tr>
+              </tbody>
             </table>
           </div>
           <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
@@ -3798,39 +3734,39 @@ function toggleNav(id) {
         </div>
       </div>
       <!-- Historical table -->
-      <table class="dtable">
+      <table class="dtable zebra">
         <thead>
           <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
         </thead>
         <tbody>
-          <tr style="background:rgba(247,147,26,0.08)">
-            <td class="td-btc">#11</td>
-            <td class="td-btc">≈ Июнь 2026</td>
-            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−10.3% est.</td>
-            <td class="td-dim">Squeeze маржи майнеров 2026</td>
+          <tr class="current">
+            <td>#11</td>
+            <td>≈ Июнь 2026</td>
+            <td>−10.3% est.</td>
+            <td>Squeeze маржи майнеров 2026</td>
           </tr>
           <tr>
             <td class="td-dim">#1</td>
             <td class="td-dim">Июль 2021</td>
-            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−27.94%</td>
+            <td style="color:var(--red)">−27.94%</td>
             <td class="td-dim">Бан майнинга в Китае</td>
           </tr>
           <tr>
             <td class="td-dim">#6</td>
             <td class="td-dim">Дек 2018</td>
-            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−15.13%</td>
+            <td style="color:var(--red)">−15.13%</td>
             <td class="td-dim">Капитуляция майнеров — дно цикла</td>
           </tr>
           <tr>
             <td class="td-dim">#5</td>
             <td class="td-dim">Март 2020</td>
-            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−15.95%</td>
+            <td style="color:var(--red)">−15.95%</td>
             <td class="td-dim">COVID-крах → дно → ×20</td>
           </tr>
           <tr>
             <td class="td-dim">#22</td>
             <td class="td-dim">Дек 2022</td>
-            <td style="color:var(--red);font-family:'IBM Plex Mono',monospace">−7.32%</td>
+            <td style="color:var(--red)">−7.32%</td>
             <td class="td-dim">Крах FTX — дно цикла</td>
           </tr>
         </tbody>
@@ -3846,7 +3782,7 @@ function toggleNav(id) {
         <span class="panel-title">Метрики сети</span>
         <span class="panel-tag">ON-CHAIN</span>
       </div>
-      <table class="dtable">
+      <table class="dtable zebra">
         <thead>
           <tr><th>Метрика</th><th>Значение</th><th>Примечание</th></tr>
         </thead>

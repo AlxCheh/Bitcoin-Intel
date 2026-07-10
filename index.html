@@ -824,6 +824,24 @@ header {
 }
 
 /* ══════════════════════════════════
+   DTABLE — модификатор ZEBRA
+   (вариант 1: центрирование данных, чередование строк,
+   акцентная заливка на строке .current — см. превью 2026-07-10)
+══════════════════════════════════ */
+.dtable.zebra th,
+.dtable.zebra td {
+  text-align: center;
+}
+.dtable.zebra tbody tr:nth-child(even) td {
+  background: rgba(255,255,255,0.015);
+}
+.dtable.zebra tr.current td {
+  background: var(--btc-low);
+  color: var(--btc);
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════
    PANEL
 ══════════════════════════════════ */
 .panel {
@@ -3118,7 +3136,7 @@ function toggleNav(id) {
         <span class="panel-tag">ЭМИССИЯ</span>
       </div>
       <div style="overflow-x:auto">
-      <table class="dtable">
+      <table class="dtable zebra">
         <thead>
           <tr>
             <th>Год</th>
@@ -3131,12 +3149,12 @@ function toggleNav(id) {
           </tr>
         </thead>
         <tbody>
-          <tr><td>2009</td><td class="td-dim">#0</td><td class="td-btc">50 BTC</td><td class="td-dim">7 200</td><td class="td-dim">~219 168</td><td class="td-dim">~2 629 800</td><td class="td-dim">Genesis</td></tr>
-          <tr><td>2012</td><td class="td-dim">#210 000</td><td class="td-btc">25 BTC</td><td class="td-dim">3 600</td><td class="td-dim">~109 584</td><td class="td-dim">~1 314 900</td><td class="td-dim">1-й</td></tr>
-          <tr><td>2016</td><td class="td-dim">#420 000</td><td class="td-btc">12.5 BTC</td><td class="td-dim">1 800</td><td class="td-dim">~54 792</td><td class="td-dim">~657 450</td><td class="td-dim">2-й</td></tr>
-          <tr><td>2020</td><td class="td-dim">#630 000</td><td class="td-btc">6.25 BTC</td><td class="td-dim">900</td><td class="td-dim">~27 396</td><td class="td-dim">~328 725</td><td class="td-dim">3-й</td></tr>
-          <tr><td>2024</td><td class="td-dim">#840 000</td><td class="td-btc">3.125 BTC</td><td class="td-btc"><strong>450</strong></td><td class="td-btc"><strong>~13 698</strong></td><td class="td-btc"><strong>~164 363</strong></td><td><span class="badge">ТЕКУЩИЙ</span></td></tr>
-          <tr><td class="td-dim">~апр. 2028</td><td class="td-dim">#1 050 000</td><td class="td-dim">1.5625 BTC</td><td class="td-grn"><strong>225</strong></td><td class="td-grn"><strong>~6 849</strong></td><td class="td-grn"><strong>~82 181</strong></td><td class="td-dim">5-й</td></tr>
+          <tr><td class="td-dim">2009</td><td class="td-dim">#0</td><td class="td-btc">50 BTC</td><td class="td-dim">7 200</td><td class="td-dim">~219 168</td><td class="td-dim">~2 629 800</td><td class="td-dim">Genesis</td></tr>
+          <tr><td class="td-dim">2012</td><td class="td-dim">#210 000</td><td class="td-btc">25 BTC</td><td class="td-dim">3 600</td><td class="td-dim">~109 584</td><td class="td-dim">~1 314 900</td><td class="td-dim">1-й</td></tr>
+          <tr><td class="td-dim">2016</td><td class="td-dim">#420 000</td><td class="td-btc">12.5 BTC</td><td class="td-dim">1 800</td><td class="td-dim">~54 792</td><td class="td-dim">~657 450</td><td class="td-dim">2-й</td></tr>
+          <tr><td class="td-dim">2020</td><td class="td-dim">#630 000</td><td class="td-btc">6.25 BTC</td><td class="td-dim">900</td><td class="td-dim">~27 396</td><td class="td-dim">~328 725</td><td class="td-dim">3-й</td></tr>
+          <tr class="current"><td>2024</td><td>#840 000</td><td>3.125 BTC</td><td>450</td><td>~13 698</td><td>~164 363</td><td><span class="badge">ТЕКУЩИЙ</span></td></tr>
+          <tr><td class="td-grn">~апр. 2028</td><td class="td-dim">#1 050 000</td><td class="td-dim">1.5625 BTC</td><td class="td-grn">225</td><td class="td-grn">~6 849</td><td class="td-grn">~82 181</td><td class="td-dim">5-й</td></tr>
           <tr><td class="td-dim">~2032</td><td class="td-dim">#1 260 000</td><td class="td-dim">0.78125 BTC</td><td class="td-dim">112,5</td><td class="td-dim">~3 425</td><td class="td-dim">~41 091</td><td class="td-dim">6-й</td></tr>
         </tbody>
       </table>

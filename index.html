@@ -843,6 +843,56 @@ header {
 }
 
 /* ══════════════════════════════════
+   PANEL — тема AMBER (Terminal Amber)
+   scoped через .panel.amber — не влияет на остальные панели
+   (превью "5 новых направлений" 2026-07-10, вариант 1)
+══════════════════════════════════ */
+.panel.amber {
+  background: #0A0C10;
+  border-color: #1E232B;
+}
+.panel.amber .panel-head {
+  border-bottom-color: #1E232B;
+  background: #0A0C10;
+}
+.panel.amber .panel-title {
+  color: #FFB300;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.panel.amber .panel-tag {
+  color: #5A6472;
+  background: transparent;
+  border: none;
+}
+.panel.amber .amber-foot {
+  color: #46505E;
+  border-top-color: #1E232B !important;
+}
+.panel.amber table.dtable {
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.panel.amber table.dtable th {
+  color: #5A6472;
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #FFB300;
+}
+.panel.amber table.dtable td {
+  color: #C4CDD8;
+  border-bottom: 1px solid rgba(30,35,43,0.7);
+}
+.panel.amber table.dtable tr.current td {
+  background: rgba(255,179,0,0.08);
+  color: #FFB300;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════
    PANEL
 ══════════════════════════════════ */
 .panel {
@@ -3166,20 +3216,20 @@ function toggleNav(id) {
 ══════════════════════════════════════ -->
 <section class="section" id="tab-emission">
   <div class="page">
-    <div class="panel">
+    <div class="panel amber">
       <div class="panel-head">
         <span class="panel-title">Not Yet Mined · динамика</span>
         <span class="panel-tag">⛏️ МАЙНИНГ</span>
       </div>
       <div id="emission-table-wrap"></div>
     </div>
-    <div class="panel">
+    <div class="panel amber">
       <div class="panel-head">
         <span class="panel-title">Скорость сокращения эмиссии</span>
         <span class="panel-tag">ХАЛВИНГИ</span>
       </div>
       <div id="emission-speed-wrap"></div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
+      <div class="amber-foot" style="padding:10px 14px;font-size:11px;font-family:var(--mono);border-top:1px solid var(--line)">
         Осталось добыть: ~2,086,170 BTC (9.9%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
       </div>
     </div>
@@ -6856,11 +6906,11 @@ function renderEmission() {
     const nm = s.categories.not_mined;
     const isLast = i === HOLDERS_DATA.snapshots.length - 1;
     tbl += '<tr' + (isLast ? ' class="current"' : '') + '>'
-         + '<td' + (isLast ? '' : ' class="td-btc"') + '>' + s.date + '</td>'
-         + '<td' + (isLast ? '' : ' style="color:var(--grn)"') + '>' + (nm ? nm.pct + '%' : '—') + '</td>'
+         + '<td>' + s.date + '</td>'
+         + '<td>' + (nm ? nm.pct + '%' : '—') + '</td>'
          + '<td>' + (nm ? nm.btc.toLocaleString() : '—') + '</td>'
-         + '<td' + (isLast ? '' : ' style="color:var(--btc)"') + '>' + s.total_mined.toLocaleString() + '</td>'
-         + '<td' + (isLast ? '' : ' style="font-size:11px;color:var(--dim)"') + '>' + s.event + '</td>'
+         + '<td>' + s.total_mined.toLocaleString() + '</td>'
+         + '<td>' + s.event + '</td>'
          + '</tr>';
   });
   tbl += '</tbody></table></div>';
@@ -6871,9 +6921,9 @@ function renderEmission() {
   HOLDERS_DATA.emission.forEach((e, i) => {
     const isLast = i === HOLDERS_DATA.emission.length - 1;
     sp += '<tr' + (isLast ? ' class="current"' : '') + '>'
-        + '<td' + (isLast ? '' : ' style="font-family:var(--mono)"') + '>' + e.period + '</td>'
-        + '<td' + (isLast ? '' : ' style="color:var(--red)"') + '>−' + e.drop_pct + '%</td>'
-        + '<td' + (isLast ? '' : ' style="color:var(--dim)"') + '>' + e.years + '</td>'
+        + '<td>' + e.period + '</td>'
+        + '<td>−' + e.drop_pct + '%</td>'
+        + '<td>' + e.years + '</td>'
         + '</tr>';
   });
   sp += '</tbody></table>';

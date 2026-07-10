@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-volume:
@@ -30,14 +31,36 @@ jobs:
       - name: Validate data/volume.json
         run: python3 -m json.tool data/volume.json > /dev/null && echo "OK data/volume.json"
 
-      - name: Commit and push if changed
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          git add data/volume.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit volume data via PR (not direct push to main)
+        if: steps.diffcheck.outputs.changed == 'true'
+        # main защищён Branch Protection — прямой push запрещён даже для
+        # github-actions[bot] (тот же паттерн, что у synthesize job в
+        # deploy.yml): коммит в отдельную ветку → PR → auto-merge после
+        # зелёного "validate". SYNTHESIS_BOT_TOKEN (не GITHUB_TOKEN) —
+        # иначе PR/push от штатного GITHUB_TOKEN не порождает новый workflow
+        # run (защита от рекурсии Actions), "validate" на PR не запустится,
+        # и auto-merge зависнет в ожидании статуса, который никогда не придёт.
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/volume.json
-          if git diff --cached --quiet; then
-            echo "Без изменений — коммит не нужен"
-          else
-            git commit -m "chore: update daily BTC volume data"
-            git push
-          fi
+          BRANCH="bot/sync-volume-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update daily BTC volume data"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: sync BTC volume data ($(date -u +%Y-%m-%d))" \
+            --body "Автообновление data/volume.json (scripts/fetch_volume.py). Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

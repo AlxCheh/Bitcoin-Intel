@@ -3699,6 +3699,21 @@ function toggleNav(id) {
       </div>
     </div>
 
+    <!-- VOLUME CHART -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Объём торгов BTC/USD</span>
+        <span class="chart-meta" id="volume-chart-meta">24Ч · 30 ДНЕЙ</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 0">
+        <span style="font-family:var(--mono);font-size:20px;color:var(--btc)" id="volume-current">—</span>
+        <span style="font-family:var(--mono);font-size:12px" id="volume-change">—</span>
+      </div>
+      <div class="chart-inner">
+        <canvas id="volumeChart" height="160"></canvas>
+      </div>
+    </div>
+
     <!-- INFLATION COMPARISON TABLE -->
     <div class="panel">
       <div class="panel-head">
@@ -6640,6 +6655,7 @@ function initCharts() {
   chartsInited = true;
   fetchDifficulty();  // live difficulty data + chart
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
+  fetchVolumeData();  // объём торгов — статичный data/volume.json, обновляется раз в сутки GitHub Action'ом
 
   const grid  = 'rgba(26,31,42,1)';
   const tick  = '#7A8BA0';
@@ -6714,6 +6730,73 @@ function initCharts() {
     },
     options: so
   });
+}
+
+// Объём торгов BTC/USD — читает статичный data/volume.json (обновляется раз в
+// сутки GitHub Action'ом scripts/fetch_volume.py, к CoinGecko при загрузке
+// страницы напрямую не обращаемся — см. CLAUDE.md / spec-pilot.md)
+function fmtVolumeUsd(n) {
+  if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+  return '$' + n.toLocaleString('en-US');
+}
+
+async function fetchVolumeData() {
+  const elCurrent = document.getElementById('volume-current');
+  const elChange  = document.getElementById('volume-change');
+  const elMeta    = document.getElementById('volume-chart-meta');
+  const canvas    = document.getElementById('volumeChart');
+  if (!canvas) return;
+
+  try {
+    const res = await fetch('data/volume.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const history = data.history || [];
+    if (!history.length) throw new Error('empty history');
+
+    if (elCurrent) elCurrent.textContent = fmtVolumeUsd(data.current.volume_usd);
+    if (elChange && typeof data.current.change_24h_pct === 'number') {
+      const pct = data.current.change_24h_pct;
+      elChange.textContent = (pct >= 0 ? '▲ +' : '▼ ') + pct.toFixed(2) + '%';
+      elChange.style.color = pct >= 0 ? 'var(--grn)' : 'var(--red)';
+    }
+    if (elMeta) elMeta.textContent = 'ОБНОВЛЕНО ' + data.updated_at.slice(0, 10);
+
+    const vo = {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0C0F14', borderColor: '#1A1F2A', borderWidth: 1,
+          titleColor: '#7A8BA0', bodyColor: '#F7931A',
+          titleFont: { family: "'IBM Plex Mono', monospace", size: 10 },
+          bodyFont:  { family: "'IBM Plex Mono', monospace", size: 11 },
+          callbacks: { label: (ctx) => fmtVolumeUsd(ctx.parsed.y) }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(26,31,42,1)' }, ticks: { color: '#7A8BA0', font: { family: "'IBM Plex Mono', monospace", size: 10 }, maxTicksLimit: 6 } },
+        y: { grid: { color: 'rgba(26,31,42,1)' }, ticks: { color: '#7A8BA0', font: { family: "'IBM Plex Mono', monospace", size: 10 }, callback: fmtVolumeUsd } }
+      }
+    };
+
+    new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: history.map(p => p.date.slice(5)), // MM-DD
+        datasets: [{
+          data: history.map(p => p.volume_usd),
+          borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.06)',
+          borderWidth: 1.5, fill: true, tension: 0.25, pointRadius: 0
+        }]
+      },
+      options: vo
+    });
+  } catch (err) {
+    if (elMeta) elMeta.textContent = 'ДАННЫЕ НЕДОСТУПНЫ';
+    console.warn('fetchVolumeData:', err);
+  }
 }
 
 // ══════════════════════════════════════════════════════

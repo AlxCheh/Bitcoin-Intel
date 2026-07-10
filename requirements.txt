@@ -1,8 +1,10 @@
 # Bitcoin Intel — зависимости
 # Python >= 3.11 required
 #
-# Core: проект не использует внешние зависимости для рантайма —
-# domain/, infrastructure/, scripts/ написаны на stdlib.
+# Core: domain/, infrastructure/ написаны на stdlib. Единственное исключение —
+# scripts/fetch_volume.py (карточка объёма торгов на сайте, GitHub Action
+# update-volume.yml), которому нужен HTTP-клиент для CoinGecko API.
+requests>=2.32.0,<3.0.0            # scripts/fetch_volume.py — CoinGecko market_chart
 
 # Development & Testing
 pytest>=9.1.1,<10.0.0

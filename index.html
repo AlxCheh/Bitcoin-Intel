@@ -831,6 +831,7 @@ header {
 .dtable.zebra th,
 .dtable.zebra td {
   text-align: center;
+  white-space: nowrap;
 }
 .dtable.zebra tbody tr:nth-child(even) td {
   background: rgba(255,255,255,0.015);
@@ -3170,43 +3171,51 @@ function toggleNav(id) {
         <span class="panel-title">Ключевые события</span>
         <span class="panel-tag">ХРОНОЛОГИЯ</span>
       </div>
-      <table class="dtable">
+      <div style="overflow-x:auto">
+      <table class="dtable zebra">
         <thead>
-          <tr><th>Год</th><th>Событие</th><th>Значение</th></tr>
+          <tr><th>Год</th><th>Событие</th><th>Детали</th><th>Значение</th></tr>
         </thead>
         <tbody>
           <tr>
             <td class="td-btc">2008</td>
-            <td><strong style="font-size:12px">Белая книга</strong><br><span class="td-dim" style="font-size:11px">Накамото публикует Bitcoin Whitepaper</span></td>
-            <td class="td-dim" style="font-size:11px">Концепция P2P-денег</td>
+            <td>Белая книга</td>
+            <td class="td-dim">Bitcoin Whitepaper</td>
+            <td class="td-dim">Концепция P2P-денег</td>
           </tr>
           <tr>
             <td class="td-btc">2009</td>
-            <td><strong style="font-size:12px">Генезис-блок</strong><br><span class="td-dim" style="font-size:11px">3 января — запуск сети</span></td>
-            <td class="td-dim" style="font-size:11px">Блок #0</td>
+            <td>Генезис-блок</td>
+            <td class="td-dim">3 января — запуск сети</td>
+            <td class="td-dim">Блок #0</td>
           </tr>
           <tr>
             <td class="td-btc">2010</td>
-            <td><strong style="font-size:12px">Pizza Day</strong><br><span class="td-dim" style="font-size:11px">10 000 BTC за 2 пиццы</span></td>
-            <td class="td-dim" style="font-size:11px">Первая покупка</td>
+            <td>Pizza Day</td>
+            <td class="td-dim">10 000 BTC за 2 пиццы</td>
+            <td class="td-dim">Первая покупка</td>
           </tr>
           <tr>
             <td class="td-btc">2017</td>
-            <td><strong style="font-size:12px">ATH $20K</strong><br><span class="td-dim" style="font-size:11px">Первый массовый бум</span></td>
-            <td class="td-grn" style="font-size:11px">$20 000</td>
+            <td>ATH $20K</td>
+            <td class="td-dim">Первый массовый бум</td>
+            <td class="td-grn">$20 000</td>
           </tr>
           <tr>
             <td class="td-btc">2021</td>
-            <td><strong style="font-size:12px">ATH $69K</strong><br><span class="td-dim" style="font-size:11px">Институциональный спрос</span></td>
-            <td class="td-grn" style="font-size:11px">$69 000</td>
+            <td>ATH $69K</td>
+            <td class="td-dim">Институциональный спрос</td>
+            <td class="td-grn">$69 000</td>
           </tr>
-          <tr>
-            <td class="td-btc">2024</td>
-            <td><strong style="font-size:12px">Спот ETF + 4-й халвинг</strong><br><span class="td-dim" style="font-size:11px">SEC одобряет ETF. BTC > $100K</span></td>
-            <td class="td-grn" style="font-size:11px">$100 000+</td>
+          <tr class="current">
+            <td>2024</td>
+            <td>Спот ETF + 4-й халвинг</td>
+            <td>SEC одобряет ETF. BTC &gt; $100K</td>
+            <td>$100 000+</td>
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
   </div>
@@ -3749,14 +3758,14 @@ function toggleNav(id) {
         <span class="panel-tag">СРАВНЕНИЕ</span>
       </div>
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table class="dtable">
+      <table class="dtable zebra">
         <thead>
           <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
         </thead>
         <tbody>
-          <tr><td>Bitcoin</td><td class="td-grn">~0.82% / год</td><td class="td-grn">~0.40% / год</td><td class="td-btc">21M BTC</td></tr>
-          <tr><td>Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
-          <tr><td>Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
+          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
+          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
+          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
         </tbody>
       </table>
       </div>
@@ -6904,29 +6913,31 @@ function renderHolders() {
 
 function renderEmission() {
   // Таблица Not Yet Mined
-  let tbl = '<div style="overflow-x:auto"><table class="dtable"><thead><tr>'
+  let tbl = '<div style="overflow-x:auto"><table class="dtable zebra"><thead><tr>'
           + '<th>Дата</th><th>Not Yet Mined %</th><th>Not Yet Mined BTC</th><th>Total Mined</th><th>Событие</th>'
           + '</tr></thead><tbody>';
-  HOLDERS_DATA.snapshots.forEach(s => {
+  HOLDERS_DATA.snapshots.forEach((s, i) => {
     const nm = s.categories.not_mined;
-    tbl += '<tr>'
-         + '<td class="td-btc">' + s.date + '</td>'
-         + '<td style="color:var(--grn)">' + (nm ? nm.pct + '%' : '—') + '</td>'
+    const isLast = i === HOLDERS_DATA.snapshots.length - 1;
+    tbl += '<tr' + (isLast ? ' class="current"' : '') + '>'
+         + '<td' + (isLast ? '' : ' class="td-btc"') + '>' + s.date + '</td>'
+         + '<td' + (isLast ? '' : ' style="color:var(--grn)"') + '>' + (nm ? nm.pct + '%' : '—') + '</td>'
          + '<td>' + (nm ? nm.btc.toLocaleString() : '—') + '</td>'
-         + '<td style="color:var(--btc)">' + s.total_mined.toLocaleString() + '</td>'
-         + '<td style="font-size:11px;color:var(--dim)">' + s.event + '</td>'
+         + '<td' + (isLast ? '' : ' style="color:var(--btc)"') + '>' + s.total_mined.toLocaleString() + '</td>'
+         + '<td' + (isLast ? '' : ' style="font-size:11px;color:var(--dim)"') + '>' + s.event + '</td>'
          + '</tr>';
   });
   tbl += '</tbody></table></div>';
   document.getElementById('emission-table-wrap').innerHTML = tbl;
 
   // Скорость сокращения
-  let sp = '<table class="dtable"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
-  HOLDERS_DATA.emission.forEach(e => {
-    sp += '<tr>'
-        + '<td style="font-family:var(--mono)">' + e.period + '</td>'
-        + '<td style="color:var(--red)">−' + e.drop_pct + '%</td>'
-        + '<td style="color:var(--dim)">' + e.years + '</td>'
+  let sp = '<table class="dtable zebra"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
+  HOLDERS_DATA.emission.forEach((e, i) => {
+    const isLast = i === HOLDERS_DATA.emission.length - 1;
+    sp += '<tr' + (isLast ? ' class="current"' : '') + '>'
+        + '<td' + (isLast ? '' : ' style="font-family:var(--mono)"') + '>' + e.period + '</td>'
+        + '<td' + (isLast ? '' : ' style="color:var(--red)"') + '>−' + e.drop_pct + '%</td>'
+        + '<td' + (isLast ? '' : ' style="color:var(--dim)"') + '>' + e.years + '</td>'
         + '</tr>';
   });
   sp += '</tbody></table>';

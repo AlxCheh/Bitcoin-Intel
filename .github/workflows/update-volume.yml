@@ -1,0 +1,43 @@
+name: Update BTC Volume Data
+
+on:
+  schedule:
+    # 06:00 UTC ежедневно
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-volume:
+    name: Fetch and commit volume data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests --quiet
+
+      - name: Fetch volume data
+        run: python3 scripts/fetch_volume.py
+
+      - name: Validate data/volume.json
+        run: python3 -m json.tool data/volume.json > /dev/null && echo "OK data/volume.json"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data/volume.json; then
+            echo "Без изменений — коммит не нужен"
+          else
+            git add data/volume.json
+            git commit -m "chore: update daily BTC volume data"
+            git push
+          fi

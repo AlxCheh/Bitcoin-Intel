@@ -1279,6 +1279,24 @@ header {
   margin-top: 10px;
 }
 .utxo-section-label:first-child { border-top: none; margin-top: 0; }
+
+/* ══════════════════════════════════
+   METRICS SECTION LABEL — крупные тематические
+   разделители вкладки МЕТРИКИ (Рынок/Эмиссия/Майнинг)
+══════════════════════════════════ */
+.metrics-section-label {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--txt);
+  padding: 22px 16px 10px;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.metrics-section-label:first-child { padding-top: 6px; }
+.metrics-section-label .rule { flex: 1; height: 1px; background: var(--line); margin-left: 4px; }
 .utxo-row-item {
   display: flex; align-items: center; gap: 8px;
   margin: 5px 0;
@@ -3625,9 +3643,34 @@ function toggleNav(id) {
 <section class="section" id="tab-analytics">
   <div class="page">
 
-    <div class="utxo-section-label" style="margin-top:12px">🪙 ЭМИССИЯ</div>
+    <div class="metrics-section-label">💹 РЫНОК<div class="rule"></div></div>
 
-    <!-- SUPPLY CHART -->
+    <!-- VOLUME CHART — бары + AVG-линия + статистика + топ-3 таблица -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Объём торгов BTC/USD</span>
+        <span class="chart-meta" id="volume-chart-meta">24Ч · 30 ДНЕЙ</span>
+      </div>
+      <div style="display:flex;align-items:baseline;padding:10px 14px 0">
+        <span style="font-family:var(--mono);font-size:20px;color:var(--btc)" id="volume-current">—</span>
+        <span style="font-family:var(--mono);font-size:12px;margin-left:8px" id="volume-change">—</span>
+      </div>
+      <div id="volume-stats-row" style="display:flex;gap:20px;padding:8px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap"></div>
+      <div class="chart-inner" style="padding:10px 0">
+        <svg id="volumeChart" width="100%" viewBox="0 0 700 130" preserveAspectRatio="none" style="display:block"></svg>
+      </div>
+      <div style="padding:8px 14px 0;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.06em;border-top:1px solid var(--line)">ТОП-3 ДНЯ ПО ОБЪЁМУ</div>
+      <div style="overflow-x:auto">
+      <table class="dtable zebra" style="margin-top:2px">
+        <thead><tr><th>#</th><th>Дата</th><th>Объём</th></tr></thead>
+        <tbody id="volume-top3-body"></tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="metrics-section-label">🪙 ЭМИССИЯ<div class="rule"></div></div>
+
+<!-- SUPPLY CHART -->
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Эмиссия Bitcoin</span>
@@ -3672,7 +3715,8 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <div class="utxo-section-label">⛏️ МАЙНИНГ</div>
+    
+    <div class="metrics-section-label">⛏️ МАЙНИНГ<div class="rule"></div></div>
 
     <!-- DIFFICULTY — Вариант 2: Контекст (расширен блоком "Корректировка сложности") -->
     <div class="panel" style="margin-top:0" id="diff-block">
@@ -3887,23 +3931,7 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <div class="utxo-section-label">💹 РЫНОК</div>
-
-    <!-- VOLUME CHART -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Объём торгов BTC/USD</span>
-        <span class="chart-meta" id="volume-chart-meta">24Ч · 30 ДНЕЙ</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 0">
-        <span style="font-family:var(--mono);font-size:20px;color:var(--btc)" id="volume-current">—</span>
-        <span style="font-family:var(--mono);font-size:12px" id="volume-change">—</span>
-      </div>
-      <div class="chart-inner">
-        <canvas id="volumeChart" height="160"></canvas>
-      </div>
-    </div>
-
+    
   </div>
 </section>
 
@@ -6819,11 +6847,13 @@ function fmtVolumeUsd(n) {
 }
 
 async function fetchVolumeData() {
-  const elCurrent = document.getElementById('volume-current');
-  const elChange  = document.getElementById('volume-change');
-  const elMeta    = document.getElementById('volume-chart-meta');
-  const canvas    = document.getElementById('volumeChart');
-  if (!canvas) return;
+  const elCurrent  = document.getElementById('volume-current');
+  const elChange   = document.getElementById('volume-change');
+  const elMeta     = document.getElementById('volume-chart-meta');
+  const elStats    = document.getElementById('volume-stats-row');
+  const elTop3Body = document.getElementById('volume-top3-body');
+  const svg        = document.getElementById('volumeChart');
+  if (!svg) return;
 
   try {
     const res = await fetch('data/volume.json', { cache: 'no-store' });
@@ -6840,36 +6870,53 @@ async function fetchVolumeData() {
     }
     if (elMeta) elMeta.textContent = 'ОБНОВЛЕНО ' + data.updated_at.slice(0, 10);
 
-    const vo = {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#0C0F14', borderColor: '#1A1F2A', borderWidth: 1,
-          titleColor: '#7A8BA0', bodyColor: '#F7931A',
-          titleFont: { family: "'IBM Plex Mono', monospace", size: 10 },
-          bodyFont:  { family: "'IBM Plex Mono', monospace", size: 11 },
-          callbacks: { label: (ctx) => fmtVolumeUsd(ctx.parsed.y) }
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(26,31,42,1)' }, ticks: { color: '#7A8BA0', font: { family: "'IBM Plex Mono', monospace", size: 10 }, maxTicksLimit: 6 } },
-        y: { grid: { color: 'rgba(26,31,42,1)' }, ticks: { color: '#7A8BA0', font: { family: "'IBM Plex Mono', monospace", size: 10 }, callback: fmtVolumeUsd } }
-      }
-    };
+    const vals  = history.map(h => h.volume_usd);
+    const minV  = Math.min(...vals);
+    const maxV  = Math.max(...vals);
+    const avgV  = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const sorted = [...vals].sort((a, b) => a - b);
+    const medV  = sorted.length % 2
+      ? sorted[(sorted.length - 1) / 2]
+      : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
 
-    new Chart(canvas.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: history.map(p => p.date.slice(5)), // MM-DD
-        datasets: [{
-          data: history.map(p => p.volume_usd),
-          borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.06)',
-          borderWidth: 1.5, fill: true, tension: 0.25, pointRadius: 0
-        }]
-      },
-      options: vo
+    // ── Строка статистики ──
+    if (elStats) {
+      const cell = (label, val) =>
+        '<div><div style="font-size:9px;color:var(--dim);font-family:var(--mono)">' + label + '</div>' +
+        '<div style="font-size:12px;font-family:var(--mono);color:var(--txt)">' + val + '</div></div>';
+      elStats.innerHTML = cell('HIGH', fmtVolumeUsd(maxV)) + cell('LOW', fmtVolumeUsd(minV)) +
+                           cell('MEDIAN', fmtVolumeUsd(medV)) + cell('AVG', fmtVolumeUsd(avgV));
+    }
+
+    // ── Бары (цвет = рост/падение к предыдущему дню) + линия среднего ──
+    const W = 700, PH = 130, N = history.length;
+    const bw = (W / N) * 0.7, gap = (W / N) * 0.3;
+    let bars = '';
+    history.forEach((h, i) => {
+      const x = i * (W / N) + gap / 2;
+      const hgt = (h.volume_usd / maxV) * (PH - 10);
+      const y = PH - hgt;
+      const prev = i > 0 ? history[i - 1].volume_usd : h.volume_usd;
+      const col = h.volume_usd >= prev ? 'var(--grn)' : 'var(--red)';
+      bars += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) +
+              '" height="' + hgt.toFixed(1) + '" fill="' + col + '" opacity="0.85"><title>' +
+              h.date + ': ' + fmtVolumeUsd(h.volume_usd) + '</title></rect>';
     });
+    const avgY = 10 + (1 - avgV / maxV) * (PH - 20);
+    svg.innerHTML = bars +
+      '<line x1="0" y1="' + avgY.toFixed(1) + '" x2="' + W + '" y2="' + avgY.toFixed(1) +
+      '" stroke="var(--dim)" stroke-width="1" stroke-dasharray="4,3"/>' +
+      '<text x="' + (W - 4) + '" y="' + (avgY - 4).toFixed(1) +
+      '" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="var(--dim)">AVG</text>';
+
+    // ── Топ-3 дня по объёму ──
+    if (elTop3Body) {
+      const top3 = [...history].sort((a, b) => b.volume_usd - a.volume_usd).slice(0, 3);
+      elTop3Body.innerHTML = top3.map((h, i) =>
+        '<tr><td>' + (i + 1) + '</td><td>' + h.date + '</td><td class="td-btc">' +
+        fmtVolumeUsd(h.volume_usd) + '</td></tr>'
+      ).join('');
+    }
   } catch (err) {
     if (elMeta) elMeta.textContent = 'ДАННЫЕ НЕДОСТУПНЫ';
     console.warn('fetchVolumeData:', err);

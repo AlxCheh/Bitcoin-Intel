@@ -1280,23 +1280,6 @@ header {
 }
 .utxo-section-label:first-child { border-top: none; margin-top: 0; }
 
-/* ══════════════════════════════════
-   METRICS SECTION LABEL — крупные тематические
-   разделители вкладки МЕТРИКИ (Рынок/Эмиссия/Майнинг)
-══════════════════════════════════ */
-.metrics-section-label {
-  font-family: var(--serif);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--txt);
-  padding: 22px 16px 10px;
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-.metrics-section-label:first-child { padding-top: 6px; }
-.metrics-section-label .rule { flex: 1; height: 1px; background: var(--line); margin-left: 4px; }
 .utxo-row-item {
   display: flex; align-items: center; gap: 8px;
   margin: 5px 0;
@@ -3643,8 +3626,6 @@ function toggleNav(id) {
 <section class="section" id="tab-analytics">
   <div class="page">
 
-    <div class="metrics-section-label">💹 РЫНОК<div class="rule"></div></div>
-
     <!-- VOLUME CHART — бары + AVG-линия + статистика + топ-3 таблица -->
     <div class="panel">
       <div class="panel-head">
@@ -3656,7 +3637,7 @@ function toggleNav(id) {
         <span style="font-family:var(--mono);font-size:12px;margin-left:8px" id="volume-change">—</span>
       </div>
       <div id="volume-stats-row" style="display:flex;gap:20px;padding:8px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap"></div>
-      <div class="chart-inner" style="padding:10px 0">
+      <div class="chart-inner" style="padding:10px 20px">
         <svg id="volumeChart" width="100%" viewBox="0 0 700 130" preserveAspectRatio="none" style="display:block"></svg>
       </div>
       <div style="padding:8px 14px 0;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.06em;border-top:1px solid var(--line)">ТОП-3 ДНЯ ПО ОБЪЁМУ</div>
@@ -3667,8 +3648,6 @@ function toggleNav(id) {
       </table>
       </div>
     </div>
-
-    <div class="metrics-section-label">🪙 ЭМИССИЯ<div class="rule"></div></div>
 
 <!-- SUPPLY CHART -->
     <div class="panel">
@@ -3714,9 +3693,6 @@ function toggleNav(id) {
         Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
       </div>
     </div>
-
-    
-    <div class="metrics-section-label">⛏️ МАЙНИНГ<div class="rule"></div></div>
 
     <!-- DIFFICULTY — Вариант 2: Контекст (расширен блоком "Корректировка сложности") -->
     <div class="panel" style="margin-top:0" id="diff-block">

@@ -44,6 +44,7 @@ body {
   color: var(--txt);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 /* ── SCROLLBAR ── */
@@ -3824,6 +3825,7 @@ function toggleNav(id) {
         </div>
       </div>
       <!-- Historical table -->
+      <div style="overflow-x:auto">
       <table class="dtable zebra">
         <thead>
           <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
@@ -3861,6 +3863,7 @@ function toggleNav(id) {
           </tr>
         </tbody>
       </table>
+      </div>
       <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
         Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
       </div>
@@ -3872,6 +3875,7 @@ function toggleNav(id) {
         <span class="panel-title">Метрики сети</span>
         <span class="panel-tag">ON-CHAIN</span>
       </div>
+      <div style="overflow-x:auto">
       <table class="dtable zebra">
         <thead>
           <tr><th>Метрика</th><th>Значение</th><th>Примечание</th></tr>
@@ -3885,6 +3889,7 @@ function toggleNav(id) {
           <tr><td>Транзакций/сек</td><td class="td-btc">~7 TPS</td><td class="td-dim">базовый уровень</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
 
   </div>
@@ -6957,7 +6962,7 @@ function renderEmission() {
   document.getElementById('emission-table-wrap').innerHTML = tbl;
 
   // Скорость сокращения
-  let sp = '<table class="dtable zebra"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
+  let sp = '<div style="overflow-x:auto"><table class="dtable zebra"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
   HOLDERS_DATA.emission.forEach((e, i) => {
     const isLast = i === HOLDERS_DATA.emission.length - 1;
     sp += '<tr' + (isLast ? ' class="current"' : '') + '>'
@@ -6966,7 +6971,7 @@ function renderEmission() {
         + '<td>' + e.years + '</td>'
         + '</tr>';
   });
-  sp += '</tbody></table>';
+  sp += '</tbody></table></div>';
   document.getElementById('emission-speed-wrap').innerHTML = sp;
 }
 

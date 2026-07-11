@@ -1,0 +1,31 @@
+{
+  "_generated_by": "scripts/build_facts.py — не редактировать руками",
+  "_source": "signals.json (facts[] по каждому сигналу)",
+  "generated_at": "2026-07-11",
+  "facts": {
+    "etf_exchanges.btc_holdings": {
+      "value": 1600000,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    },
+    "strategy.btc_holdings": {
+      "value": 843775,
+      "unit": "BTC",
+      "as_of": "2026-07-05",
+      "signal_id": "STR-2026-0706-001"
+    },
+    "strategy.usd_reserve": {
+      "value": 2550000000,
+      "unit": "USD",
+      "as_of": "2026-07-05",
+      "signal_id": "STR-2026-0706-001"
+    },
+    "top100_public_companies.btc_holdings": {
+      "value": 1264867,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    }
+  }
+}

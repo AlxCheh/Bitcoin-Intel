@@ -1,0 +1,58 @@
+name: Build Facts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "signals.json"
+      - "scripts/build_facts.py"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-facts:
+    name: Regenerate data/facts.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Build facts.json
+        run: python3 scripts/build_facts.py
+
+      - name: Validate data/facts.json
+        run: python3 -m json.tool data/facts.json > /dev/null && echo "OK data/facts.json"
+
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          git add data/facts.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit via PR (main is protected — see update-volume.yml for the same pattern)
+        if: steps.diffcheck.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="bot/sync-facts-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: regenerate data/facts.json"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: sync data/facts.json ($(date -u +%Y-%m-%d))" \
+            --body "Автоперегенерация из signals.json (scripts/build_facts.py). Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

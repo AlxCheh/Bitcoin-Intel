@@ -128,6 +128,34 @@
     "alternative_scenario": {
       "type": ["string", "null"],
       "description": "Требуется CLAUDE.md v7.7 Шаг 3/7 когда уверенность в интерпретации не высокая (ADR-015). Отсутствовало в схеме до её обновления при добавлении первого сигнала с этим полем — INF-2026-0702-001."
+    },
+    "facts": {
+      "type": "array",
+      "description": "Опционально. Структурированные машиночитаемые факты из этого сигнала — дополняют свободнотекстовый data, не заменяют его. Ключ key: 'entity_id.metric' (entity_id переиспользует ENTITIES.json.id где применимо; для агрегатных категорий без сущности — любой стабильный snake_case идентификатор). Обрабатывается scripts/build_facts.py → data/facts.json (см. CLAUDE.md, раздел 'FACTS — машиночитаемые факты'). Добавлено CLAUDE.md v8.2.",
+      "items": {
+        "type": "object",
+        "required": ["key", "value", "unit", "as_of"],
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$",
+            "description": "Формат 'entity_id.metric', оба сегмента — snake_case"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "description": "Дата, на которую значение верно (не дата сигнала обязательно — может быть точнее)"
+          }
+        }
+      }
     }
   }
 }

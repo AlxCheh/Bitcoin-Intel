@@ -3625,8 +3625,57 @@ function toggleNav(id) {
 <section class="section" id="tab-analytics">
   <div class="page">
 
-    <!-- DIFFICULTY — Вариант 2: Контекст -->
-    <div class="panel" style="margin-top:12px" id="diff-block">
+    <div class="utxo-section-label" style="margin-top:12px">🪙 ЭМИССИЯ</div>
+
+    <!-- SUPPLY CHART -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Эмиссия Bitcoin</span>
+        <span class="chart-meta">BTC В ОБРАЩЕНИИ (МЛН)</span>
+      </div>
+      <div class="chart-inner">
+        <canvas id="supplyChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- INFLATION COMPARISON TABLE -->
+    <div class="panel amber">
+      <div class="panel-head">
+        <span class="panel-title">Монетарная инфляция</span>
+        <span class="panel-tag">СРАВНЕНИЕ</span>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="dtable zebra">
+        <thead>
+          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
+        </thead>
+        <tbody>
+          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
+          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
+          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <!-- Добыто/Осталось — перенесено из бывшей "Метрики сети" -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)">
+        <div style="padding:10px 14px;border-right:1px solid var(--line)">
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.05em;margin-bottom:4px">ДОБЫТО BTC</div>
+          <div style="font-family:var(--mono);font-size:15px;color:var(--btc);font-weight:700">~19.7M <span style="font-size:10px;color:var(--dim);font-weight:400">из 21 000 000</span></div>
+        </div>
+        <div style="padding:10px 14px">
+          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.05em;margin-bottom:4px">ОСТАЛОСЬ ДОБЫТЬ</div>
+          <div style="font-family:var(--mono);font-size:15px;color:var(--btc);font-weight:700">~1.3M <span style="font-size:10px;color:var(--dim);font-weight:400">~6.2% лимита</span></div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
+        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
+      </div>
+    </div>
+
+    <div class="utxo-section-label">⛏️ МАЙНИНГ</div>
+
+    <!-- DIFFICULTY — Вариант 2: Контекст (расширен блоком "Корректировка сложности") -->
+    <div class="panel" style="margin-top:0" id="diff-block">
 
       <!-- Header -->
       <div class="panel-head">
@@ -3739,9 +3788,77 @@ function toggleNav(id) {
         </div>
         <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
+
+      <!-- Корректировка сложности — слито из отдельной панели -->
+      <div class="amber" style="border-top:1px solid var(--line)">
+        <div style="padding:12px 14px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1E232B">
+          <span style="font-family:var(--mono);font-size:12px;color:#FFB300;text-transform:uppercase;letter-spacing:.08em">Корректировка сложности</span>
+          <span class="panel-tag" style="color:#5A6472;background:transparent;border:none">Июнь 2026</span>
+        </div>
+        <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line);line-height:1.6">
+          ~13 июня 2026 ожидается одна из крупнейших отрицательных корректировок сложности в истории Bitcoin.
+          Майнеры отключают оборудование из-за падения доходности — это классический сигнал капитуляции.
+        </div>
+        <!-- Current event metrics -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
+          <div style="padding:12px 14px;border-right:1px solid var(--line)">
+            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
+            <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:700">−10.3%</div>
+            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">est. · блок 953,568</div>
+          </div>
+          <div style="padding:12px 14px">
+            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">РАНГ В ИСТОРИИ</div>
+            <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--btc);font-weight:700">#11</div>
+            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">из 471 корректировки</div>
+          </div>
+        </div>
+        <!-- Historical table -->
+        <div style="overflow-x:auto">
+        <table class="dtable zebra">
+          <thead>
+            <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
+          </thead>
+          <tbody>
+            <tr class="current">
+              <td>#11</td>
+              <td>≈ Июнь 2026</td>
+              <td>−10.3% est.</td>
+              <td>Squeeze маржи майнеров 2026</td>
+            </tr>
+            <tr>
+              <td class="td-dim">#1</td>
+              <td class="td-dim">Июль 2021</td>
+              <td style="color:var(--red)">−27.94%</td>
+              <td class="td-dim">Бан майнинга в Китае</td>
+            </tr>
+            <tr>
+              <td class="td-dim">#6</td>
+              <td class="td-dim">Дек 2018</td>
+              <td style="color:var(--red)">−15.13%</td>
+              <td class="td-dim">Капитуляция майнеров — дно цикла</td>
+            </tr>
+            <tr>
+              <td class="td-dim">#5</td>
+              <td class="td-dim">Март 2020</td>
+              <td style="color:var(--red)">−15.95%</td>
+              <td class="td-dim">COVID-крах → дно → ×20</td>
+            </tr>
+            <tr>
+              <td class="td-dim">#22</td>
+              <td class="td-dim">Дек 2022</td>
+              <td style="color:var(--red)">−7.32%</td>
+              <td class="td-dim">Крах FTX — дно цикла</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace">
+          Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
+        </div>
+      </div>
     </div>
 
-    <!-- HASHRATE CHART -->
+    <!-- HASHRATE CHART (расширен строкой сетевых метрик из бывшей "Метрики сети") -->
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Хешрейт сети</span>
@@ -3750,18 +3867,27 @@ function toggleNav(id) {
       <div class="chart-inner">
         <canvas id="hashrateChart" height="160"></canvas>
       </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)">
+        <div style="padding:10px 8px;border-right:1px solid var(--line);text-align:center">
+          <div style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em">НОДЫ</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--btc);font-weight:700;margin-top:3px">~17K</div>
+        </div>
+        <div style="padding:10px 8px;border-right:1px solid var(--line);text-align:center">
+          <div style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em">UPTIME</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--grn);font-weight:700;margin-top:3px">99.99%</div>
+        </div>
+        <div style="padding:10px 8px;border-right:1px solid var(--line);text-align:center">
+          <div style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em">БЛОК</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--btc);font-weight:700;margin-top:3px">~1.5 MB</div>
+        </div>
+        <div style="padding:10px 8px;text-align:center">
+          <div style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em">TPS</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--btc);font-weight:700;margin-top:3px">~7</div>
+        </div>
+      </div>
     </div>
 
-    <!-- SUPPLY CHART -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Эмиссия Bitcoin</span>
-        <span class="chart-meta">BTC В ОБРАЩЕНИИ (МЛН)</span>
-      </div>
-      <div class="chart-inner">
-        <canvas id="supplyChart" height="160"></canvas>
-      </div>
-    </div>
+    <div class="utxo-section-label">💹 РЫНОК</div>
 
     <!-- VOLUME CHART -->
     <div class="panel">
@@ -3778,126 +3904,9 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <!-- INFLATION COMPARISON TABLE -->
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Монетарная инфляция</span>
-        <span class="panel-tag">СРАВНЕНИЕ</span>
-      </div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table class="dtable zebra">
-        <thead>
-          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
-        </thead>
-        <tbody>
-          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
-          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
-          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
-        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
-      </div>
-    </div>
-
-    <!-- DIFFICULTY ADJUSTMENT BLOCK -->
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Корректировка сложности</span>
-        <span class="panel-tag">⛏️ МАЙНИНГ · Июнь 2026</span>
-      </div>
-      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line);line-height:1.6">
-        ~13 июня 2026 ожидается одна из крупнейших отрицательных корректировок сложности в истории Bitcoin.
-        Майнеры отключают оборудование из-за падения доходности — это классический сигнал капитуляции.
-      </div>
-      <!-- Current event metrics -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
-        <div style="padding:12px 14px;border-right:1px solid var(--line)">
-          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
-          <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:700">−10.3%</div>
-          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">est. · блок 953,568</div>
-        </div>
-        <div style="padding:12px 14px">
-          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">РАНГ В ИСТОРИИ</div>
-          <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--btc);font-weight:700">#11</div>
-          <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">из 471 корректировки</div>
-        </div>
-      </div>
-      <!-- Historical table -->
-      <div style="overflow-x:auto">
-      <table class="dtable zebra">
-        <thead>
-          <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
-        </thead>
-        <tbody>
-          <tr class="current">
-            <td>#11</td>
-            <td>≈ Июнь 2026</td>
-            <td>−10.3% est.</td>
-            <td>Squeeze маржи майнеров 2026</td>
-          </tr>
-          <tr>
-            <td class="td-dim">#1</td>
-            <td class="td-dim">Июль 2021</td>
-            <td style="color:var(--red)">−27.94%</td>
-            <td class="td-dim">Бан майнинга в Китае</td>
-          </tr>
-          <tr>
-            <td class="td-dim">#6</td>
-            <td class="td-dim">Дек 2018</td>
-            <td style="color:var(--red)">−15.13%</td>
-            <td class="td-dim">Капитуляция майнеров — дно цикла</td>
-          </tr>
-          <tr>
-            <td class="td-dim">#5</td>
-            <td class="td-dim">Март 2020</td>
-            <td style="color:var(--red)">−15.95%</td>
-            <td class="td-dim">COVID-крах → дно → ×20</td>
-          </tr>
-          <tr>
-            <td class="td-dim">#22</td>
-            <td class="td-dim">Дек 2022</td>
-            <td style="color:var(--red)">−7.32%</td>
-            <td class="td-dim">Крах FTX — дно цикла</td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
-        Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
-      </div>
-    </div>
-
-    <!-- NETWORK METRICS TABLE -->
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Метрики сети</span>
-        <span class="panel-tag">ON-CHAIN</span>
-      </div>
-      <div style="overflow-x:auto">
-      <table class="dtable zebra">
-        <thead>
-          <tr><th>Метрика</th><th>Значение</th><th>Примечание</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Добыто BTC</td><td class="td-btc">~19.7M</td><td class="td-dim">из 21 000 000</td></tr>
-          <tr><td>Осталось добыть</td><td class="td-btc">~1.3M</td><td class="td-dim">~6.2% лимита</td></tr>
-          <tr><td>Полных нодов</td><td class="td-btc">~17K</td><td class="td-dim">по всему миру</td></tr>
-          <tr><td>Uptime сети</td><td class="td-grn">99.99%</td><td class="td-dim">с 2009 года</td></tr>
-          <tr><td>Размер блока</td><td class="td-btc">~1.5 MB</td><td class="td-dim">SegWit</td></tr>
-          <tr><td>Транзакций/сек</td><td class="td-btc">~7 TPS</td><td class="td-dim">базовый уровень</td></tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-
   </div>
 </section>
 
-<!-- ══════════════════════════════════════
-     POOLS
-══════════════════════════════════════ -->
 <section class="section" id="tab-pools">
   <div class="page">
     <div id="pool-summary"></div>

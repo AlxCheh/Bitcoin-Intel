@@ -124,7 +124,7 @@ header {
   background: var(--bg2);
   border-bottom: 1px solid var(--line);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   touch-action: pan-y;
   user-select: none;
 }
@@ -138,7 +138,7 @@ header {
   display: inline-block;
   color: var(--grn);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   animation: crumb-blink 1s steps(1) infinite;
 }
 .crumb-dots { display: flex; gap: 4px; flex-shrink: 0; }
@@ -164,7 +164,7 @@ header {
   border-bottom: 2px solid transparent;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -197,7 +197,7 @@ header {
   cursor: pointer;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-align: center;
@@ -1764,113 +1764,11 @@ header {
       </div>
     </div>
 
-    <!-- ══ БЛОК 2: КЛЮЧЕВЫЕ МЕТРИКИ (вариант C) ══ -->
-    <div style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
-      <div class="panel-head" style="margin:0">
-        <span class="panel-title">Ключевые метрики</span>
-        <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
-      </div>
-
-      <!-- СТРОКА 1: РАЗРЫВ — главный герой -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg2)">
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:4px">РАЗРЫВ К СЕБЕСТОИМОСТИ</div>
-          <div style="font-family:var(--mono);font-size:26px;font-weight:700" id="dash-gap">—</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.8">
-            Цена <span style="color:var(--txt)" id="dash-price-inline">—</span><br>
-            Себестоимость <span style="color:var(--txt)" id="dash-cost-inline">—</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- СТРОКА 2: REALIZED PRICE -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg3)">
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--dim);margin-bottom:4px">REALIZED PRICE</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--txt)" id="rp-value">~$53 000</span>
-            <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="rp-vs-market"></span>
-          </div>
-          <div style="font-family:var(--sans);font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4" id="rp-status-text">Средняя цена покупки всего предложения BTC по on-chain движению монеты</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:12px">
-          <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em;margin-bottom:4px">BTC / ЦЕНА</div>
-          <div style="font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid var(--line);color:var(--dim)" id="rp-ratio">—</div>
-        </div>
-      </div>
-
-      <!-- АККОРДЕОН 1: Production Cost -->
-      <div style="border-bottom:1px solid var(--line)">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('acc-prod-cost')">
-          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">~ ЧТО ТАКОЕ PRODUCTION COST</span>
-          <span id="arr-acc-prod-cost" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
-        </div>
-        <div id="acc-prod-cost" style="display:none;padding:10px 14px;background:var(--bg2)">
-          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.7">
-            Расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
-          </div>
-        </div>
-      </div>
-
-      <!-- АККОРДЕОН 2: Как считается Realized Price -->
-      <div style="border-bottom:1px solid var(--line)">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-explainer')">
-          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">КАК СЧИТАЕТСЯ REALIZED PRICE</span>
-          <span id="arr-rp-explainer" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
-        </div>
-        <div id="rp-explainer" style="display:none;padding:12px 14px;background:var(--bg2)">
-          <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);letter-spacing:0.08em;margin-bottom:8px">ФОРМУЛА</div>
-          <div style="background:var(--bg);border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;font-family:var(--mono);font-size:10px;color:var(--btc);line-height:2">
-            Realized Cap = Σ (BTC в UTXO × цена на дату последнего движения)<br>
-            <span style="color:var(--dim)">Realized Price = Realized Cap ÷ Циркулирующее предложение</span>
-          </div>
-          <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.65">
-            Блокчейн хранит монеты в UTXO — каждый имеет дату последнего движения. Берётся цена BTC на ту дату, умножается на количество монет в этом UTXO. Сумма всех UTXO = <span style="color:var(--txt)">Realized Cap</span>. Делится на все монеты в обращении = Realized Price.<br><br>
-            Когда рыночная цена падает <span style="color:var(--red)">ниже Realized Price</span> — больше половины всех монет уходят в убыток одновременно. Исторически это зона капитуляции и дна.
-          </div>
-        </div>
-      </div>
-
-      <!-- АККОРДЕОН 3: Исторические уровни дна -->
-      <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-history')">
-          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">ИСТОРИЧЕСКИЕ УРОВНИ ДНА</span>
-          <span id="arr-rp-history" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
-        </div>
-        <div id="rp-history" style="display:none;padding:12px 14px;background:var(--bg2)">
-          <div style="display:flex;flex-direction:column;gap:0">
-            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
-              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2015</span>
-              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
-              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC уходил ниже Realized Price на несколько месяцев перед разворотом</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
-              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2018–19</span>
-              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
-              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Декабрь 2018 — цена на $3 200, RP ~$5 000. Дно сформировалось ниже</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
-              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2022</span>
-              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
-              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Ноябрь 2022 — $15 700, RP ~$19 700. Пробой на 20% ниже</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0">
-              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2026</span>
-              <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:60px">выше RP</span>
-              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC ~$59–61K, RP ~$53K. Пока выше — капитуляция не достигнута</span>
-            </div>
-          </div>
-          <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--dim)">
-            <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5">
-              <span style="color:var(--txt)">Оговорка:</span> в 2026 впервые присутствуют ETF и корпоративные покупатели — паттерн может не повториться. RP растёт медленно и не падает.
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /ключевые метрики -->
+    <!-- Ключевые метрики (Production Cost / Realized Price) перенесены на
+         вкладку МЕТРИКИ — здесь короткая ссылка + актуальный коэффициент -->
+    <div class="dash-sum-link" onclick="showTab('analytics', null)" style="margin:0 0 12px">
+      СЕБЕСТОИМОСТЬ И REALIZED PRICE → МЕТРИКИ <span>→</span>
+    </div>
 
     <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
     <div id="price-chart-wrap" style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
@@ -3908,7 +3806,228 @@ function toggleNav(id) {
       </div>
     </div>
 
-    
+    <!-- ══ БЛОК 2: КЛЮЧЕВЫЕ МЕТРИКИ (вариант C) ══ -->
+    <div style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
+      <div class="panel-head" style="margin:0">
+        <span class="panel-title">Ключевые метрики</span>
+        <span class="chart-meta">ЦЕНА · СЕБЕСТОИМОСТЬ · РАЗРЫВ</span>
+      </div>
+
+      <!-- СТРОКА 1: РАЗРЫВ — главный герой -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg2)">
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim);margin-bottom:4px">РАЗРЫВ К СЕБЕСТОИМОСТИ</div>
+          <div style="font-family:var(--mono);font-size:26px;font-weight:700" id="dash-gap">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.8">
+            Цена <span style="color:var(--txt)" id="dash-price-inline">—</span><br>
+            Себестоимость <span style="color:var(--txt)" id="dash-cost-inline">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- СТРОКА 2: REALIZED PRICE -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg3)">
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--dim);margin-bottom:4px">REALIZED PRICE</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--txt)" id="rp-value">~$53 000</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--dim)" id="rp-vs-market"></span>
+          </div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4" id="rp-status-text">Средняя цена покупки всего предложения BTC по on-chain движению монеты</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.08em;margin-bottom:4px">BTC / ЦЕНА</div>
+          <div style="font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid var(--line);color:var(--dim)" id="rp-ratio">—</div>
+        </div>
+      </div>
+
+      <!-- АККОРДЕОН 1: Production Cost -->
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('acc-prod-cost')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">~ ЧТО ТАКОЕ PRODUCTION COST</span>
+          <span id="arr-acc-prod-cost" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="acc-prod-cost" style="display:none;padding:10px 14px;background:var(--bg2)">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.7">
+            Расчётная оценка на основе хешрейта сети, средней эффективности флота (22 J/TH) и промышленной цены электричества ($0.065/kWh). Точность ±15–20%. Не является точной себестоимостью конкретного майнера.
+          </div>
+        </div>
+      </div>
+
+      <!-- АККОРДЕОН 2: Как считается Realized Price -->
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-explainer')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">КАК СЧИТАЕТСЯ REALIZED PRICE</span>
+          <span id="arr-rp-explainer" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="rp-explainer" style="display:none;padding:12px 14px;background:var(--bg2)">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);letter-spacing:0.08em;margin-bottom:8px">ФОРМУЛА</div>
+          <div style="background:var(--bg);border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;font-family:var(--mono);font-size:10px;color:var(--btc);line-height:2">
+            Realized Cap = Σ (BTC в UTXO × цена на дату последнего движения)<br>
+            <span style="color:var(--dim)">Realized Price = Realized Cap ÷ Циркулирующее предложение</span>
+          </div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.65">
+            Блокчейн хранит монеты в UTXO — каждый имеет дату последнего движения. Берётся цена BTC на ту дату, умножается на количество монет в этом UTXO. Сумма всех UTXO = <span style="color:var(--txt)">Realized Cap</span>. Делится на все монеты в обращении = Realized Price.<br><br>
+            Когда рыночная цена падает <span style="color:var(--red)">ниже Realized Price</span> — больше половины всех монет уходят в убыток одновременно. Исторически это зона капитуляции и дна.
+          </div>
+        </div>
+      </div>
+
+      <!-- АККОРДЕОН 3: Исторические уровни дна -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;background:var(--bg3)" onclick="toggleNav('rp-history')">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--dim)">ИСТОРИЧЕСКИЕ УРОВНИ ДНА</span>
+          <span id="arr-rp-history" style="font-family:var(--mono);font-size:9px;color:var(--dim);transition:transform 0.2s">▶</span>
+        </div>
+        <div id="rp-history" style="display:none;padding:12px 14px;background:var(--bg2)">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2015</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC уходил ниже Realized Price на несколько месяцев перед разворотом</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2018–19</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Декабрь 2018 — цена на $3 200, RP ~$5 000. Дно сформировалось ниже</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2022</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--red);min-width:60px">ниже RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">Ноябрь 2022 — $15 700, RP ~$19 700. Пробой на 20% ниже</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--dim2);min-width:40px">2026</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--btc);min-width:60px">выше RP</span>
+              <span style="font-family:var(--sans);font-size:11px;color:var(--dim)">BTC ~$59–61K, RP ~$53K. Пока выше — капитуляция не достигнута</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--dim)">
+            <div style="font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.5">
+              <span style="color:var(--txt)">Оговорка:</span> в 2026 впервые присутствуют ETF и корпоративные покупатели — паттерн может не повториться. RP растёт медленно и не падает.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ключевые метрики -->
+
+
+    <!-- МЕТОДОЛОГИЯ — метрики без живых данных на сайте (BDKS Раздел 9) -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">MVRV</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Market Value to Realized Value — отношение рыночной капитализации к «реализованной» капитализации (сумма стоимости всех UTXO по цене их последнего перемещения).
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Высокое значение — рынок в среднем в прибыли (потенциальный локальный топ); низкое — в среднем в убытке.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Не абсолютный порог — пороговые значения различаются между циклами. Требует сравнения с историческим диапазоном текущего, а не предыдущего цикла.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">NVT</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Network Value to Transactions — отношение капитализации к объёму on-chain транзакций. Аналог P/E для сети.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Высокое значение может означать переоценку относительно «полезности» сети.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Искажается ростом объёмов, не связанных с реальным использованием (биржевые внутренние переводы). Прямое сравнение между эпохами некорректно без учёта роста Layer 2 (транзакции уходят off-chain).
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">SOPR</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Spent Output Profit Ratio — отношение цены продажи к цене покупки перемещаемых монет.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> &gt;1 — держатели продают в прибыль; &lt;1 — в убыток. Переход через 1.0 — психологически значимый уровень капитуляции/восстановления.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Чувствителен к отдельным крупным перемещениям (биржевые внутренние операции). Высокая волатильность на дневном интервале, требует сглаживания.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Puell Multiple</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Дневная эмиссионная выручка майнеров к её 365-дневному среднему.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Экстремумы исторически совпадали с циклическими разворотами.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Основан на цене — циркулярная зависимость с самим активом, который пытается предсказать. Требует полного цикла для калибровки экстремумов, не переносится между циклами без перекалибровки.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Exchange Reserve</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Совокупный объём BTC, находящийся на кошельках бирж.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Снижение — вывод в холодное/институциональное хранение (структурно бычий сигнал); рост — потенциальное давление продавцов.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Искажается внутренними перемещениями бирж между собственными кошельками. Требует различения crypto-native и fiat-onramp бирж — трактовка любого оттока как «бычьего» без учёта причины (например, перевод на деривативную площадку) — типичная ошибка.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Funding Rate</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">МЕТОДОЛОГИЯ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Стоимость удержания перпетуальной фьючерсной позиции.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Высокий положительный funding — избыточный леверидж в лонг, риск каскадных ликвидаций.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Не отражает спотовый спрос. Требует сопоставления с Open Interest для оценки абсолютного масштаба риска — использование как самостоятельного направленного индикатора цены является ошибкой.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">ETF Net Flows</span>
+        <span class="panel-tag" style="color:var(--dim);background:transparent;border:1px solid var(--line2)">НАРРАТИВНО · СМ. ДАЙДЖЕСТ</span>
+      </div>
+      <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;border-bottom:1px solid var(--line)">
+        Чистый приток/отток капитала через регулируемые биржевые фонды (ETF).
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6;border-bottom:1px solid var(--line)">
+        <span style="color:var(--txt)">Интерпретация:</span> Прямой, высоковерифицируемый индикатор институционального спроса.
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;line-height:1.6">
+        <span style="color:var(--red)">Ограничение (BDKS Р9):</span> Публикуется с задержкой (обычно T+1). Требует сопоставления с общим AUM для оценки относительной значимости — экстраполяция однодневного оттока как разворота тренда является типичной ошибкой. Живые данные по этой метрике на сайте не подключены — актуальные события отслеживаются через сигналы кластера <code style="color:var(--btc)">etf_institutional_flow</code> в ДАЙДЖЕСТЕ.
+      </div>
+    </div>
+
   </div>
 </section>
 

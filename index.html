@@ -896,6 +896,43 @@ header {
 }
 
 /* ══════════════════════════════════
+   HTABLE (транспонированная — Структура владения)
+   под темой .amber: "текущее" — не строка, а самая свежая
+   колонка (nth-child(2), т.к. snapshots идут в обратном порядке —
+   первая колонка данных = самая свежая дата)
+══════════════════════════════════ */
+.amber .htable {
+  font-family: var(--mono);
+}
+.amber .htable th {
+  color: #5A6472 !important;
+  border-bottom: 1px solid #FFB300 !important;
+}
+.amber .htable td {
+  color: #C4CDD8 !important;
+}
+.amber .htable td.htable-btc {
+  color: #C4CDD8 !important;
+}
+.amber .htable td.htable-dim {
+  color: #46505E !important;
+}
+.amber .htable-pct {
+  color: #46505E !important;
+}
+.amber .htable th:nth-child(2),
+.amber .htable td:nth-child(2) {
+  background: rgba(255,179,0,0.08);
+}
+.amber .htable td:nth-child(2),
+.amber .htable th:nth-child(2) {
+  color: #FFB300 !important;
+}
+.amber .htable td:nth-child(2) .htable-pct {
+  color: rgba(255,179,0,0.7) !important;
+}
+
+/* ══════════════════════════════════
    PANEL
 ══════════════════════════════════ */
 .panel {
@@ -1037,8 +1074,8 @@ header {
 .htable td.htable-btc { color: var(--btc); font-weight: 700; }
 .htable td.htable-dim { color: var(--dim); }
 .htable td.htable-event { max-width: 140px; overflow: hidden; text-overflow: ellipsis; cursor: help; }
-.htable-pct-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.htable-pct { color: var(--dim); font-size: 10px; margin-left: auto; }
+.htable-pct-row { display: flex; align-items: baseline; justify-content: center; gap: 2px; }
+.htable-pct { color: var(--dim); font-size: 10px; margin-left: 6px; }
 .htable tr:hover td { background: var(--bg3); }
 
 
@@ -3310,7 +3347,7 @@ function toggleNav(id) {
 
     <div id="holders-toc"></div>
 
-    <div class="panel" id="holders-structure" style="scroll-margin-top:64px">
+    <div class="panel amber" id="holders-structure" style="scroll-margin-top:64px">
       <div class="panel-head">
         <span class="panel-title">Структура владения · 2009–2024</span>
         <span class="panel-tag">📊 ON-CHAIN</span>

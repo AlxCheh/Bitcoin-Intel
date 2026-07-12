@@ -1836,7 +1836,7 @@ header {
 
 
     <!-- ══ БЛОК 5: ПОСЛЕДНИЕ БЛОКИ ══ -->
-    <div class="terminal" style="margin:0 0 16px;border:1px solid var(--btc)">
+    <div class="terminal" id="latest-blocks-panel" style="margin:0 0 16px;border:1px solid var(--btc)">
       <div class="panel-head" style="margin:-0px -0px 0px;border-bottom:none">
         <span class="panel-title">Последние блоки</span>
         <span class="terminal-title chart-meta" id="block-title">загрузка...</span>
@@ -3048,12 +3048,26 @@ function toggleNav(id) {
   <div class="page">
 
 
-    <div class="halving-block">
-      <div class="halving-icon">₿</div>
-      <div class="halving-info">
-        <div class="halving-label">Текущая награда майнера</div>
-        <div class="halving-val">3.125 <span style="font-size:13px;color:var(--dim)">BTC/блок</span></div>
-        <div class="halving-sub">Следующий халвинг ~апрель 2028 → 1.5625 BTC</div>
+    <div class="panel" style="margin:0 0 12px">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center">
+        <div style="padding:18px 14px;text-align:center;background:var(--btc-low)">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--btc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Сейчас · эпоха 4</div>
+          <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--btc)">3.125</div>
+        </div>
+        <div style="padding:0 6px;color:var(--dim2);font-size:16px">→</div>
+        <div style="padding:18px 14px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Далее · эпоха 5</div>
+          <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--dim)">1.5625</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--line)">
+        <div style="height:3px;background:var(--line2);border-radius:2px;overflow:hidden;margin-bottom:6px">
+          <div id="halving-progress-fill" style="height:100%;background:var(--btc);width:0%;transition:width 0.6s ease"></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);display:flex;justify-content:space-between">
+          <span id="halving-block-link" style="cursor:pointer;color:var(--btc);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px" onclick="goToLatestBlocks()" title="Перейти к «Последние блоки» на ОБЗОРЕ">Блок —</span>
+          <span id="halving-days-left">~— дней · апрель 2028</span>
+        </div>
       </div>
     </div>
 
@@ -6101,7 +6115,7 @@ function updateCrumb(id) {
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
-  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['history','ИСТОРИЯ']] },
+  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['history','ЭМИССИЯ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','АРХИВ']] }
 };
 const TAB_TO_CLUSTER = {
@@ -6206,7 +6220,7 @@ function showTab(id, btn, keepCluster) {
   if (id === 'theory') renderTheoryEssays();
   if (id === 'macrocontext') renderTheoryTopics();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
-  if (id === 'history')   renderEmission();
+  if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
 }
 
@@ -6875,7 +6889,6 @@ function initCharts() {
   fetchDifficulty();  // live difficulty data + chart
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
   fetchVolumeData();  // объём торгов — статичный data/volume.json, обновляется раз в сутки GitHub Action'ом
-  fetchRemainingSupply();  // детерминированный расчёт по высоте блока — не зависит от сигналов/снэпшотов
   fetchHashrateHistory();  // живой график вместо статичного массива 2016–2025 (см. функцию ниже)
 }
 
@@ -6904,14 +6917,61 @@ function calcTotalMined(height) {
   return mined;
 }
 
+// Единый источник текущей высоты блока для всех виджетов сайта —
+// переиспользует LATEST_BLOCKS (тот же массив, что питает "Последние
+// блоки" на ОБЗОРЕ), не дёргает отдельный эндпоинт с риском получить
+// другое число из-за задержки/рассинхронизации между двумя live-фетчами.
+async function getCurrentBlockHeight() {
+  if (LATEST_BLOCKS.length) return LATEST_BLOCKS[0].height;
+  try {
+    const res = await fetch('https://mempool.space/api/v1/blocks');
+    const blocks = await res.json();
+    renderBlocks(blocks);
+    return blocks[0].height;
+  } catch (e) {
+    const res2 = await fetch('https://mempool.space/api/blocks/tip/height');
+    return parseInt(await res2.text(), 10);
+  }
+}
+
+// Переход к "Последние блоки" на ОБЗОРЕ — клик по номеру блока в halving-block
+function goToLatestBlocks() {
+  showTab('home', null);
+  setTimeout(() => {
+    const el = document.getElementById('latest-blocks-panel');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+// Halving-block: прогресс текущей эпохи + живая высота блока (общий
+// источник с "Последние блоки" — см. getCurrentBlockHeight() выше)
+const HALVING_EPOCH_START = 840000; // блок 4-го халвинга (апрель 2024)
+const HALVING_EPOCH_LEN   = 210000;
+async function renderHalvingBlock() {
+  const fillEl  = document.getElementById('halving-progress-fill');
+  const blockEl = document.getElementById('halving-block-link');
+  const daysEl  = document.getElementById('halving-days-left');
+  if (!fillEl) return;
+  try {
+    const height = await getCurrentBlockHeight();
+    const blocksIn = height - HALVING_EPOCH_START;
+    const progress = Math.min(100, Math.max(0, blocksIn / HALVING_EPOCH_LEN * 100));
+    const blocksLeft = Math.max(0, HALVING_EPOCH_LEN - blocksIn);
+    const daysLeft = Math.round(blocksLeft / 144);
+
+    fillEl.style.width = progress.toFixed(1) + '%';
+    if (blockEl) blockEl.textContent = 'Блок ' + height.toLocaleString('ru-RU');
+    if (daysEl) daysEl.textContent = '~' + daysLeft.toLocaleString('ru-RU') + ' дней · апрель 2028';
+  } catch (e) {
+    console.warn('renderHalvingBlock:', e);
+  }
+}
+
 async function fetchRemainingSupply() {
   const el = document.getElementById('emission-remaining-foot');
   if (!el) return;
   try {
-    const res = await fetch('https://mempool.space/api/blocks/tip/height');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const height = parseInt(await res.text(), 10);
-    if (!Number.isFinite(height)) throw new Error('bad height');
+    const height = await getCurrentBlockHeight();
     const totalMined = calcTotalMined(height);
     const remaining = 21000000 - totalMined;
     const remainingPct = (remaining / 21000000 * 100).toFixed(2);

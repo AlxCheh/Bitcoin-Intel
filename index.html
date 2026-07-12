@@ -3548,17 +3548,6 @@ function toggleNav(id) {
       </div>
     </div>
 
-<!-- SUPPLY CHART -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Эмиссия Bitcoin</span>
-        <span class="chart-meta">BTC В ОБРАЩЕНИИ (МЛН)</span>
-      </div>
-      <div class="chart-inner">
-        <canvas id="supplyChart" height="160"></canvas>
-      </div>
-    </div>
-
     <!-- INFLATION COMPARISON TABLE -->
     <div class="panel amber">
       <div class="panel-head">
@@ -3781,7 +3770,7 @@ function toggleNav(id) {
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Хешрейт сети</span>
-        <span class="chart-meta">EH/s · 2016–2025</span>
+        <span class="chart-meta" id="hashrate-chart-meta">EH/s · 3 ГОДА</span>
       </div>
       <div class="chart-inner">
         <canvas id="hashrateChart" height="160"></canvas>
@@ -6917,80 +6906,7 @@ function initCharts() {
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
   fetchVolumeData();  // объём торгов — статичный data/volume.json, обновляется раз в сутки GitHub Action'ом
   fetchRemainingSupply();  // детерминированный расчёт по высоте блока — не зависит от сигналов/снэпшотов
-
-  const grid  = 'rgba(26,31,42,1)';
-  const tick  = '#7A8BA0';
-  const font  = "'IBM Plex Mono', monospace";
-  const opts  = (log) => ({
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#0C0F14',
-        borderColor: '#1A1F2A',
-        borderWidth: 1,
-        titleColor: tick,
-        bodyColor: '#F7931A',
-        titleFont: { family: font, size: 10 },
-        bodyFont:  { family: font, size: 11 }
-      }
-    },
-    scales: {
-      x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 11 } } },
-      y: {
-        type: log ? 'logarithmic' : 'linear',
-        grid: { color: grid },
-        ticks: { color: tick, font: { family: font, size: 11 } }
-      }
-    }
-  });
-
-
-  // Price (Chart.js — REMOVED, replaced by Terminal chart above)
-
-  // Hashrate
-  const ho = opts(false);
-  ho.scales.y.ticks.callback = v => v + ' EH';
-  new Chart(document.getElementById('hashrateChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
-      datasets: [{
-        data: [2,8,40,65,120,180,240,380,580,720],
-        backgroundColor: 'rgba(247,147,26,0.65)',
-        borderColor: '#F7931A', borderWidth: 1, borderRadius: 1
-      }]
-    },
-    options: ho
-  });
-
-  // Supply
-  const so = opts(false);
-  so.plugins.legend = { display: true, labels: { color: tick, font: { family: font, size: 10 }, boxWidth: 10 } };
-  so.scales.y.ticks.callback = v => v + 'M';
-  so.scales.y.min = 0; so.scales.y.max = 22;
-  new Chart(document.getElementById('supplyChart').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: ['2009','2012','2016','2020','2024','2028','2032','2140'],
-      datasets: [
-        {
-          label: 'Добыто',
-          data: [0,10.5,15.75,18.37,19.7,20.34,20.67,21],
-          borderColor: '#F7931A', backgroundColor: 'rgba(247,147,26,0.06)',
-          borderWidth: 1.5, fill: true, tension: 0.35, pointRadius: 3,
-          pointBackgroundColor: '#F7931A'
-        },
-        {
-          label: 'Лимит 21M',
-          data: [21,21,21,21,21,21,21,21],
-          borderColor: 'rgba(74,85,104,0.5)', borderDash: [4,4],
-          borderWidth: 1, pointRadius: 0, fill: false
-        }
-      ]
-    },
-    options: so
-  });
+  fetchHashrateHistory();  // живой график вместо статичного массива 2016–2025 (см. функцию ниже)
 }
 
 // Объём торгов BTC/USD — читает статичный data/volume.json (обновляется раз в
@@ -7034,6 +6950,76 @@ async function fetchRemainingSupply() {
       '(блок ' + height.toLocaleString('ru-RU') + ')';
   } catch (e) {
     console.warn('fetchRemainingSupply:', e);
+  }
+}
+
+// Хешрейт сети — живой график вместо статичного массива 2016–2025.
+// mempool.space отдаёт максимум 3 года истории через этот эндпоинт
+// (документированные периоды: 1m,3m,6m,1y,2y,3y) — полную историю с 2016
+// как раньше показать нельзя без отдельного датасета, зато данные живые,
+// не протухнут молча как было раньше (см. CLAUDE.md 'FACTS', этот график
+// не входит в сам механизм, но той же природы баг — статичный массив,
+// который никто не обновлял).
+async function fetchHashrateHistory() {
+  const canvas = document.getElementById('hashrateChart');
+  const meta   = document.getElementById('hashrate-chart-meta');
+  if (!canvas) return;
+  try {
+    const res = await fetch('https://mempool.space/api/v1/mining/hashrate/3y');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const points = data.hashrates || [];
+    if (!points.length) throw new Error('empty hashrates');
+
+    // Сырые данные — примерно ежедневные за 3 года; агрегируем по месяцам,
+    // иначе на баре не поместится и не читается.
+    const monthly = {};
+    points.forEach(p => {
+      const d = new Date(p.timestamp * 1000);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      if (!monthly[key]) monthly[key] = { sum: 0, n: 0 };
+      monthly[key].sum += p.avgHashrate;
+      monthly[key].n += 1;
+    });
+    const labels = Object.keys(monthly).sort();
+    const values = labels.map(k => (monthly[k].sum / monthly[k].n) / 1e18); // H/s → EH/s
+
+    if (meta) meta.textContent = 'EH/s · ' + labels[0].slice(2).replace('-', '/') +
+      ' – ' + labels[labels.length - 1].slice(2).replace('-', '/');
+
+    const grid = 'rgba(26,31,42,1)';
+    const tick = '#7A8BA0';
+    const font = "'IBM Plex Mono', monospace";
+    new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels.map(l => l.slice(2).replace('-', '/')),
+        datasets: [{
+          data: values,
+          backgroundColor: 'rgba(247,147,26,0.65)',
+          borderColor: '#F7931A', borderWidth: 1, borderRadius: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0C0F14', borderColor: '#1A1F2A', borderWidth: 1,
+            titleColor: tick, bodyColor: '#F7931A',
+            titleFont: { family: font, size: 10 }, bodyFont: { family: font, size: 11 },
+            callbacks: { label: ctx => ctx.parsed.y.toFixed(0) + ' EH/s' }
+          }
+        },
+        scales: {
+          x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 10 }, maxTicksLimit: 12 } },
+          y: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 11 }, callback: v => v + ' EH' } }
+        }
+      }
+    });
+  } catch (e) {
+    if (meta) meta.textContent = 'ДАННЫЕ НЕДОСТУПНЫ';
+    console.warn('fetchHashrateHistory:', e);
   }
 }
 

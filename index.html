@@ -1738,8 +1738,15 @@ header {
 .dash-narrative-cluster {
   margin-bottom: 8px;
 }
+.dash-narrative-cluster-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
 .dash-narrative-cluster-name {
-  display: block;
+  flex: 1;
+  min-width: 0;
   color: var(--btc);
   font-family: var(--sans);
   font-size: 13px;
@@ -1748,11 +1755,11 @@ header {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 6px;
 }
 .dash-narrative-meta {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
   flex-wrap: wrap;
 }
@@ -6158,9 +6165,11 @@ function renderDashboard() {
 
     item.innerHTML =
         '<div class="dash-narrative-cluster">'
-      +   '<div class="dash-narrative-cluster-name" title="' + sanitize(label) + '">' + label + '</div>'
-      +   '<div class="dash-narrative-meta">'
+      +   '<div class="dash-narrative-cluster-top">'
+      +     '<div class="dash-narrative-cluster-name" title="' + sanitize(label) + '">' + label + '</div>'
       +     '<span class="dash-meta-badge" style="color:var(--btc);border-color:rgba(247,147,26,.4)">' + n + '</span>'
+      +   '</div>'
+      +   '<div class="dash-narrative-meta">'
       +     (weak ? '<span class="dash-meta-badge" style="color:var(--red);border-color:rgba(194,96,96,.4)">СЛАБЫЙ СИГНАЛ</span>' : '')
       +     (phaseInfo.label ? '<span class="dash-meta-badge" style="color:' + phaseInfo.color + ';border-color:' + phaseInfo.border + '">' + phaseInfo.label + '</span>' : '')
       +     '<span class="dash-meta-badge" style="color:' + (freshness.stale ? 'var(--red)' : 'var(--dim)') + ';border-color:' + (freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)') + '" title="' + sanitize(freshness.title) + '">'

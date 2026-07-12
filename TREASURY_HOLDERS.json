@@ -15,7 +15,7 @@
       "name": "Strategy",
       "country": "US",
       "ticker": "MSTR",
-      "btc": 847363,
+      "btc": 843775,
       "mnav": 1.07
     },
     {
@@ -63,7 +63,7 @@
       "name": "Strive",
       "country": "US",
       "ticker": "ASST",
-      "btc": 19864,
+      "btc": 19882,
       "mnav": 1.28
     },
     {
@@ -199,7 +199,7 @@
       "name": "OranjeBTC",
       "country": "BR",
       "ticker": "OBTC3",
-      "btc": 3898,
+      "btc": 3904,
       "mnav": 0.86
     },
     {

@@ -3,8 +3,26 @@
   "_source": "signals.json (facts[] по каждому сигналу)",
   "generated_at": "2026-07-12",
   "facts": {
+    "bstr.btc_holdings": {
+      "value": 30021,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    },
+    "el_salvador.btc_holdings": {
+      "value": 7700.37,
+      "unit": "BTC",
+      "as_of": "2026-07-01",
+      "signal_id": "STR-2026-0701-002"
+    },
     "etf_exchanges.btc_holdings": {
       "value": 1600000,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    },
+    "mara_holdings.btc_holdings": {
+      "value": 36303,
       "unit": "BTC",
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
@@ -14,6 +32,12 @@
       "unit": "BTC",
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
+    },
+    "oranjebtc.btc_holdings": {
+      "value": 3904,
+      "unit": "BTC",
+      "as_of": "2026-07-06",
+      "signal_id": "STR-2026-0706-002"
     },
     "strategy.btc_holdings": {
       "value": 843775,
@@ -27,8 +51,20 @@
       "as_of": "2026-07-05",
       "signal_id": "STR-2026-0706-001"
     },
+    "strive.btc_holdings": {
+      "value": 19882,
+      "unit": "BTC",
+      "as_of": "2026-07-06",
+      "signal_id": "STR-2026-0706-003"
+    },
     "top100_public_companies.btc_holdings": {
       "value": 1264867,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    },
+    "twenty_one_capital.btc_holdings": {
+      "value": 43514,
       "unit": "BTC",
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"

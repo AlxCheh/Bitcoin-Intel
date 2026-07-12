@@ -20,7 +20,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from build_facts import resolve_facts  # noqa: E402
+from build_facts import resolve_facts, sync_treasury_holders  # noqa: E402
 
 
 def _load_signals() -> list[dict]:
@@ -81,3 +81,40 @@ def test_real_signals_json_facts_resolve_without_error():
     signals = _load_signals()
     resolved = resolve_facts(signals)
     assert isinstance(resolved, dict)
+
+
+def test_sync_treasury_holders_fixes_stale_value(tmp_path, monkeypatch):
+    import build_facts
+
+    fake_treasury = {
+        "holders": [
+            {"rank": 1, "name": "Strategy", "btc": 999999},
+            {"rank": 2, "name": "Unmapped Company Ltd.", "btc": 111},
+        ]
+    }
+    path = tmp_path / "TREASURY_HOLDERS.json"
+    path.write_text(json.dumps(fake_treasury), encoding="utf-8")
+    monkeypatch.setattr(build_facts, "TREASURY_PATH", path)
+
+    resolved = {"strategy.btc_holdings": {"value": 843775, "unit": "BTC",
+                                           "as_of": "2026-07-05", "signal_id": "X-1"}}
+    fixed = sync_treasury_holders(resolved)
+    assert fixed == 1
+
+    updated = json.loads(path.read_text(encoding="utf-8"))
+    assert updated["holders"][0]["btc"] == 843775
+    assert updated["holders"][1]["btc"] == 111  # немаппленная запись не тронута
+
+
+def test_sync_treasury_holders_noop_when_already_current(tmp_path, monkeypatch):
+    import build_facts
+
+    fake_treasury = {"holders": [{"rank": 1, "name": "Strategy", "btc": 843775}]}
+    path = tmp_path / "TREASURY_HOLDERS.json"
+    path.write_text(json.dumps(fake_treasury), encoding="utf-8")
+    monkeypatch.setattr(build_facts, "TREASURY_PATH", path)
+
+    resolved = {"strategy.btc_holdings": {"value": 843775, "unit": "BTC",
+                                           "as_of": "2026-07-05", "signal_id": "X-1"}}
+    fixed = sync_treasury_holders(resolved)
+    assert fixed == 0

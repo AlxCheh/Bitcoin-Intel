@@ -118,3 +118,57 @@ def test_sync_treasury_holders_noop_when_already_current(tmp_path, monkeypatch):
                                            "as_of": "2026-07-05", "signal_id": "X-1"}}
     fixed = sync_treasury_holders(resolved)
     assert fixed == 0
+
+
+def test_no_forgotten_stale_fact_copies_in_index_html():
+    """FACTS Фаза 5 — сторожевой тест против повторного дрейфа (см.
+    scripts/check_stale_facts.py). Падает, если где-то в index.html или
+    TREASURY_HOLDERS.json осталось голым текстом устаревшее (не текущее)
+    значение отслеживаемого факта — вне <... data-fact-key="..."> и вне
+    JS constant fallback (легитимные исключения, см. сам скрипт)."""
+    import check_stale_facts
+    findings = check_stale_facts.find_stale_occurrences()
+    assert not findings, (
+        "Забытые копии устаревших значений фактов:\n"
+        + "\n".join(f"  - {k} = {v} ({where})" for k, v, where in findings)
+    )
+
+
+def test_strip_safe_spans_excludes_any_tag_with_fact_key():
+    import check_stale_facts as csf
+    html = '<div id="x" data-fact-key="a.b">999999</div><p>888888</p>'
+    stripped = csf.strip_safe_spans(html)
+    assert "999999" not in stripped
+    assert "888888" in stripped  # не помечено — должно остаться
+
+
+def test_strip_safe_spans_excludes_js_const_fallback():
+    import check_stale_facts as csf
+    html = "const MSTR_BTC_RESERVE = 847363;\n<div>847363</div>"
+    stripped = csf.strip_safe_spans(html)
+    assert stripped.count("847363") == 1  # константа вычищена, текст в div остался
+
+
+def test_number_variants_covers_common_formats():
+    import check_stale_facts as csf
+    variants = csf.number_variants(847363)
+    assert "847,363" in variants
+    assert "847 363" in variants
+    assert "847363" in variants
+
+
+def test_check_stale_facts_catches_injected_stale_copy(tmp_path, monkeypatch):
+    """Проверка, что детектор действительно СРАБАТЫВАЕТ на подставленный
+    случай — не только молча проходит на чистом репозитории."""
+    import check_stale_facts as csf
+
+    fake_html = tmp_path / "index.html"
+    fake_html.write_text('<div class="stat-val">847 363 BTC</div>', encoding="utf-8")
+    monkeypatch.setattr(csf, "INDEX_HTML", fake_html)
+    fake_treasury = tmp_path / "TREASURY_HOLDERS.json"
+    fake_treasury.write_text('{"holders": []}', encoding="utf-8")
+    monkeypatch.setattr(csf, "TREASURY_PATH", fake_treasury)
+
+    findings = csf.find_stale_occurrences()
+    keys_found = [f[0] for f in findings]
+    assert "strategy.btc_holdings" in keys_found

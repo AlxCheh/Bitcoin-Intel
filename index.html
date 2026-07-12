@@ -1036,6 +1036,15 @@ header {
   background: var(--bg2);
   border: 1px solid var(--btc);
 }
+/* scroll-margin-top на ВСЕХ потенциальных целях scrollIntoView — не
+   точечно на отдельных панелях (та практика уже пропустила большинство
+   панелей — заголовок при переходе прятался под sticky-шапкой,
+   4px градиент + 48px header = 52px, здесь с запасом). Раньше
+   scroll-margin-top:64px добавлялся вручную на каждую конкретную
+   панель по мере необходимости — не системно. */
+.panel, .acc-item, .terminal {
+  scroll-margin-top: 64px;
+}
 .panel-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px;

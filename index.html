@@ -1736,15 +1736,35 @@ header {
   border-top: 1px solid var(--line);
 }
 .dash-narrative-cluster {
-  font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em;
-  color: var(--dim); margin-bottom: 6px;
-  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
 }
 .dash-narrative-cluster-name {
+  display: block;
   color: var(--btc);
-  font-size: 10px;
+  font-family: var(--sans);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+.dash-narrative-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.dash-meta-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 .dash-narrative-item.pos .dash-narrative-text { color: var(--grn); }
 .dash-narrative-item.neg .dash-narrative-text { color: var(--red); }
@@ -6062,11 +6082,11 @@ function renderDashboard() {
   // "разрешённое противоречие" от "активного конфликта" с первого взгляда.
   function formatPhaseLabel(phase) {
     switch (phase) {
-      case 'resolution': return { label: '✓ РАЗРЕШЕНО',      color: 'var(--grn)' };
-      case 'active':     return { label: 'АКТИВНЫЙ КОНФЛИКТ', color: 'var(--btc)' };
-      case 'tension':    return { label: 'ПРОТИВОРЕЧИЕ',      color: 'var(--amber)' };
-      case 'structural': return { label: 'СТРУКТУРНЫЙ ФОН',   color: 'var(--dim)' };
-      default:           return { label: '',                  color: 'var(--dim)' };
+      case 'resolution': return { label: '✓ РАЗРЕШЕНО',      color: 'var(--grn)', border: 'rgba(90,158,114,.4)' };
+      case 'active':     return { label: 'АКТИВНЫЙ КОНФЛИКТ', color: 'var(--btc)', border: 'rgba(247,147,26,.4)' };
+      case 'tension':    return { label: 'ПРОТИВОРЕЧИЕ',      color: 'var(--amber)', border: 'rgba(200,168,75,.4)' };
+      case 'structural': return { label: 'СТРУКТУРНЫЙ ФОН',   color: 'var(--dim)', border: 'rgba(122,139,160,.35)' };
+      default:           return { label: '',                  color: 'var(--dim)', border: 'rgba(122,139,160,.35)' };
     }
   }
 
@@ -6115,7 +6135,6 @@ function renderDashboard() {
     const isHot  = score.total >= SCORE_HOT;
     const bdId   = 'nbd-' + idx;
     const label  = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
-    const cnt    = n + ' сигнал' + (n===1?'':n<5?'а':'ов');
     const macroText = synthesis.narrative || '—';
     const tension   = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '';
     // synthesis доступен для takeaway и strength
@@ -6138,13 +6157,16 @@ function renderDashboard() {
     if (idx > 0) item.style.borderTop = '1px solid var(--line)';
 
     item.innerHTML =
-        '<div class="dash-narrative-cluster" style="margin-bottom:8px">'
-      +   '<span class="dash-narrative-cluster-name">' + label + (weak ? ' · СЛАБЫЙ СИГНАЛ' : '') + '</span>'
-      +   '<span style="color:var(--dim);font-size:8px;margin-left:8px">' + cnt + '</span>'
-      +   (phaseInfo.label ? '<span style="color:' + phaseInfo.color + ';font-size:8px;margin-left:8px;font-weight:600">' + phaseInfo.label + '</span>' : '')
-      +   '<span style="color:' + (freshness.stale ? 'var(--red)' : 'var(--dim)') + ';font-size:8px;margin-left:8px" title="' + sanitize(freshness.title) + '">'
-      +     (freshness.stale ? '⚠ ' : '') + sanitize(freshness.label)
-      +   '</span>'
+        '<div class="dash-narrative-cluster">'
+      +   '<div class="dash-narrative-cluster-name" title="' + sanitize(label) + '">' + label + '</div>'
+      +   '<div class="dash-narrative-meta">'
+      +     '<span class="dash-meta-badge" style="color:var(--btc);border-color:rgba(247,147,26,.4)">' + n + '</span>'
+      +     (weak ? '<span class="dash-meta-badge" style="color:var(--red);border-color:rgba(194,96,96,.4)">СЛАБЫЙ СИГНАЛ</span>' : '')
+      +     (phaseInfo.label ? '<span class="dash-meta-badge" style="color:' + phaseInfo.color + ';border-color:' + phaseInfo.border + '">' + phaseInfo.label + '</span>' : '')
+      +     '<span class="dash-meta-badge" style="color:' + (freshness.stale ? 'var(--red)' : 'var(--dim)') + ';border-color:' + (freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)') + '" title="' + sanitize(freshness.title) + '">'
+      +       (freshness.stale ? '⚠ ' : '') + sanitize(freshness.label)
+      +     '</span>'
+      +   '</div>'
       + '</div>'
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
       + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightEntities(tension) + '</div>' : '')

@@ -62,6 +62,41 @@ def load_signals() -> list[dict]:
     return raw.get("signals", raw) if isinstance(raw, dict) else raw
 
 
+def history_of_facts(signals: list[dict]) -> dict[str, list[dict]]:
+    """В отличие от resolve_facts() (только текущее значение), возвращает
+    ВСЕ значения, когда-либо встреченные на каждый key — нужно, чтобы
+    найти значения, которые были актуальны раньше, но с тех пор устарели
+    (см. superseded_values() и scripts/check_stale_facts.py)."""
+    history: dict[str, list[dict]] = {}
+    for sig in signals:
+        for fact in sig.get("facts", []) or []:
+            key = fact["key"]
+            history.setdefault(key, []).append({
+                "value": fact["value"],
+                "unit": fact["unit"],
+                "as_of": fact["as_of"],
+                "signal_id": sig["id"],
+            })
+    return history
+
+
+def superseded_values(signals: list[dict]) -> dict[str, list]:
+    """Для каждого key с более чем одним значением в истории — список
+    значений (уникальных), которые НЕ являются текущим (по as_of). Именно
+    эти значения не должны встречаться голым текстом в index.html вне
+    data-fact-key — если встречаются, это забытая при миграции копия
+    (см. scripts/check_stale_facts.py)."""
+    history = history_of_facts(signals)
+    resolved = resolve_facts(signals)
+    result: dict[str, list] = {}
+    for key, entries in history.items():
+        current_value = resolved[key]["value"]
+        stale = sorted({e["value"] for e in entries if e["value"] != current_value})
+        if stale:
+            result[key] = stale
+    return result
+
+
 def resolve_facts(signals: list[dict]) -> dict[str, dict]:
     """Для каждого встреченного key оставляет запись с максимальным as_of.
     При равенстве as_of — оставляет ту, что встретилась раньше в signals.json

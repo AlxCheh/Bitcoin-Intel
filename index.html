@@ -2062,7 +2062,7 @@ header {
 
         <div class="instrument-stat-grid">
           <div class="instrument-stat"><div class="instrument-stat-label">ТИП</div><div class="instrument-stat-val">Обыкновенная акция</div></div>
-          <div class="instrument-stat"><div class="instrument-stat-label">BTC-РЕЗЕРВ</div><div class="instrument-stat-val" style="color:var(--btc)">847 363 BTC</div></div>
+          <div class="instrument-stat"><div class="instrument-stat-label">BTC-РЕЗЕРВ</div><div class="instrument-stat-val" style="color:var(--btc)"><span data-fact-key="strategy.btc_holdings">847 363</span> BTC</div></div>
           <div class="instrument-stat"><div class="instrument-stat-label">NAV-СТАТУС</div><div class="instrument-stat-val" style="color:var(--red)">Дисконт 0.83×</div></div>
         </div>
 
@@ -2084,7 +2084,7 @@ header {
           <!-- Определение — всегда видно -->
           <div style="padding:10px 12px 12px;border-bottom:1px solid var(--line)">
             <div style="font-family:var(--sans);font-size:12px;color:var(--txt);line-height:1.6">
-              NAV (Net Asset Value) — справедливая стоимость компании если продать все активы и погасить все долги. Для Strategy это почти синоним стоимости BTC-резерва: <span style="color:var(--btc)">847 363 BTC × цена BTC = NAV</span>. Когда MSTR стоит дороже NAV — это <span style="color:var(--grn)">премия</span>. Когда дешевле — <span style="color:var(--red)">дисконт</span>.
+              NAV (Net Asset Value) — справедливая стоимость компании если продать все активы и погасить все долги. Для Strategy это почти синоним стоимости BTC-резерва: <span style="color:var(--btc)"><span data-fact-key="strategy.btc_holdings">847 363</span> BTC × цена BTC = NAV</span>. Когда MSTR стоит дороже NAV — это <span style="color:var(--grn)">премия</span>. Когда дешевле — <span style="color:var(--red)">дисконт</span>.
             </div>
           </div>
 
@@ -2104,7 +2104,7 @@ header {
                 </div>
               </div>
               <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.65">
-                <span style="color:var(--txt)">Пример (июнь 2026):</span> 847 363 BTC × $59 000 = $49,9 млрд BTC NAV. Минус долг ~$8,2 млрд и привилегированные обязательства ~$4,1 млрд = Чистый NAV ~$37,6 млрд. Акций в обращении ~242 млн → NAV на акцию ~$155. MSTR торгуется по $92 → мультипликатор 0.59×.
+                <span style="color:var(--txt)">Пример (июнь 2026):</span> <span data-fact-key="strategy.btc_holdings">847 363</span> BTC × $59 000 = $49,9 млрд BTC NAV. Минус долг ~$8,2 млрд и привилегированные обязательства ~$4,1 млрд = Чистый NAV ~$37,6 млрд. Акций в обращении ~242 млн → NAV на акцию ~$155. MSTR торгуется по $92 → мультипликатор 0.59×.
               </div>
             </div>
           </div>
@@ -2273,7 +2273,7 @@ header {
 
         <div class="instrument-label">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
         <div class="instrument-badges">
-          <span class="instrument-badge dim">BTC-резерв: 847 363 BTC</span>
+          <span class="instrument-badge dim">BTC-резерв: <span data-fact-key="strategy.btc_holdings">847 363</span> BTC</span>
           <span class="instrument-badge dim">USD-резерв: $1,4 млрд</span>
           <span class="instrument-badge dim">Покрытие: ~14 мес.</span>
           <span class="instrument-badge red">Ниже номинала: $84–87 (июнь 2026)</span>
@@ -2616,7 +2616,7 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Bitcoin постепенно поглощает функции традиционных банков: денежные переводы, микроплатежи, p2p-кредитование, торговля активами. Институциональный капитал входит через ETF, корпоративные казначейства, суверенные резервы. Этот процесс необратим — деньги, однажды вошедшие в Bitcoin-инфраструктуру, не возвращаются в старую систему.</p>
           <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
-            2026: BlackRock IBIT, Fidelity FBTC, суверенные резервы США, Strategy 847K BTC — эффект 06 в действии
+            2026: BlackRock IBIT, Fidelity FBTC, суверенные резервы США, Strategy <span data-fact-key="strategy.btc_holdings" data-fact-format="k">847K</span> BTC — эффект 06 в действии
           </div>
         </div>
       </div>
@@ -2990,8 +2990,8 @@ function toggleNav(id) {
                 </tr>
               </thead>
               <tbody>
-                <tr><td class="td-dim">Strategy</td><td>847 363</td><td style="color:var(--red)">0.83x</td><td class="td-grn">~15% YTD</td></tr>
-                <tr><td class="td-dim">Metaplanet</td><td>40 177</td><td style="color:var(--red)">&lt;1x</td><td class="td-grn">2.8% Q1</td></tr>
+                <tr><td class="td-dim">Strategy</td><td><span data-fact-key="strategy.btc_holdings">847 363</span></td><td style="color:var(--red)">0.83x</td><td class="td-grn">~15% YTD</td></tr>
+                <tr><td class="td-dim">Metaplanet</td><td><span data-fact-key="metaplanet.btc_holdings">43 000</span></td><td style="color:var(--red)">&lt;1x</td><td class="td-grn">2.8% Q1</td></tr>
               </tbody>
             </table>
           </div>
@@ -3169,8 +3169,8 @@ function toggleNav(id) {
         <span class="panel-tag">ХАЛВИНГИ</span>
       </div>
       <div id="emission-speed-wrap"></div>
-      <div class="amber-foot" style="padding:10px 14px;font-size:11px;font-family:var(--mono);border-top:1px solid var(--line)">
-        Осталось добыть: ~2,086,170 BTC (9.9%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
+      <div class="amber-foot" id="emission-remaining-foot" style="padding:10px 14px;font-size:11px;font-family:var(--mono);border-top:1px solid var(--line)">
+        Осталось добыть: ~1.3M BTC. Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
       </div>
     </div>
   </div>
@@ -6627,9 +6627,30 @@ async function fetchFacts() {
     const data = await res.json();
     window.FACTS = data.facts || {};
     renderFactsAggregate();
+    applyFactsToDOM();
   } catch (e) {
     console.warn('fetchFacts:', e);
   }
+}
+
+// Универсальный механизм: любой элемент с data-fact-key="entity_id.metric"
+// автоматически подхватывает актуальное значение из window.FACTS при
+// каждом fetchFacts(). Формат вывода — data-fact-format:
+//   full (по умолчанию) — "843 375" (toLocaleString ru-RU)
+//   k                    — "844K" (округление до тысяч)
+// Оборачивать только САМО число в разметке, не весь текст/предложение —
+// так фраза вокруг числа не теряется при миграции старого статичного текста.
+function fmtFactValue(value, format) {
+  if (format === 'k') return Math.round(value / 1000) + 'K';
+  return value.toLocaleString('ru-RU');
+}
+function applyFactsToDOM() {
+  document.querySelectorAll('[data-fact-key]').forEach(el => {
+    const fact = window.FACTS[el.dataset.factKey];
+    if (!fact) return; // факт ещё не подъехал/ключ не найден — оставляем плейсхолдер как есть
+    el.textContent = fmtFactValue(fact.value, el.dataset.factFormat);
+    el.title = 'Источник: ' + fact.signal_id + ' · на ' + fact.as_of;
+  });
 }
 
 function renderFactsAggregate() {
@@ -6895,6 +6916,7 @@ function initCharts() {
   fetchDifficulty();  // live difficulty data + chart
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
   fetchVolumeData();  // объём торгов — статичный data/volume.json, обновляется раз в сутки GitHub Action'ом
+  fetchRemainingSupply();  // детерминированный расчёт по высоте блока — не зависит от сигналов/снэпшотов
 
   const grid  = 'rgba(26,31,42,1)';
   const tick  = '#7A8BA0';
@@ -6978,6 +7000,41 @@ function fmtVolumeUsd(n) {
   if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
   if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
   return '$' + n.toLocaleString('en-US');
+}
+
+// Осталось добыть BTC — детерминированный расчёт по текущей высоте блока
+// (протокольная константа, не аналитический факт — не через FACTS/сигналы,
+// см. CLAUDE.md 'FACTS' § Что НЕ проходит через этот механизм).
+// Раньше это был статичный текст с данными Oct 2024 (2,086,170 BTC) —
+// молча разошёлся с реальностью (в июле 2026 фактически ~947K).
+function calcTotalMined(height) {
+  let mined = 0, reward = 50, blocksLeft = height;
+  while (blocksLeft > 0 && reward > 1e-8) {
+    const blocksInEra = Math.min(blocksLeft, 210000);
+    mined += blocksInEra * reward;
+    blocksLeft -= blocksInEra;
+    reward /= 2;
+  }
+  return mined;
+}
+
+async function fetchRemainingSupply() {
+  const el = document.getElementById('emission-remaining-foot');
+  if (!el) return;
+  try {
+    const res = await fetch('https://mempool.space/api/blocks/tip/height');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const height = parseInt(await res.text(), 10);
+    if (!Number.isFinite(height)) throw new Error('bad height');
+    const totalMined = calcTotalMined(height);
+    const remaining = 21000000 - totalMined;
+    const remainingPct = (remaining / 21000000 * 100).toFixed(2);
+    el.textContent = 'Осталось добыть: ~' + (remaining / 1e6).toFixed(3) + 'M BTC (' +
+      remainingPct + '%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок. ' +
+      '(блок ' + height.toLocaleString('ru-RU') + ')';
+  } catch (e) {
+    console.warn('fetchRemainingSupply:', e);
+  }
 }
 
 async function fetchVolumeData() {

@@ -27,6 +27,12 @@
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
     },
+    "metaplanet.btc_holdings": {
+      "value": 43000,
+      "unit": "BTC",
+      "as_of": "2026-07-03",
+      "signal_id": "STR-2026-0703-001"
+    },
     "oranjebtc.btc_holdings": {
       "value": 3904,
       "unit": "BTC",

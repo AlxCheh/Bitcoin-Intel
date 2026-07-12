@@ -2179,6 +2179,12 @@
           "value": 30021,
           "unit": "BTC",
           "as_of": "2026-07-03"
+        },
+        {
+          "key": "metaplanet.btc_holdings",
+          "value": 43000,
+          "unit": "BTC",
+          "as_of": "2026-07-03"
         }
       ]
     },

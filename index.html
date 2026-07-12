@@ -3089,8 +3089,41 @@ function toggleNav(id) {
       <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:var(--mono);border-top:1px solid var(--line)">
         Расчёт: 144 блока/сутки (среднее ~10 мин/блок) × награда за блок. Даты будущих халвингов — оценка по текущему блоку и среднему интервалу, сместится вместе с хешрейтом сети.
       </div>
+      <div class="amber-foot" id="emission-remaining-foot" style="padding:10px 14px;font-size:11px;font-family:var(--mono);border-top:1px solid var(--line)">
+        Осталось добыть: ~1.3M BTC. Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
+      </div>
     </div>
 
+    <div class="panel amber">
+      <div class="panel-head">
+        <span class="panel-title">Not Yet Mined · динамика</span>
+        <span class="panel-tag">⛏️ МАЙНИНГ</span>
+      </div>
+      <div id="emission-table-wrap"></div>
+    </div>
+
+    <!-- INFLATION COMPARISON TABLE -->
+    <div class="panel amber">
+      <div class="panel-head">
+        <span class="panel-title">Монетарная инфляция</span>
+        <span class="panel-tag">СРАВНЕНИЕ</span>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="dtable zebra">
+        <thead>
+          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
+        </thead>
+        <tbody>
+          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
+          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
+          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
+        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%. Текущий остаток предложения — см. «Таблица халвингов» выше.
+      </div>
+    </div>
 
     <div class="panel amber">
       <div class="panel-head">
@@ -3144,58 +3177,6 @@ function toggleNav(id) {
       </div>
     </div>
 
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     MACRO / ХОЛДЕРЫ
-══════════════════════════════════════ -->
-
-<!-- ══════════════════════════════════════
-     MACRO / ЭМИССИЯ
-══════════════════════════════════════ -->
-<section class="section" id="tab-emission">
-  <div class="page">
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Not Yet Mined · динамика</span>
-        <span class="panel-tag">⛏️ МАЙНИНГ</span>
-      </div>
-      <div id="emission-table-wrap"></div>
-    </div>
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Скорость сокращения эмиссии</span>
-        <span class="panel-tag">ХАЛВИНГИ</span>
-      </div>
-      <div id="emission-speed-wrap"></div>
-      <div class="amber-foot" id="emission-remaining-foot" style="padding:10px 14px;font-size:11px;font-family:var(--mono);border-top:1px solid var(--line)">
-        Осталось добыть: ~1.3M BTC. Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
-      </div>
-    </div>
-
-    <!-- INFLATION COMPARISON TABLE (перенесено из МЕТРИКИ) -->
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Монетарная инфляция</span>
-        <span class="panel-tag">СРАВНЕНИЕ</span>
-      </div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table class="dtable zebra">
-        <thead>
-          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
-        </thead>
-        <tbody>
-          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
-          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
-          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
-        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%. Текущий остаток предложения — см. панель «Скорость сокращения эмиссии» выше.
-      </div>
-    </div>
   </div>
 </section>
 
@@ -6120,13 +6101,13 @@ function updateCrumb(id) {
 const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
-  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['emission','ЭМИССИЯ'],['history','ИСТОРИЯ']] },
+  macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['history','ИСТОРИЯ']] },
   analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','АРХИВ']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
   tech:'knowledge', lightning:'knowledge', instruments:'knowledge',
-  theory:'macro', history:'macro', emission:'macro', macrocontext:'macro',
+  theory:'macro', history:'macro', macrocontext:'macro',
   signals:'analysis', holders:'analysis', base:'analysis'
 };
 
@@ -6225,7 +6206,7 @@ function showTab(id, btn, keepCluster) {
   if (id === 'theory') renderTheoryEssays();
   if (id === 'macrocontext') renderTheoryTopics();
   if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
-  if (id === 'emission')  renderEmission();
+  if (id === 'history')   renderEmission();
   if (id === 'signals')   renderPresetSignals();
 }
 
@@ -7182,19 +7163,6 @@ function renderEmission() {
   });
   tbl += '</tbody></table></div>';
   document.getElementById('emission-table-wrap').innerHTML = tbl;
-
-  // Скорость сокращения
-  let sp = '<div style="overflow-x:auto"><table class="dtable zebra"><thead><tr><th>Период</th><th>Сокращение %</th><th>Лет</th></tr></thead><tbody>';
-  HOLDERS_DATA.emission.forEach((e, i) => {
-    const isLast = i === HOLDERS_DATA.emission.length - 1;
-    sp += '<tr' + (isLast ? ' class="current"' : '') + '>'
-        + '<td>' + e.period + '</td>'
-        + '<td>−' + e.drop_pct + '%</td>'
-        + '<td>' + e.years + '</td>'
-        + '</tr>';
-  });
-  sp += '</tbody></table></div>';
-  document.getElementById('emission-speed-wrap').innerHTML = sp;
 }
 
 // ══════════════════════════════════════════════════════

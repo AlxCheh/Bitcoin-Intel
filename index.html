@@ -217,6 +217,34 @@ header {
   font-family: var(--mono); font-size: 9px; color: var(--dim);
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 8px 16px 4px;
+  scroll-margin-top: 8px;
+}
+.sm-tab-row {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px 8px;
+  flex-wrap: wrap;
+}
+.sm-tab-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 6px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sm-tab-btn:hover, .sm-tab-btn:active {
+  color: var(--btc);
+  border-color: var(--btc);
 }
 .sm-entry {
   display: flex; align-items: center; gap: 8px;
@@ -6565,6 +6593,16 @@ function jumpToSiteMapCluster(clusterKey) {
   if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Переход к заголовку конкретной вкладки внутри дерева (строка кнопок
+// под названием кластера) — id вкладок уникальны сайт-целиком, доп.
+// скоуп по кластеру не нужен.
+function jumpToSiteMapTab(tabKey) {
+  const search = document.getElementById('sitemap-search');
+  if (search.value) { search.value = ''; renderSiteMap(SITE_MAP.entries); }
+  const head = document.querySelector('.sm-tab-head[data-tab="' + tabKey + '"]');
+  if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function filterSiteMap(query) {
   if (!SITE_MAP) return;
   const q = query.trim().toLowerCase();
@@ -6598,9 +6636,14 @@ function renderSiteMap(entries) {
   clusterOrder.forEach(clusterKey => {
     const cluster = clusters[clusterKey];
     html += '<div class="sm-cluster-head" data-cluster="' + clusterKey + '">' + cluster.label + '</div>';
+    html += '<div class="sm-tab-row">'
+      + cluster.tabOrder.map(tabKey =>
+          '<button class="sm-tab-btn" onclick="jumpToSiteMapTab(\'' + tabKey + '\')">' + cluster.tabs[tabKey].label + '</button>'
+        ).join('')
+      + '</div>';
     cluster.tabOrder.forEach(tabKey => {
       const tab = cluster.tabs[tabKey];
-      html += '<div class="sm-tab-head">' + tab.label + '</div>';
+      html += '<div class="sm-tab-head" data-tab="' + tabKey + '">' + tab.label + '</div>';
       tab.items.forEach(item => {
         const titleAttr = item.title.replace(/'/g, "\\'");
         html += '<div class="sm-entry" onclick="siteMapGoTo(\'' + tabKey + '\', \'' + titleAttr + '\')">'

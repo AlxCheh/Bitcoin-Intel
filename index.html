@@ -3435,32 +3435,6 @@ function toggleNav(id) {
       <div id="holders-waves"></div>
     </div>
 
-    <div style="height:650px" aria-hidden="true"></div>
-
-  </div>
-</section>
-
-<section class="section" id="tab-base">
-  <div class="page">
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Накопленные разборы</span>
-        <span class="panel-tag">SIGNALS.MD</span>
-      </div>
-      <div style="padding:24px 14px;text-align:center;color:var(--dim);font-size:12px;font-family:var(--mono)">
-        База пополняется по мере накопления материала.<br>
-        <span style="color:var(--btc)">Первые разборы появятся здесь.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="tab-tech">
-  <div class="page">
-
-
-    <div id="tech-toc"></div>
-
     <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="treasury-panel">
       <div class="panel-head collapsible" data-collapse-target="treasury-panel">
         <span class="panel-title">Топ-100 держателей BTC</span>
@@ -3505,6 +3479,32 @@ function toggleNav(id) {
       </div>
       <div class="re-list" id="re-list"></div>
     </div>
+
+    <div style="height:650px" aria-hidden="true"></div>
+
+  </div>
+</section>
+
+<section class="section" id="tab-base">
+  <div class="page">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Накопленные разборы</span>
+        <span class="panel-tag">SIGNALS.MD</span>
+      </div>
+      <div style="padding:24px 14px;text-align:center;color:var(--dim);font-size:12px;font-family:var(--mono)">
+        База пополняется по мере накопления материала.<br>
+        <span style="color:var(--btc)">Первые разборы появятся здесь.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="tab-tech">
+  <div class="page">
+
+
+    <div id="tech-toc"></div>
 
     <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="eco-panel">
       <div class="panel-head collapsible" data-collapse-target="eco-panel">
@@ -6369,10 +6369,10 @@ function showTab(id, btn, keepCluster) {
       if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
-  if (id === 'holders')   renderHolders();
+  if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderRevenueEngines(); }
   if (id === 'theory') renderTheoryEssays();
   if (id === 'macrocontext') renderTheoryTopics();
-  if (id === 'tech') { renderEcosystem(); renderRevenueEngines(); renderTreasuryHolders(); renderBitcoinFunctions(); }
+  if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
 }
@@ -6448,8 +6448,6 @@ renderTOC('lightning-toc', [
 ]);
 
 renderTOC('tech-toc', [
-  { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' },
-  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' },
   { target: 'eco-panel', title: 'Экосистема Bitcoin', subtitle: 'L2, протоколы, компании, фонды' },
   { target: 'protocols-panel', title: 'Протоколы', subtitle: 'Proof-of-Work, Lightning Network' },
   { target: 'bitcoin-functions-panel', title: 'Функции Bitcoin', subtitle: 'Практические возможности протокола' },
@@ -6459,7 +6457,9 @@ renderTOC('tech-toc', [
 renderTOC('holders-toc', [
   { target: 'holders-structure', title: 'Структура владения · 2009–2024', subtitle: 'On-chain распределение по категориям держателей' },
   { target: 'holders-trends-panel', title: 'Ключевые тренды', subtitle: 'Динамика перераспределения владения' },
-  { target: 'holders-waves-panel', title: 'Три волны институционализации', subtitle: 'Корпорации, ETF, государства' }
+  { target: 'holders-waves-panel', title: 'Три волны институционализации', subtitle: 'Корпорации, ETF, государства' },
+  { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' },
+  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' }
 ]);
 
 loadSignals();

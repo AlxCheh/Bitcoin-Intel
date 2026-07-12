@@ -115,3 +115,27 @@ def test_every_html_panel_title_is_in_manifest():
         "panel-title/acc-label в index.html без записи в data/site_map.json: "
         + str(missing)
     )
+
+
+def test_entries_are_grouped_contiguously_by_cluster_and_tab():
+    """Ловит регрессию 2026-07-12: точечное обновление cluster/tab у
+    перенесённой панели (без физического перемещения записи в массиве)
+    рассеивает записи одного кластера/вкладки по всему файлу — дерево
+    поиска на сайте показывает кластеры не в реальном порядке навигации
+    (например ANALYSIS всплывал между LIVE и ECOSYSTEM). Физический
+    порядок записей в data/site_map.json обязан совпадать с порядком
+    кластер→вкладка на сайте — при переносе панели её нужно не только
+    перекрасить полями, но и переместить в файле."""
+    manifest = _load_manifest()
+    seen_pairs = []
+    for e in manifest["entries"]:
+        pair = (e["cluster"], e["tab"])
+        if not seen_pairs or seen_pairs[-1] != pair:
+            if pair in seen_pairs:
+                raise AssertionError(
+                    f"Записи ({pair[0]}/{pair[1]}) не идут подряд в data/site_map.json — "
+                    "разбросаны минимум двумя группами. При переносе панели между "
+                    "вкладками нужно физически переместить её запись в файле, "
+                    "не только поменять поля cluster/tab."
+                )
+            seen_pairs.append(pair)

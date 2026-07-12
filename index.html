@@ -7421,7 +7421,11 @@ function renderHolders() {
   tbl += '</tr>';
 
   cats.forEach(c => {
-    tbl += '<tr><td>' + c.label + '</td>';
+    const isCompanies = c.key === 'companies';
+    const labelCell = isCompanies
+      ? '<td style="cursor:pointer;color:var(--btc);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px" onclick="document.getElementById(\'treasury-panel\').scrollIntoView({behavior:\'smooth\',block:\'start\'})" title="Смотреть детализацию по компаниям">' + c.label + '</td>'
+      : '<td>' + c.label + '</td>';
+    tbl += '<tr>' + labelCell;
     snapsDesc.forEach(s => {
       const v = s.categories[c.key];
       tbl += v

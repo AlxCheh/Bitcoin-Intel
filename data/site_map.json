@@ -1,5 +1,5 @@
 {
-  "_generated_by": "ручной инвентарь 2026-07-12, сверяется tests/unit/test_site_map_sync.py против panel-title/acc-label в index.html",
+  "_generated_by": "ручной инвентарь 2026-07-12, сверяется tests/unit/test_site_map_sync.py против panel-title/acc-label в index.html. Физический порядок записей = порядок кластеров/вкладок/панелей на сайте — важно для дерева поиска.",
   "_source_meaning": {
     "live": "живой fetch при каждой загрузке (mempool.space, Yahoo Finance и т.п.)",
     "facts": "из механизма FACTS (signals.json → data/facts.json) или синхронизируемых JSON (TREASURY_HOLDERS.json, data/holders.js)",
@@ -97,7 +97,6 @@
       "keywords": [
         "сигналы",
         "кластеры",
-        "дайджест",
         "дайджест"
       ],
       "dynamic": true
@@ -272,42 +271,11 @@
       "keywords": [
         "пулы",
         "майнинг",
-        "доля",
-        "Сводка по пулам (последние 10 блоков)"
+        "доля"
       ]
     },
     {
       "id": "e019",
-      "title": "Топ-100 держателей BTC",
-      "cluster": "analysis",
-      "cluster_label": "ANALYSIS",
-      "tab": "holders",
-      "tab_label": "ХОЛДЕРЫ",
-      "source": "facts",
-      "kind": "table",
-      "keywords": [
-        "казначейство",
-        "компании",
-        "treasury"
-      ]
-    },
-    {
-      "id": "e020",
-      "title": "Доходные движки",
-      "cluster": "analysis",
-      "cluster_label": "ANALYSIS",
-      "tab": "holders",
-      "tab_label": "ХОЛДЕРЫ",
-      "source": "static",
-      "kind": "table",
-      "keywords": [
-        "доход",
-        "дивиденды",
-        "revenue"
-      ]
-    },
-    {
-      "id": "e021",
       "title": "Экосистема Bitcoin",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -322,7 +290,7 @@
       ]
     },
     {
-      "id": "e022",
+      "id": "e020",
       "title": "Протоколы",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -337,7 +305,7 @@
       ]
     },
     {
-      "id": "e023",
+      "id": "e021",
       "title": "Proof-of-Work",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -352,7 +320,7 @@
       ]
     },
     {
-      "id": "e024",
+      "id": "e022",
       "title": "SECP256k1 криптография",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -367,7 +335,7 @@
       ]
     },
     {
-      "id": "e025",
+      "id": "e023",
       "title": "Скрипты Bitcoin",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -382,7 +350,7 @@
       ]
     },
     {
-      "id": "e026",
+      "id": "e024",
       "title": "Функции Bitcoin",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -396,7 +364,22 @@
       ]
     },
     {
-      "id": "e027",
+      "id": "e025",
+      "title": "Lightning Network",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "l2",
+        "функции bitcoin",
+        "обзор"
+      ]
+    },
+    {
+      "id": "e026",
       "title": "Архитектура",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -411,7 +394,7 @@
       ]
     },
     {
-      "id": "e028",
+      "id": "e027",
       "title": "Блокчейн",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -426,7 +409,7 @@
       ]
     },
     {
-      "id": "e029",
+      "id": "e028",
       "title": "Ключи и адреса",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -440,7 +423,7 @@
       ]
     },
     {
-      "id": "e030",
+      "id": "e029",
       "title": "Модель UTXO",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -455,7 +438,7 @@
       ]
     },
     {
-      "id": "e031",
+      "id": "e030",
       "title": "MSTR",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -467,12 +450,11 @@
         "strategy",
         "mstr",
         "nav",
-        "мультипликатор",
-        "MSTR — Strategy Common Stock"
+        "мультипликатор"
       ]
     },
     {
-      "id": "e032",
+      "id": "e031",
       "title": "STRC",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -483,12 +465,11 @@
       "keywords": [
         "strc",
         "дивиденды",
-        "привилегированная",
-        "STRC — Perpetual Preferred"
+        "привилегированная"
       ]
     },
     {
-      "id": "e033",
+      "id": "e032",
       "title": "Что такое Lightning Network",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -502,7 +483,7 @@
       ]
     },
     {
-      "id": "e034",
+      "id": "e033",
       "title": "Как работает маршрутизация",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -516,7 +497,7 @@
       ]
     },
     {
-      "id": "e035",
+      "id": "e034",
       "title": "Платёжные каналы",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -530,7 +511,7 @@
       ]
     },
     {
-      "id": "e036",
+      "id": "e035",
       "title": "Сеть каналов и HTLC",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -544,7 +525,7 @@
       ]
     },
     {
-      "id": "e037",
+      "id": "e036",
       "title": "Проблема ликвидности",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -559,7 +540,7 @@
       ]
     },
     {
-      "id": "e038",
+      "id": "e037",
       "title": "Как подключиться к Lightning",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -573,7 +554,7 @@
       ]
     },
     {
-      "id": "e039",
+      "id": "e038",
       "title": "Путь 1 — Кошелёк-кастодиан (просто, без узла)",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -587,7 +568,7 @@
       ]
     },
     {
-      "id": "e040",
+      "id": "e039",
       "title": "Путь 2 — Non-custodial кошелёк (твои ключи, без узла)",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -602,7 +583,7 @@
       ]
     },
     {
-      "id": "e041",
+      "id": "e040",
       "title": "Путь 3 — Своя нода (полный контроль)",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -617,7 +598,7 @@
       ]
     },
     {
-      "id": "e042",
+      "id": "e041",
       "title": "Сравнение подходов",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -631,7 +612,7 @@
       ]
     },
     {
-      "id": "e043",
+      "id": "e042",
       "title": "Ограничения и риски",
       "cluster": "knowledge",
       "cluster_label": "ECOSYSTEM",
@@ -645,7 +626,7 @@
       ]
     },
     {
-      "id": "e044",
+      "id": "e043",
       "title": "Что такое деньги",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -659,7 +640,7 @@
       ]
     },
     {
-      "id": "e045",
+      "id": "e044",
       "title": "Три функции денег",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -673,7 +654,7 @@
       ]
     },
     {
-      "id": "e046",
+      "id": "e045",
       "title": "Шесть свойств денег",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -687,7 +668,7 @@
       ]
     },
     {
-      "id": "e047",
+      "id": "e046",
       "title": "История денег: от бартера к Bitcoin",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -702,7 +683,7 @@
       ]
     },
     {
-      "id": "e048",
+      "id": "e047",
       "title": "Bitcoin vs Золото vs Фиат",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -716,7 +697,7 @@
       ]
     },
     {
-      "id": "e049",
+      "id": "e048",
       "title": "Асимметрия",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -730,7 +711,7 @@
       ]
     },
     {
-      "id": "e050",
+      "id": "e049",
       "title": "Семь сетевых эффектов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -744,7 +725,7 @@
       ]
     },
     {
-      "id": "e051",
+      "id": "e050",
       "title": "Спекуляция",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -758,7 +739,7 @@
       ]
     },
     {
-      "id": "e052",
+      "id": "e051",
       "title": "Принятие бизнесами",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -772,7 +753,7 @@
       ]
     },
     {
-      "id": "e053",
+      "id": "e052",
       "title": "Принятие потребителями",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -786,7 +767,7 @@
       ]
     },
     {
-      "id": "e054",
+      "id": "e053",
       "title": "Безопасность",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -800,7 +781,7 @@
       ]
     },
     {
-      "id": "e055",
+      "id": "e054",
       "title": "Предпочтение разработчиков",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -814,7 +795,7 @@
       ]
     },
     {
-      "id": "e056",
+      "id": "e055",
       "title": "Финансирование",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -828,7 +809,7 @@
       ]
     },
     {
-      "id": "e057",
+      "id": "e056",
       "title": "Мировая резервная валюта",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -841,7 +822,7 @@
       ]
     },
     {
-      "id": "e058",
+      "id": "e057",
       "title": "Стратегия DCA",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -855,7 +836,7 @@
       ]
     },
     {
-      "id": "e059",
+      "id": "e058",
       "title": "Почему не работает «купи дёшево»",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -869,7 +850,7 @@
       ]
     },
     {
-      "id": "e060",
+      "id": "e059",
       "title": "Как работает DCA",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -883,7 +864,7 @@
       ]
     },
     {
-      "id": "e061",
+      "id": "e060",
       "title": "Шесть преимуществ",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -897,7 +878,7 @@
       ]
     },
     {
-      "id": "e062",
+      "id": "e061",
       "title": "Модель PlanB: 1% в BTC",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -911,7 +892,7 @@
       ]
     },
     {
-      "id": "e063",
+      "id": "e062",
       "title": "DCA подходит если...",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -924,7 +905,7 @@
       ]
     },
     {
-      "id": "e064",
+      "id": "e063",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -938,7 +919,7 @@
       ]
     },
     {
-      "id": "e065",
+      "id": "e064",
       "title": "Что такое mNAV",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -953,7 +934,7 @@
       ]
     },
     {
-      "id": "e066",
+      "id": "e065",
       "title": "Почему возникает премия",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -967,7 +948,7 @@
       ]
     },
     {
-      "id": "e067",
+      "id": "e066",
       "title": "Машина аккреции: как работает при премии",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -981,7 +962,7 @@
       ]
     },
     {
-      "id": "e068",
+      "id": "e067",
       "title": "Дисконт: когда машина ломается",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -995,7 +976,7 @@
       ]
     },
     {
-      "id": "e069",
+      "id": "e068",
       "title": "BTC Yield — главный KPI",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1010,7 +991,7 @@
       ]
     },
     {
-      "id": "e070",
+      "id": "e069",
       "title": "Как читать mNAV при анализе сигналов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1024,7 +1005,7 @@
       ]
     },
     {
-      "id": "e071",
+      "id": "e070",
       "title": "Текущая награда майнера",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1039,7 +1020,7 @@
       ]
     },
     {
-      "id": "e072",
+      "id": "e071",
       "title": "Таблица халвингов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1054,7 +1035,7 @@
       ]
     },
     {
-      "id": "e073",
+      "id": "e072",
       "title": "Not Yet Mined · динамика",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1068,7 +1049,7 @@
       ]
     },
     {
-      "id": "e074",
+      "id": "e073",
       "title": "Монетарная инфляция",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1083,7 +1064,7 @@
       ]
     },
     {
-      "id": "e075",
+      "id": "e074",
       "title": "Ключевые события",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1098,7 +1079,7 @@
       ]
     },
     {
-      "id": "e076",
+      "id": "e075",
       "title": "Опиши аномалию или сигнал",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1113,7 +1094,7 @@
       ]
     },
     {
-      "id": "e077",
+      "id": "e076",
       "title": "Или выбери из базы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1126,7 +1107,7 @@
       ]
     },
     {
-      "id": "e078",
+      "id": "e077",
       "title": "Структура владения · 2009–2024",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1141,7 +1122,7 @@
       ]
     },
     {
-      "id": "e079",
+      "id": "e078",
       "title": "Ключевые тренды",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1155,7 +1136,7 @@
       ]
     },
     {
-      "id": "e080",
+      "id": "e079",
       "title": "Три волны институционализации",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1169,7 +1150,37 @@
       ]
     },
     {
+      "id": "e080",
+      "title": "Топ-100 держателей BTC",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "facts",
+      "kind": "table",
+      "keywords": [
+        "казначейство",
+        "компании",
+        "treasury"
+      ]
+    },
+    {
       "id": "e081",
+      "title": "Доходные движки",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "доход",
+        "дивиденды",
+        "revenue"
+      ]
+    },
+    {
+      "id": "e082",
       "title": "Накопленные разборы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1180,21 +1191,6 @@
       "keywords": [
         "архив",
         "разборы"
-      ]
-    },
-    {
-      "id": "e082",
-      "title": "Lightning Network",
-      "cluster": "knowledge",
-      "cluster_label": "ECOSYSTEM",
-      "tab": "tech",
-      "tab_label": "ТЕХНОЛОГИИ",
-      "source": "none",
-      "kind": "text",
-      "keywords": [
-        "l2",
-        "функции bitcoin",
-        "обзор"
       ]
     }
   ]

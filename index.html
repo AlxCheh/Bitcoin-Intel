@@ -166,6 +166,32 @@ header {
   font-size: 16px; cursor: pointer; padding: 4px 8px;
 }
 .sitemap-close:hover { color: var(--btc); }
+.sitemap-clusters {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.sm-cluster-btn {
+  background: transparent;
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sm-cluster-btn:hover, .sm-cluster-btn:active {
+  color: var(--btc);
+  border-color: var(--btc);
+}
 .sitemap-legend {
   display: flex; gap: 14px; flex-wrap: wrap;
   padding: 8px 16px;
@@ -1866,6 +1892,12 @@ header {
     <div class="sitemap-head">
       <input type="text" class="sitemap-search" id="sitemap-search" placeholder="Поиск по всему сайту… (например «халвинг»)" oninput="filterSiteMap(this.value)" autocomplete="off">
       <button class="sitemap-close" onclick="closeSiteMap()">✕</button>
+    </div>
+    <div class="sitemap-clusters">
+      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('live')">LIVE</button>
+      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('knowledge')">ECOSYSTEM</button>
+      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
+      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
     </div>
     <div class="sitemap-legend">
       <span><span class="sm-dot live"></span>живое</span>
@@ -6522,6 +6554,17 @@ function closeSiteMap() {
   document.getElementById('sitemap-overlay').classList.remove('open');
 }
 
+// Быстрый переход к заголовку кластера внутри оверлея (кнопки LIVE/
+// ECOSYSTEM/FUNDAMENTAL/ANALYSIS вверху) — сбрасывает поиск, чтобы
+// заголовок гарантированно был в DOM (при активном фильтре кластер
+// без совпадений может быть скрыт целиком).
+function jumpToSiteMapCluster(clusterKey) {
+  const search = document.getElementById('sitemap-search');
+  if (search.value) { search.value = ''; renderSiteMap(SITE_MAP.entries); }
+  const head = document.querySelector('.sm-cluster-head[data-cluster="' + clusterKey + '"]');
+  if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function filterSiteMap(query) {
   if (!SITE_MAP) return;
   const q = query.trim().toLowerCase();
@@ -6554,7 +6597,7 @@ function renderSiteMap(entries) {
   let html = '';
   clusterOrder.forEach(clusterKey => {
     const cluster = clusters[clusterKey];
-    html += '<div class="sm-cluster-head">' + cluster.label + '</div>';
+    html += '<div class="sm-cluster-head" data-cluster="' + clusterKey + '">' + cluster.label + '</div>';
     cluster.tabOrder.forEach(tabKey => {
       const tab = cluster.tabs[tabKey];
       html += '<div class="sm-tab-head">' + tab.label + '</div>';

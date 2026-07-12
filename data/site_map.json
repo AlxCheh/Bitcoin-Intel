@@ -279,10 +279,10 @@
     {
       "id": "e019",
       "title": "Топ-100 держателей BTC",
-      "cluster": "knowledge",
-      "cluster_label": "ECOSYSTEM",
-      "tab": "tech",
-      "tab_label": "ТЕХНОЛОГИИ",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
       "source": "facts",
       "kind": "table",
       "keywords": [
@@ -294,10 +294,10 @@
     {
       "id": "e020",
       "title": "Доходные движки",
-      "cluster": "knowledge",
-      "cluster_label": "ECOSYSTEM",
-      "tab": "tech",
-      "tab_label": "ТЕХНОЛОГИИ",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
       "source": "static",
       "kind": "table",
       "keywords": [

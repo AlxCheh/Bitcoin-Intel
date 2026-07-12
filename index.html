@@ -3173,6 +3173,29 @@ function toggleNav(id) {
         Осталось добыть: ~1.3M BTC. Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок.
       </div>
     </div>
+
+    <!-- INFLATION COMPARISON TABLE (перенесено из МЕТРИКИ) -->
+    <div class="panel amber">
+      <div class="panel-head">
+        <span class="panel-title">Монетарная инфляция</span>
+        <span class="panel-tag">СРАВНЕНИЕ</span>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="dtable zebra">
+        <thead>
+          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
+        </thead>
+        <tbody>
+          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
+          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
+          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
+        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%. Текущий остаток предложения — см. панель «Скорость сокращения эмиссии» выше.
+      </div>
+    </div>
   </div>
 </section>
 
@@ -3545,40 +3568,6 @@ function toggleNav(id) {
         <thead><tr><th>#</th><th>Дата</th><th>Объём</th></tr></thead>
         <tbody id="volume-top3-body"></tbody>
       </table>
-      </div>
-    </div>
-
-    <!-- INFLATION COMPARISON TABLE -->
-    <div class="panel amber">
-      <div class="panel-head">
-        <span class="panel-title">Монетарная инфляция</span>
-        <span class="panel-tag">СРАВНЕНИЕ</span>
-      </div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table class="dtable zebra">
-        <thead>
-          <tr><th>Актив</th><th>Инфляция 2026</th><th>После 2028</th><th>Лимит</th></tr>
-        </thead>
-        <tbody>
-          <tr class="current"><td>Bitcoin</td><td>~0.82% / год</td><td>~0.40% / год</td><td>21M BTC</td></tr>
-          <tr><td class="td-dim">Золото</td><td class="td-dim">~1.6% / год</td><td class="td-dim">~1.6% / год</td><td class="td-dim">неизвестен</td></tr>
-          <tr><td class="td-dim">Фиат (USD)</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">3–7% / год</td><td style="color:var(--red)">нет лимита</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <!-- Добыто/Осталось — перенесено из бывшей "Метрики сети" -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)">
-        <div style="padding:10px 14px;border-right:1px solid var(--line)">
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.05em;margin-bottom:4px">ДОБЫТО BTC</div>
-          <div style="font-family:var(--mono);font-size:15px;color:var(--btc);font-weight:700">~19.7M <span style="font-size:10px;color:var(--dim);font-weight:400">из 21 000 000</span></div>
-        </div>
-        <div style="padding:10px 14px">
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.05em;margin-bottom:4px">ОСТАЛОСЬ ДОБЫТЬ</div>
-          <div style="font-family:var(--mono);font-size:15px;color:var(--btc);font-weight:700">~1.3M <span style="font-size:10px;color:var(--dim);font-weight:400">~6.2% лимита</span></div>
-        </div>
-      </div>
-      <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line)">
-        Bitcoin — единственный актив с программно снижающейся инфляцией. Каждый халвинг (~каждые 4 года) сокращает эмиссию вдвое. После 2140 года инфляция BTC = 0%.
       </div>
     </div>
 

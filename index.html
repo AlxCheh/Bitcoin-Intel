@@ -113,6 +113,101 @@ header {
 }
 
 /* ══════════════════════════════════
+   SITEMAP — карта сайта
+══════════════════════════════════ */
+.sitemap-btn {
+  background: transparent;
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  border-radius: 4px;
+  width: 28px; height: 28px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sitemap-btn:hover { color: var(--btc); border-color: var(--btc); }
+
+.sitemap-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(12,15,20,0.92);
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+.sitemap-overlay.open { display: flex; flex-direction: column; }
+.sitemap-panel {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+}
+.sitemap-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.sitemap-search {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  color: var(--txt);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 4px;
+  outline: none;
+}
+.sitemap-search:focus { border-color: var(--btc); }
+.sitemap-close {
+  background: transparent; border: none; color: var(--dim);
+  font-size: 16px; cursor: pointer; padding: 4px 8px;
+}
+.sitemap-close:hover { color: var(--btc); }
+.sitemap-legend {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 9px; color: var(--dim);
+  flex-shrink: 0;
+}
+.sitemap-legend span { display: flex; align-items: center; gap: 5px; }
+.sm-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.sm-dot.live    { background: var(--grn); }
+.sm-dot.facts   { background: var(--btc); }
+.sm-dot.static  { background: var(--blue); }
+.sm-dot.signals { background: #A78BFA; }
+.sm-dot.none    { background: var(--dim2); }
+.sm-dot.tool    { background: #60A5FA; }
+.sitemap-body { flex: 1; overflow-y: auto; padding: 6px 0 40px; }
+.sm-cluster-head {
+  font-family: var(--mono); font-size: 10px; color: var(--btc);
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+  padding: 14px 16px 4px;
+}
+.sm-tab-head {
+  font-family: var(--mono); font-size: 9px; color: var(--dim);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 8px 16px 4px;
+}
+.sm-entry {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--txt);
+  transition: background 0.1s;
+}
+.sm-entry:hover { background: var(--bg2); }
+.sm-entry-title { flex: 1; }
+.sm-empty {
+  padding: 40px 16px; text-align: center;
+  color: var(--dim); font-size: 12px; font-family: var(--mono);
+}
+
+/* ══════════════════════════════════
    NAV
 ══════════════════════════════════ */
 .nav-crumb {
@@ -1720,11 +1815,33 @@ header {
     <span class="header-sep">/</span>
     BITCOIN INTEL
   </div>
-  <div class="header-live">
-    <div class="live-dot"></div>
-    LIVE
+  <div style="display:flex;align-items:center;gap:12px;margin-left:auto">
+    <button class="sitemap-btn" onclick="openSiteMap()" title="Карта сайта">🔍</button>
+    <div class="header-live">
+      <div class="live-dot"></div>
+      LIVE
+    </div>
   </div>
 </header>
+
+<!-- ══ КАРТА САЙТА (оверлей) ══ -->
+<div class="sitemap-overlay" id="sitemap-overlay">
+  <div class="sitemap-panel">
+    <div class="sitemap-head">
+      <input type="text" class="sitemap-search" id="sitemap-search" placeholder="Поиск по всему сайту… (например «халвинг»)" oninput="filterSiteMap(this.value)" autocomplete="off">
+      <button class="sitemap-close" onclick="closeSiteMap()">✕</button>
+    </div>
+    <div class="sitemap-legend">
+      <span><span class="sm-dot live"></span>живое</span>
+      <span><span class="sm-dot facts"></span>из сигналов</span>
+      <span><span class="sm-dot static"></span>статика</span>
+      <span><span class="sm-dot signals"></span>нарратив</span>
+      <span><span class="sm-dot none"></span>без данных</span>
+      <span><span class="sm-dot tool"></span>инструмент</span>
+    </div>
+    <div class="sitemap-body" id="sitemap-body"></div>
+  </div>
+</div>
 
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
@@ -5480,6 +5597,7 @@ async function loadSignals() {
       }
     }
     fetchFacts(); // машиночитаемые факты из сигналов — независимо от meta
+    fetchSiteMap(); // прогрев карты сайта — не ждём первого открытия оверлея
     renderDashboard();
     setTimeout(renderDashStatus, 600);
     const marketTab = document.getElementById('tab-market');
@@ -6326,6 +6444,117 @@ function toggleAcc(head) {
     body.classList.add('open');
     arrow.style.transform = 'rotate(180deg)';
   }
+}
+
+// ══════════════════════════════════════════════════════
+// SITEMAP — интерактивная карта сайта
+// data/site_map.json — единственный источник истины по структуре сайта
+// (аналог FACTS, но для структуры, не данных). Сверяется тестом
+// tests/unit/test_site_map_sync.py в обе стороны при каждом CI-прогоне.
+// ══════════════════════════════════════════════════════
+let SITE_MAP = null;
+
+async function fetchSiteMap() {
+  try {
+    const res = await fetch('data/site_map.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    SITE_MAP = await res.json();
+  } catch (e) {
+    console.warn('fetchSiteMap:', e);
+  }
+}
+
+function openSiteMap() {
+  const overlay = document.getElementById('sitemap-overlay');
+  overlay.classList.add('open');
+  const search = document.getElementById('sitemap-search');
+  search.value = '';
+  search.focus();
+  if (SITE_MAP) {
+    renderSiteMap(SITE_MAP.entries);
+  } else {
+    document.getElementById('sitemap-body').innerHTML = '<div class="sm-empty">Загрузка карты сайта…</div>';
+    fetchSiteMap().then(() => { if (SITE_MAP) renderSiteMap(SITE_MAP.entries); });
+  }
+}
+
+function closeSiteMap() {
+  document.getElementById('sitemap-overlay').classList.remove('open');
+}
+
+function filterSiteMap(query) {
+  if (!SITE_MAP) return;
+  const q = query.trim().toLowerCase();
+  if (!q) { renderSiteMap(SITE_MAP.entries); return; }
+  const filtered = SITE_MAP.entries.filter(e =>
+    e.title.toLowerCase().includes(q) ||
+    (e.keywords || []).some(k => k.toLowerCase().includes(q)) ||
+    e.tab_label.toLowerCase().includes(q) ||
+    e.cluster_label.toLowerCase().includes(q)
+  );
+  renderSiteMap(filtered);
+}
+
+function renderSiteMap(entries) {
+  const body = document.getElementById('sitemap-body');
+  if (!entries.length) {
+    body.innerHTML = '<div class="sm-empty">Ничего не найдено</div>';
+    return;
+  }
+  // группировка кластер → вкладка, с сохранением исходного порядка появления
+  const clusterOrder = [];
+  const clusters = {};
+  entries.forEach(e => {
+    if (!clusters[e.cluster]) { clusters[e.cluster] = { label: e.cluster_label, tabOrder: [], tabs: {} }; clusterOrder.push(e.cluster); }
+    const c = clusters[e.cluster];
+    if (!c.tabs[e.tab]) { c.tabs[e.tab] = { label: e.tab_label, items: [] }; c.tabOrder.push(e.tab); }
+    c.tabs[e.tab].items.push(e);
+  });
+
+  let html = '';
+  clusterOrder.forEach(clusterKey => {
+    const cluster = clusters[clusterKey];
+    html += '<div class="sm-cluster-head">' + cluster.label + '</div>';
+    cluster.tabOrder.forEach(tabKey => {
+      const tab = cluster.tabs[tabKey];
+      html += '<div class="sm-tab-head">' + tab.label + '</div>';
+      tab.items.forEach(item => {
+        const titleAttr = item.title.replace(/'/g, "\\'");
+        html += '<div class="sm-entry" onclick="siteMapGoTo(\'' + tabKey + '\', \'' + titleAttr + '\')">'
+          + '<span class="sm-dot ' + item.source + '"></span>'
+          + '<span class="sm-entry-title">' + item.title + '</span>'
+          + '</div>';
+      });
+    });
+  });
+  body.innerHTML = html;
+}
+
+// Переход из карты сайта к конкретной панели: переключает вкладку и находит
+// панель по точному тексту заголовка (не по id — большинство панелей их не
+// имеют, а искать по совпадению текста надёжнее, чем расставлять id на
+// полсотни мест только ради этой функции). Раскрывает аккордеон, если он
+// был свёрнут.
+function siteMapGoTo(tabId, title) {
+  closeSiteMap();
+  showTab(tabId, null);
+  setTimeout(() => {
+    const activeSection = document.querySelector('.section.active');
+    if (!activeSection) return;
+    const spans = activeSection.querySelectorAll('.panel-title, .acc-label, .instrument-ticker');
+    for (const span of spans) {
+      if (span.textContent.trim() === title) {
+        const container = span.closest('.panel') || span.closest('.acc-item') || span.closest('.terminal') || span.parentElement;
+        if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const head = span.closest('.acc-head');
+        if (head) {
+          const accBody = head.nextElementSibling;
+          if (accBody && !accBody.classList.contains('open')) toggleAcc(head);
+        }
+        break;
+      }
+    }
+  }, 80);
 }
 
 // ── POOLS DATABASE ──

@@ -1,0 +1,1201 @@
+{
+  "_generated_by": "ручной инвентарь 2026-07-12, сверяется tests/unit/test_site_map_sync.py против panel-title/acc-label в index.html",
+  "_source_meaning": {
+    "live": "живой fetch при каждой загрузке (mempool.space, Yahoo Finance и т.п.)",
+    "facts": "из механизма FACTS (signals.json → data/facts.json) или синхронизируемых JSON (TREASURY_HOLDERS.json, data/holders.js)",
+    "static": "статичные данные, обновляются только вручную",
+    "signals": "нарративный синтез из корпуса сигналов, не число",
+    "none": "методология/описание, живых данных нет",
+    "tool": "интерактивный инструмент, не витрина данных"
+  },
+  "generated_at": "2026-07-12",
+  "entries": [
+    {
+      "id": "e001",
+      "title": "График BTC / USD",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "live",
+      "kind": "chart",
+      "keywords": [
+        "цена",
+        "price",
+        "терминал"
+      ]
+    },
+    {
+      "id": "e002",
+      "title": "Главные нарративы",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "дайджест",
+        "кластеры",
+        "сигналы"
+      ]
+    },
+    {
+      "id": "e003",
+      "title": "Общий фон",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "сигналы",
+        "контекст"
+      ]
+    },
+    {
+      "id": "e004",
+      "title": "Фаза цикла",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "live",
+      "kind": "widget",
+      "keywords": [
+        "production cost",
+        "себестоимость",
+        "цикл",
+        "накопление"
+      ]
+    },
+    {
+      "id": "e005",
+      "title": "Последние блоки",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "live",
+      "kind": "table",
+      "keywords": [
+        "блок",
+        "пул",
+        "mempool"
+      ]
+    },
+    {
+      "id": "e006",
+      "title": "Дайджест сигналов по кластерам",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "market",
+      "tab_label": "ДАЙДЖЕСТ",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "сигналы",
+        "кластеры",
+        "дайджест",
+        "дайджест"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e007",
+      "title": "Объём торгов BTC/USD",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "chart",
+      "keywords": [
+        "объём",
+        "volume"
+      ]
+    },
+    {
+      "id": "e008",
+      "title": "Сложность сети",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "widget",
+      "keywords": [
+        "difficulty",
+        "хешрейт",
+        "ретаргет"
+      ]
+    },
+    {
+      "id": "e009",
+      "title": "Хешрейт сети",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "chart",
+      "keywords": [
+        "hashrate",
+        "майнинг"
+      ]
+    },
+    {
+      "id": "e010",
+      "title": "Ключевые метрики",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "widget",
+      "keywords": [
+        "production cost",
+        "realized price",
+        "себестоимость"
+      ]
+    },
+    {
+      "id": "e011",
+      "title": "MVRV",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "mvrv",
+        "оценка"
+      ]
+    },
+    {
+      "id": "e012",
+      "title": "NVT",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "nvt",
+        "p/e"
+      ]
+    },
+    {
+      "id": "e013",
+      "title": "SOPR",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "sopr",
+        "прибыль"
+      ]
+    },
+    {
+      "id": "e014",
+      "title": "Puell Multiple",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "puell",
+        "майнеры"
+      ]
+    },
+    {
+      "id": "e015",
+      "title": "Exchange Reserve",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "биржи",
+        "резервы"
+      ]
+    },
+    {
+      "id": "e016",
+      "title": "Funding Rate",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "none",
+      "kind": "methodology",
+      "keywords": [
+        "funding",
+        "фьючерсы",
+        "леверидж"
+      ]
+    },
+    {
+      "id": "e017",
+      "title": "ETF Net Flows",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "signals",
+      "kind": "methodology",
+      "keywords": [
+        "etf",
+        "потоки",
+        "институционалы"
+      ]
+    },
+    {
+      "id": "e018",
+      "title": "Пулы последних 10 блоков",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "pools",
+      "tab_label": "ПУЛЫ",
+      "source": "live",
+      "kind": "table",
+      "keywords": [
+        "пулы",
+        "майнинг",
+        "доля",
+        "Сводка по пулам (последние 10 блоков)"
+      ]
+    },
+    {
+      "id": "e019",
+      "title": "Топ-100 держателей BTC",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "facts",
+      "kind": "table",
+      "keywords": [
+        "казначейство",
+        "компании",
+        "treasury"
+      ]
+    },
+    {
+      "id": "e020",
+      "title": "Доходные движки",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "доход",
+        "дивиденды",
+        "revenue"
+      ]
+    },
+    {
+      "id": "e021",
+      "title": "Экосистема Bitcoin",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "l2",
+        "протоколы",
+        "entities"
+      ]
+    },
+    {
+      "id": "e022",
+      "title": "Протоколы",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "pow",
+        "secp256k1",
+        "скрипты"
+      ]
+    },
+    {
+      "id": "e023",
+      "title": "Proof-of-Work",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "майнинг",
+        "nonce",
+        "хэш"
+      ]
+    },
+    {
+      "id": "e024",
+      "title": "SECP256k1 криптография",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "ключи",
+        "подпись",
+        "эллиптическая кривая"
+      ]
+    },
+    {
+      "id": "e025",
+      "title": "Скрипты Bitcoin",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "utxo",
+        "script",
+        "p2pkh"
+      ]
+    },
+    {
+      "id": "e026",
+      "title": "Функции Bitcoin",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "lightning",
+        "обзор"
+      ]
+    },
+    {
+      "id": "e027",
+      "title": "Архитектура",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "блокчейн",
+        "utxo",
+        "ключи"
+      ]
+    },
+    {
+      "id": "e028",
+      "title": "Блокчейн",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "блок",
+        "хэш",
+        "merkle"
+      ]
+    },
+    {
+      "id": "e029",
+      "title": "Ключи и адреса",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "приватный ключ",
+        "адрес"
+      ]
+    },
+    {
+      "id": "e030",
+      "title": "Модель UTXO",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "utxo",
+        "транзакция",
+        "комиссия"
+      ]
+    },
+    {
+      "id": "e031",
+      "title": "MSTR",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "instruments",
+      "tab_label": "ИНСТРУМЕНТЫ",
+      "source": "live",
+      "kind": "deep-dive",
+      "keywords": [
+        "strategy",
+        "mstr",
+        "nav",
+        "мультипликатор",
+        "MSTR — Strategy Common Stock"
+      ]
+    },
+    {
+      "id": "e032",
+      "title": "STRC",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "instruments",
+      "tab_label": "ИНСТРУМЕНТЫ",
+      "source": "facts",
+      "kind": "deep-dive",
+      "keywords": [
+        "strc",
+        "дивиденды",
+        "привилегированная",
+        "STRC — Perpetual Preferred"
+      ]
+    },
+    {
+      "id": "e033",
+      "title": "Что такое Lightning Network",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "l2",
+        "каналы"
+      ]
+    },
+    {
+      "id": "e034",
+      "title": "Как работает маршрутизация",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "htlc",
+        "routing"
+      ]
+    },
+    {
+      "id": "e035",
+      "title": "Платёжные каналы",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "мультисиг",
+        "commitment"
+      ]
+    },
+    {
+      "id": "e036",
+      "title": "Сеть каналов и HTLC",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "onion",
+        "htlc"
+      ]
+    },
+    {
+      "id": "e037",
+      "title": "Проблема ликвидности",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "исходящая",
+        "входящая",
+        "lsp"
+      ]
+    },
+    {
+      "id": "e038",
+      "title": "Как подключиться к Lightning",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "кошелёк",
+        "нода"
+      ]
+    },
+    {
+      "id": "e039",
+      "title": "Путь 1 — Кошелёк-кастодиан (просто, без узла)",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "strike",
+        "wallet of satoshi"
+      ]
+    },
+    {
+      "id": "e040",
+      "title": "Путь 2 — Non-custodial кошелёк (твои ключи, без узла)",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "phoenix",
+        "breez",
+        "zeus"
+      ]
+    },
+    {
+      "id": "e041",
+      "title": "Путь 3 — Своя нода (полный контроль)",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "umbrel",
+        "lnd",
+        "cln"
+      ]
+    },
+    {
+      "id": "e042",
+      "title": "Сравнение подходов",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "table",
+      "keywords": [
+        "кастодиан",
+        "нода"
+      ]
+    },
+    {
+      "id": "e043",
+      "title": "Ограничения и риски",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "lightning",
+      "tab_label": "LIGHTNING",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "scb",
+        "канал"
+      ]
+    },
+    {
+      "id": "e044",
+      "title": "Что такое деньги",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "функции денег",
+        "тони"
+      ]
+    },
+    {
+      "id": "e045",
+      "title": "Три функции денег",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "сбережение",
+        "обмен"
+      ]
+    },
+    {
+      "id": "e046",
+      "title": "Шесть свойств денег",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "редкость",
+        "делимость"
+      ]
+    },
+    {
+      "id": "e047",
+      "title": "История денег: от бартера к Bitcoin",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "бартер",
+        "золото",
+        "фиат"
+      ]
+    },
+    {
+      "id": "e048",
+      "title": "Bitcoin vs Золото vs Фиат",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "table",
+      "keywords": [
+        "сравнение",
+        "свойства"
+      ]
+    },
+    {
+      "id": "e049",
+      "title": "Асимметрия",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "капитализация",
+        "ставка"
+      ]
+    },
+    {
+      "id": "e050",
+      "title": "Семь сетевых эффектов",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "трейс мейер",
+        "network effects"
+      ]
+    },
+    {
+      "id": "e051",
+      "title": "Спекуляция",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "ликвидность",
+        "волатильность"
+      ]
+    },
+    {
+      "id": "e052",
+      "title": "Принятие бизнесами",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "мерчанты",
+        "казначейства"
+      ]
+    },
+    {
+      "id": "e053",
+      "title": "Принятие потребителями",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "переводы",
+        "санкции"
+      ]
+    },
+    {
+      "id": "e054",
+      "title": "Безопасность",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "хешрейт",
+        "атака"
+      ]
+    },
+    {
+      "id": "e055",
+      "title": "Предпочтение разработчиков",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "l2",
+        "открытый код"
+      ]
+    },
+    {
+      "id": "e056",
+      "title": "Финансирование",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "etf",
+        "институционалы"
+      ]
+    },
+    {
+      "id": "e057",
+      "title": "Мировая резервная валюта",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "расчётный слой"
+      ]
+    },
+    {
+      "id": "e058",
+      "title": "Стратегия DCA",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "dca",
+        "усреднение"
+      ]
+    },
+    {
+      "id": "e059",
+      "title": "Почему не работает «купи дёшево»",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "эмоции",
+        "fomo"
+      ]
+    },
+    {
+      "id": "e060",
+      "title": "Как работает DCA",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "table",
+      "keywords": [
+        "усреднение",
+        "пример"
+      ]
+    },
+    {
+      "id": "e061",
+      "title": "Шесть преимуществ",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "dca",
+        "волатильность"
+      ]
+    },
+    {
+      "id": "e062",
+      "title": "Модель PlanB: 1% в BTC",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "table",
+      "keywords": [
+        "portfolio",
+        "1%"
+      ]
+    },
+    {
+      "id": "e063",
+      "title": "DCA подходит если...",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "чеклист"
+      ]
+    },
+    {
+      "id": "e064",
+      "title": "mNAV — механика BTC-казначейств",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "mnav",
+        "казначейство"
+      ]
+    },
+    {
+      "id": "e065",
+      "title": "Что такое mNAV",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "формула",
+        "премия",
+        "дисконт"
+      ]
+    },
+    {
+      "id": "e066",
+      "title": "Почему возникает премия",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "леверидж",
+        "ликвидность"
+      ]
+    },
+    {
+      "id": "e067",
+      "title": "Машина аккреции: как работает при премии",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "эмиссия акций",
+        "цикл"
+      ]
+    },
+    {
+      "id": "e068",
+      "title": "Дисконт: когда машина ломается",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "buyback",
+        "разводнение"
+      ]
+    },
+    {
+      "id": "e069",
+      "title": "BTC Yield — главный KPI",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "facts",
+      "kind": "table",
+      "keywords": [
+        "strategy",
+        "metaplanet",
+        "btc yield"
+      ]
+    },
+    {
+      "id": "e070",
+      "title": "Как читать mNAV при анализе сигналов",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "сигналы",
+        "интерпретация"
+      ]
+    },
+    {
+      "id": "e071",
+      "title": "Текущая награда майнера",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "history",
+      "tab_label": "ЭМИССИЯ",
+      "source": "live",
+      "kind": "widget",
+      "keywords": [
+        "халвинг",
+        "эпоха",
+        "блок"
+      ]
+    },
+    {
+      "id": "e072",
+      "title": "Таблица халвингов",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "history",
+      "tab_label": "ЭМИССИЯ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "халвинг",
+        "награда",
+        "btc/день"
+      ]
+    },
+    {
+      "id": "e073",
+      "title": "Not Yet Mined · динамика",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "history",
+      "tab_label": "ЭМИССИЯ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "добыча",
+        "снэпшот"
+      ]
+    },
+    {
+      "id": "e074",
+      "title": "Монетарная инфляция",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "history",
+      "tab_label": "ЭМИССИЯ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "инфляция",
+        "золото",
+        "фиат"
+      ]
+    },
+    {
+      "id": "e075",
+      "title": "Ключевые события",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "history",
+      "tab_label": "ЭМИССИЯ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "whitepaper",
+        "genesis",
+        "ath"
+      ]
+    },
+    {
+      "id": "e076",
+      "title": "Опиши аномалию или сигнал",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "signals",
+      "tab_label": "SIGNALS",
+      "source": "tool",
+      "kind": "tool",
+      "keywords": [
+        "ai",
+        "анализ",
+        "ручной ввод"
+      ]
+    },
+    {
+      "id": "e077",
+      "title": "Или выбери из базы",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "signals",
+      "tab_label": "SIGNALS",
+      "source": "tool",
+      "kind": "tool",
+      "keywords": [
+        "готовые сигналы"
+      ]
+    },
+    {
+      "id": "e078",
+      "title": "Структура владения · 2009–2024",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "facts",
+      "kind": "table",
+      "keywords": [
+        "governments",
+        "companies",
+        "etfs"
+      ]
+    },
+    {
+      "id": "e079",
+      "title": "Ключевые тренды",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "динамика",
+        "тренды"
+      ]
+    },
+    {
+      "id": "e080",
+      "title": "Три волны институционализации",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "институционалы",
+        "волны"
+      ]
+    },
+    {
+      "id": "e081",
+      "title": "Накопленные разборы",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "base",
+      "tab_label": "АРХИВ",
+      "source": "signals",
+      "kind": "list",
+      "keywords": [
+        "архив",
+        "разборы"
+      ]
+    },
+    {
+      "id": "e082",
+      "title": "Lightning Network",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "tech",
+      "tab_label": "ТЕХНОЛОГИИ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "l2",
+        "функции bitcoin",
+        "обзор"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-07-12",
+  "generated_at": "2026-07-13",
   "facts": {
     "bstr.btc_holdings": {
       "value": 30021,

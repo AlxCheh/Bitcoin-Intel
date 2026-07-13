@@ -636,6 +636,55 @@
         "INF-2026-0623-002"
       ],
       "last_updated": "2026-06-23"
+    },
+    {
+      "id": "rgb_protocol",
+      "name": "RGB Protocol",
+      "type": "protocol",
+      "status": "active",
+      "summary": "Протокол выпуска и передачи активов (включая стейблкоины) на Bitcoin через client-side validation, интегрированный с Lightning Network для мгновенных приватных расчётов",
+      "profile": {
+        "what": "Client-side validation протокол, якорящий безопасность в UTXO-модели Bitcoin; версия v0.11.1 используется Tether/UTEXO для нативного выпуска USDT",
+        "metrics": [
+          "В разработке с 2016 года (истоки — single-use seals Питера Тодда, 2014)",
+          "Не успел к буму 2017 года — упущенное окно, давшее Tron доминирование в USDT-расчётах",
+          "С 2022 года открытый код курирует Federico Tenga (Bitfinex R&D Strategist)"
+        ],
+        "links_to": [
+          "bitcoin",
+          "lightning"
+        ],
+        "notable": "Название изначально расшифровывалось как 'Riccardo Giacomo Bitcoin' (в честь разработчиков Giacomo Zucco и Riccardo Casatta), позже переосмыслено как 'Really Good Bitcoin'"
+      },
+      "signal_refs": [
+        "INF-2026-0706-001"
+      ],
+      "last_updated": "2026-07-06"
+    },
+    {
+      "id": "utexo",
+      "name": "UTEXO",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Software lab, ведущий коммерческий запуск нативного USDT на Bitcoin через RGB в партнёрстве с Tether — issuer и distributor",
+      "profile": {
+        "what": "Bitcoin-native execution/settlement layer — SDK, API, mid-level протоколы, UI для стейблкоинов на RGB/Lightning",
+        "metrics": [
+          "$7,5 млн seed-раунд (март 2026), лидировал Tether",
+          "Основатели — совместное предприятие Boosty Venture Studio (Viktor Ihnatiuk), Fulgur Ventures, Tether Investments",
+          "Уже действующий мост mint.utexo.com — перенос USDT между блокчейнами с низкими комиссиями"
+        ],
+        "links_to": [
+          "bitcoin",
+          "lightning",
+          "rgb_protocol"
+        ],
+        "notable": "Позиционирует себя как решающий 'последнюю милю' софта для массового развёртывания USDT на Bitcoin — не сам протокол, а слой коммерциализации поверх RGB"
+      },
+      "signal_refs": [
+        "INF-2026-0706-001"
+      ],
+      "last_updated": "2026-07-06"
     }
   ]
 }

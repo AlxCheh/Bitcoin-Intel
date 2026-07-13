@@ -7114,9 +7114,27 @@ async function fetchDifficulty() {
 
     const diffs     = hr.difficulty  || [];
     const hashrates = hr.hashrates   || [];
+    // curDiff — из готового поля API (currentDifficulty), не из
+    // последнего элемента массива diffs: массив может иметь другую
+    // резолюцию/полноту, готовое поле надёжнее.
     const lastDiff  = diffs.length   ? diffs[diffs.length - 1]     : null;
-    const curDiff   = lastDiff       ? lastDiff.difficulty          : null;
-    const firstDiff = diffs.length   ? diffs[0].difficulty          : null;
+    const curDiff   = hr.currentDifficulty || (lastDiff ? lastDiff.difficulty : null);
+    // firstDiff — не diffs[0] "как есть" (был баг: если массив с сервера
+    // приходит не ровно за 365 дней или другой плотности, diffs[0] может
+    // оказаться намного ближе к текущей дате, чем "год назад" — отсюда
+    // наблюдавшийся ×1.00 роста при почти неизменном значении). Ищем
+    // запись, чей timestamp реально ближе всего к (сейчас − 365 дней).
+    let firstDiff = null;
+    if (diffs.length) {
+      const oneYearAgoSec = Date.now() / 1000 - 365 * 86400;
+      let closest = diffs[0];
+      let closestDelta = Math.abs(closest.timestamp - oneYearAgoSec);
+      for (const d of diffs) {
+        const delta = Math.abs(d.timestamp - oneYearAgoSec);
+        if (delta < closestDelta) { closest = d; closestDelta = delta; }
+      }
+      firstDiff = closest.difficulty;
+    }
 
     // ATH difficulty (max in history array)
     const athDiff = diffs.length ? Math.max(...diffs.map(d => d.difficulty)) : null;
@@ -7161,7 +7179,7 @@ async function fetchDifficulty() {
       const el = $('diff-value');
       if (el) el.textContent = tVal >= 100 ? Math.round(tVal) : tVal.toFixed(2);
       const ul = $('diff-unit-label');
-      if (ul) ul.textContent = 'TRILLION';
+      if (ul) ul.textContent = 'T';
     }
 
     // ATH % in hero row

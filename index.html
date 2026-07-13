@@ -1105,7 +1105,7 @@ header {
    4px градиент + 48px header = 52px, здесь с запасом). Раньше
    scroll-margin-top:64px добавлялся вручную на каждую конкретную
    панель по мере необходимости — не системно. */
-.panel, .acc-item, .terminal {
+.panel, .acc-item, .terminal, .panel-title, .acc-label, .instrument-ticker {
   scroll-margin-top: 64px;
 }
 .panel-head {
@@ -6699,8 +6699,14 @@ function siteMapGoTo(tabId, title) {
     const spans = activeSection.querySelectorAll('.panel-title, .acc-label, .instrument-ticker');
     for (const span of spans) {
       if (span.textContent.trim() === title) {
-        const container = span.closest('.panel') || span.closest('.acc-item') || span.closest('.terminal') || span.parentElement;
-        if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Скроллим сам заголовок (span), не "ближайший подходящий контейнер" —
+        // раньше искали через closest('.panel')/('.acc-item')/('.terminal'),
+        // но не все панели используют эти классы (например 'Общий фон' лежит
+        // в .dash-summary) — цепочка молча падала на parentElement без
+        // scroll-margin-top, шапка перекрывала заголовок. scroll-margin-top
+        // на самих .panel-title/.acc-label/.instrument-ticker работает
+        // одинаково независимо от того, чем именно они обёрнуты.
+        span.scrollIntoView({ behavior: 'smooth', block: 'start' });
         const head = span.closest('.acc-head');
         if (head) {
           const accBody = head.nextElementSibling;

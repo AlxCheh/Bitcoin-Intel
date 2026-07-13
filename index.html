@@ -3887,8 +3887,8 @@ function toggleNav(id) {
         </div>
         <div style="padding:12px 14px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <span style="font-size:13px">📈</span>
-            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">РОСТ</span>
+            <span style="font-size:13px" id="diff-yoy-icon">📈</span>
+            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em" id="diff-yoy-label">РОСТ</span>
           </div>
           <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:#A78BFA;margin-bottom:4px" id="diff-yoy">× — за год</div>
           <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5" id="diff-yoy-desc">—</div>
@@ -7231,14 +7231,25 @@ async function fetchDifficulty() {
       if (el) el.textContent = asicM.toFixed(1) + 'M машин';
     }
 
-    // Card 4 — рост год к году
+    // Card 4 — изменение год к году (было безусловно 'РОСТ'/📈 — не всегда
+    // корректно, сложность/хешрейт могли и снизиться)
     if (yoyDiff) {
-      const el   = $('diff-yoy');
-      const desc = $('diff-yoy-desc');
+      const el    = $('diff-yoy');
+      const desc  = $('diff-yoy-desc');
+      const icon  = $('diff-yoy-icon');
+      const label = $('diff-yoy-label');
       if (el) el.textContent = '×' + yoyDiff.toFixed(2) + ' за год';
+      const growing = yoyDiff > 1.03;
+      const declining = yoyDiff < 0.97;
+      if (icon)  icon.textContent  = growing ? '📈' : declining ? '📉' : '➡️';
+      if (label) label.textContent = growing ? 'РОСТ' : declining ? 'СНИЖЕНИЕ' : 'БЕЗ ИЗМЕНЕНИЙ';
       if (desc && firstDiff) {
-        desc.textContent = 'Год назад: ' + (firstDiff / 1e12).toFixed(1) + 'T. '
-          + 'Хешрейт сети вырос пропорционально.';
+        const changeText = growing
+          ? 'Хешрейт сети вырос за этот период.'
+          : declining
+          ? 'Хешрейт сети снизился за этот период — давление на маржу майнеров.'
+          : 'Хешрейт сети почти не изменился за этот период.';
+        desc.textContent = 'Год назад: ' + (firstDiff / 1e12).toFixed(1) + 'T. ' + changeText;
       }
     }
 

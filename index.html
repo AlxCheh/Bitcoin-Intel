@@ -192,6 +192,14 @@ header {
   color: var(--btc);
   border-color: var(--btc);
 }
+.sitemap-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
 .sitemap-legend {
   display: flex; gap: 14px; flex-wrap: wrap;
   padding: 8px 16px;
@@ -218,12 +226,6 @@ header {
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 8px 16px 4px;
   scroll-margin-top: 8px;
-}
-.sm-tab-row {
-  display: flex;
-  gap: 4px;
-  padding: 0 16px 8px;
-  flex-wrap: wrap;
 }
 .sm-tab-btn {
   flex: 1 1 0;
@@ -1927,6 +1929,7 @@ header {
       <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
       <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
     </div>
+    <div class="sitemap-tabs" id="sitemap-tabs"></div>
     <div class="sitemap-legend">
       <span><span class="sm-dot live"></span>живое</span>
       <span><span class="sm-dot facts"></span>из сигналов</span>
@@ -6572,9 +6575,10 @@ function openSiteMap() {
   search.focus();
   if (SITE_MAP) {
     renderSiteMap(SITE_MAP.entries);
+    renderSiteMapTabs('live');
   } else {
     document.getElementById('sitemap-body').innerHTML = '<div class="sm-empty">Загрузка карты сайта…</div>';
-    fetchSiteMap().then(() => { if (SITE_MAP) renderSiteMap(SITE_MAP.entries); });
+    fetchSiteMap().then(() => { if (SITE_MAP) { renderSiteMap(SITE_MAP.entries); renderSiteMapTabs('live'); } });
   }
 }
 
@@ -6589,8 +6593,26 @@ function closeSiteMap() {
 function jumpToSiteMapCluster(clusterKey) {
   const search = document.getElementById('sitemap-search');
   if (search.value) { search.value = ''; renderSiteMap(SITE_MAP.entries); }
+  renderSiteMapTabs(clusterKey);
   const head = document.querySelector('.sm-cluster-head[data-cluster="' + clusterKey + '"]');
   if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Постоянная строка вкладок сразу под кнопками кластеров (не повторяется
+// внутри дерева на каждый кластер отдельно) — обновляется при переключении
+// кластера, по умолчанию показывает вкладки первого кластера (LIVE).
+function renderSiteMapTabs(clusterKey) {
+  const wrap = document.getElementById('sitemap-tabs');
+  if (!SITE_MAP || !wrap) return;
+  const seen = [];
+  const labels = {};
+  SITE_MAP.entries.forEach(e => {
+    if (e.cluster !== clusterKey) return;
+    if (!(e.tab in labels)) { labels[e.tab] = e.tab_label; seen.push(e.tab); }
+  });
+  wrap.innerHTML = seen.map(tabKey =>
+    '<button class="sm-tab-btn" onclick="jumpToSiteMapTab(\'' + tabKey + '\')">' + labels[tabKey] + '</button>'
+  ).join('');
 }
 
 // Переход к заголовку конкретной вкладки внутри дерева (строка кнопок
@@ -6636,11 +6658,6 @@ function renderSiteMap(entries) {
   clusterOrder.forEach(clusterKey => {
     const cluster = clusters[clusterKey];
     html += '<div class="sm-cluster-head" data-cluster="' + clusterKey + '">' + cluster.label + '</div>';
-    html += '<div class="sm-tab-row">'
-      + cluster.tabOrder.map(tabKey =>
-          '<button class="sm-tab-btn" onclick="jumpToSiteMapTab(\'' + tabKey + '\')">' + cluster.tabs[tabKey].label + '</button>'
-        ).join('')
-      + '</div>';
     cluster.tabOrder.forEach(tabKey => {
       const tab = cluster.tabs[tabKey];
       html += '<div class="sm-tab-head" data-tab="' + tabKey + '">' + tab.label + '</div>';

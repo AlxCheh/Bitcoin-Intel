@@ -6693,29 +6693,36 @@ function renderSiteMap(entries) {
 function siteMapGoTo(tabId, title) {
   closeSiteMap();
   showTab(tabId, null);
-  setTimeout(() => {
+
+  // Находит span по точному тексту заголовка и скроллит к нему + раскрывает
+  // аккордеон, если был свёрнут. Вынесено в отдельную функцию — вызывается
+  // дважды (см. ниже, почему).
+  function scrollToTitle() {
     const activeSection = document.querySelector('.section.active');
     if (!activeSection) return;
     const spans = activeSection.querySelectorAll('.panel-title, .acc-label, .instrument-ticker');
     for (const span of spans) {
       if (span.textContent.trim() === title) {
-        // Скроллим сам заголовок (span), не "ближайший подходящий контейнер" —
-        // раньше искали через closest('.panel')/('.acc-item')/('.terminal'),
-        // но не все панели используют эти классы (например 'Общий фон' лежит
-        // в .dash-summary) — цепочка молча падала на parentElement без
-        // scroll-margin-top, шапка перекрывала заголовок. scroll-margin-top
-        // на самих .panel-title/.acc-label/.instrument-ticker работает
-        // одинаково независимо от того, чем именно они обёрнуты.
         span.scrollIntoView({ behavior: 'smooth', block: 'start' });
         const head = span.closest('.acc-head');
         if (head) {
           const accBody = head.nextElementSibling;
           if (accBody && !accBody.classList.contains('open')) toggleAcc(head);
         }
-        break;
+        return;
       }
     }
-  }, 80);
+  }
+
+  // Двойной вызов: сразу после переключения вкладки (80мс) асинхронный
+  // контент (графики Chart.js, живые виджеты типа 'Сложность сети',
+  // JS-таблицы) ещё не дорисовался — страница физически короче, чем
+  // станет через долю секунды, поэтому scrollIntoView упирается в
+  // ТОГДАШНИЙ предел скролла раньше времени, оставляя панель в середине
+  // экрана вместо самого верха. Повторный вызов через 500мс — когда
+  // страница уже выросла до финальной высоты — исправляет позицию.
+  setTimeout(scrollToTitle, 80);
+  setTimeout(scrollToTitle, 500);
 }
 
 // ── POOLS DATABASE ──
@@ -7360,10 +7367,15 @@ async function getCurrentBlockHeight() {
 // Переход к "Последние блоки" на ОБЗОРЕ — клик по номеру блока в halving-block
 function goToLatestBlocks() {
   showTab('home', null);
-  setTimeout(() => {
+  function scroll() {
     const el = document.getElementById('latest-blocks-panel');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 50);
+  }
+  // Двойной вызов — та же причина, что в siteMapGoTo(): ОБЗОР тоже грузит
+  // асинхронный контент (Фаза цикла, график цены), страница физически
+  // короче в момент первого вызова.
+  setTimeout(scroll, 50);
+  setTimeout(scroll, 500);
 }
 
 // Halving-block: прогресс текущей эпохи + живая высота блока (общий

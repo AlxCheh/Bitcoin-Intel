@@ -172,25 +172,32 @@ header {
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
   flex-shrink: 0;
-  overflow-x: auto;
 }
 .sm-cluster-btn {
+  flex: 1 1 0;
+  min-width: 0;
   background: transparent;
   border: 1px solid var(--line2);
   color: var(--dim);
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.06em;
-  padding: 6px 12px;
+  padding: 6px 8px;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color 0.15s, border-color 0.15s;
 }
 .sm-cluster-btn:hover, .sm-cluster-btn:active {
   color: var(--btc);
   border-color: var(--btc);
+}
+.sm-cluster-btn.active {
+  color: var(--btc);
+  border-color: var(--btc);
+  background: var(--btc-low);
 }
 .sitemap-tabs {
   display: flex;
@@ -1924,10 +1931,10 @@ header {
       <button class="sitemap-close" onclick="closeSiteMap()">✕</button>
     </div>
     <div class="sitemap-clusters">
-      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('live')">LIVE</button>
-      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('knowledge')">ECOSYSTEM</button>
-      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
-      <button class="sm-cluster-btn" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
+      <button class="sm-cluster-btn" data-cluster="live" onclick="jumpToSiteMapCluster('live')">LIVE</button>
+      <button class="sm-cluster-btn" data-cluster="knowledge" onclick="jumpToSiteMapCluster('knowledge')">ECOSYSTEM</button>
+      <button class="sm-cluster-btn" data-cluster="macro" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
+      <button class="sm-cluster-btn" data-cluster="analysis" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
     </div>
     <div class="sitemap-tabs" id="sitemap-tabs"></div>
     <div class="sitemap-legend">
@@ -6601,9 +6608,14 @@ function jumpToSiteMapCluster(clusterKey) {
 // Постоянная строка вкладок сразу под кнопками кластеров (не повторяется
 // внутри дерева на каждый кластер отдельно) — обновляется при переключении
 // кластера, по умолчанию показывает вкладки первого кластера (LIVE).
+// Заодно подсвечивает активную кнопку кластера — вызывается и при
+// открытии оверлея, и по клику, так что подсветка не дублируется отдельно.
 function renderSiteMapTabs(clusterKey) {
   const wrap = document.getElementById('sitemap-tabs');
   if (!SITE_MAP || !wrap) return;
+  document.querySelectorAll('.sm-cluster-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.cluster === clusterKey)
+  );
   const seen = [];
   const labels = {};
   SITE_MAP.entries.forEach(e => {

@@ -2,9 +2,9 @@
 
 > Автогенерируется еженедельно из `scripts/quality_report.py` (MON05). Не редактировать вручную — правки затрутся следующим запуском `.github/workflows/quality-dashboard.yml`.
 
-**Сгенерировано:** 2026-07-06 · **Сигналов:** 56
+**Сгенерировано:** 2026-07-13 · **Сигналов:** 62
 
-## 🟢 Health Score: 98.8/100 (Grade A)
+## 🟢 Health Score: 98.6/100 (Grade A)
 
 ### Покрытие полей
 
@@ -19,7 +19,7 @@
 
 | Период | Доля |
 |--------|------|
-| last_30_days | `███████████████████░` 96% |
+| last_30_days | `███████████████████░` 95% |
 | last_90_days | `████████████████████` 98% |
 
 ### Качество
@@ -31,13 +31,13 @@
 
 ### Распределение
 
-**По направлению (dir):** neg: 17, neu: 9, pos: 30
+**По направлению (dir):** neg: 17, neu: 12, pos: 33
 
-**По кластеру:** btc_infrastructure_growth: 12, btc_treasury_competition: 12, etf_institutional_flow: 14, strategy_model_stress: 14, supply_scarcity: 4
+**По кластеру:** btc_infrastructure_growth: 13, btc_treasury_competition: 15, etf_institutional_flow: 14, leverage_deleveraging_cycle: 1, strategy_model_stress: 15, supply_scarcity: 4
 
-**По весу источника (weight):** market: 13, media: 8, onchain: 4, primary: 31
+**По весу источника (weight):** market: 16, media: 8, onchain: 4, primary: 34
 
-**По роли (narrative_role):** background: 11, complication: 33, resolution: 1, trigger: 11
+**По роли (narrative_role):** background: 11, complication: 38, resolution: 1, trigger: 12
 
 ### Calibration Readiness (ADR-011)
 

@@ -7632,14 +7632,42 @@ function renderHolders() {
   tbl += '</tbody></table></div>';
   document.getElementById('holders-table-wrap').innerHTML = tbl;
 
-  // Тренды
-  const trends = [
-    { label: 'Individuals', note: 'Росли с 5.4% (2009) до пика 72.7% (2022), затем снизились до 68.9% — часть перетекла в ETFs' },
-    { label: 'ETFs & Funds', note: 'Появились в Oct 2024: 4.6% · 966,839 BTC — 3-я категория среди активных держателей' },
-    { label: 'Governments', note: 'Впервые в 2014 (0.7% · изъятие FBI), выросли до 2.4% · 510,864 BTC к 2024' },
-    { label: 'Companies', note: 'Sep 2022: 0.9% · 184,390 BTC → Oct 2024: 2.0% · 421,313 BTC (+128% за 2 года)' },
-    { label: 'Lost & Satoshi', note: 'Стабилизировались на ~11-12% с 2018 года. Расчётная величина, точно неизвестна' }
+  // Тренды — вычисляются из HOLDERS_DATA.snapshots, не захардкожены.
+  // Раньше это был статичный массив текста, ссылавшийся на Oct 2024 —
+  // молча разошёлся с реальностью, когда снэпшот обновили до Jul 2026.
+  // Теперь автоматически актуализируется при любом обновлении снэпшота
+  // (см. CLAUDE.md, 'HOLDERS_DATA — правило верификации': при поступлении
+  // сигнала со свежей цифрой по категории снэпшот обновляется — эта
+  // таблица подхватывает изменение без отдельной правки).
+  function computeHolderTrend(key, label, extraNote) {
+    const points = HOLDERS_DATA.snapshots
+      .map(s => ({ date: s.date, cat: s.categories[key] }))
+      .filter(p => p.cat);
+    if (!points.length) return null;
+    const first = points[0];
+    const last = points[points.length - 1];
+    const peak = points.reduce((m, p) => p.cat.pct > m.cat.pct ? p : m, points[0]);
+    let note;
+    if (points.length === 1) {
+      note = 'Впервые зафиксированы в ' + first.date + ': ' + first.cat.pct + '% · ' + first.cat.btc.toLocaleString() + ' BTC';
+    } else if (peak.date === last.date) {
+      note = 'Выросли с ' + first.cat.pct + '% (' + first.date + ') до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString() + ' BTC)';
+    } else {
+      note = 'Росли с ' + first.cat.pct + '% (' + first.date + ') до пика ' + peak.cat.pct + '% (' + peak.date + '), затем снизились до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString() + ' BTC)';
+    }
+    if (extraNote) note += ' ' + extraNote;
+    return { label: label, note: note };
+  }
+
+  const trendDefs = [
+    ['individuals', 'Individuals', null],
+    ['companies', 'Companies', null],
+    ['etfs', 'ETFs & Funds', null],
+    ['governments', 'Governments', '— последняя точка является минимальной (floor) оценкой, не полной суммой всех государств.'],
+    ['lost_satoshi', 'Lost & Satoshi', '— оценочная категория, точное значение неизвестно.']
   ];
+  const trends = trendDefs.map(([key, label, note]) => computeHolderTrend(key, label, note)).filter(Boolean);
+
   let tr = '';
   trends.forEach(t => {
     tr += '<div style="padding:10px 14px;border-bottom:1px solid var(--line)">'

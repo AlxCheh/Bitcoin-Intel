@@ -1,48 +1,49 @@
 {
   "btc_treasury_competition": {
     "tension": "Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился",
-    "narrative": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — однако впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
+    "narrative": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — в то время как впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "takeaway": "Впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "strength": "strong",
-    "confidence": 0.811,
+    "confidence": 0.773,
     "phase": "active",
-    "score": 116,
-    "signal_count": 13,
+    "score": 119,
+    "signal_count": 14,
     "anchor_signal_id": "STR-2026-0701-002",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'однако'; confidence: 0.81; signals_used: 13; ignored_duplicates: ['STR-2026-0623-002', 'STR-2026-0706-003']",
+    "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'в то время как'; confidence: 0.77; signals_used: 14; ignored_duplicates: ['STR-2026-0623-002', 'STR-2026-0706-003']",
     "signals_used": [
       "STR-2026-0626-001",
       "STR-2026-0623-003",
       "STR-2026-0701-002",
       "INF-2026-0625-002",
       "STR-2026-0624-003",
-      "STR-2026-0706-002",
       "STR-2026-0709-001",
+      "STR-2026-0706-002",
       "STR-2026-0702-001",
       "STR-2026-0630-001",
       "STR-2026-0623-006",
       "STR-2026-0624-001",
       "STR-2026-0703-001",
+      "STR-2026-0707-001",
       "SUP-2026-0624-001"
     ],
     "signals_ignored": [
       "STR-2026-0623-002",
       "STR-2026-0706-003"
     ],
-    "generated_at": "2026-07-13T18:46:18.792173+00:00",
+    "generated_at": "2026-07-14T03:10:11.908958+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260713_184618"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260714_031011"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
     "narrative": "Падение STRC ниже номинала — первый признак что дивидендная машина Strategy испытывает давление — в результате чего дивидендная машина Strategy сжимает пространство для BTC-накопления: модель «занять → купить BTC → рост акции» работала в условиях премии к NAV — при дисконте 0.83x и 14 месяцах дивидендного покрытия она требует паузы или перестройки",
     "takeaway": "BTC-казначейство Strategy эволюционировало от накопительной догмы к управляемому балансовому инструменту: BTC теперь официально выполняет функцию кредитного коллатерала, резервного актива и источника ликвидности одновременно — корпоративная BTC-модель достигла зрелости",
     "strength": "strong",
-    "confidence": 0.727,
+    "confidence": 0.713,
     "phase": "resolution",
-    "score": 104,
+    "score": 102,
     "signal_count": 13,
     "anchor_signal_id": "STR-2026-0629-001",
     "phase_changed": true,
@@ -50,9 +51,9 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-13T18:46:18.796014+00:00"
+      "detected_at": "2026-07-14T03:10:11.915181+00:00"
     },
-    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.73; signals_used: 13; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
+    "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.71; signals_used: 13; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
       "STR-2026-0625-001",
       "STR-2026-0628-001",
@@ -72,9 +73,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-13T18:46:18.796124+00:00",
+    "generated_at": "2026-07-14T03:10:11.915263+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260713_184618"
+    "synthesis_id": "synthesis_strategy_model_stress_20260714_031011"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -106,9 +107,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-13T18:46:18.798174+00:00",
+    "generated_at": "2026-07-14T03:10:11.916901+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260713_184618"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260714_031011"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -130,23 +131,23 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-13T18:46:18.799811+00:00",
+    "generated_at": "2026-07-14T03:10:11.918762+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260713_184618"
+    "synthesis_id": "synthesis_supply_scarcity_20260714_031011"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
     "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — в то время как bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "takeaway": "Bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "strength": "strong",
-    "confidence": 0.669,
+    "confidence": 0.656,
     "phase": "active",
-    "score": 103,
+    "score": 101,
     "signal_count": 14,
     "anchor_signal_id": "INF-2026-0609-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'в то время как'; confidence: 0.67; signals_used: 14; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'в то время как'; confidence: 0.66; signals_used: 14; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0609-001",
       "INF-2026-0625-001",
@@ -164,29 +165,29 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-13T18:46:18.801839+00:00",
+    "generated_at": "2026-07-14T03:10:11.920533+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260713_184618"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260714_031011"
   },
   "leverage_deleveraging_cycle": {
     "tension": "BTC отскочил на слабом jobs-репорте и снёс $450 млн шортов vs та же неделя уже снесла лонги на падении к $58,293 — рынок дважды подряд принудительно чистит leverage в противоположные стороны",
     "narrative": "Некрупные макро-катализаторы способны быстро и полностью развернуть контролирующую сторону leverage в обе стороны за считанные дни — рынок BTC сейчас структурно хрупок и держится на быстро пересобирающемся плечевом позиционировании, а не на устойчивом направленном тренде — в условиях некрупные макро-катализаторы способны быстро и полностью развернуть контролирующую сторону leverage в обе стороны за считанные дни — рынок BTC сейчас структурно хрупок и держится на быстро пересобирающемся плечевом позиционировании, а не на устойчивом направленном тренде",
     "takeaway": "",
     "strength": "moderate",
-    "confidence": 0.327,
+    "confidence": 0.255,
     "phase": "structural",
-    "score": 9,
+    "score": 7,
     "signal_count": 1,
     "anchor_signal_id": "MAC-2026-0706-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from MAC-2026-0706-001 (contradicts: 0, weight: market); partA from MAC-2026-0706-001; phase: structural; bridge: 'в условиях'; confidence: 0.33; signals_used: 1; ignored_duplicates: []",
+    "rationale": "Tension from MAC-2026-0706-001 (contradicts: 0, weight: market); partA from MAC-2026-0706-001; phase: structural; bridge: 'в условиях'; confidence: 0.25; signals_used: 1; ignored_duplicates: []",
     "signals_used": [
       "MAC-2026-0706-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-13T18:46:18.803240+00:00",
+    "generated_at": "2026-07-14T03:10:11.922140+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260713_184618"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260714_031011"
   }
 }

@@ -1232,10 +1232,12 @@ header {
 /* ── HOLDERS SNAPSHOT TABLE — визуал как у .th-table (Топ-100), пока без сортировки/поиска ── */
 .htable { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
 .htable th {
-  text-align: center; padding: 6px 8px;
+  text-align: center; padding: 8px 6px;
   color: var(--dim); font-size: 9px; letter-spacing: 0.05em;
   border-bottom: 1px solid var(--line);
-  white-space: nowrap;
+  white-space: normal;
+  min-width: 62px;
+  line-height: 1.35;
 }
 .htable td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--txt); white-space: nowrap; text-align: center; }
 .htable td:first-child { text-align: left; }
@@ -3494,7 +3496,7 @@ function toggleNav(id) {
 
     <div class="panel amber" id="holders-structure" style="scroll-margin-top:64px">
       <div class="panel-head">
-        <span class="panel-title">Структура владения · 2009–2024</span>
+        <span class="panel-title">Структура владения · 2009–2026</span>
         <span class="panel-tag">📊 ON-CHAIN</span>
       </div>
       <div id="holders-table-wrap"></div>
@@ -6534,7 +6536,7 @@ renderTOC('tech-toc', [
 ]);
 
 renderTOC('holders-toc', [
-  { target: 'holders-structure', title: 'Структура владения · 2009–2024', subtitle: 'On-chain распределение по категориям держателей' },
+  { target: 'holders-structure', title: 'Структура владения · 2009–2026', subtitle: 'On-chain распределение по категориям держателей' },
   { target: 'holders-trends-panel', title: 'Ключевые тренды', subtitle: 'Динамика перераспределения владения' },
   { target: 'holders-waves-panel', title: 'Три волны институционализации', subtitle: 'Корпорации, ETF, государства' },
   { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' },

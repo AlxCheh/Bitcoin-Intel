@@ -6456,10 +6456,26 @@ function showTab(id, btn, keepCluster) {
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
+
+  // Запоминаем активную вкладку — при перезагрузке страницы восстановится
+  // именно она, а не дефолтный ОБЗОР (localStorage, не sessionStorage —
+  // сохраняется и между полным закрытием вкладки браузера).
+  try { localStorage.setItem('bi_active_tab', id); } catch (e) {}
 }
 
-// инициализация подвкладок при загрузке
-renderSubnav('live', 'home');
+// Восстановление последней активной вкладки при загрузке страницы.
+// Если сохранённой вкладки нет (первый визит) или соответствующего
+// tab-<id> уже не существует (переименовали/удалили) — падаем на
+// обычный дефолт (ОБЗОР), не ломаемся молча.
+(function restoreLastActiveTab() {
+  let saved = null;
+  try { saved = localStorage.getItem('bi_active_tab'); } catch (e) {}
+  if (saved && document.getElementById('tab-' + saved)) {
+    showTab(saved, null);
+  } else {
+    renderSubnav('live', 'home');
+  }
+})();
 
 // загрузка сигналов из signals.json
 // ── ШАБЛОН ОГЛАВЛЕНИЯ ВКЛАДКИ («СОДЕРЖАНИЕ») ────────────────────────────

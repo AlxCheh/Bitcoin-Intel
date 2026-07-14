@@ -5708,8 +5708,17 @@ async function loadSignals() {
     fetchSiteMap(); // прогрев карты сайта — не ждём первого открытия оверлея
     renderDashboard();
     setTimeout(renderDashStatus, 600);
-    const marketTab = document.getElementById('tab-market');
-    if (marketTab && marketTab.classList.contains('active')) renderSignals();
+    // Перерисовать данные ТЕКУЩЕЙ вкладки после завершения загрузки —
+    // не только 'market' (была точечная заплатка только для него), а
+    // любую. Раньше это было условие 'if marketTab.active', которое не
+    // спасало другие вкладки от той же гонки: restoreLastActiveTab()
+    // вызывает showTab() СИНХРОННО при загрузке страницы, до того как
+    // loadSignals() успевает завершиться — если сохранённая вкладка
+    // (например ХОЛДЕРЫ) зависит от SIGNALS/TREASURY_HOLDERS/
+    // REVENUE_ENGINES, её панели рендерились с пустыми массивами и
+    // никогда не перерисовывались повторно. currentTabId отслеживает
+    // реально активную вкладку на момент завершения загрузки.
+    if (currentTabId) triggerTabData(currentTabId);
   } catch(e) {
     console.error('signals.json load error:', e);
   }
@@ -6421,25 +6430,12 @@ function renderSubnav(key, activeId) {
   ).join('');
 }
 
-function showTab(id, btn, keepCluster) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+let currentTabId = null;
 
-  // синхронизировать кластер, если перешли на вкладку другого кластера (напр. клик по пулу)
-  const cluster = TAB_TO_CLUSTER[id];
-  if (cluster && cluster !== activeCluster) {
-    activeCluster = cluster;
-    document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('cbar-' + cluster).classList.add('active');
-  }
-  // перерисовать подвкладки с подсветкой текущей
-  renderSubnav(activeCluster, id);
-
-  // крошки
-  if (TAB_TO_CLUSTER[id]) {
-    updateCrumb(id);
-  }
-
+// Триггеры загрузки/рендера данных для конкретной вкладки — вынесено из
+// showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
+// после завершения loadSignals() (см. ниже, почему это нужно).
+function triggerTabData(id) {
   if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
   if (id === 'analytics') initCharts();
   if (id === 'market')    renderSignals();
@@ -6456,6 +6452,29 @@ function showTab(id, btn, keepCluster) {
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
+}
+
+function showTab(id, btn, keepCluster) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  currentTabId = id;
+
+  // синхронизировать кластер, если перешли на вкладку другого кластера (напр. клик по пулу)
+  const cluster = TAB_TO_CLUSTER[id];
+  if (cluster && cluster !== activeCluster) {
+    activeCluster = cluster;
+    document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('cbar-' + cluster).classList.add('active');
+  }
+  // перерисовать подвкладки с подсветкой текущей
+  renderSubnav(activeCluster, id);
+
+  // крошки
+  if (TAB_TO_CLUSTER[id]) {
+    updateCrumb(id);
+  }
+
+  triggerTabData(id);
 
   // Запоминаем активную вкладку — при перезагрузке страницы восстановится
   // именно она, а не дефолтный ОБЗОР (localStorage, не sessionStorage —
@@ -6473,7 +6492,13 @@ function showTab(id, btn, keepCluster) {
   if (saved && document.getElementById('tab-' + saved)) {
     showTab(saved, null);
   } else {
+    // Не showTab('home') — home и так инициализируется отдельно ниже
+    // (fetchProdCost/initPriceChart/fetchBlocks на верхнем уровне);
+    // повторный вызов через showTab() задвоил бы инициализацию Chart.js
+    // на тот же canvas. currentTabId ставим явно, чтобы loadSignals()
+    // всё равно знал какую вкладку перерисовать при необходимости.
     renderSubnav('live', 'home');
+    currentTabId = 'home';
   }
 })();
 

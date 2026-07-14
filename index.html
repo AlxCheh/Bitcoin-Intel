@@ -3264,6 +3264,14 @@ function toggleNav(id) {
 
     <div id="theory-topics-container"></div>
 
+    <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="revenue-engines-panel">
+      <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
+        <span class="panel-title">Доходные движки</span>
+        <span class="panel-head-right"><span class="panel-tag" id="re-count">—</span><span class="panel-collapse-arrow">▾</span></span>
+      </div>
+      <div class="re-list" id="re-list"></div>
+    </div>
+
     <div style="height:650px" aria-hidden="true"></div>
 
   </div>
@@ -3551,14 +3559,6 @@ function toggleNav(id) {
           <tbody id="th-tbody"></tbody>
         </table>
       </div>
-    </div>
-
-    <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="revenue-engines-panel">
-      <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
-        <span class="panel-title">Доходные движки</span>
-        <span class="panel-head-right"><span class="panel-tag" id="re-count">—</span><span class="panel-collapse-arrow">▾</span></span>
-      </div>
-      <div class="re-list" id="re-list"></div>
     </div>
 
     <div style="height:650px" aria-hidden="true"></div>
@@ -6446,9 +6446,9 @@ function triggerTabData(id) {
       if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
-  if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderRevenueEngines(); }
+  if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); }
   if (id === 'theory') renderTheoryEssays();
-  if (id === 'macrocontext') renderTheoryTopics();
+  if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
@@ -6558,7 +6558,8 @@ renderTOC('theory-toc', [
 renderTOC('macrocontext-toc', [
   { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' },
   { target: 'theory-macro', title: 'Макроэкономика и Bitcoin', subtitle: 'Канал воздействия: ставки → ликвидность → BTC' },
-  { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' }
+  { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' },
+  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' }
 ]);
 
 renderTOC('lightning-toc', [
@@ -6580,8 +6581,7 @@ renderTOC('holders-toc', [
   { target: 'holders-structure', title: 'Структура владения · 2009–2026', subtitle: 'On-chain распределение по категориям держателей' },
   { target: 'holders-trends-panel', title: 'Ключевые тренды', subtitle: 'Динамика перераспределения владения' },
   { target: 'holders-waves-panel', title: 'Три волны институционализации', subtitle: 'Корпорации, ETF, государства' },
-  { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' },
-  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' }
+  { target: 'treasury-panel', title: 'Топ-100 держателей BTC', subtitle: 'Рейтинг публичных компаний по резервам BTC' }
 ]);
 
 loadSignals();

@@ -125,7 +125,7 @@ const HOLDERS_DATA = {
       // обработки сигналов эти цифры подлежат проверке и обновлению
       // (см. CLAUDE.md, раздел "HOLDERS_DATA — правило верификации").
       date:        "Jul 2026",
-      event:       "Corporate treasuries surpass 1.26M BTC (см. STR-2026-0703-001)",
+      event:       "Corporate treasuries surpass 1.26M BTC",
       total_mined: 20053066,
       // not_mined: Newhedge + MacroMicro независимо сошлись на
       // ~20.05M circulating на 1-7 июля 2026 — самая точная и свежая

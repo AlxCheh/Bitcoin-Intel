@@ -53,6 +53,7 @@ TREASURY_NAME_TO_FACT_KEY = {
     "Bitcoin Standard Treasury Company": "bstr.btc_holdings",
     "Strive": "strive.btc_holdings",
     "OranjeBTC": "oranjebtc.btc_holdings",
+    "SpaceX": "spacex.btc_holdings",
 }
 
 

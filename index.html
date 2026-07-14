@@ -2475,7 +2475,7 @@ header {
         <div class="instrument-stat-grid">
           <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">ТИП</div><div class="instrument-stat-val">Вечная привилегированная акция</div></div>
           <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">ОБЕСПЕЧЕНИЕ</div><div class="instrument-stat-val" style="color:var(--btc)">BTC-резерв 4–5×</div></div>
-          <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">USD-РЕЗЕРВ</div><div class="instrument-stat-val">$1,4 млрд</div></div>
+          <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">USD-РЕЗЕРВ</div><div class="instrument-stat-val" data-fact-key="strategy.usd_reserve" data-fact-format="usd_b">$1,4 млрд</div></div>
         </div>
 
         <div class="instrument-text">
@@ -2499,7 +2499,7 @@ header {
         <div class="instrument-label">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
         <div class="instrument-badges">
           <span class="instrument-badge dim">BTC-резерв: <span data-fact-key="strategy.btc_holdings">847 363</span> BTC</span>
-          <span class="instrument-badge dim">USD-резерв: $1,4 млрд</span>
+          <span class="instrument-badge dim">USD-резерв: <span data-fact-key="strategy.usd_reserve" data-fact-format="usd_b">$1,4 млрд</span></span>
           <span class="instrument-badge dim">Покрытие: ~14 мес.</span>
           <span class="instrument-badge red">Ниже номинала: $84–87 (июнь 2026)</span>
           <span class="instrument-badge dim">Дивиденды: $1,2 млрд/год</span>
@@ -7034,6 +7034,7 @@ async function fetchFacts() {
 // так фраза вокруг числа не теряется при миграции старого статичного текста.
 function fmtFactValue(value, format) {
   if (format === 'k') return Math.round(value / 1000) + 'K';
+  if (format === 'usd_b') return '$' + (value / 1e9).toFixed(1).replace('.', ',') + ' млрд';
   return value.toLocaleString('ru-RU');
 }
 function applyFactsToDOM() {

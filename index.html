@@ -3262,8 +3262,6 @@ function toggleNav(id) {
 
     </div>
 
-    <div id="theory-topics-container"></div>
-
     <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="revenue-engines-panel">
       <div class="panel-head collapsible" data-collapse-target="revenue-engines-panel">
         <span class="panel-title">Доходные движки</span>
@@ -3271,6 +3269,8 @@ function toggleNav(id) {
       </div>
       <div class="re-list" id="re-list"></div>
     </div>
+
+    <div id="theory-topics-container"></div>
 
     <div style="height:650px" aria-hidden="true"></div>
 
@@ -6557,9 +6557,9 @@ renderTOC('theory-toc', [
 
 renderTOC('macrocontext-toc', [
   { target: 'theory-mnav', title: 'mNAV — механика BTC-казначейств', subtitle: 'Премия, дисконт, аккреция, BTC Yield' },
+  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' },
   { target: 'theory-macro', title: 'Макроэкономика и Bitcoin', subtitle: 'Канал воздействия: ставки → ликвидность → BTC' },
-  { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' },
-  { target: 'revenue-engines-panel', title: 'Доходные движки', subtitle: 'Как компании зарабатывают на BTC-резервах' }
+  { target: 'theory-regulation', title: 'Регуляторная среда', subtitle: 'Юрисдикции, асимметрия реакции, роли государства' }
 ]);
 
 renderTOC('lightning-toc', [

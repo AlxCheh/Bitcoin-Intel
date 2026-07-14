@@ -1005,6 +1005,21 @@
       ]
     },
     {
+      "id": "e081",
+      "title": "Доходные движки",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "macrocontext",
+      "tab_label": "МАКРОКОНТЕКСТ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "доход",
+        "дивиденды",
+        "revenue"
+      ]
+    },
+    {
       "id": "e070",
       "title": "Текущая награда майнера",
       "cluster": "macro",
@@ -1162,21 +1177,6 @@
         "казначейство",
         "компании",
         "treasury"
-      ]
-    },
-    {
-      "id": "e081",
-      "title": "Доходные движки",
-      "cluster": "analysis",
-      "cluster_label": "ANALYSIS",
-      "tab": "holders",
-      "tab_label": "ХОЛДЕРЫ",
-      "source": "static",
-      "kind": "table",
-      "keywords": [
-        "доход",
-        "дивиденды",
-        "revenue"
       ]
     },
     {

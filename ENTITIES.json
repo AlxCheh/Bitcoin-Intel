@@ -759,6 +759,29 @@
         "STR-2026-0714-001"
       ],
       "last_updated": "2026-07-14"
+    },
+    {
+      "id": "spark_protocol",
+      "name": "Spark",
+      "type": "protocol",
+      "status": "active",
+      "summary": "Bitcoin-протокол для платежей и стейблкоинов — единый SDK для ончейн/Lightning/стейблкоин-рельсов, zero-conf валидация; используется Polymarket для мгновенных BTC-депозитов",
+      "profile": {
+        "what": "Layer 2 инфраструктура, обслуживающая Lightning-платежи с zero-conf валидацией (double-spend/fee/RBF-проверка в момент broadcast, зачисление <1 секунды)",
+        "metrics": [
+          "Polymarket — первый крупный клиент для instant BTC-депозитов (7 июля 2026)",
+          "Другие провайдеры на той же инфраструктуре: Breez, Xverse, Cake"
+        ],
+        "links_to": [
+          "bitcoin",
+          "lightning"
+        ],
+        "notable": "НЕ полностью trustless — Spark Operators co-signят переводы, хотя unilateral exit на Bitcoin L1 всегда доступен (федеративная модель с гарантированным путём выхода, не классический некастодиальный Lightning-узел)"
+      },
+      "signal_refs": [
+        "INF-2026-0715-001"
+      ],
+      "last_updated": "2026-07-15"
     }
   ]
 }

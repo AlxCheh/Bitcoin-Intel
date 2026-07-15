@@ -595,6 +595,59 @@ header {
   color: var(--dim);
   line-height: 1.45;
 }
+.re-engine-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--btc);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.re-engine-link:hover { color: var(--btc-hover, var(--btc)); }
+
+/* ══ Оверлей деталей доходного движка ══ */
+.re-detail-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(12,15,20,0.92);
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+.re-detail-overlay.open { display: flex; flex-direction: column; }
+.re-detail-panel {
+  max-width: 720px; width: 100%; margin: 0 auto; height: 100%;
+  display: flex; flex-direction: column; background: var(--bg);
+}
+.re-detail-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+.re-detail-head-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--btc); }
+.re-detail-close { background: transparent; border: none; color: var(--dim); font-size: 18px; cursor: pointer; padding: 4px 8px; }
+.re-detail-close:hover { color: var(--btc); }
+.re-detail-body { flex: 1; overflow-y: auto; padding: 16px; }
+.re-detail-section { margin-bottom: 20px; }
+.re-detail-label {
+  font-family: var(--mono); font-size: 9px; color: var(--dim);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+}
+.re-detail-text { font-size: 13px; color: var(--txt); line-height: 1.65; }
+.re-detail-risk-item {
+  font-size: 12px; color: var(--dim); line-height: 1.55;
+  padding: 6px 0 6px 14px; border-left: 2px solid rgba(194,96,96,0.3); margin-bottom: 6px;
+}
+.re-history-item {
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.re-history-item:last-child { border-bottom: none; }
+.re-history-date { font-family: var(--mono); font-size: 9px; color: var(--btc); letter-spacing: 0.05em; }
+.re-history-event { font-size: 12px; color: var(--txt); line-height: 1.5; }
+.re-history-signal { font-family: var(--mono); font-size: 9px; color: var(--dim2); }
 .re-card-metrics {
   display: flex;
   flex-wrap: wrap;
@@ -1948,6 +2001,17 @@ header {
       <span><span class="sm-dot tool"></span>инструмент</span>
     </div>
     <div class="sitemap-body" id="sitemap-body"></div>
+  </div>
+</div>
+
+<!-- ══ ДЕТАЛИ ДОХОДНОГО ДВИЖКА ══ -->
+<div class="re-detail-overlay" id="re-detail-overlay">
+  <div class="re-detail-panel">
+    <div class="re-detail-head">
+      <span class="re-detail-head-title" id="re-detail-title">—</span>
+      <button class="re-detail-close" onclick="closeEngineDetail()">✕</button>
+    </div>
+    <div class="re-detail-body" id="re-detail-body"></div>
   </div>
 </div>
 
@@ -4700,21 +4764,80 @@ function renderRevenueEngines() {
   const sorted = [...REVENUE_ENGINES].sort((a, b) => a.entity_name.localeCompare(b.entity_name, 'ru'));
   countEl.textContent = sorted.length + ' ' + ruPlural(sorted.length, 'МЕХАНИЗМ', 'МЕХАНИЗМА', 'МЕХАНИЗМОВ');
 
-  listEl.innerHTML = sorted.map(r => {
+  // Нумерованные аккордеоны (01, 02, 03...) — тот же паттерн, что у mNAV
+  // и Семи сетевых эффектов, вместо плоских некликабельных карточек.
+  listEl.innerHTML = sorted.map((r, i) => {
+    const num = String(i + 1).padStart(2, '0');
     const metrics = (r.metrics || []).slice(0, 2);
     const trendLabel = RE_TREND_LABEL[r.trend] || sanitize(r.trend || '').toUpperCase();
-    return '<div class="re-card" data-engine-id="' + sanitize(r.id) + '">'
-      + '<div class="re-card-head">'
-      +   '<div>'
-      +     '<div class="re-card-entity">' + sanitize(r.entity_name) + '</div>'
-      +     '<span class="re-card-name">' + sanitize(r.name) + '</span>'
-      +   '</div>'
-      +   '<span class="re-trend-badge ' + sanitize(r.trend || '') + '">' + trendLabel + '</span>'
+    return '<div class="acc-item">'
+      + '<div class="acc-head" onclick="toggleAcc(this)">'
+      +   '<span class="acc-icon">' + num + '</span>'
+      +   '<span class="acc-label">' + sanitize(r.entity_name) + '</span>'
+      +   '<span class="re-trend-badge ' + sanitize(r.trend || '') + '" style="margin-left:auto">' + trendLabel + '</span>'
+      +   '<span class="acc-arrow">▼</span>'
       + '</div>'
-      + '<div class="re-card-summary">' + sanitize(r.summary) + '</div>'
-      + (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+      + '<div class="acc-body">'
+      +   '<span class="re-engine-link" onclick="event.stopPropagation(); openEngineDetail(\'' + sanitize(r.id) + '\')">' + sanitize(r.name) + '</span>'
+      +   '<p class="re-card-summary">' + sanitize(r.summary) + '</p>'
+      +   (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+      + '</div>'
       + '</div>';
   }).join('');
+}
+
+// Оверлей деталей доходного движка — полная информация (не обрезанная до
+// 2 метрик) + таймлайн history, который растёт с каждым новым сигналом
+// по этой сущности (см. REVENUE_ENGINES.json, поле history).
+function openEngineDetail(engineId) {
+  const engine = REVENUE_ENGINES.find(r => r.id === engineId);
+  if (!engine) return;
+  const overlay = document.getElementById('re-detail-overlay');
+  const title   = document.getElementById('re-detail-title');
+  const body    = document.getElementById('re-detail-body');
+
+  title.textContent = engine.entity_name;
+
+  let html = '';
+  html += '<div class="re-detail-section"><div class="re-detail-label">Механизм</div>'
+        + '<div class="re-detail-text" style="color:var(--btc);font-weight:700;margin-bottom:8px">' + sanitize(engine.name) + '</div>'
+        + '<div class="re-detail-text">' + sanitize(engine.how_it_works || engine.summary) + '</div></div>';
+
+  if ((engine.metrics || []).length) {
+    html += '<div class="re-detail-section"><div class="re-detail-label">Метрики</div>'
+          + '<div class="re-card-metrics">' + engine.metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div></div>';
+  }
+
+  const trendLabel = RE_TREND_LABEL[engine.trend] || sanitize(engine.trend || '').toUpperCase();
+  html += '<div class="re-detail-section"><div class="re-detail-label">Тренд</div>'
+        + '<span class="re-trend-badge ' + sanitize(engine.trend || '') + '">' + trendLabel + '</span>'
+        + (engine.trend_evidence ? '<div class="re-detail-text" style="margin-top:8px">' + sanitize(engine.trend_evidence) + '</div>' : '')
+        + '</div>';
+
+  if ((engine.risk_factors || []).length) {
+    html += '<div class="re-detail-section"><div class="re-detail-label">Риски</div>'
+          + engine.risk_factors.map(r => '<div class="re-detail-risk-item">' + sanitize(r) + '</div>').join('')
+          + '</div>';
+  }
+
+  if ((engine.history || []).length) {
+    html += '<div class="re-detail-section"><div class="re-detail-label">История (' + engine.history.length + ')</div>'
+          + [...engine.history].reverse().map(h =>
+              '<div class="re-history-item">'
+              + '<span class="re-history-date">' + sanitize(h.date) + '</span>'
+              + '<span class="re-history-event">' + sanitize(h.event) + '</span>'
+              + '<span class="re-history-signal">' + sanitize(h.signal_id) + '</span>'
+              + '</div>'
+            ).join('')
+          + '</div>';
+  }
+
+  body.innerHTML = html;
+  overlay.classList.add('open');
+}
+
+function closeEngineDetail() {
+  document.getElementById('re-detail-overlay').classList.remove('open');
 }
 
 // ── ДОПОЛНИТЕЛЬНЫЕ ПАНЕЛИ ТЕОРИИ (data-driven, SBBA-IRP Wave 2) ─────────

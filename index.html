@@ -596,18 +596,18 @@ header {
   line-height: 1.45;
 }
 .re-engine-link {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--btc);
+  display: block;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 2px;
-  display: inline-block;
-  margin-bottom: 8px;
+  border: 1px solid rgba(200,168,75,.3);
+  background: rgba(200,168,75,.05);
+  padding: 12px 14px;
+  margin-bottom: 12px;
 }
-.re-engine-link:hover { color: var(--btc-hover, var(--btc)); }
+.re-engine-link:hover { border-color: rgba(200,168,75,.5); }
 
 /* ══ Оверлей деталей доходного движка ══ */
 .re-detail-overlay {
@@ -650,9 +650,21 @@ header {
 .re-history-signal { font-family: var(--mono); font-size: 9px; color: var(--dim2); }
 .re-card-metrics {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 2px;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+/* Отдельный класс от .eco-metric-chip (тот переиспользуется в
+   "Экосистема Bitcoin" — менять его глобально задело бы не относящуюся
+   к этой правке панель). */
+.re-metric-chip {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+  border-left: 2px solid rgba(200,168,75,.45);
+  background: rgba(200,168,75,.045);
+  padding: 6px 10px 6px 18px;
 }
 
 
@@ -4780,7 +4792,7 @@ function renderRevenueEngines() {
       + '<div class="acc-body">'
       +   '<span class="re-engine-link" onclick="event.stopPropagation(); openEngineDetail(\'' + sanitize(r.id) + '\')">' + sanitize(r.name) + '</span>'
       +   '<p class="re-card-summary">' + sanitize(r.summary) + '</p>'
-      +   (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
+      +   (metrics.length ? '<div class="re-card-metrics">' + metrics.map(m => '<span class="re-metric-chip">' + sanitize(m) + '</span>').join('') + '</div>' : '')
       + '</div>'
       + '</div>';
   }).join('');
@@ -4805,7 +4817,7 @@ function openEngineDetail(engineId) {
 
   if ((engine.metrics || []).length) {
     html += '<div class="re-detail-section"><div class="re-detail-label">Метрики</div>'
-          + '<div class="re-card-metrics">' + engine.metrics.map(m => '<span class="eco-metric-chip">' + sanitize(m) + '</span>').join('') + '</div></div>';
+          + '<div class="re-card-metrics">' + engine.metrics.map(m => '<span class="re-metric-chip">' + sanitize(m) + '</span>').join('') + '</div></div>';
   }
 
   const trendLabel = RE_TREND_LABEL[engine.trend] || sanitize(engine.trend || '').toUpperCase();

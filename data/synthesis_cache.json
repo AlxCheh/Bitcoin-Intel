@@ -33,9 +33,9 @@
       "STR-2026-0623-002",
       "STR-2026-0706-003"
     ],
-    "generated_at": "2026-07-15T19:44:06.710550+00:00",
+    "generated_at": "2026-07-15T19:49:10.479352+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260715_194406"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260715_194910"
   },
   "strategy_model_stress": {
     "tension": "Strategy легализовала продажу BTC нарушив \"never sell\" vs байбек акций на $2 млрд сигнализирует что менеджмент видит акции недооценёнными — модель эволюционировала",
@@ -52,7 +52,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-15T19:44:06.713920+00:00"
+      "detected_at": "2026-07-15T19:49:10.482732+00:00"
     },
     "rationale": "Tension from STR-2026-0629-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'что означает что'; confidence: 0.72; signals_used: 14; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -75,9 +75,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-15T19:44:06.714076+00:00",
+    "generated_at": "2026-07-15T19:49:10.482856+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260715_194406"
+    "synthesis_id": "synthesis_strategy_model_stress_20260715_194910"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -110,9 +110,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-15T19:44:06.716199+00:00",
+    "generated_at": "2026-07-15T19:49:10.484887+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260715_194406"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260715_194910"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -134,26 +134,27 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-15T19:44:06.717903+00:00",
+    "generated_at": "2026-07-15T19:49:10.486647+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260715_194406"
+    "synthesis_id": "synthesis_supply_scarcity_20260715_194910"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
-    "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — в то время как bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
+    "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — тогда как bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "takeaway": "Bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "strength": "strong",
-    "confidence": 0.656,
+    "confidence": 0.661,
     "phase": "active",
-    "score": 101,
-    "signal_count": 14,
+    "score": 109,
+    "signal_count": 15,
     "anchor_signal_id": "INF-2026-0609-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'в то время как'; confidence: 0.66; signals_used: 14; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'тогда как'; confidence: 0.66; signals_used: 15; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0609-001",
       "INF-2026-0625-001",
+      "INF-2026-0715-001",
       "INF-2026-0706-001",
       "INF-2026-0624-001",
       "INF-2026-0629-001",
@@ -168,9 +169,9 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-15T19:44:06.719916+00:00",
+    "generated_at": "2026-07-15T19:49:10.488686+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260715_194406"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260715_194910"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -190,8 +191,8 @@
       "NAR-2026-0715-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-15T19:44:06.721559+00:00",
+    "generated_at": "2026-07-15T19:49:10.490415+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260715_194406"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260715_194910"
   }
 }

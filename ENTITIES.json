@@ -826,6 +826,29 @@
         "STR-2026-0715-001"
       ],
       "last_updated": "2026-07-15"
+    },
+    {
+      "id": "bitgo",
+      "name": "BitGo",
+      "type": "exchange",
+      "status": "active",
+      "summary": "Крупнейший регулируемый кастодиан BTC (NYSE: BTGO) — пионер мультиподписных кошельков; выпустил инструменты quantum-risk оценки для институциональных клиентов (9 июля 2026)",
+      "profile": {
+        "what": "Digital asset infrastructure компания — кастоди, кошельки, стейкинг, трейдинг, финансирование, стейблкоины, settlement из регулируемого холодного хранения (с 2013 года)",
+        "metrics": [
+          "Quantum Risk Score + Fix Exposed Addresses Workflow (9 июля 2026) — покрывает UTXO-based и мультиподписные кошельки, НЕ покрывает Taproot/P2PK",
+          "Первая post-quantum MPC-транзакция регулируемого кастодиана — с Silence Laboratories, 26 мая 2026, ML-DSA (NIST FIPS 204)",
+          "BitGo Bank & Trust — первый федерально лицензированный digital asset trust bank, принадлежащий публичной компании"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Пионер мультиподписных кошельков для Bitcoin — движется первым среди кастодианов на quantum-safe инфраструктуре, пока протокольные предложения (BIP-360/361) остаются в статусе Draft"
+      },
+      "signal_refs": [
+        "INF-2026-0709-001"
+      ],
+      "last_updated": "2026-07-09"
     }
   ]
 }

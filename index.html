@@ -2951,6 +2951,83 @@ function toggleNav(id) {
 
     </div>
 
+    <div class="panel" id="theory-governance" style="scroll-margin-top:64px;margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Bitcoin Governance</span>
+        <span class="panel-tag">ПЬЕР РОШАР · 2018</span>
+      </div>
+
+      <p>Управление Bitcoin — не вопрос «кто главный» (майнеры/ноды/инвесторы), а процесс, которым набор правил проверки транзакций и блоков согласуется, внедряется и обеспечивается — так, что независимые участники приходят к общему пониманию, что считать «биткоином».</p>
+
+      <p>Два взгляда на саму цель управления. Мэтт Коралло: главное — trustlessness, возможность пользоваться Bitcoin, доверяя только открытому коду, который сам запускаешь. Дэниел Кравиш: управление де-факто максимизирует стоимость монеты — приживаются только апгрейды, повышающие цену. Автор — на стороне Коралло: доверие третьей стороне в денежной истории неизменно заканчивалось злоупотреблением, а прямой корреляции между апгрейдами протокола и ценой не прослеживается.</p>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">1️⃣</span>
+          <span class="acc-label">Research</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Любое изменение правил начинается с исследования проблемы. Пример: SegWit родился из решения transaction malleability — бага, который блокировал запуск Lightning Network поверх Bitcoin.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">2️⃣</span>
+          <span class="acc-label">Proposal</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Найденное решение публикуется для протокольных разработчиков: письмо в bitcoin-dev mailing list, формальный white paper и/или Bitcoin Improvement Proposal (BIP).</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">3️⃣</span>
+          <span class="acc-label">Implementation</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Предложение реализует сам исследователь либо другие разработчики. Мейнтейнеры референсной реализации (github.com/bitcoin/bitcoin) сознательно следуют за консенсусом, а не навязывают его — спорные изменения они не мержат. Обойти это можно: скопировать кодовую базу и выпустить правки отдельно, как это сделал BIP-148 (User Activated Soft Fork).</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">4️⃣</span>
+          <span class="acc-label">Deployment</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Реализованный софт нужно убедить принять пользователей. Узлы не равны по влиянию: блокчейн-эксплореры и биржи весомее рядового участника. Софтфорки используют BIP-9 (Version bits with timeout and delay) — механизм измерения поддержки майнеров как прокси для поддержки всего сообщества. Автор подчёркивает: это несовершенный прокси (из-за централизации майнинга и конфликта интересов майнер/пользователь), а не признак «майнерской демократии».</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">5️⃣</span>
+          <span class="acc-label">Enforcement</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Правила обеспечивает децентрализованная p2p-сеть полных нод: каждая независимо проверяет полученные транзакции и блоки, отклоняя и банят пиров, рассылающих невалидные данные. Роль майнеров — только proof-of-work timestamping (упорядочивание транзакций по стоимости оборудования и электричества); из-за централизации майнинга доверять им как единственным арбитрам правил нельзя.</p>
+        </div>
+      </div>
+
+      <div style="padding:12px 14px;background:var(--bg3);border-top:1px solid var(--line)">
+        <p style="margin:0;font-size:12px;color:var(--txt);line-height:1.6">Вывод автора: текущая модель управления Bitcoin успешно предотвратила деградацию trustlessness — пример: сопротивление прошлому давлению майнеров на увеличение размера блока. А вот причинно-следственную связь между управлением и ростом цены он считает недоказуемой — зато уверен, что consensus-изменения, на которых работает Lightning Network, реально повышают ценность сети.</p>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ИСТОЧНИК: Pierre Rochard · Bitcoin Governance · 9 июля 2018 · <a href="https://pierre-rochard.medium.com/bitcoin-governance-37e86299470f" target="_blank" style="color:var(--btc);text-decoration:none">medium.com</a>
+        </div>
+      </div>
+
+    </div>
+
     <div class="panel" id="theory-dca" style="scroll-margin-top:64px;margin-top:12px">
       <div class="panel-head">
         <span class="panel-title">Стратегия DCA</span>
@@ -6687,6 +6764,7 @@ function renderTOC(containerId, items) {
 renderTOC('theory-toc', [
   { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
   { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
+  { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
   { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' }
 ]);
 

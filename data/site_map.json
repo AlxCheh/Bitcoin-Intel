@@ -726,6 +726,98 @@
     },
     {
       "id": "e050",
+      "title": "Bitcoin Governance",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "governance",
+        "консенсус",
+        "bip",
+        "софтфорк",
+        "трастлесс"
+      ]
+    },
+    {
+      "id": "e051",
+      "title": "Research",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "исследование",
+        "segwit",
+        "malleability"
+      ]
+    },
+    {
+      "id": "e052",
+      "title": "Proposal",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "предложение",
+        "bip",
+        "mailing list"
+      ]
+    },
+    {
+      "id": "e053",
+      "title": "Implementation",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "реализация",
+        "референсная реализация",
+        "uasf"
+      ]
+    },
+    {
+      "id": "e054",
+      "title": "Deployment",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "развёртывание",
+        "bip-9",
+        "версия биты"
+      ]
+    },
+    {
+      "id": "e055",
+      "title": "Enforcement",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "обеспечение",
+        "полные ноды",
+        "валидация"
+      ]
+    },
+    {
+      "id": "e056",
       "title": "Спекуляция",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -739,7 +831,7 @@
       ]
     },
     {
-      "id": "e051",
+      "id": "e057",
       "title": "Принятие бизнесами",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -753,7 +845,7 @@
       ]
     },
     {
-      "id": "e052",
+      "id": "e058",
       "title": "Принятие потребителями",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -767,7 +859,7 @@
       ]
     },
     {
-      "id": "e053",
+      "id": "e059",
       "title": "Безопасность",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -781,7 +873,7 @@
       ]
     },
     {
-      "id": "e054",
+      "id": "e060",
       "title": "Предпочтение разработчиков",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -795,7 +887,7 @@
       ]
     },
     {
-      "id": "e055",
+      "id": "e061",
       "title": "Финансирование",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -809,7 +901,7 @@
       ]
     },
     {
-      "id": "e056",
+      "id": "e062",
       "title": "Мировая резервная валюта",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -822,7 +914,7 @@
       ]
     },
     {
-      "id": "e057",
+      "id": "e063",
       "title": "Стратегия DCA",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -836,7 +928,7 @@
       ]
     },
     {
-      "id": "e058",
+      "id": "e064",
       "title": "Почему не работает «купи дёшево»",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -850,7 +942,7 @@
       ]
     },
     {
-      "id": "e059",
+      "id": "e065",
       "title": "Как работает DCA",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -864,7 +956,7 @@
       ]
     },
     {
-      "id": "e060",
+      "id": "e066",
       "title": "Шесть преимуществ",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -878,7 +970,7 @@
       ]
     },
     {
-      "id": "e061",
+      "id": "e067",
       "title": "Модель PlanB: 1% в BTC",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -892,7 +984,7 @@
       ]
     },
     {
-      "id": "e062",
+      "id": "e068",
       "title": "DCA подходит если...",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -905,7 +997,7 @@
       ]
     },
     {
-      "id": "e063",
+      "id": "e069",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -919,7 +1011,7 @@
       ]
     },
     {
-      "id": "e064",
+      "id": "e070",
       "title": "Что такое mNAV",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -934,7 +1026,7 @@
       ]
     },
     {
-      "id": "e065",
+      "id": "e071",
       "title": "Почему возникает премия",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -948,7 +1040,7 @@
       ]
     },
     {
-      "id": "e066",
+      "id": "e072",
       "title": "Машина аккреции: как работает при премии",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -962,7 +1054,7 @@
       ]
     },
     {
-      "id": "e067",
+      "id": "e073",
       "title": "Дисконт: когда машина ломается",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -976,7 +1068,7 @@
       ]
     },
     {
-      "id": "e068",
+      "id": "e074",
       "title": "BTC Yield — главный KPI",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -991,7 +1083,7 @@
       ]
     },
     {
-      "id": "e069",
+      "id": "e075",
       "title": "Как читать mNAV при анализе сигналов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1005,7 +1097,7 @@
       ]
     },
     {
-      "id": "e081",
+      "id": "e076",
       "title": "Доходные движки",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1020,7 +1112,7 @@
       ]
     },
     {
-      "id": "e070",
+      "id": "e077",
       "title": "Текущая награда майнера",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1035,7 +1127,7 @@
       ]
     },
     {
-      "id": "e071",
+      "id": "e078",
       "title": "Таблица халвингов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1050,7 +1142,7 @@
       ]
     },
     {
-      "id": "e072",
+      "id": "e079",
       "title": "Not Yet Mined · динамика",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1064,7 +1156,7 @@
       ]
     },
     {
-      "id": "e073",
+      "id": "e080",
       "title": "Монетарная инфляция",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1079,7 +1171,7 @@
       ]
     },
     {
-      "id": "e074",
+      "id": "e081",
       "title": "Ключевые события",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1094,7 +1186,7 @@
       ]
     },
     {
-      "id": "e075",
+      "id": "e082",
       "title": "Опиши аномалию или сигнал",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1109,7 +1201,7 @@
       ]
     },
     {
-      "id": "e076",
+      "id": "e083",
       "title": "Или выбери из базы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1122,7 +1214,7 @@
       ]
     },
     {
-      "id": "e077",
+      "id": "e084",
       "title": "Структура владения · 2009–2026",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1137,7 +1229,7 @@
       ]
     },
     {
-      "id": "e078",
+      "id": "e085",
       "title": "Ключевые тренды",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1151,7 +1243,7 @@
       ]
     },
     {
-      "id": "e079",
+      "id": "e086",
       "title": "Три волны институционализации",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1165,7 +1257,7 @@
       ]
     },
     {
-      "id": "e080",
+      "id": "e087",
       "title": "Топ-100 держателей BTC",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1180,7 +1272,7 @@
       ]
     },
     {
-      "id": "e082",
+      "id": "e088",
       "title": "Накопленные разборы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",

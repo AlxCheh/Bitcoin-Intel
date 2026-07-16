@@ -2957,9 +2957,17 @@ function toggleNav(id) {
         <span class="panel-tag">ПЬЕР РОШАР · 2018</span>
       </div>
 
-      <p>Управление Bitcoin — не вопрос «кто главный» (майнеры/ноды/инвесторы), а процесс, которым набор правил проверки транзакций и блоков согласуется, внедряется и обеспечивается — так, что независимые участники приходят к общему пониманию, что считать «биткоином».</p>
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Управление Bitcoin — не вопрос «кто главный» (майнеры/ноды/инвесторы), а процесс, которым набор правил проверки транзакций и блоков согласуется, внедряется и обеспечивается — так, что независимые участники приходят к общему пониманию, что считать «биткоином».
+        </div>
+      </div>
 
-      <p>Два взгляда на саму цель управления. Мэтт Коралло: главное — trustlessness, возможность пользоваться Bitcoin, доверяя только открытому коду, который сам запускаешь. Дэниел Кравиш: управление де-факто максимизирует стоимость монеты — приживаются только апгрейды, повышающие цену. Автор — на стороне Коралло: доверие третьей стороне в денежной истории неизменно заканчивалось злоупотреблением, а прямой корреляции между апгрейдами протокола и ценой не прослеживается.</p>
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Два взгляда на саму цель управления. Мэтт Коралло: главное — trustlessness, возможность пользоваться Bitcoin, доверяя только открытому коду, который сам запускаешь. Дэниел Кравиш: управление де-факто максимизирует стоимость монеты — приживаются только апгрейды, повышающие цену. Автор — на стороне Коралло: доверие третьей стороне в денежной истории неизменно заканчивалось злоупотреблением, а прямой корреляции между апгрейдами протокола и ценой не прослеживается.
+        </div>
+      </div>
 
       <div class="acc-item">
         <div class="acc-head" onclick="toggleAcc(this)">
@@ -2969,6 +2977,9 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Любое изменение правил начинается с исследования проблемы. Пример: SegWit родился из решения transaction malleability — бага, который блокировал запуск Lightning Network поверх Bitcoin.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Проблема на практике → пример: transaction malleability блокировала Lightning
+          </div>
         </div>
       </div>
 
@@ -2980,6 +2991,9 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Найденное решение публикуется для протокольных разработчиков: письмо в bitcoin-dev mailing list, формальный white paper и/или Bitcoin Improvement Proposal (BIP).</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            mailing list → white paper → BIP — формализация идеи для разработчиков
+          </div>
         </div>
       </div>
 
@@ -2991,6 +3005,9 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Предложение реализует сам исследователь либо другие разработчики. Мейнтейнеры референсной реализации (github.com/bitcoin/bitcoin) сознательно следуют за консенсусом, а не навязывают его — спорные изменения они не мержат. Обойти это можно: скопировать кодовую базу и выпустить правки отдельно, как это сделал BIP-148 (User Activated Soft Fork).</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Мейнтейнеры следуют консенсусу, а не навязывают его
+          </div>
         </div>
       </div>
 
@@ -3002,6 +3019,9 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Реализованный софт нужно убедить принять пользователей. Узлы не равны по влиянию: блокчейн-эксплореры и биржи весомее рядового участника. Софтфорки используют BIP-9 (Version bits with timeout and delay) — механизм измерения поддержки майнеров как прокси для поддержки всего сообщества. Автор подчёркивает: это несовершенный прокси (из-за централизации майнинга и конфликта интересов майнер/пользователь), а не признак «майнерской демократии».</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            BIP-9 — прокси поддержки сообщества, не «майнерская демократия»
+          </div>
         </div>
       </div>
 
@@ -3013,6 +3033,9 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Правила обеспечивает децентрализованная p2p-сеть полных нод: каждая независимо проверяет полученные транзакции и блоки, отклоняя и банят пиров, рассылающих невалидные данные. Роль майнеров — только proof-of-work timestamping (упорядочивание транзакций по стоимости оборудования и электричества); из-за централизации майнинга доверять им как единственным арбитрам правил нельзя.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Полные ноды проверяют правила → майнеры дают только timestamping
+          </div>
         </div>
       </div>
 

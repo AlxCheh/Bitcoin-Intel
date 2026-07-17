@@ -1350,10 +1350,6 @@ header {
 /* ══════════════════════════════════
    HALVING BLOCK
 ══════════════════════════════════ */
-@keyframes pulse-glow {
-  0%,100% { filter: drop-shadow(0 0 6px rgba(247,147,26,0.3)); }
-  50%      { filter: drop-shadow(0 0 16px rgba(247,147,26,0.8)); }
-}
 
 /* ══════════════════════════════════
    UTXO FLOW
@@ -1410,8 +1406,25 @@ header {
 }
 
 /* ══════════════════════════════════
+/* ══════════════════════════════════
    CALLOUTS
 ══════════════════════════════════ */
+.callout-mono {
+  background: var(--bg3);
+  border-left: 2px solid var(--btc);
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+}
+.callout {
+  background: var(--bg3);
+  border-left: 2px solid var(--btc);
+  padding: 8px 12px;
+}
+.callout.red   { border-left-color: var(--red); }
+.callout.grn   { border-left-color: var(--grn); }
+.callout.amber { border-left-color: var(--amber); }
 .callout-note {
   padding: 8px 12px;
   background: var(--bg3);
@@ -1627,9 +1640,6 @@ header {
   margin: 0 0 12px;
   background: var(--bg2); border: 1px solid var(--btc);
   overflow: hidden;
-}
-.dash-narrative-item {
-  padding: 12px 14px;
 }
 .dash-narrative-item + .dash-narrative-item {
   border-top: 1px solid var(--line);
@@ -2406,15 +2416,15 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Деньги — инструмент для организации торговли. Чтобы выполнять эту роль, товар должен одновременно быть:</p>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО СБЕРЕЖЕНИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Хорошо хранить собственную ценность. Без этого никто не захочет держать деньги — они начнут тратить немедленно, экономика деградирует к бартеру.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО ОБМЕНА</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть востребованным при торговле. Чем больше участников готовы принять этот товар — тем лучшие это деньги.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ЕДИНИЦА ИСЧИСЛЕНИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть мерилом стоимости всего остального. Это финальная стадия — когда большинство участников измеряют цены именно в этом товаре.</div>
             </div>
@@ -2545,7 +2555,7 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Bitcoin молод — 17 лет против 5000 лет золота. Общая капитализация ~$1.2 трлн против десятков триллионов мировых денег. Активных пользователей — несколько сотен миллионов из 8 млрд.</p>
           <p>Если Bitcoin действительно лучшие деньги — а по свойствам это так — то текущая капитализация составляет лишь малую долю от потенциальной. Соотношение возможного роста к возможным потерям асимметрично в пользу роста.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             «Каждый покупает Bitcoin по той цене, которую заслужил» — Тони, 21ideas.org
           </div>
           <div class="crosslink" onclick="document.getElementById('theory-dca').scrollIntoView({behavior:'smooth'})">
@@ -2586,7 +2596,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Bitcoin — новый класс криптографически подкреплённых активов с потенциалом роста и высокой волатильностью. Это привлекает спекулянтов с высокой толерантностью к риску. Они создают первичную ликвидность и ценовое открытие — без этого не запускаются остальные эффекты.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Спекуляция → ликвидность → цена → стимул для майнеров → безопасность сети
           </div>
           <div class="crosslink" onclick="document.getElementById('theory-money').scrollIntoView({behavior:'smooth'})">
@@ -2605,7 +2615,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Бизнесы принимают Bitcoin потому что это увеличивает маржу: нет возвратных платежей, нет комиссий платёжных систем (2–3%), нет зависимости от банков. Каждый новый мерчант расширяет полезность сети для потребителей.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             2026: корпоративные казначейства как следующий уровень — бизнес не просто принимает BTC, но и держит его на балансе
           </div>
         </div>
@@ -2630,7 +2640,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Принятие → рост цены → больше майнеров → выше хешрейт → дороже атака. Децентрализованный необратимый реестр — форма тройного бухучёта: дебет, кредит и публичное подтверждение в сети. Каждый новый участник делает систему безопаснее для всех.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Хешрейт июнь 2026: ~900 EH/s — исторический максимум несмотря на падение цены
           </div>
         </div>
@@ -2644,7 +2654,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Bitcoin — простая и предсказуемая сеть с элементарными правилами и открытым кодом. Децентрализованная природа допускает инновации без разрешения. Разработчики тянутся к Bitcoin потому что здесь самая глубокая ликвидность, самая высокая безопасность и самый консервативный протокол — именно то что нужно для финансовой инфраструктуры.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             L2 2026: Stacks, Rootstock, Citrea, Botanix — все строят на Bitcoin, не вокруг него
           </div>
         </div>
@@ -2658,7 +2668,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Bitcoin постепенно поглощает функции традиционных банков: денежные переводы, микроплатежи, p2p-кредитование, торговля активами. Институциональный капитал входит через ETF, корпоративные казначейства, суверенные резервы. Этот процесс необратим — деньги, однажды вошедшие в Bitcoin-инфраструктуру, не возвращаются в старую систему.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             2026: BlackRock IBIT, Fidelity FBTC, суверенные резервы США, Strategy <span data-fact-key="strategy.btc_holdings" data-fact-format="k">847K</span> BTC — эффект 06 в действии
           </div>
         </div>
@@ -2672,7 +2682,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Логическое продолжение первых шести эффектов. Когда все транзакции — недвижимость, акции, валюты — рассчитываются через блокчейн, Bitcoin становится базовым расчётным слоем мировой экономики. Любому новому игроку нужно превзойти Bitcoin во всех семи областях одновременно. Это структурно невозможно.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Спекулятивная атака (Saifedean Ammous): страны с дешёвой энергией накапливают BTC → их валюта укрепляется → остальные вынуждены следовать
           </div>
         </div>
@@ -2719,7 +2729,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Любое изменение правил начинается с исследования проблемы. Пример: SegWit родился из решения transaction malleability — бага, который блокировал запуск Lightning Network поверх Bitcoin.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Проблема на практике → пример: transaction malleability блокировала Lightning
           </div>
         </div>
@@ -2733,7 +2743,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Найденное решение публикуется для протокольных разработчиков: письмо в bitcoin-dev mailing list, формальный white paper и/или Bitcoin Improvement Proposal (BIP).</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             mailing list → white paper → BIP — формализация идеи для разработчиков
           </div>
         </div>
@@ -2747,7 +2757,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Предложение реализует сам исследователь либо другие разработчики. Мейнтейнеры референсной реализации (github.com/bitcoin/bitcoin) сознательно следуют за консенсусом, а не навязывают его — спорные изменения они не мержат. Обойти это можно: скопировать кодовую базу и выпустить правки отдельно, как это сделал BIP-148 (User Activated Soft Fork).</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Мейнтейнеры следуют консенсусу, а не навязывают его
           </div>
         </div>
@@ -2761,7 +2771,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Реализованный софт нужно убедить принять пользователей. Узлы не равны по влиянию: блокчейн-эксплореры и биржи весомее рядового участника. Софтфорки используют BIP-9 (Version bits with timeout and delay) — механизм измерения поддержки майнеров как прокси для поддержки всего сообщества. Автор подчёркивает: это несовершенный прокси (из-за централизации майнинга и конфликта интересов майнер/пользователь), а не признак «майнерской демократии».</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             BIP-9 — прокси поддержки сообщества, не «майнерская демократия»
           </div>
         </div>
@@ -2775,7 +2785,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Правила обеспечивает децентрализованная p2p-сеть полных нод: каждая независимо проверяет полученные транзакции и блоки, отклоняя и банят пиров, рассылающих невалидные данные. Роль майнеров — только proof-of-work timestamping (упорядочивание транзакций по стоимости оборудования и электричества); из-за централизации майнинга доверять им как единственным арбитрам правил нельзя.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Полные ноды проверяют правила → майнеры дают только timestamping
           </div>
         </div>
@@ -2815,11 +2825,11 @@ function toggleNav(id) {
           <p>«Покупай дёшево, продавай дорого» — мантра, которой следуют все. Менее 10% участников рынка делают это регулярно.</p>
           <p>Причина: рынки — это отражение эмоций большинства. Когда всё растёт — люди покупают дороже из жадности. Когда падает — продают на дне из страха.</p>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+            <div class="callout red">
               <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">ЭМОЦИОНАЛЬНЫЙ ИНВЕСТОР</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает на хайпе → держит на просадке → продаёт на панике → пропускает восстановление. Итог: минус при растущем активе.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+            <div class="callout grn">
               <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">DCA-ИНВЕСТОР</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает каждый месяц → на просадке получает больше BTC за те же деньги → на росте получает меньше. Эмоции исключены из уравнения.</div>
             </div>
@@ -2997,7 +3007,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Метод Diceware (Арнольд Райнхольд, 1995): бросаешь кости, число указывает на слово в пронумерованном списке. Полный список — 7 776 слов (5 костей), сокращённый (доработка Джозефа Боннье для EFF) — 1 296 слов (4 кости). Короткий список даёт более короткие слова, но для той же надёжности нужна более длинная фраза — например, 5 слов из короткого списка примерно равны по стойкости 4 словам из полного.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Кости → номер → слово из списка — не «придумывать», а честно рандомизировать
           </div>
         </div>
@@ -3011,7 +3021,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Те же правила, что для обычных паролей: чем шире алфавит (строчные → буквы+цифры → регистрозависимые → весь печатаемый ASCII), тем короче может быть фраза при той же стойкости. Компромисс симметричный: узкий алфавит — длиннее фраза, широкий — сложнее запомнить и вводить.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Шире алфавит → короче фраза при той же стойкости — и наоборот
           </div>
         </div>
@@ -3025,7 +3035,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Грамматически правильное предложение легко запомнить, но оценка энтропии ниже, чем кажется — ~5,7 бита на слово (консервативная оценка). Главное ограничение: предложение нужно придумать самому. Цитата из книги или фильма — первое, что проверит атакующий по словарю известных фраз, точно так же как и опубликованное стихотворение.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Только собственное предложение — никогда не цитата и не чужой текст
           </div>
         </div>
@@ -3039,7 +3049,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Атакующий с GPU (NVIDIA Tesla V100 через AWS) проверяет ~620 млн фраз за $1. Фраза из 12 случайных строчных букв даёт ~48 квадриллионов вариантов — перебор обойдётся в ~$77 млн по сегодняшним ценам. По закону Мура стоимость атаки падает вдвое каждые 18 месяцев: через 10 лет та же фраза будет стоить взломать уже ~$750 тыс. Пример из авторской таблицы: для устойчивости на уровне $10 млн в 2030 году через короткий Diceware-список нужно 5,8 слова — округляем до 6.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Оценивать в долларах взлома, не в годах — вычислительная мощность дешевеет
           </div>
         </div>
@@ -3053,7 +3063,7 @@ function toggleNav(id) {
         </div>
         <div class="acc-body">
           <p>Model T вводит парольную фразу прямо на устройстве, не на компьютере — Trusted Display защищает даже при заражённой малварью машине: символы никогда не проходят через потенциально скомпрометированный ввод компьютера.</p>
-          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+          <div class="callout-mono">
             Ввод на устройстве → малварь на компьютере не видит саму фразу
           </div>
         </div>
@@ -3103,15 +3113,15 @@ function toggleNav(id) {
             <div style="font-family:var(--mono);font-size:13px;color:var(--btc)">mNAV = (Капитализация + Долг − Кэш) ÷ Стоимость BTC</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+            <div class="callout grn">
               <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">mNAV &gt; 1x — ПРЕМИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Рынок платит больше чем стоит BTC внутри. Инвесторы верят в модель и будущие покупки. Любая эмиссия акций аккретивна — компания продаёт акции дороже чем стоит её BTC и покупает ещё.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+            <div class="callout amber">
               <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">mNAV = 1x — ПАРИТЕТ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция стоит ровно столько сколько BTC внутри. Нейтральная точка — ни аккреция ни разводнение.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+            <div class="callout red">
               <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">mNAV &lt; 1x — ДИСКОНТ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция дешевле чем BTC внутри. Эмиссия разводняет — компания продаёт $1 BTC за $0.90. Та же машина работает в обратную сторону. Strategy в июне 2026: 0.83x.</div>
             </div>
@@ -3187,11 +3197,11 @@ function toggleNav(id) {
             <div>5. → спираль вниз</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+            <div class="callout amber">
               <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">BUYBACK КАК ВЫХОД</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">При mNAV < 1x обратный выкуп акций = покупка BTC по дисконту. Metaplanet рассматривал buyback при mNAV 0.90x в июне 2026 именно по этой логике.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ПРОДУКТОВЫЙ БИЗНЕС КАК ВЫХОД</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Metaplanet купил Siiibo Securities: комиссионный доход от BTC-продуктов не зависит от mNAV. Это второй движок независимый от цикла премии.</div>
             </div>
@@ -4804,7 +4814,7 @@ function renderTheoryItem(item) {
     html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
   }
   if (item.highlight) {
-    html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
+    html += '<div class="callout-mono">'
       + sanitize(item.highlight) + '</div>';
   }
   html += '</div></div>';
@@ -4851,7 +4861,7 @@ function renderEssayItem(item) {
     html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
   }
   if (item.highlight) {
-    html += '<div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">'
+    html += '<div class="callout-mono">'
       + sanitize(item.highlight) + '</div>';
   }
   if (item.crosslink) {

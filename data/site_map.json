@@ -998,6 +998,96 @@
     },
     {
       "id": "e069",
+      "title": "Насколько надёжна ваша парольная фраза?",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "essay",
+      "keywords": [
+        "passphrase",
+        "diceware",
+        "trezor",
+        "seed"
+      ]
+    },
+    {
+      "id": "e070",
+      "title": "Случайная последовательность слов",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "diceware",
+        "кости",
+        "eff wordlist"
+      ]
+    },
+    {
+      "id": "e071",
+      "title": "Случайная последовательность символов",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "алфавит",
+        "энтропия",
+        "символы"
+      ]
+    },
+    {
+      "id": "e072",
+      "title": "Осмысленное предложение",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "предложение",
+        "энтропия на слово"
+      ]
+    },
+    {
+      "id": "e073",
+      "title": "Математика взлома",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "брутфорс",
+        "закон мура",
+        "gpu"
+      ]
+    },
+    {
+      "id": "e074",
+      "title": "Trezor Trusted Display",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "trezor model t",
+        "малварь",
+        "ввод на устройстве"
+      ]
+    },
+    {
+      "id": "e075",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1011,7 +1101,7 @@
       ]
     },
     {
-      "id": "e070",
+      "id": "e076",
       "title": "Что такое mNAV",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1026,7 +1116,7 @@
       ]
     },
     {
-      "id": "e071",
+      "id": "e077",
       "title": "Почему возникает премия",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1040,7 +1130,7 @@
       ]
     },
     {
-      "id": "e072",
+      "id": "e078",
       "title": "Машина аккреции: как работает при премии",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1054,7 +1144,7 @@
       ]
     },
     {
-      "id": "e073",
+      "id": "e079",
       "title": "Дисконт: когда машина ломается",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1068,7 +1158,7 @@
       ]
     },
     {
-      "id": "e074",
+      "id": "e080",
       "title": "BTC Yield — главный KPI",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1083,7 +1173,7 @@
       ]
     },
     {
-      "id": "e075",
+      "id": "e081",
       "title": "Как читать mNAV при анализе сигналов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1097,7 +1187,7 @@
       ]
     },
     {
-      "id": "e076",
+      "id": "e082",
       "title": "Доходные движки",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1112,7 +1202,7 @@
       ]
     },
     {
-      "id": "e077",
+      "id": "e083",
       "title": "Текущая награда майнера",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1127,7 +1217,7 @@
       ]
     },
     {
-      "id": "e078",
+      "id": "e084",
       "title": "Таблица халвингов",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1142,7 +1232,7 @@
       ]
     },
     {
-      "id": "e079",
+      "id": "e085",
       "title": "Not Yet Mined · динамика",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1156,7 +1246,7 @@
       ]
     },
     {
-      "id": "e080",
+      "id": "e086",
       "title": "Монетарная инфляция",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1171,7 +1261,7 @@
       ]
     },
     {
-      "id": "e081",
+      "id": "e087",
       "title": "Ключевые события",
       "cluster": "macro",
       "cluster_label": "FUNDAMENTAL",
@@ -1186,7 +1276,7 @@
       ]
     },
     {
-      "id": "e082",
+      "id": "e088",
       "title": "Опиши аномалию или сигнал",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1201,7 +1291,7 @@
       ]
     },
     {
-      "id": "e083",
+      "id": "e089",
       "title": "Или выбери из базы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1214,7 +1304,7 @@
       ]
     },
     {
-      "id": "e084",
+      "id": "e090",
       "title": "Структура владения · 2009–2026",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1229,7 +1319,7 @@
       ]
     },
     {
-      "id": "e085",
+      "id": "e091",
       "title": "Ключевые тренды",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1243,7 +1333,7 @@
       ]
     },
     {
-      "id": "e086",
+      "id": "e092",
       "title": "Три волны институционализации",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1257,7 +1347,7 @@
       ]
     },
     {
-      "id": "e087",
+      "id": "e093",
       "title": "Топ-100 держателей BTC",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
@@ -1272,7 +1362,7 @@
       ]
     },
     {
-      "id": "e088",
+      "id": "e094",
       "title": "Накопленные разборы",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",

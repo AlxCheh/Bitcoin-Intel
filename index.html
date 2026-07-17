@@ -1459,43 +1459,9 @@ header {
 /* ══════════════════════════════════
    HALVING BLOCK
 ══════════════════════════════════ */
-.halving-block {
-  margin: 12px 16px;
-  border: 1px solid rgba(247,147,26,0.25);
-  background: linear-gradient(135deg, rgba(247,147,26,0.04) 0%, var(--bg2) 60%);
-  padding: 20px 18px;
-  display: flex; align-items: center; gap: 16px;
-}
-.halving-icon {
-  font-size: 28px;
-  line-height: 1;
-  animation: pulse-glow 3s ease-in-out infinite;
-}
 @keyframes pulse-glow {
   0%,100% { filter: drop-shadow(0 0 6px rgba(247,147,26,0.3)); }
   50%      { filter: drop-shadow(0 0 16px rgba(247,147,26,0.8)); }
-}
-.halving-info {}
-.halving-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.halving-val {
-  font-family: var(--mono);
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--btc);
-  line-height: 1;
-}
-.halving-sub {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--dim);
-  margin-top: 4px;
 }
 
 /* ══════════════════════════════════
@@ -1783,7 +1749,6 @@ header {
   padding: 16px;
   overflow: hidden;
 }
-.dash-cycle-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 10px; }
 .dash-cycle-phase { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--grn); letter-spacing: 0.04em; margin-bottom: 6px; }
 .dash-cycle.warn .dash-cycle-phase { color: var(--amber); }
 .dash-cycle.danger .dash-cycle-phase { color: var(--red); }
@@ -1804,31 +1769,11 @@ header {
 .dct-active { color: var(--grn); font-weight: 700; }
 .dash-cycle-labels span:not(.dct-active) { opacity: 0.45; }
 
-.dash-metrics {
-  display: flex; flex-wrap: wrap; gap: 1px; margin: 0 16px 0;
-  background: var(--line); border: 1px solid var(--line); overflow: hidden;
-}
-.dash-m-cell { flex: 1; background: var(--bg2); padding: 12px 10px; text-align: center; }
 .dash-m-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
 .dash-m-val.dash-m-up { color: var(--grn); }
 .dash-m-val.dash-m-warn { color: var(--amber); }
 .dash-m-val.dash-m-neg { color: var(--red); }
-.dash-m-lbl { font-family: var(--mono); font-size: 7px; letter-spacing: 0.08em; color: var(--dim); }
-.dash-m-est { color: var(--btc); }
-.dash-disclaimer {
-  margin: -8px 16px 12px;
-  font-family: var(--mono); font-size: 8px; line-height: 1.5;
-  color: var(--dim); padding: 7px 10px;
-  border: 1px solid var(--line); border-top: none;
-  background: var(--bg2);
-}
 
-.dash-signal {
-  margin: 0 16px 12px;
-  background: var(--bg2); border: 1px solid var(--line);
-  border-left: 3px solid var(--grn); padding: 16px 14px 12px;
-  overflow: hidden;
-}
 .dash-narratives {
   margin: 0 0 12px;
   background: var(--bg2); border: 1px solid var(--btc);
@@ -1878,13 +1823,6 @@ header {
   white-space: nowrap;
   line-height: 1.4;
 }
-.dash-narrative-item.pos .dash-narrative-text { color: var(--grn); }
-.dash-narrative-item.neg .dash-narrative-text { color: var(--red); }
-.dash-narrative-item.neu .dash-narrative-text { color: var(--slate); }
-.dash-narrative-text {
-  font-family: var(--sans); font-size: 13px; font-weight: 500;
-  color: var(--txt); line-height: 1.4; margin-bottom: 6px;
-}
 .dash-narrative-item {
   padding: 14px 14px 10px;
 }
@@ -1906,17 +1844,6 @@ header {
   line-height: 1.5;
   margin-bottom: 8px;
 }
-.dash-signal.neg { border-left-color: var(--red); }
-.dash-signal.neu { border-left-color: var(--dim); }
-.dash-signal-head {
-  display: flex; align-items: center; justify-content: space-between;
-  font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em; color: var(--dim); margin-bottom: 7px;
-}
-.dash-signal-dir { color: var(--grn); }
-.dash-signal.neg .dash-signal-dir { color: var(--red); }
-.dash-signal.neu .dash-signal-dir { color: var(--dim); }
-.dash-signal-title { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--txt); line-height: 1.35; margin-bottom: 8px; }
-.dash-signal-chips { display: flex; gap: 5px; flex-wrap: wrap; }
 
 .dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }

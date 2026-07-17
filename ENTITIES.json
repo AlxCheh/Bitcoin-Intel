@@ -849,6 +849,28 @@
         "INF-2026-0709-001"
       ],
       "last_updated": "2026-07-09"
+    },
+    {
+      "id": "cryl",
+      "name": "CRYL",
+      "type": "exchange",
+      "status": "active",
+      "summary": "Японский BTC-обеспеченный кредитор (аффилирован с J-CAM Group, платформа BitLending) — займы до $6,2 млн под залог BTC для физлиц и бизнеса, запущено 9 июля 2026",
+      "profile": {
+        "what": "Регулируемый BTC-collateral lending сервис в Японии — второй значимый игрок на рынке после Fintertech (Daiwa Securities/Credit Saison, с 2020)",
+        "metrics": [
+          "Диапазон займов: ¥1 млн - ¥1 млрд (~$6 200-$6,2 млн)",
+          "Ставка 3,5-7% годовых, LTV 40-60%, срок 1 год"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Более высокий потолок и низкий минимум займа, чем у Fintertech, но залог только BTC (не BTC+ETH)"
+      },
+      "signal_refs": [
+        "STR-2026-0709-002"
+      ],
+      "last_updated": "2026-07-09"
     }
   ]
 }

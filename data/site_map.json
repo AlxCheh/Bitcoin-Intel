@@ -1003,14 +1003,15 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "essay",
       "keywords": [
         "passphrase",
         "diceware",
         "trezor",
         "seed"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e070",
@@ -1019,13 +1020,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "diceware",
         "кости",
         "eff wordlist"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e071",
@@ -1034,13 +1036,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "алфавит",
         "энтропия",
         "символы"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e072",
@@ -1049,12 +1052,13 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "предложение",
         "энтропия на слово"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e073",
@@ -1063,13 +1067,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "брутфорс",
         "закон мура",
         "gpu"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e074",
@@ -1078,13 +1083,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "trezor model t",
         "малварь",
         "ввод на устройстве"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e075",

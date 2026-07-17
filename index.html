@@ -85,14 +85,6 @@ header {
 
 .header-sep { color: var(--line2); margin: 0 2px; }
 
-.header-tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--dim);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .header-live {
   margin-left: auto;
   display: flex; align-items: center; gap: 6px;
@@ -829,8 +821,6 @@ header {
 .blk-tx { color: var(--dim); }
 .blk-age { color: var(--dim); }
 .blk-loading { display: block; color: var(--dim); padding: 14px 12px; }
-.blk-pool.clickable { cursor: pointer; color: var(--btc); text-decoration: none; }
-.blk-pool.clickable:active { opacity: 0.6; }
 
 .pool-back {
   display: inline-block;
@@ -898,8 +888,6 @@ header {
 }
 .psum-row:last-child { border-bottom: none; }
 .psum-name { color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.psum-name.clickable { color: var(--btc); cursor: pointer; }
-.psum-name.clickable:active { opacity: 0.6; }
 .psum-n { color: var(--txt); }
 .psum-bar-wrap {
   position: relative;
@@ -975,7 +963,6 @@ header {
 .td-btc { color: var(--btc) !important; font-weight: 700; }
 .td-dim { color: var(--dim) !important; font-size: 10px; }
 .td-grn { color: var(--grn) !important; }
-.td-blue { color: var(--blue) !important; }
 .badge {
   display: inline-block;
   background: var(--btc-low);
@@ -1421,25 +1408,6 @@ header {
   border-top: 1px solid var(--line);
   margin-top: 8px;
 }
-
-/* ══════════════════════════════════
-   PILLS
-══════════════════════════════════ */
-.pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--line); }
-.pill {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--dim);
-  border: 1px solid var(--line2);
-  padding: 3px 8px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* ══════════════════════════════════
-   SPACER
-══════════════════════════════════ */
-.sp12 { height: 12px; }
 
 /* ══════════════════════════════════
    SIGNALS BASE

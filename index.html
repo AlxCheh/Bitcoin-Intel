@@ -1417,6 +1417,14 @@ header {
   font-size: 10px;
   color: var(--dim);
 }
+.callout {
+  background: var(--bg3);
+  border-left: 2px solid var(--btc);
+  padding: 8px 12px;
+}
+.callout.red   { border-left-color: var(--red); }
+.callout.grn   { border-left-color: var(--grn); }
+.callout.amber { border-left-color: var(--amber); }
 
 /* ══════════════════════════════════
    SIGNALS BASE
@@ -2400,15 +2408,15 @@ function toggleNav(id) {
         <div class="acc-body">
           <p>Деньги — инструмент для организации торговли. Чтобы выполнять эту роль, товар должен одновременно быть:</p>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО СБЕРЕЖЕНИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Хорошо хранить собственную ценность. Без этого никто не захочет держать деньги — они начнут тратить немедленно, экономика деградирует к бартеру.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">СРЕДСТВО ОБМЕНА</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть востребованным при торговле. Чем больше участников готовы принять этот товар — тем лучшие это деньги.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ЕДИНИЦА ИСЧИСЛЕНИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Быть мерилом стоимости всего остального. Это финальная стадия — когда большинство участников измеряют цены именно в этом товаре.</div>
             </div>
@@ -2809,11 +2817,11 @@ function toggleNav(id) {
           <p>«Покупай дёшево, продавай дорого» — мантра, которой следуют все. Менее 10% участников рынка делают это регулярно.</p>
           <p>Причина: рынки — это отражение эмоций большинства. Когда всё растёт — люди покупают дороже из жадности. Когда падает — продают на дне из страха.</p>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+            <div class="callout red">
               <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">ЭМОЦИОНАЛЬНЫЙ ИНВЕСТОР</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает на хайпе → держит на просадке → продаёт на панике → пропускает восстановление. Итог: минус при растущем активе.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+            <div class="callout grn">
               <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">DCA-ИНВЕСТОР</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Покупает каждый месяц → на просадке получает больше BTC за те же деньги → на росте получает меньше. Эмоции исключены из уравнения.</div>
             </div>
@@ -3097,15 +3105,15 @@ function toggleNav(id) {
             <div style="font-family:var(--mono);font-size:13px;color:var(--btc)">mNAV = (Капитализация + Долг − Кэш) ÷ Стоимость BTC</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--grn);padding:8px 12px">
+            <div class="callout grn">
               <div style="font-family:var(--mono);font-size:9px;color:var(--grn);letter-spacing:0.1em;margin-bottom:3px">mNAV &gt; 1x — ПРЕМИЯ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Рынок платит больше чем стоит BTC внутри. Инвесторы верят в модель и будущие покупки. Любая эмиссия акций аккретивна — компания продаёт акции дороже чем стоит её BTC и покупает ещё.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+            <div class="callout amber">
               <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">mNAV = 1x — ПАРИТЕТ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция стоит ровно столько сколько BTC внутри. Нейтральная точка — ни аккреция ни разводнение.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--red);padding:8px 12px">
+            <div class="callout red">
               <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:3px">mNAV &lt; 1x — ДИСКОНТ</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Акция дешевле чем BTC внутри. Эмиссия разводняет — компания продаёт $1 BTC за $0.90. Та же машина работает в обратную сторону. Strategy в июне 2026: 0.83x.</div>
             </div>
@@ -3181,11 +3189,11 @@ function toggleNav(id) {
             <div>5. → спираль вниз</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <div style="background:var(--bg3);border-left:2px solid var(--amber);padding:8px 12px">
+            <div class="callout amber">
               <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:3px">BUYBACK КАК ВЫХОД</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">При mNAV < 1x обратный выкуп акций = покупка BTC по дисконту. Metaplanet рассматривал buyback при mNAV 0.90x в июне 2026 именно по этой логике.</div>
             </div>
-            <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px">
+            <div class="callout">
               <div style="font-family:var(--mono);font-size:9px;color:var(--btc);letter-spacing:0.1em;margin-bottom:3px">ПРОДУКТОВЫЙ БИЗНЕС КАК ВЫХОД</div>
               <div style="font-size:11px;color:var(--dim);line-height:1.5">Metaplanet купил Siiibo Securities: комиссионный доход от BTC-продуктов не зависит от mNAV. Это второй движок независимый от цикла премии.</div>
             </div>

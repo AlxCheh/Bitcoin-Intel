@@ -3235,6 +3235,96 @@ function toggleNav(id) {
 
     </div>
 
+    <div class="panel" id="theory-passphrase" style="scroll-margin-top:64px;margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">Насколько надёжна ваша парольная фраза?</span>
+        <span class="panel-tag">SATOSHILABS · 2019</span>
+      </div>
+
+      <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">
+          Никакое железо не даёт 100% защиты — при физическом доступе seed-фразу можно извлечь из любого аппаратного кошелька. Парольная фраза (passphrase) поверх seed — дополнительный слой, который не хранится на устройстве и не восстанавливается, если забыт. Вопрос в том, насколько она надёжна против перебора — зависит от способа создания и длины.
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">01</span>
+          <span class="acc-label">Случайная последовательность слов</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Метод Diceware (Арнольд Райнхольд, 1995): бросаешь кости, число указывает на слово в пронумерованном списке. Полный список — 7 776 слов (5 костей), сокращённый (доработка Джозефа Боннье для EFF) — 1 296 слов (4 кости). Короткий список даёт более короткие слова, но для той же надёжности нужна более длинная фраза — например, 5 слов из короткого списка примерно равны по стойкости 4 словам из полного.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Кости → номер → слово из списка — не «придумывать», а честно рандомизировать
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">02</span>
+          <span class="acc-label">Случайная последовательность символов</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Те же правила, что для обычных паролей: чем шире алфавит (строчные → буквы+цифры → регистрозависимые → весь печатаемый ASCII), тем короче может быть фраза при той же стойкости. Компромисс симметричный: узкий алфавит — длиннее фраза, широкий — сложнее запомнить и вводить.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Шире алфавит → короче фраза при той же стойкости — и наоборот
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">03</span>
+          <span class="acc-label">Осмысленное предложение</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Грамматически правильное предложение легко запомнить, но оценка энтропии ниже, чем кажется — ~5,7 бита на слово (консервативная оценка). Главное ограничение: предложение нужно придумать самому. Цитата из книги или фильма — первое, что проверит атакующий по словарю известных фраз, точно так же как и опубликованное стихотворение.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Только собственное предложение — никогда не цитата и не чужой текст
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">04</span>
+          <span class="acc-label">Математика взлома</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Атакующий с GPU (NVIDIA Tesla V100 через AWS) проверяет ~620 млн фраз за $1. Фраза из 12 случайных строчных букв даёт ~48 квадриллионов вариантов — перебор обойдётся в ~$77 млн по сегодняшним ценам. По закону Мура стоимость атаки падает вдвое каждые 18 месяцев: через 10 лет та же фраза будет стоить взломать уже ~$750 тыс. Пример из авторской таблицы: для устойчивости на уровне $10 млн в 2030 году через короткий Diceware-список нужно 5,8 слова — округляем до 6.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Оценивать в долларах взлома, не в годах — вычислительная мощность дешевеет
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <span class="acc-icon">05</span>
+          <span class="acc-label">Trezor Trusted Display</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">
+          <p>Model T вводит парольную фразу прямо на устройстве, не на компьютере — Trusted Display защищает даже при заражённой малварью машине: символы никогда не проходят через потенциально скомпрометированный ввод компьютера.</p>
+          <div style="background:var(--bg3);border-left:2px solid var(--btc);padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+            Ввод на устройстве → малварь на компьютере не видит саму фразу
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">
+          ИСТОЧНИК: SatoshiLabs · Trezor Blog · 12 июля 2019 · <a href="https://blog.trezor.io/is-your-passphrase-strong-enough-d687f44c63af" target="_blank" style="color:var(--btc);text-decoration:none">blog.trezor.io</a>
+        </div>
+      </div>
+
+    </div>
+
     <div style="height:650px" aria-hidden="true"></div>
 
   </div>
@@ -6788,7 +6878,8 @@ renderTOC('theory-toc', [
   { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
   { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
   { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
-  { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' }
+  { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
+  { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' }
 ]);
 
 renderTOC('macrocontext-toc', [

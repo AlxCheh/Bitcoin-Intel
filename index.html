@@ -1425,6 +1425,14 @@ header {
 .callout.red   { border-left-color: var(--red); }
 .callout.grn   { border-left-color: var(--grn); }
 .callout.amber { border-left-color: var(--amber); }
+.callout-note {
+  padding: 8px 12px;
+  background: var(--bg3);
+  border-left: 2px solid var(--btc);
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.5;
+}
 
 /* ══════════════════════════════════
    SIGNALS BASE
@@ -2527,7 +2535,7 @@ function toggleNav(id) {
               </tbody>
             </table>
           </div>
-          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+          <div class="callout-note" style="margin-top:10px">
             Bitcoin превосходит золото и фиат по совокупности свойств. Это не мнение — это результат сравнения по объективным критериям. Bitcoin = деньги.
           </div>
           <div class="crosslink" onclick="document.getElementById('theory-network').scrollIntoView({behavior:'smooth'})">
@@ -2924,7 +2932,7 @@ function toggleNav(id) {
               </tbody>
             </table>
           </div>
-          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+          <div class="callout-note" style="margin-top:10px">
             Увеличивай долю BTC по мере роста убеждённости и горизонта инвестирования. DCA позволяет наращивать позицию постепенно не беспокоясь о точке входа.
           </div>
           <div class="crosslink" onclick="document.getElementById('theory-money').scrollIntoView({behavior:'smooth'})">
@@ -3166,7 +3174,7 @@ function toggleNav(id) {
             <div>4. BTC per share растёт — премия сохраняется</div>
             <div>5. → вернуться к шагу 1</div>
           </div>
-          <div style="padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+          <div class="callout-note">
             Strategy провела этот цикл сотни раз в 2021–2024. При каждой эмиссии по 2x mNAV она фактически покупала BTC вдвое дешевле рынка за счёт инвесторов платящих премию.
           </div>
         </div>
@@ -3230,7 +3238,7 @@ function toggleNav(id) {
               </tbody>
             </table>
           </div>
-          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-left:2px solid var(--btc);font-size:11px;color:var(--dim);line-height:1.5">
+          <div class="callout-note" style="margin-top:10px">
             mNAV может быть ниже 1x, а BTC Yield — положительным одновременно. Strategy в июне 2026: дисконт к NAV, но BTC per share растёт. Это разные измерения разных вещей.
           </div>
         </div>

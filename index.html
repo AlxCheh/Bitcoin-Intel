@@ -1938,45 +1938,7 @@ header {
     </div>
 
     <!-- КАК ЭТО РАБОТАЕТ -->
-    <div class="panel" id="lightning-routing" style="scroll-margin-top:64px">
-      <div class="panel-head">
-        <span class="panel-title">Как работает маршрутизация</span>
-        <span class="panel-tag">МЕХАНИКА</span>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">🔗</span>
-          <span class="acc-label">Платёжные каналы</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body open">
-          <p>Канал — это мультисиг-кошелёк 2-of-2 в блокчейне. Оба участника вносят BTC. Каждый платёж — это подписанное состояние (commitment transaction), которое можно предъявить в сеть в любой момент.</p>
-          <p>Хитрость: стороны всегда держат актуальную подписанную транзакцию, но публикуют только финальную. Обман карается: если один попытается транслировать старое состояние — второй может забрать весь депозит через <strong>revocation key</strong>.</p>
-        </div>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">🌐</span>
-          <span class="acc-label">Сеть каналов и HTLC</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Не нужно открывать канал с каждым. Если Алиса → Боб → Кэрол, платёж маршрутизируется через Боба. Для защиты используются <strong>HTLC</strong> (Hash Time-Locked Contracts): Боб получает комиссию только если выполнит условие, иначе деньги возвращаются автоматически.</p>
-          <p>Маршрутизация onion-шифрованная (как Tor): Боб знает только предыдущий и следующий узел, не видит ни отправителя, ни получателя целиком.</p>
-        </div>
-      </div>
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <span class="acc-icon">💧</span>
-          <span class="acc-label">Проблема ликвидности</span>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="acc-body">
-          <p>Канал имеет две стороны: <strong>исходящая</strong> ликвидность (сколько можешь отправить) и <strong>входящая</strong> (сколько можешь получить). Сумма обеих сторон равна депозиту канала.</p>
-          <p>Главная сложность Lightning: получить <strong>входящую ликвидность</strong>, то есть чтобы кто-то открыл канал к тебе или ты занял место на их стороне. Без входящей ликвидности принимать платежи нельзя.</p>
-        </div>
-      </div>
-    </div>
+    <div id="lightning-routing-mount"></div>
 
     <!-- КАК ПОДКЛЮЧИТЬСЯ -->
     <div class="panel" id="lightning-connect" style="scroll-margin-top:64px">
@@ -4623,9 +4585,9 @@ function renderTheoryItem(item) {
   html += '<span class="acc-label">' + sanitize(item.label) + '</span>';
   html += '<span class="acc-arrow">▼</span>';
   html += '</div>';
-  html += '<div class="acc-body">';
+  html += '<div class="acc-body' + (item.open ? ' open' : '') + '">';
   if (item.paragraphs && item.paragraphs.length) {
-    html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
+    html += item.paragraphs.map(function(p){ return '<p>' + sanitizeStrong(p) + '</p>'; }).join('');
   }
   if (item.highlight) {
     html += '<div class="callout-mono">'
@@ -4961,6 +4923,17 @@ function sanitize(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
+}
+
+// Узкий allowlist поверх sanitize() — только <strong>/</strong>, для
+// параграфов THEORY_TOPICS.json с инлайн-выделением слов в оригинальном
+// авторском тексте. Экранирует ВСЁ как sanitize(), затем точечно
+// возвращает буквально только эти два тега — никакой другой HTML или
+// атрибут через это пройти не может.
+function sanitizeStrong(str) {
+  return sanitize(str)
+    .replace(/&lt;strong&gt;/g, '<strong>')
+    .replace(/&lt;\/strong&gt;/g, '</strong>');
 }
 
 function highlightEntities(text) {
@@ -6373,6 +6346,7 @@ function triggerTabData(id) {
     }
   }
   if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); }
+  if (id === 'lightning') renderTheoryTopics();
   if (id === 'theory') { renderTheoryEssays(); renderTheoryTopics(); }
   if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }

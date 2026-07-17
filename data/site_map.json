@@ -489,12 +489,13 @@
       "cluster_label": "ECOSYSTEM",
       "tab": "lightning",
       "tab_label": "LIGHTNING",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "htlc",
         "routing"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e034",
@@ -503,12 +504,13 @@
       "cluster_label": "ECOSYSTEM",
       "tab": "lightning",
       "tab_label": "LIGHTNING",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "мультисиг",
         "commitment"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e035",
@@ -517,12 +519,13 @@
       "cluster_label": "ECOSYSTEM",
       "tab": "lightning",
       "tab_label": "LIGHTNING",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "onion",
         "htlc"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e036",
@@ -531,13 +534,14 @@
       "cluster_label": "ECOSYSTEM",
       "tab": "lightning",
       "tab_label": "LIGHTNING",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "исходящая",
         "входящая",
         "lsp"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e037",

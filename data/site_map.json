@@ -731,7 +731,7 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "essay",
       "keywords": [
         "governance",
@@ -739,7 +739,8 @@
         "bip",
         "софтфорк",
         "трастлесс"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e051",
@@ -748,13 +749,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "исследование",
         "segwit",
         "malleability"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e052",
@@ -763,13 +765,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "предложение",
         "bip",
         "mailing list"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e053",
@@ -778,13 +781,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "реализация",
         "референсная реализация",
         "uasf"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e054",
@@ -793,13 +797,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "развёртывание",
         "bip-9",
         "версия биты"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e055",
@@ -808,13 +813,14 @@
       "cluster_label": "FUNDAMENTAL",
       "tab": "theory",
       "tab_label": "ТЕОРИЯ",
-      "source": "none",
+      "source": "static",
       "kind": "text",
       "keywords": [
         "обеспечение",
         "полные ноды",
         "валидация"
-      ]
+      ],
+      "dynamic": true
     },
     {
       "id": "e056",

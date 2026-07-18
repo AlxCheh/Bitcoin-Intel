@@ -407,7 +407,6 @@ SANITIZE_RATCHET_BASELINE = {
     "(TREASURY_META.public_holders_count || '?')": 1,
     "(anchorObj.weight || '?')": 1,
     "(s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : safeTheoryRef.replace('theory-','').toUpperCase())": 1,
-    "(synthesis.strength||'moderate')": 1,  # [1.3] уходит в className
     "c.label": 2,
     "cluster.label": 1,
     "etfEx.as_of": 1,
@@ -428,8 +427,10 @@ SANITIZE_RATCHET_BASELINE = {
     "r.name": 2,
     "s.date": 2,
     "s.dir": 1,
-    "s.event": 3,
-    "s.event.replace(/\"/g,'&quot;')": 1,  # [1.3] ручное экранирование вместо sanitize
+    # не-HTML контекст: сборка текстового промпта AI-анализатора
+    # (snapshotText) — детектор не различает HTML/текст, sanitize здесь
+    # был бы вреден (внёс бы &quot; в промпт)
+    "s.event": 1,
     "t.key": 1,
     "t.label": 2,
     "t.note": 1,

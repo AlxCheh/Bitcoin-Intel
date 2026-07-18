@@ -6178,7 +6178,7 @@ function renderDashboard() {
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
       +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
       +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" data-bd="' + bdId + '">'
-      +     '<span class="dash-narrative-strength strength-' + (synthesis.strength||'moderate') + '">' + (synthesis.strength||'').toUpperCase() + '</span>'
+      +     '<span class="dash-narrative-strength strength-' + sanitize(synthesis.strength||'moderate') + '">' + sanitize((synthesis.strength||'').toUpperCase()) + '</span>'
       +     (isHot ? '🔥 ' : '') + 'score: ' + score.total + ' ▾'
       +   '</div>'
       + '</div>'
@@ -7534,7 +7534,7 @@ function renderHolders() {
   tbl += '</tr></thead><tbody>';
 
   tbl += '<tr><td class="htable-dim">Событие</td>';
-  snapsDesc.forEach(s => tbl += '<td class="htable-dim htable-event" title="' + s.event.replace(/"/g,'&quot;') + '">' + s.event + '</td>');
+  snapsDesc.forEach(s => tbl += '<td class="htable-dim htable-event" title="' + sanitize(s.event) + '">' + sanitize(s.event) + '</td>');
   tbl += '</tr>';
 
   cats.forEach(c => {
@@ -7631,7 +7631,7 @@ function renderEmission() {
          + '<td>' + (nm ? nm.pct + '%' : '—') + '</td>'
          + '<td>' + (nm ? nm.btc.toLocaleString('ru-RU') : '—') + '</td>'
          + '<td>' + s.total_mined.toLocaleString('ru-RU') + '</td>'
-         + '<td>' + s.event + '</td>'
+         + '<td>' + sanitize(s.event) + '</td>'
          + '</tr>';
   });
   tbl += '</tbody></table></div>';

@@ -4578,7 +4578,28 @@ function closeEngineDetail() {
 let THEORY_TOPICS = [];
 let THEORY_ESSAYS = [];
 
-function renderTheoryItem(item) {
+// Общая плашка «ИСТОЧНИК: …» (низ панели или пункта аккордеона) — до
+// аудита 2.2 этот inline-блок дублировался в renderEssayItem и
+// renderTheoryTopic и уже успел бы разойтись при первой правке стиля.
+// content — готовый HTML (вызывающий сам решает, что sanitize'ить:
+// у THEORY_ESSAYS источник структурированный и экранируется по полям,
+// у THEORY_TOPICS source_footer — сырой авторский HTML со ссылкой).
+function sourceFooterHtml(content) {
+  return '<div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">'
+    + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">'
+    + content
+    + '</div></div>';
+}
+
+// Единый рендер пункта аккордеона для THEORY_TOPICS и THEORY_ESSAYS —
+// слит из renderTheoryItem + renderEssayItem (аудит 2.1): функции были
+// построчными дубликатами, эволюционировавшими врозь (item.open появлялся
+// только в одной, crosslink/source — только в другой; отсутствие
+// crosslink в THEORY_TOPICS остановило миграцию «Семи сетевых эффектов»).
+// Схема-надмножество: open, paragraphs (через sanitizeStrong — узкий
+// allowlist <strong>, для текста без <strong> вывод идентичен sanitize),
+// highlight, crosslink, source.
+function renderAccItem(item) {
   let html = '<div class="acc-item">';
   html += '<div class="acc-head" onclick="toggleAcc(this)">';
   html += '<span class="acc-icon">' + sanitize(item.icon) + '</span>';
@@ -4593,7 +4614,22 @@ function renderTheoryItem(item) {
     html += '<div class="callout-mono">'
       + sanitize(item.highlight) + '</div>';
   }
+  if (item.crosslink) {
+    const cl = item.crosslink;
+    html += '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})">'
+      + '<span class="crosslink-arrow">↳</span>'
+      + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
+      + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
+      + '</div>';
+  }
   html += '</div></div>';
+  if (item.source) {
+    const s = item.source;
+    html += sourceFooterHtml(
+      'ИСТОЧНИК (' + sanitize(item.icon) + '): ' + sanitize(s.author) + ' · «' + sanitize(s.title) + '» · ' + sanitize(s.date)
+      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:none">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
+    );
+  }
   return html;
 }
 
@@ -4612,7 +4648,7 @@ function renderTheoryTopic(topic) {
     }).join('');
   }
   if (topic.items && topic.items.length) {
-    html += topic.items.map(renderTheoryItem).join('');
+    html += topic.items.map(renderAccItem).join('');
   }
   if (topic.conclusion) {
     html += '<div style="padding:12px 14px;background:var(--bg3);border-top:1px solid var(--line)">'
@@ -4620,10 +4656,7 @@ function renderTheoryTopic(topic) {
       + '</div>';
   }
   if (topic.source_footer) {
-    html += '<div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">'
-      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">'
-      + topic.source_footer
-      + '</div></div>';
+    html += sourceFooterHtml(topic.source_footer);
   }
   html += '</div>';
   return html;
@@ -4660,41 +4693,6 @@ function renderTheoryTopics() {
 // ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
 // панелях (не создают новых панелей). Реестр в THEORY_ESSAYS.json, не в
 // index.html — добавление нового материала = запись в файл, без правки HTML.
-function renderEssayItem(item) {
-  let html = '<div class="acc-item">';
-  html += '<div class="acc-head" onclick="toggleAcc(this)">';
-  html += '<span class="acc-icon">' + sanitize(item.icon) + '</span>';
-  html += '<span class="acc-label">' + sanitize(item.label) + '</span>';
-  html += '<span class="acc-arrow">▼</span>';
-  html += '</div>';
-  html += '<div class="acc-body">';
-  if (item.paragraphs && item.paragraphs.length) {
-    html += item.paragraphs.map(function(p){ return '<p>' + sanitize(p) + '</p>'; }).join('');
-  }
-  if (item.highlight) {
-    html += '<div class="callout-mono">'
-      + sanitize(item.highlight) + '</div>';
-  }
-  if (item.crosslink) {
-    const cl = item.crosslink;
-    html += '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})">'
-      + '<span class="crosslink-arrow">↳</span>'
-      + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
-      + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
-      + '</div>';
-  }
-  html += '</div></div>';
-  if (item.source) {
-    const s = item.source;
-    html += '<div style="padding:10px 14px;border-top:1px solid var(--line);background:var(--bg3)">'
-      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.08em">'
-      + 'ИСТОЧНИК (' + sanitize(item.icon) + '): ' + sanitize(s.author) + ' · «' + sanitize(s.title) + '» · ' + sanitize(s.date)
-      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:none">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
-      + '</div></div>';
-  }
-  return html;
-}
-
 function renderTheoryEssays() {
   if (!THEORY_ESSAYS.length) return;
   const byPanel = {};
@@ -4704,7 +4702,7 @@ function renderTheoryEssays() {
   Object.keys(byPanel).forEach(function(panelId) {
     const el = document.getElementById(panelId + '-essays');
     if (!el) return;
-    el.innerHTML = byPanel[panelId].map(renderEssayItem).join('');
+    el.innerHTML = byPanel[panelId].map(renderAccItem).join('');
   });
 }
 

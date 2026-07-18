@@ -6793,18 +6793,18 @@ function renderBlocks(blocks) {
   const list = document.getElementById('blocks-list');
   const title = document.getElementById('block-title');
   if (title && blocks[0]) {
-    title.textContent = 'LATEST_BLOCKS — TIP #' + blocks[0].height.toLocaleString();
+    title.textContent = 'LATEST_BLOCKS — TIP #' + blocks[0].height.toLocaleString('ru-RU');
   }
   if (list) {
     list.innerHTML = blocks.slice(0, 10).map(b => {
       const pool = (b.extras && b.extras.pool && b.extras.pool.name) ? b.extras.pool.name : 'Unknown';
-      const tx = b.tx_count != null ? b.tx_count.toLocaleString() : '—';
+      const tx = b.tx_count != null ? b.tx_count.toLocaleString('ru-RU') : '—';
       const known = POOLS[normPool(pool)];
       const poolCell = known
         ? '<span class="blk-pool">' + pool + '<span class="pool-badge" onclick="openPool(\'' + normPool(pool) + '\')">INFO</span></span>'
         : '<span class="blk-pool">' + pool + '</span>';
       return '<div class="blk-row">'
-        + '<span class="blk-h">#' + b.height.toLocaleString() + '</span>'
+        + '<span class="blk-h">#' + b.height.toLocaleString('ru-RU') + '</span>'
         + poolCell
         + '<span class="blk-tx">' + tx + '</span>'
         + '<span class="blk-age">' + timeAgo(b.timestamp) + '</span>'
@@ -6832,7 +6832,7 @@ function renderPoolSummary() {
   });
   const rows = Object.values(counts).sort((a, b) => b.n - a.n);
   const heights = last10.map(b => b.height);
-  const range = '#' + Math.min(...heights).toLocaleString() + ' – #' + Math.max(...heights).toLocaleString();
+  const range = '#' + Math.min(...heights).toLocaleString('ru-RU') + ' – #' + Math.max(...heights).toLocaleString('ru-RU');
 
   wrap.innerHTML =
     '<div class="panel">'
@@ -7213,7 +7213,7 @@ async function fetchDifficulty() {
       const elBar = $('diffBar');
       const elBlk = $('diff-blocks');
       if (elPct) elPct.textContent = pct.toFixed(1) + '%';
-      if (elBlk && adj.remainingBlocks !== undefined) elBlk.textContent = adj.remainingBlocks.toLocaleString();
+      if (elBlk && adj.remainingBlocks !== undefined) elBlk.textContent = adj.remainingBlocks.toLocaleString('ru-RU');
       setTimeout(() => { if (elBar) elBar.style.width = pct.toFixed(1) + '%'; }, 500);
     }
 
@@ -7356,7 +7356,7 @@ async function fetchRemainingSupply() {
     const totalMined = calcTotalMined(height);
     const remaining = 21000000 - totalMined;
     const remainingPct = (remaining / 21000000 * 100).toFixed(2);
-    el.textContent = 'Осталось добыть: ~' + (remaining / 1e6).toFixed(3) + 'M BTC (' +
+    el.textContent = 'Осталось добыть: ~' + (remaining / 1e6).toFixed(2) + 'M BTC (' +
       remainingPct + '%). Последний BTC — ~2140 год. Текущая эмиссия: 3.125 BTC/блок. ' +
       '(блок ' + height.toLocaleString('ru-RU') + ')';
   } catch (e) {
@@ -7546,14 +7546,14 @@ function renderHolders() {
     snapsDesc.forEach(s => {
       const v = s.categories[c.key];
       tbl += v
-        ? '<td><div class="htable-pct-row"><span>' + v.btc.toLocaleString() + '</span><span class="htable-pct">' + v.pct + '%</span></div></td>'
+        ? '<td><div class="htable-pct-row"><span>' + v.btc.toLocaleString('ru-RU') + '</span><span class="htable-pct">' + v.pct + '%</span></div></td>'
         : '<td class="htable-dim">—</td>';
     });
     tbl += '</tr>';
   });
 
   tbl += '<tr><td class="htable-btc">Total Mined</td>';
-  snapsDesc.forEach(s => tbl += '<td class="htable-btc">' + s.total_mined.toLocaleString() + '</td>');
+  snapsDesc.forEach(s => tbl += '<td class="htable-btc">' + s.total_mined.toLocaleString('ru-RU') + '</td>');
   tbl += '</tr>';
 
   tbl += '</tbody></table></div>';
@@ -7576,11 +7576,11 @@ function renderHolders() {
     const peak = points.reduce((m, p) => p.cat.pct > m.cat.pct ? p : m, points[0]);
     let note;
     if (points.length === 1) {
-      note = 'Впервые зафиксированы в ' + first.date + ': ' + first.cat.pct + '% · ' + first.cat.btc.toLocaleString() + ' BTC';
+      note = 'Впервые зафиксированы в ' + first.date + ': ' + first.cat.pct + '% · ' + first.cat.btc.toLocaleString('ru-RU') + ' BTC';
     } else if (peak.date === last.date) {
-      note = 'Выросли с ' + first.cat.pct + '% (' + first.date + ') до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString() + ' BTC)';
+      note = 'Выросли с ' + first.cat.pct + '% (' + first.date + ') до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString('ru-RU') + ' BTC)';
     } else {
-      note = 'Росли с ' + first.cat.pct + '% (' + first.date + ') до пика ' + peak.cat.pct + '% (' + peak.date + '), затем снизились до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString() + ' BTC)';
+      note = 'Росли с ' + first.cat.pct + '% (' + first.date + ') до пика ' + peak.cat.pct + '% (' + peak.date + '), затем снизились до ' + last.cat.pct + '% (' + last.date + ', ' + last.cat.btc.toLocaleString('ru-RU') + ' BTC)';
     }
     if (extraNote) note += ' ' + extraNote;
     return { label: label, note: note };
@@ -7629,8 +7629,8 @@ function renderEmission() {
     tbl += '<tr' + (isLast ? ' class="current"' : '') + '>'
          + '<td>' + s.date + '</td>'
          + '<td>' + (nm ? nm.pct + '%' : '—') + '</td>'
-         + '<td>' + (nm ? nm.btc.toLocaleString() : '—') + '</td>'
-         + '<td>' + s.total_mined.toLocaleString() + '</td>'
+         + '<td>' + (nm ? nm.btc.toLocaleString('ru-RU') : '—') + '</td>'
+         + '<td>' + s.total_mined.toLocaleString('ru-RU') + '</td>'
          + '<td>' + s.event + '</td>'
          + '</tr>';
   });
@@ -7689,7 +7689,7 @@ async function analyzeSignal() {
   const snapshotText = HOLDERS_DATA.snapshots.map(s => {
     const cats = Object.entries(s.categories)
       .filter(([,v]) => v !== null)
-      .map(([k,v]) => k + ': ' + v.pct + '% · ' + v.btc.toLocaleString() + ' BTC')
+      .map(([k,v]) => k + ': ' + v.pct + '% · ' + v.btc.toLocaleString('ru-RU') + ' BTC')
       .join(', ');
     return s.date + ' [' + s.event + ']: ' + cats;
   }).join('\n');

@@ -97,6 +97,177 @@ def test_schema_required_fields_all_documented_in_claude_md():
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# Страж синхронности enum-описаний: schemas/signal/v1.json ↔ CLAUDE.md
+#
+# schemas/signal/v1.json обогащён (oneOf const+description вместо голого
+# enum) для 8 полей — machine-readable смысл каждого значения теперь
+# существует В САМОЙ СХЕМЕ, не только в прозе CLAUDE.md. Без этого теста
+# два места с одним и тем же смыслом неизбежно разошлись бы — ровно
+# то же, что уже произошло с таблицей кластеров (v8.8) и разделом FACTS
+# (v8.9): дублирование смысла без механизма не держится (AD-6).
+#
+# Описания в схему перенесены ДОСЛОВНО из прозы CLAUDE.md на момент
+# обогащения — для `cat` описание составное (catLabel без эмодзи +
+# примеры), т.к. в прозе у cat нет отдельной колонки "смысл", только
+# catLabel + Примеры; для narrative_role используется колонка
+# "Критерий" (содержательное определение, не короткая расшифровка для
+# сводки).
+# ═══════════════════════════════════════════════════════════════════════
+
+def _load_schema_oneof_descriptions(field: str) -> dict[str, str]:
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    prop = schema["properties"][field]
+    assert "oneOf" in prop, f"Поле '{field}' в схеме должно использовать oneOf(const+description), не голый enum"
+    return {branch["const"]: branch["description"] for branch in prop["oneOf"]}
+
+
+def _parse_two_col_table_after(text: str, anchor: str) -> dict[str, str]:
+    """
+    Парсит markdown-таблицу '| Значение | Смысл |' сразу после anchor —
+    используется для dir/horizon/weight/actor/flow (общая форма).
+    """
+    idx = text.index(anchor)
+    m = re.search(
+        r"\| Значение \| Смысл \|\n\|[-|]+\|\n((?:\|.+\|\n)+)",
+        text[idx:],
+    )
+    assert m, f"Таблица 'Значение|Смысл' не найдена после '{anchor[:40]}...'"
+    rows = {}
+    for line in m.group(1).strip().split("\n"):
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        value = cells[0].strip("`")
+        rows[value] = cells[1]
+    return rows
+
+
+def _parse_theme_table(text: str) -> dict[str, str]:
+    """Тема встроена в id-префиксную таблицу: | Префикс | theme | Смысл темы |"""
+    m = re.search(
+        r"\| Префикс \| theme \| Смысл темы \|\n\|[-|]+\|\n((?:\|.+\|\n)+)",
+        text,
+    )
+    assert m, "Таблица id-префиксов (Префикс|theme|Смысл темы) не найдена"
+    rows = {}
+    for line in m.group(1).strip().split("\n"):
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        rows[cells[1].strip("`")] = cells[2]
+    return rows
+
+
+def _parse_cat_table(text: str) -> dict[str, str]:
+    """
+    cat/catLabel/Примеры → составное description 'LABEL (без эмодзи) —
+    например: Примеры', плюс ta (депрецирована, своя строка вне таблицы).
+    """
+    m = re.search(
+        r"\| cat \| catLabel \(канон\) \| Примеры \|\n\|[-|]+\|\n((?:\|.+\|\n)+)",
+        text,
+    )
+    assert m, "Таблица cat/catLabel/Примеры не найдена"
+    rows = {}
+    for line in m.group(1).strip().split("\n"):
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        cat_value = cells[0].strip("`")
+        label_no_emoji = re.sub(r"^\S+\s+", "", cells[1]).strip()  # снять ведущий emoji
+        examples = cells[2]
+        rows[cat_value] = f"{label_no_emoji} — например: {examples}"
+
+    ta_match = re.search(r"Категория `ta`.*?депрецирована в v6\.0[^.]*\.", text)
+    assert ta_match, "Заметка о депрекации 'ta' не найдена"
+    rows["ta"] = "Технический анализ — депрецирована в v6.0, новые сигналы с этой категорией не создаются"
+    return rows
+
+
+def _parse_narrative_role_table(text: str) -> dict[str, str]:
+    """| Роль | Критерий | Расшифровка для сводки | — используем 'Критерий'."""
+    m = re.search(
+        r"\| Роль \| Критерий \| Расшифровка для сводки \|\n\|[-|]+\|\n((?:\|.+\|\n)+)",
+        text,
+    )
+    assert m, "Таблица narrative_role (Роль|Критерий|Расшифровка) не найдена"
+    rows = {}
+    for line in m.group(1).strip().split("\n"):
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        meaning = re.sub(r"`([^`]+)`", r"\1", cells[1])  # снять markdown-код внутри текста
+        rows[cells[0].strip("`")] = meaning
+    return rows
+
+
+import pytest as _pytest  # noqa: E402
+
+
+@_pytest.mark.parametrize("field,anchor", [
+    ("dir", "**`dir`** — что сигнал говорит"),
+    ("horizon", "**`horizon`** — временной горизонт"),
+    ("weight", "**`weight`** — достоверность источника"),
+    ("actor", "**`actor`** — субъект сигнала"),
+    ("flow", "**`flow`** — направление капитала"),
+])
+def test_schema_enum_description_matches_claude_md_two_col_table(field, anchor):
+    """
+    Для 5 полей с однотипной таблицей '| Значение | Смысл |': описание в
+    schemas/signal/v1.json (oneOf) должно дословно совпадать с колонкой
+    "Смысл" в CLAUDE.md.
+    """
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    claude_md = _parse_two_col_table_after(text, anchor)
+    schema_desc = _load_schema_oneof_descriptions(field)
+
+    assert claude_md == schema_desc, (
+        f"[{field}] Расхождение CLAUDE.md ↔ schema: "
+        f"claude_md={claude_md}, schema={schema_desc}"
+    )
+
+
+def test_schema_theme_description_matches_claude_md():
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    assert _parse_theme_table(text) == _load_schema_oneof_descriptions("theme")
+
+
+def test_schema_cat_description_matches_claude_md():
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    assert _parse_cat_table(text) == _load_schema_oneof_descriptions("cat")
+
+
+def test_schema_narrative_role_description_matches_claude_md():
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    assert _parse_narrative_role_table(text) == _load_schema_oneof_descriptions("narrative_role")
+
+
+def test_all_eight_enum_fields_use_oneof_not_bare_enum():
+    """
+    Явная проверка формы: ни одно из 8 полей не должно тихо откатиться
+    на голый `enum` (например, при будущей правке кем-то, кто не знает
+    про это решение) — иначе описания молча перестанут существовать в
+    схеме, а этот файл тестов перестанет их проверять (упадёт на
+    отсутствии oneOf, но с менее говорящим сообщением без этой проверки).
+    """
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    for field in ["narrative_role", "theme", "weight", "dir", "horizon", "cat", "actor", "flow"]:
+        prop = schema["properties"][field]
+        assert "oneOf" in prop and "enum" not in prop, (
+            f"Поле '{field}' должно использовать oneOf(const+description), "
+            "не enum — см. CLAUDE.md v8.10/предложение 1 (машиночитаемые "
+            "описания значений в самой схеме)"
+        )
+
+
+def test_enum_description_detector_catches_injected_drift():
+    """
+    Страж-на-стража: искажение описания в схеме ловится сравнением с
+    прозой CLAUDE.md (паттерн test_check_stale_facts_catches_injected_stale_copy).
+    """
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    real_claude_md = _parse_two_col_table_after(text, "**`dir`** — что сигнал говорит")
+    real_schema = _load_schema_oneof_descriptions("dir")
+    assert real_claude_md == real_schema  # исходное состояние синхронно
+
+    corrupted_schema = dict(real_schema)
+    corrupted_schema["pos"] = "ИСКАЖЁННОЕ описание"
+    assert corrupted_schema != real_claude_md, "детектор обязан ловить искажение"
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # Страж против дрейфа CLAUDE.md ↔ ontology.json (таблица «Кластеры»)
 #
 # CLAUDE.md сам объявляет ontology.json.clusters «фактическим источником

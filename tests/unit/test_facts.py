@@ -172,3 +172,130 @@ def test_check_stale_facts_catches_injected_stale_copy(tmp_path, monkeypatch):
     findings = csf.find_stale_occurrences()
     keys_found = [f[0] for f in findings]
     assert "strategy.btc_holdings" in keys_found
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Страж CLAUDE.md ↔ data/facts.json (раздел FACTS «Текущий охват», v8.9→v8.10)
+#
+# КОНТЕКСТ: до v8.9 «Текущий охват» фиксировал точные числа в прозе
+# («10 ключей, 9 сущностей») — они протухли молча (реально стало 12/9,
+# spacex.btc_holdings не был упомянут вовсе), потому что ничто не
+# проверяло совпадение. v8.9 актуализировал числа вручную; v8.10 убрал
+# числа-счётчики из прозы (они протухнут снова при следующем facts-
+# сигнале) и оставил только список сущностей — под защитой этого теста.
+#
+# Различение «индивидуальная сущность» vs «агрегатная категория» —
+# программное, не хардкод: если entity_id есть в ENTITIES.json.entities,
+# это индивидуальная сущность; если нет — агрегатная категория. Это
+# соответствует определению из раздела «Формат ключа» того же CLAUDE.md
+# («entity_id переиспользует id из ENTITIES.json там, где сущность там
+# существует; для агрегатных категорий без отдельной сущности — любой
+# стабильный snake_case идентификатор») — тест проверяет по тому же
+# правилу, что уже задокументировано, не изобретает новое.
+# ═══════════════════════════════════════════════════════════════════════
+
+def _load_entities_ids() -> set[str]:
+    path = os.path.join(ROOT, "ENTITIES.json")
+    with open(path, encoding="utf-8") as f:
+        return {e["id"] for e in json.load(f)["entities"]}
+
+
+def _load_facts_entity_ids() -> set[str]:
+    path = os.path.join(ROOT, "data", "facts.json")
+    with open(path, encoding="utf-8") as f:
+        facts = json.load(f)["facts"]
+    return {key.split(".")[0] for key in facts}
+
+
+def _load_claude_md_facts_coverage() -> tuple[set[str], set[str]]:
+    """Возвращает (индивидуальные_сущности, агрегатные_категории) из прозы CLAUDE.md."""
+    path = os.path.join(ROOT, "CLAUDE.md")
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+
+    import re
+
+    individual_match = re.search(
+        r"usd_reserve`\): (.+?)\. Плюс", text
+    )
+    assert individual_match, (
+        "Не найдено предложение со списком индивидуальных сущностей в "
+        "разделе FACTS «Текущий охват» — формулировка в CLAUDE.md "
+        "изменилась, обнови регулярку теста"
+    )
+    aggregate_match = re.search(
+        r"агрегатные категории без отдельной сущности в ENTITIES\.json: (.+?)\.\n",
+        text,
+    )
+    assert aggregate_match, (
+        "Не найдено предложение со списком агрегатных категорий в "
+        "разделе FACTS «Текущий охват» — формулировка изменилась, "
+        "обнови регулярку теста"
+    )
+
+    def _parse_backtick_list(s: str) -> set[str]:
+        return set(re.findall(r"`([a-z0-9_]+)`", s))
+
+    return (
+        _parse_backtick_list(individual_match.group(1)),
+        _parse_backtick_list(aggregate_match.group(1)),
+    )
+
+
+def test_claude_md_facts_coverage_matches_data():
+    """
+    Двусторонняя сверка: список сущностей в прозе CLAUDE.md должен точно
+    совпадать с тем, что реально есть в data/facts.json — раздельно для
+    индивидуальных сущностей и агрегатных категорий (граница между ними
+    выводится из ENTITIES.json, не хардкодится).
+
+    Падение с недостающей записью → допиши сущность/категорию в CLAUDE.md.
+    Падение с лишней → удали устаревшую строку (facts[] для неё исчез)
+    или проверь опечатку.
+    Падение не в той группе (индивид./агрегат) → сущность появилась в
+    ENTITIES.json (или пропала оттуда) — перенеси между списками.
+    """
+    entities_ids = _load_entities_ids()
+    facts_entity_ids = _load_facts_entity_ids()
+
+    expected_individual = facts_entity_ids & entities_ids
+    expected_aggregate = facts_entity_ids - entities_ids
+
+    claude_individual, claude_aggregate = _load_claude_md_facts_coverage()
+
+    assert claude_individual == expected_individual, (
+        f"Индивидуальные сущности в CLAUDE.md {claude_individual} не "
+        f"совпадают с фактическими {expected_individual} "
+        f"(data/facts.json ∩ ENTITIES.json)"
+    )
+    assert claude_aggregate == expected_aggregate, (
+        f"Агрегатные категории в CLAUDE.md {claude_aggregate} не "
+        f"совпадают с фактическими {expected_aggregate} "
+        f"(data/facts.json \\ ENTITIES.json)"
+    )
+
+
+def test_claude_md_facts_coverage_detector_catches_injected_drift(tmp_path, monkeypatch):
+    """Страж-на-стража: искусственно рассинхронизированный список ловится."""
+    fake_claude_md = tmp_path / "CLAUDE.md"
+    fake_claude_md.write_text(
+        "usd_reserve`): `strategy`, `brand_new_entity_not_in_facts`.\n\n"
+        "агрегатные категории без отдельной сущности в ENTITIES.json: "
+        "`top100_public_companies`.\n",
+        encoding="utf-8",
+    )
+
+    import re as _re
+
+    text = fake_claude_md.read_text(encoding="utf-8")
+    individual_match = _re.search(r"usd_reserve`\): (.+?)\.\n", text)
+    parsed = set(_re.findall(r"`([a-z0-9_]+)`", individual_match.group(1)))
+
+    assert "brand_new_entity_not_in_facts" in parsed, "детектор должен был распарсить искажённое имя"
+    entities_ids = _load_entities_ids()
+    facts_entity_ids = _load_facts_entity_ids()
+    expected_individual = facts_entity_ids & entities_ids
+
+    assert parsed != expected_individual, (
+        "детектор обязан отличать искажённый список от настоящего"
+    )

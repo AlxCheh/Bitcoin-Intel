@@ -1,13 +1,13 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-07-17",
+  "generated_at": "2026-07-19",
   "facts": {
     "bstr.btc_holdings": {
       "value": 30021,
       "unit": "BTC",
-      "as_of": "2026-07-03",
-      "signal_id": "STR-2026-0703-001"
+      "as_of": "2026-07-08",
+      "signal_id": "STR-2026-0708-001"
     },
     "el_salvador.btc_holdings": {
       "value": 7700.37,

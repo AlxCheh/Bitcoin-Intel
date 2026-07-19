@@ -571,24 +571,26 @@
       "id": "bstr",
       "name": "Bitcoin Standard Treasury Company (BSTR)",
       "type": "corporate",
-      "status": "active",
-      "summary": "#5 корпоративный держатель BTC (30 021 BTC) — основана Адамом Беком (изобретатель Hashcash, со-основатель Blockstream), позиционируется как «Berkshire Hathaway биткоина»",
+      "status": "pending",
+      "summary": "Казначейский вехикл Адама Бэка с 30 021 BTC — SPAC-сделка с Cantor на пересмотре (8-K 8 июля 2026), листинга нет; позиционировался как «Berkshire Hathaway биткоина»",
       "profile": {
-        "what": "Bitcoin-treasury компания, вышла на биржу через SPAC-слияние с Cantor Equity Partners I (тикер BSTR, Nasdaq); стратегия — консервативная доходность на BTC-резерв через covered calls и маркет-мейкинг, не DeFi-yield",
+        "what": "Bitcoin-treasury компания (CEO Adam Back, CIO Sean Bill); план листинга на Nasdaq через SPAC-слияние с Cantor Equity Partners I НЕ закрыт: 8 июля 2026 стороны отказались от исходных условий июля 2025, обязательность private placements снята, обсуждается пересмотренная структура. Стратегия — консервативная доходность на BTC-резерв через covered calls и маркет-мейкинг, не DeFi-yield",
         "metrics": [
-          "30 021 BTC (~+ млрд): 25 000 BTC от учредителей (Back + Blockstream Capital) + 5 021 BTC через BTC-номинированный PIPE",
-          "До ,5 млрд fiat PIPE-финансирования (00 млн common equity + 75 млн конвертируемые ноты 1% + 00 млн preferred 7%)",
+          "30 021 BTC (монеты целы, ~$1,9 млрд при ~$64K): 25 000 BTC от учредителей (Back + Blockstream Capital) + 4 156,11 BTC in-kind PIPE + 865 BTC equity PIPE",
+          "Исходный пакет финансирования (расформирован 8-K от 8 июля 2026): до $1,5 млрд fiat PIPE (common equity + конвертируемые ноты + preferred) + ~$200 млн trust Cantor",
+          "Собрание акционеров 10 июля 2026 отложено на неопределённый срок после двух предыдущих переносов",
           "CEO: Adam Back, CIO: Sean Bill"
         ],
         "links_to": [
           "bitcoin"
         ],
-        "notable": "Первый Bitcoin-treasury SPAC с BTC-номинированным PIPE — часть капитала внесена держателями BTC напрямую в криптовалюте, а не в долларах"
+        "notable": "Первый Bitcoin-treasury SPAC с BTC-номинированным PIPE — и первый флагманский казначейский запуск, чья структура финансирования была распущена до закрытия: тест того, финансирует ли рынок казначейские листинги в медвежьих условиях"
       },
       "signal_refs": [
-        "STR-2026-0703-001"
+        "STR-2026-0703-001",
+        "STR-2026-0708-001"
       ],
-      "last_updated": "2026-07-05"
+      "last_updated": "2026-07-19"
     },
     {
       "id": "strive",

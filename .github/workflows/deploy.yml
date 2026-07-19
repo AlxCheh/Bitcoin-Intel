@@ -161,6 +161,31 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # ГОНКА С main: required_status_checks на main выставлен со strict=true
+          # ("up to date with base branch" перед мерджем). Бот создаёт ветку
+          # ОДИН РАЗ и никогда её не обновляет — если main уходит вперёд
+          # (сливается что угодно ещё) ДО того как auto-merge успеет сработать,
+          # PR навсегда виснет в mergeable_state=unknown, ожидая состояние,
+          # которое никто не актуализирует. В активном репозитории с частыми
+          # мерджами это не редкий случай, а почти гарантированный — за
+          # 2026-07-14..17 накопилось 4 таких зависших PR подряд (#276, #299,
+          # #313, #327), обнаружено и устранено 2026-07-19.
+          #
+          # ФИКС: перед созданием нового PR закрываем все ещё открытые старые
+          # bot/sync-synthesis-* — они полностью регенерируемы (детерминированный
+          # вывод от текущего signals.json, не аддитивные правки), так что
+          # держать больше одного открытого одновременно не нужно и вредно:
+          # смерженный устаревший снимок отбросил бы более новые сигналы.
+          # Гарантирует ровно 0-1 открытый sync-PR в любой момент, и новый
+          # всегда создаётся от актуального main — strict-требование
+          # удовлетворено уже в момент создания, не полагаясь на то, что
+          # кто-то потом обновит ветку вручную.
+          for old_pr in $(gh pr list --state open --search "head:bot/sync-synthesis-" --json number,headRefName --jq '.[] | .number'); do
+            echo "Закрываю устаревший sync-PR #$old_pr"
+            gh pr close "$old_pr" --delete-branch || true
+          done
+
           git add data/synthesis_cache.json
           BRANCH="bot/sync-synthesis-${{ github.run_id }}"
           git checkout -b "$BRANCH"

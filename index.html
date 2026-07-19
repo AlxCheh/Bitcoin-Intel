@@ -4,31 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BITCOIN INTEL</title>
-<script>
-/* ВРЕМЕННЫЙ ДИАГНОСТИЧЕСКИЙ ПЕРЕХВАТЧИК — удалить после расследования "прочерков"
-   (сессия 2026-07-18). Ловит любые ошибки, включая SyntaxError последующих
-   <script>-блоков, и показывает их на экране — для устройств без DevTools. */
-window.addEventListener('error', function (ev) {
-  try {
-    var box = document.getElementById('diag-err-box');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'diag-err-box';
-      box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#7a1f1f;color:#fff;font:11px/1.5 monospace;padding:8px 10px;white-space:pre-wrap;word-break:break-all;max-height:45vh;overflow:auto';
-      (document.body || document.documentElement).appendChild(box);
-    }
-    var src = [ev.filename || '', ':', ev.lineno || '?', ':', ev.colno || '?'].join('');
-    box.textContent += ['⚠ ', ev.message || String(ev.error), '\n   @ ', src, '\n'].join('');
-  } catch (e) {}
-}, true);
-window.addEventListener('unhandledrejection', function (ev) {
-  try {
-    var box = document.getElementById('diag-err-box');
-    if (!box) return;
-    box.textContent += ['⚠ (promise) ', String(ev.reason && ev.reason.message || ev.reason), '\n'].join('');
-  } catch (e) {}
-});
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="data/holders.js"></script>
 <script src="data/crosslinks.js"></script>
@@ -6354,6 +6329,19 @@ function renderSubnav(key, activeId) {
 
 let currentTabId = null;
 
+// Массив последних блоков (mempool.space) — питает «Последние блоки» на
+// ОБЗОРЕ и getCurrentBlockHeight(). ОБЯЗАН быть объявлен ЗДЕСЬ, выше
+// triggerTabData(): она читает LATEST_BLOCKS, а restoreLastActiveTab()
+// вызывает её СИНХРОННО при загрузке страницы (через showTab), когда в
+// localStorage сохранена вкладка 'home'/'pools'. При объявлении ниже по
+// файлу это давало TDZ ReferenceError («Cannot access before
+// initialization»), убивавший ВЕСЬ script-блок — сайт открывался без
+// единого работающего скрипта («везде прочерки») у любого
+// возвращающегося посетителя. Обнаружено 2026-07-18 через диагностическую
+// плашку window.onerror; латентная гонка коммитов f07b9db (чтение в
+// triggerTabData) и #290 (синхронный restoreLastActiveTab).
+let LATEST_BLOCKS = [];
+
 // Триггеры загрузки/рендера данных для конкретной вкладки — вынесено из
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
@@ -6810,7 +6798,8 @@ function timeAgo(ts) {
   return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
 }
 
-let LATEST_BLOCKS = [];
+// let LATEST_BLOCKS — объявление перенесено выше triggerTabData(),
+// см. комментарий у объявления (фикс TDZ-краша при восстановлении вкладки).
 function renderBlocks(blocks) {
   LATEST_BLOCKS = blocks;
   const list = document.getElementById('blocks-list');

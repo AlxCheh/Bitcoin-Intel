@@ -94,3 +94,85 @@ def test_schema_required_fields_all_documented_in_claude_md():
         f"{sorted(missing_in_example)}. Обновите пример в секции "
         "'## Сигнал: схема объекта'."
     )
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Страж против дрейфа CLAUDE.md ↔ ontology.json (таблица «Кластеры»)
+#
+# CLAUDE.md сам объявляет ontology.json.clusters «фактическим источником
+# истины» (раздел «Кластеры (текущие)»), а свою таблицу — человекочитаемым
+# зеркалом для быстрой справки. Без теста это зеркало может разойтись
+# молча — и разошлось: при аудите 2026-07-19 обнаружено, что описание
+# supply_scarcity в CLAUDE.md потеряло ", цикличность" по сравнению с
+# ontology.json (исправлено тем же PR, что и этот тест). Тот же класс
+# проблемы, что FACTS/SITE_MAP/SIGNALS.md — процедура без механизма не
+# держится (AD-6).
+#
+# Проверка двусторонняя: новый кластер в ontology.json без строки в
+# CLAUDE.md — падение (человек не увидит документацию новой темы);
+# строка в CLAUDE.md без кластера в ontology.json — падение (устаревшая/
+# удалённая запись вводит в заблуждение); описания должны совпадать
+# дословно, не только набор ключей.
+# ═══════════════════════════════════════════════════════════════════════
+
+ONTOLOGY_PATH = REPO_ROOT / "ontology.json"
+
+
+def _load_claude_md_cluster_table() -> dict[str, str]:
+    text = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    match = re.search(
+        r"## Кластеры \(текущие\)\n\n\| cluster \| Описание \|\n\|---------\|----------\|\n(.*?)\n\n",
+        text,
+        re.S,
+    )
+    assert match, (
+        "Не найдена таблица кластеров в CLAUDE.md (секция "
+        "'## Кластеры (текущие)') — структура файла изменилась, "
+        "тест нужно обновить вручную"
+    )
+    rows = {}
+    for line in match.group(1).strip().split("\n"):
+        m = re.match(r"\| `([^`]+)` \| (.+) \|$", line)
+        if m:
+            rows[m.group(1)] = m.group(2)
+    return rows
+
+
+def _load_ontology_clusters() -> dict[str, str]:
+    ontology = json.loads(ONTOLOGY_PATH.read_text(encoding="utf-8"))
+    return {k: v["description"] for k, v in ontology["clusters"].items()}
+
+
+def test_claude_md_cluster_table_matches_ontology_json():
+    """
+    Двусторонняя сверка ключей + дословное совпадение описаний.
+    Падение с недостающим кластером → допиши строку в таблицу CLAUDE.md.
+    Падение с лишним кластером → удали устаревшую строку (кластер убран
+    из ontology.json) или проверь опечатку в имени.
+    Падение с расхождением описания → одно из двух устарело; ontology.json
+    объявлен источником истины, но реши осознанно, не просто скопируй.
+    """
+    claude_rows = _load_claude_md_cluster_table()
+    ontology_rows = _load_ontology_clusters()
+
+    missing_in_claude_md = set(ontology_rows) - set(claude_rows)
+    assert not missing_in_claude_md, (
+        f"Кластеры есть в ontology.json, но не в таблице CLAUDE.md: "
+        f"{sorted(missing_in_claude_md)}"
+    )
+
+    stale_in_claude_md = set(claude_rows) - set(ontology_rows)
+    assert not stale_in_claude_md, (
+        f"Строки в таблице CLAUDE.md ссылаются на кластеры, которых нет "
+        f"в ontology.json: {sorted(stale_in_claude_md)}"
+    )
+
+    mismatched = {
+        k: (claude_rows[k], ontology_rows[k])
+        for k in claude_rows
+        if claude_rows[k] != ontology_rows[k]
+    }
+    assert not mismatched, (
+        "Описания кластеров разошлись между CLAUDE.md и ontology.json "
+        f"(claude_md, ontology): {mismatched}"
+    )

@@ -4585,7 +4585,16 @@ function renderAccItem(item) {
   }
   if (item.crosslink) {
     const cl = item.crosslink;
-    html += '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})">'
+    // target_tab — опционально (добавлено 2026-07-20): межвкладочная
+    // ссылка через уже существующий siteMapGoTo(tab, title) вместо
+    // getElementById+scrollIntoView, который не переключает вкладки.
+    // target_panel в этом случае — точный текст .panel-title цели (как
+    // ищет siteMapGoTo), не id. Без target_tab — прежнее поведение
+    // (та же вкладка), не тронуто — обратная совместимость сохранена.
+    const onclickAttr = cl.target_tab
+      ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
+      : 'document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})';
+    html += '<div class="crosslink" onclick="' + onclickAttr + '">'
       + '<span class="crosslink-arrow">↳</span>'
       + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
       + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
@@ -6437,7 +6446,8 @@ renderTOC('theory-toc', [
   { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
   { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
   { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
-  { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' }
+  { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
+  { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' }
 ]);
 
 renderTOC('macrocontext-toc', [

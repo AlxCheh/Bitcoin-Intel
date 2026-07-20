@@ -1103,6 +1103,25 @@
       "dynamic": true
     },
     {
+      "id": "e095",
+      "title": "Хешрейт и сложность: единицы измерения",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "essay",
+      "keywords": [
+        "хешрейт",
+        "сложность",
+        "TH/s",
+        "EH/s",
+        "единицы измерения",
+        "difficulty"
+      ],
+      "dynamic": true
+    },
+    {
       "id": "e075",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",

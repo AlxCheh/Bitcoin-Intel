@@ -1348,6 +1348,66 @@ header {
 }
 
 /* ══════════════════════════════════
+   DIFFICULTY PANEL — редизайн 2026-07-20
+   (убрана вводящая в заблуждение шкала "позиция в истории" — статичные
+   halving-метки были на шкале ВСЕЙ истории Bitcoin, а двигающийся маркер
+   считался от athPct за ПОСЛЕДНИЙ ГОД — разные оси на одной линейке;
+   убран мёртвый статичный блок "Июнь 2026"; 4 карточки → 1 hero-метрика
+   + свёрнутые вторичные)
+══════════════════════════════════ */
+.hero-delta {
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  padding: 2px 7px; border-radius: 3px;
+  background: rgba(194,96,96,.12); color: var(--red);
+}
+.hero-delta.pos { background: rgba(90,158,114,.12); color: var(--grn); }
+.unit-note {
+  margin-top: 8px; padding: 6px 8px;
+  background: var(--bg3); border-radius: 3px;
+  font-size: 9px; font-family: var(--mono); color: var(--dim); line-height: 1.6;
+}
+.unit-note b { color: var(--txt); }
+.unit-note-link { color: var(--btc); cursor: pointer; }
+.unit-note-link:hover { text-decoration: underline; }
+.hero-unit-clickable {
+  border-bottom: 1px dotted var(--dim2); cursor: pointer;
+}
+.hero-unit-clickable:hover { color: var(--btc); border-bottom-color: var(--btc); }
+
+.disclosure-head {
+  padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+}
+.disclosure-arrow { font-family: var(--mono); font-size: 9px; color: var(--dim); transition: transform .2s ease; }
+.disclosure.open .disclosure-arrow { transform: rotate(90deg); }
+.disclosure-title { font-size: 10px; font-family: var(--mono); color: var(--dim); letter-spacing: .06em; }
+.disclosure-body { display: none; grid-template-columns: 1fr 1fr 1fr; }
+.disclosure.open .disclosure-body { display: grid; }
+.dmetric { padding: 10px 12px 12px; border-top: 1px solid var(--line); }
+.dmetric:not(:last-child) { border-right: 1px solid var(--line); }
+.dmetric-label { font-size: 8px; color: var(--dim); font-family: var(--mono); letter-spacing: .06em; margin-bottom: 5px; }
+.dmetric-val { font-size: 14px; font-weight: 700; font-family: var(--mono); color: var(--txt); margin-bottom: 3px; }
+.dmetric-desc { font-size: 8.5px; color: var(--dim); font-family: var(--mono); line-height: 1.5; }
+
+.signal-bridge { background: linear-gradient(90deg, rgba(247,147,26,.05), transparent 60%); border-top: 1px solid var(--line); }
+.signal-bridge-head { padding: 10px 14px 0; display: flex; align-items: center; gap: 8px; }
+.signal-bridge-tag {
+  font-size: 8px; font-family: var(--mono); color: var(--btc); letter-spacing: .1em;
+  border: 1px solid var(--btc-mid); padding: 2px 6px; border-radius: 3px;
+}
+.signal-bridge-label { font-size: 9px; font-family: var(--mono); color: var(--dim); letter-spacing: .08em; }
+.signal-bridge-body { padding: 10px 14px 12px; }
+.signal-bridge-title { font-size: 12.5px; color: var(--txt); font-family: var(--sans); line-height: 1.45; margin-bottom: 8px; cursor: pointer; }
+.signal-bridge-title:hover { color: var(--btc); }
+.signal-bridge-tension {
+  font-size: 10.5px; color: var(--dim); font-family: var(--mono); line-height: 1.6;
+  padding: 8px 10px; background: var(--bg3); border-left: 2px solid var(--btc); margin-bottom: 10px;
+}
+.signal-bridge-cta { display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; font-family: var(--mono); color: var(--dim); }
+.signal-bridge-link { color: var(--btc); cursor: pointer; }
+.signal-bridge-link:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════
    HALVING BLOCK
 ══════════════════════════════════ */
 
@@ -2853,6 +2913,8 @@ function toggleNav(id) {
 
     <div id="theory-passphrase-mount"></div>
 
+    <div id="theory-hashrate-units-mount"></div>
+
     <div style="height:650px" aria-hidden="true"></div>
 
   </div>
@@ -3589,186 +3651,93 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <!-- DIFFICULTY — Вариант 2: Контекст (расширен блоком "Корректировка сложности") -->
+    <!-- DIFFICULTY — редизайн 2026-07-20: убрана шкала "позиция в истории"
+         (несовместимые оси — halving-метки по всей истории Bitcoin, а
+         маркер считался от athPct только за год), убран мёртвый статичный
+         блок "Июнь 2026" (заменён на живую карточку последнего mining-
+         сигнала), 4 карточки → 1 hero-метрика + свёрнутые вторичные -->
     <div class="panel" style="margin-top:0" id="diff-block">
 
       <!-- Header -->
       <div class="panel-head">
         <span class="panel-title">Сложность сети</span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:9px;font-family:var(--mono);color:var(--btc)" id="diff-change">—</span>
-          <span class="chart-meta" id="diff-next-label">РЕТАРГЕТ —</span>
-        </div>
+        <span class="chart-meta" id="diff-next-label">РЕТАРГЕТ —</span>
       </div>
 
-      <!-- Текущее значение + ATH% -->
+      <!-- Hero: значение + дельта + подпись единиц + прогресс эпохи -->
       <div style="padding:14px 16px 10px;border-bottom:1px solid var(--line)">
         <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:6px">ТЕКУЩЕЕ ЗНАЧЕНИЕ</div>
-        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
           <span style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--btc);letter-spacing:-.02em" id="diff-value">—</span>
-          <span style="font-size:11px;font-family:var(--mono);color:var(--dim)" id="diff-unit-label">T</span>
-          <span style="font-size:11px;font-family:var(--mono);color:var(--dim)">·</span>
-          <span style="font-size:11px;font-family:var(--mono);color:var(--txt)" id="diff-ath-pct">— от ATH</span>
+          <span class="hero-unit-clickable" style="font-size:11px;font-family:var(--mono);color:var(--dim)" id="diff-unit-label" onclick="siteMapGoTo('theory','Хешрейт и сложность: единицы измерения')" title="Что означает T? →">T</span>
+          <span class="hero-delta" id="diff-change">—</span>
         </div>
-      </div>
-
-      <!-- Шкала позиции в истории -->
-      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--line)">
-        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:12px">ПОЗИЦИЯ В ИСТОРИИ BITCOIN</div>
-        <div style="position:relative;height:4px;background:var(--line2);border-radius:3px;margin-bottom:22px">
-          <div id="diff-scale-fill" style="position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,rgba(247,147,26,.4),var(--btc));border-radius:3px;transition:width 1s ease"></div>
-          <!-- Epoch markers — static -->
-          <div style="position:absolute;left:0%;top:0;transform:translateX(-50%)">
-            <div style="width:1px;height:4px;background:var(--dim2)"></div>
-            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8px;color:var(--dim);font-family:var(--mono);text-align:center">
-              <div>GENESIS</div><div style="color:var(--dim2);margin-top:1px">~1</div>
-            </div>
+        <div style="margin-top:6px;font-size:11px;font-family:var(--mono);color:var(--dim)" id="diff-ath-pct">— от ATH</div>
+        <div class="unit-note">
+          <b>T</b> — масштаб самого числа сложности, не единица хешрейта.
+          <span class="unit-note-link" onclick="siteMapGoTo('theory','Хешрейт и сложность: единицы измерения')">В ТЕОРИЮ →</span>
+        </div>
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--dim);margin-bottom:5px">
+            <span>ПРОГРЕСС ЭПОХИ <span style="color:var(--btc)" id="diff-progress-pct">—%</span></span>
+            <span><span id="diff-blocks">—</span> БЛ. ОСТАЛОСЬ</span>
           </div>
-          <div style="position:absolute;left:20%;top:0;transform:translateX(-50%)">
-            <div style="width:1px;height:4px;background:var(--dim2)"></div>
-            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8px;color:var(--dim);font-family:var(--mono);text-align:center">
-              <div>HALVING 1</div><div style="color:var(--dim2);margin-top:1px">~1M</div>
-            </div>
-          </div>
-          <div style="position:absolute;left:40%;top:0;transform:translateX(-50%)">
-            <div style="width:1px;height:4px;background:var(--dim2)"></div>
-            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8px;color:var(--dim);font-family:var(--mono);text-align:center">
-              <div>HALVING 2</div><div style="color:var(--dim2);margin-top:1px">~200B</div>
-            </div>
-          </div>
-          <div style="position:absolute;left:62%;top:0;transform:translateX(-50%)">
-            <div style="width:1px;height:4px;background:var(--dim2)"></div>
-            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8px;color:var(--dim);font-family:var(--mono);text-align:center">
-              <div>HALVING 3</div><div style="color:var(--dim2);margin-top:1px">~20T</div>
-            </div>
-          </div>
-          <div style="position:absolute;left:82%;top:0;transform:translateX(-50%)">
-            <div style="width:1px;height:4px;background:var(--dim2)"></div>
-            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8px;color:var(--dim);font-family:var(--mono);text-align:center">
-              <div>HALVING 4</div><div style="color:var(--dim2);margin-top:1px">~80T</div>
-            </div>
-          </div>
-          <!-- Current position marker (dynamic) -->
-          <div id="diff-scale-marker" style="position:absolute;top:-3px;width:12px;height:12px;background:var(--btc);border-radius:50%;transform:translateX(-50%);left:0%;transition:left 1s ease;box-shadow:0 0 6px rgba(247,147,26,.5)">
-            <div id="diff-scale-label" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:7px;color:var(--btc);font-family:var(--mono);font-weight:700">СЕЙЧАС</div>
+          <div style="height:3px;background:var(--line2);border-radius:2px;overflow:hidden">
+            <div class="bar-fill" id="diffBar" style="width:0%"></div>
           </div>
         </div>
       </div>
 
-      <!-- 4 интерпретации -->
-      <div style="display:grid;grid-template-columns:1fr 1fr">
-        <div style="padding:12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <span style="font-size:13px">⛏️</span>
-            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">ДЛЯ МАЙНЕРА</span>
-          </div>
-          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--btc);margin-bottom:4px" id="diff-blocktime">— мин/блок</div>
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5">Среднее время поиска блока в текущей эпохе. Протокол целится в 10 мин.</div>
-        </div>
-        <div style="padding:12px 14px;border-bottom:1px solid var(--line)">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <span style="font-size:13px">📊</span>
-            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">В ЦИКЛЕ</span>
-          </div>
-          <div style="font-size:16px;font-weight:700;font-family:var(--mono);margin-bottom:4px" id="diff-cycle-val">—% от ATH</div>
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5" id="diff-cycle-desc">—</div>
-        </div>
-        <div style="padding:12px 14px;border-right:1px solid var(--line)">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <span style="font-size:13px">🖥️</span>
-            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">В ЖЕЛЕЗЕ</span>
-          </div>
-          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:#60A5FA;margin-bottom:4px" id="diff-asic">— машин</div>
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5">Эквивалент Antminer S19 (110 TH/s), работающих одновременно.</div>
-        </div>
-        <div style="padding:12px 14px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <span style="font-size:13px" id="diff-yoy-icon">📈</span>
-            <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em" id="diff-yoy-label">РОСТ</span>
-          </div>
-          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:#A78BFA;margin-bottom:4px" id="diff-yoy">× — за год</div>
-          <div style="font-size:9px;color:var(--dim);font-family:var(--mono);line-height:1.5" id="diff-yoy-desc">—</div>
-        </div>
-      </div>
-
-      <!-- История + прогресс эпохи -->
-      <div style="border-top:1px solid var(--line)">
-        <div style="padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">ИСТОРИЯ · 52 НЕДЕЛИ</span>
-          <span style="font-size:8px;color:var(--dim);font-family:var(--mono)">ПРОГРЕСС ЭПОХИ <span style="color:var(--btc)" id="diff-progress-pct">—%</span> · <span id="diff-blocks">—</span> БЛ. ОСТАЛОСЬ</span>
+      <!-- График: ступенчатый (сложность меняется скачком раз в ~2 недели,
+           не непрерывно — плавная линия технически приукрашивала реальность) -->
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em">ИСТОРИЯ · 26 РЕТАРГЕТОВ</span>
+          <span class="chart-meta">T</span>
         </div>
         <svg id="diff-chart" width="100%" viewBox="0 0 600 72" preserveAspectRatio="none" style="display:block"></svg>
-        <div style="height:3px;background:var(--line2);margin:0 14px 0">
-          <div class="bar-fill" id="diffBar" style="width:0%"></div>
-        </div>
         <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="diff-chart-labels"></div>
       </div>
 
-      <!-- Корректировка сложности — слито из отдельной панели -->
-      <div class="amber" style="border-top:1px solid var(--line)">
-        <div style="padding:12px 14px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1E232B">
-          <span style="font-family:var(--mono);font-size:12px;color:#FFB300;text-transform:uppercase;letter-spacing:.08em">Корректировка сложности</span>
-          <span class="panel-tag" style="color:#5A6472;background:transparent;border:none">Июнь 2026</span>
+      <!-- Свёрнутые вторичные метрики: время блока, железо, год к году -->
+      <div class="disclosure" id="diff-disclosure" onclick="document.getElementById('diff-disclosure').classList.toggle('open')">
+        <div class="disclosure-head">
+          <span class="disclosure-arrow">▶</span>
+          <span class="disclosure-title">ПОДРОБНЕЕ · ВРЕМЯ БЛОКА, ЖЕЛЕЗО, ГОД К ГОДУ</span>
         </div>
-        <div style="padding:12px 14px;font-size:12px;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;border-bottom:1px solid var(--line);line-height:1.6">
-          ~13 июня 2026 ожидается одна из крупнейших отрицательных корректировок сложности в истории Bitcoin.
-          Майнеры отключают оборудование из-за падения доходности — это классический сигнал капитуляции.
-        </div>
-        <!-- Current event metrics -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
-          <div style="padding:12px 14px;border-right:1px solid var(--line)">
-            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">ИЗМЕНЕНИЕ</div>
-            <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:700">−10.3%</div>
-            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">est. · блок 953,568</div>
+        <div class="disclosure-body">
+          <div class="dmetric">
+            <div class="dmetric-label">ДЛЯ МАЙНЕРА</div>
+            <div class="dmetric-val" id="diff-blocktime">— мин/блок</div>
+            <div class="dmetric-desc">Среднее время поиска блока. Протокол целится в 10 мин.</div>
           </div>
-          <div style="padding:12px 14px">
-            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace;margin-bottom:4px">РАНГ В ИСТОРИИ</div>
-            <div style="font-size:22px;font-family:'IBM Plex Mono',monospace;color:var(--btc);font-weight:700">#11</div>
-            <div style="font-size:10px;color:var(--dim);font-family:'IBM Plex Mono',monospace">из 471 корректировки</div>
+          <div class="dmetric">
+            <div class="dmetric-label">В ЖЕЛЕЗЕ</div>
+            <div class="dmetric-val" id="diff-asic">— машин</div>
+            <div class="dmetric-desc">Эквивалент Antminer S19 (110 TH/s) — теоретический пересчёт мощности сети в «штуки», не подсчёт реальных устройств.</div>
+          </div>
+          <div class="dmetric">
+            <div class="dmetric-label" id="diff-yoy-label">ГОД К ГОДУ</div>
+            <div class="dmetric-val" id="diff-yoy">× —</div>
+            <div class="dmetric-desc" id="diff-yoy-desc">—</div>
           </div>
         </div>
-        <!-- Historical table -->
-        <div style="overflow-x:auto">
-        <table class="dtable zebra">
-          <thead>
-            <tr><th>Ранг</th><th>Дата</th><th>Изменение</th><th>Причина</th></tr>
-          </thead>
-          <tbody>
-            <tr class="current">
-              <td>#11</td>
-              <td>≈ Июнь 2026</td>
-              <td>−10.3% est.</td>
-              <td>Squeeze маржи майнеров 2026</td>
-            </tr>
-            <tr>
-              <td class="td-dim">#1</td>
-              <td class="td-dim">Июль 2021</td>
-              <td style="color:var(--red)">−27.94%</td>
-              <td class="td-dim">Бан майнинга в Китае</td>
-            </tr>
-            <tr>
-              <td class="td-dim">#6</td>
-              <td class="td-dim">Дек 2018</td>
-              <td style="color:var(--red)">−15.13%</td>
-              <td class="td-dim">Капитуляция майнеров — дно цикла</td>
-            </tr>
-            <tr>
-              <td class="td-dim">#5</td>
-              <td class="td-dim">Март 2020</td>
-              <td style="color:var(--red)">−15.95%</td>
-              <td class="td-dim">COVID-крах → дно → ×20</td>
-            </tr>
-            <tr>
-              <td class="td-dim">#22</td>
-              <td class="td-dim">Дек 2022</td>
-              <td style="color:var(--red)">−7.32%</td>
-              <td class="td-dim">Крах FTX — дно цикла</td>
-            </tr>
-          </tbody>
-        </table>
+      </div>
+
+      <!-- Мост к сигналам — вместо мёртвого статичного блока "Июнь 2026":
+           живая карточка последнего сигнала категории mining -->
+      <div class="signal-bridge" id="diff-signal-bridge" style="display:none">
+        <div class="signal-bridge-head">
+          <span class="signal-bridge-tag">⛏ MINING</span>
+          <span class="signal-bridge-label">ПОСЛЕДНИЙ РАЗБОР · <span id="diff-signal-date">—</span></span>
         </div>
-        <div style="padding:10px 14px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace">
-          Исторически крупные отрицательные корректировки совпадают с зонами дна. Связь с Production Cost (~$61–62k): майнеры работают в ноль → капитуляция → ретаргет. Источник: Galaxy Research.
+        <div class="signal-bridge-body">
+          <div class="signal-bridge-title" id="diff-signal-title" onclick="pendingScrollSignal=this.dataset.sigid; showTab('signals')">—</div>
+          <div class="signal-bridge-tension" id="diff-signal-tension">—</div>
+          <div class="signal-bridge-cta">
+            <span id="diff-signal-cluster">—</span>
+            <span class="signal-bridge-link" onclick="pendingScrollSignal=document.getElementById('diff-signal-title').dataset.sigid; showTab('signals')">В ДАЙДЖЕСТ →</span>
+          </div>
         </div>
       </div>
     </div>
@@ -5604,6 +5573,7 @@ async function loadSignals() {
     fetchFacts(); // машиночитаемые факты из сигналов — независимо от meta
     fetchSiteMap(); // прогрев карты сайта — не ждём первого открытия оверлея
     renderDashboard();
+    renderDifficultySignalBridge(); // мост к последнему mining-сигналу в панели "Сложность сети"
     setTimeout(renderDashStatus, 600);
     // Перерисовать данные ТЕКУЩЕЙ вкладки после завершения загрузки —
     // не только 'market' (была точечная заплатка только для него), а
@@ -7107,6 +7077,17 @@ async function fetchDifficulty() {
     const athDiff = diffs.length ? Math.max(...diffs.map(d => d.difficulty)) : null;
     const athPct  = (curDiff && athDiff) ? (curDiff / athDiff * 100) : null;
 
+    // Ранг текущего значения среди значений ЭТОГО ЖЕ массива за год —
+    // честно вычисляемый (не хардкод), в отличие от прежнего статичного
+    // "3-е по низости значение года", которое было бы неверным уже на
+    // следующей корректировке. rank=1 — минимум года.
+    let rankText = null;
+    if (curDiff && diffs.length > 1) {
+      const sorted = [...new Set(diffs.map(d => d.difficulty))].sort((a, b) => a - b);
+      const rank = sorted.indexOf(curDiff) + 1;
+      if (rank > 0) rankText = rank + '-е по низости значение за год (из ' + sorted.length + ')';
+    }
+
     // Year-over-year multiplier
     const yoyDiff = firstDiff && curDiff ? (curDiff / firstDiff) : null;
 
@@ -7125,15 +7106,8 @@ async function fetchDifficulty() {
     // ── Update DOM ────────────────────────────────────────────────────────────
     const $ = id => document.getElementById(id);
 
-    // Header: change % + next retarget
-    if (adj.difficultyChange !== undefined) {
-      const chg = adj.difficultyChange;
-      const el = $('diff-change');
-      if (el) {
-        el.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
-        el.style.color = chg >= 0 ? 'var(--grn)' : 'var(--red)';
-      }
-    }
+    // Header: только дата ретаргета (было + % изменения — перенесено
+    // в hero как заметный бейдж, не дублируется здесь)
     if (adj.estimatedRetargetDate) {
       const eta = new Date(adj.estimatedRetargetDate * 1000);
       const el = $('diff-next-label');
@@ -7145,71 +7119,44 @@ async function fetchDifficulty() {
       const tVal = curDiff / 1e12;
       const el = $('diff-value');
       if (el) el.textContent = tVal >= 100 ? Math.round(tVal) : tVal.toFixed(2);
-      const ul = $('diff-unit-label');
-      if (ul) ul.textContent = 'T';
     }
 
-    // ATH % in hero row
-    if (athPct) {
-      const el = $('diff-ath-pct');
+    // Hero delta badge (перенесено из header — было diff-change там)
+    if (adj.difficultyChange !== undefined) {
+      const chg = adj.difficultyChange;
+      const el = $('diff-change');
       if (el) {
-        el.textContent = athPct.toFixed(1) + '% от ATH';
-        el.style.color = athPct >= 90 ? 'var(--red)' : athPct >= 70 ? 'var(--btc)' : 'var(--grn)';
+        el.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+        el.classList.toggle('pos', chg >= 0);
       }
     }
 
-    // Historical scale — move fill + marker
+    // ATH% + честный ранг за год (вместо прежнего выдуманного "3-е место")
     if (athPct) {
-      const fill   = $('diff-scale-fill');
-      const marker = $('diff-scale-marker');
-      const lbl    = $('diff-scale-label');
-      const pct    = Math.min(98, athPct); // cap at 98% so dot stays visible
-      setTimeout(() => {
-        if (fill)   fill.style.width = pct + '%';
-        if (marker) marker.style.left = pct + '%';
-        if (lbl)    lbl.textContent   = athPct.toFixed(1) + '%';
-      }, 400);
+      const el = $('diff-ath-pct');
+      if (el) {
+        el.innerHTML = '<b style="color:var(--txt);font-weight:400">' + athPct.toFixed(1) + '%</b> от годового максимума'
+          + (rankText ? ' · ' + rankText : '');
+      }
     }
 
-    // Card 1 — для майнера: avg block time
+    // Свёрнутые вторичные метрики
     if (blockTimeMins) {
       const el = $('diff-blocktime');
       if (el) el.textContent = blockTimeMins.toFixed(1) + ' мин/блок';
     }
-
-    // Card 2 — в цикле: ATH%
-    if (athPct) {
-      const val  = $('diff-cycle-val');
-      const desc = $('diff-cycle-desc');
-      if (val) {
-        val.textContent  = athPct.toFixed(1) + '% от ATH';
-        val.style.color  = athPct >= 90 ? 'var(--red)' : athPct >= 70 ? 'var(--btc)' : 'var(--grn)';
-      }
-      if (desc) desc.textContent = athPct >= 90
-        ? 'Вблизи исторического максимума. Высокая нагрузка на майнеров.'
-        : athPct >= 70
-        ? 'Высокий уровень. Сеть в фазе активного роста.'
-        : 'Умеренный уровень. Сеть в стабильном состоянии.';
-    }
-
-    // Card 3 — в железе: ASIC эквивалент
     if (asicM) {
       const el = $('diff-asic');
       if (el) el.textContent = asicM.toFixed(1) + 'M машин';
     }
-
-    // Card 4 — изменение год к году (было безусловно 'РОСТ'/📈 — не всегда
-    // корректно, сложность/хешрейт могли и снизиться)
     if (yoyDiff) {
       const el    = $('diff-yoy');
       const desc  = $('diff-yoy-desc');
-      const icon  = $('diff-yoy-icon');
       const label = $('diff-yoy-label');
       if (el) el.textContent = '×' + yoyDiff.toFixed(2) + ' за год';
       const growing = yoyDiff > 1.03;
       const declining = yoyDiff < 0.97;
-      if (icon)  icon.textContent  = growing ? '📈' : declining ? '📉' : '➡️';
-      if (label) label.textContent = growing ? 'РОСТ' : declining ? 'СНИЖЕНИЕ' : 'БЕЗ ИЗМЕНЕНИЙ';
+      if (label) label.textContent = growing ? 'РОСТ ЗА ГОД' : declining ? 'СНИЖЕНИЕ ЗА ГОД' : 'ГОД К ГОДУ';
       if (desc && firstDiff) {
         const changeText = growing
           ? 'Хешрейт сети вырос за этот период.'
@@ -7231,7 +7178,9 @@ async function fetchDifficulty() {
       setTimeout(() => { if (elBar) elBar.style.width = pct.toFixed(1) + '%'; }, 500);
     }
 
-    // ── SVG history chart ─────────────────────────────────────────────────────
+    // ── SVG history chart — СТУПЕНЧАТЫЙ (вариант B): сложность физически
+    // меняется скачком раз в ~2 недели на ретаргете, не непрерывно —
+    // прежняя сглаженная линия технически приукрашивала природу данных.
     const svg      = $('diff-chart');
     const labelsEl = $('diff-chart-labels');
     if (svg && diffs.length > 1) {
@@ -7245,8 +7194,14 @@ async function fetchDifficulty() {
         y: Pt + (1 - (d.difficulty - minD) / range) * (H - Pt - Pb),
         ts: d.time * 1000,
       }));
-      const lineD = pts.map((p, i) => (i === 0 ? `M${p.x.toFixed(1)},${p.y.toFixed(1)}` : `L${p.x.toFixed(1)},${p.y.toFixed(1)}`)).join(' ');
-      const areaD = lineD + ` L${W},${H} L0,${H} Z`;
+      // Ступенчатая интерполяция step-after: горизонталь на уровне текущей
+      // точки до x следующей, затем вертикальный скачок — так и ведёт себя
+      // сложность между ретаргетами на самом деле.
+      let stepD = `M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+      for (let i = 1; i < n; i++) {
+        stepD += ` L${pts[i].x.toFixed(1)},${pts[i-1].y.toFixed(1)} L${pts[i].x.toFixed(1)},${pts[i].y.toFixed(1)}`;
+      }
+      const areaD = stepD + ` L${W},${H} L0,${H} Z`;
       svg.innerHTML = `
         <defs>
           <linearGradient id="dg" x1="0" y1="0" x2="0" y2="1">
@@ -7255,7 +7210,7 @@ async function fetchDifficulty() {
           </linearGradient>
         </defs>
         <path d="${areaD}" fill="url(#dg)"/>
-        <path d="${lineD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="${stepD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
         <circle cx="${pts[n-1].x.toFixed(1)}" cy="${pts[n-1].y.toFixed(1)}" r="3" fill="var(--btc)"/>
       `;
       if (labelsEl) {
@@ -7269,6 +7224,30 @@ async function fetchDifficulty() {
   } catch(e) {
     console.warn('Difficulty fetch error:', e);
   }
+}
+
+// Мост к сигналам — последний сигнал категории mining вместо прежнего
+// мёртвого статичного блока "Июнь 2026". Вызывается из loadSignals()
+// после того как SIGNALS точно загружен (не из fetchDifficulty() —
+// разные источники данных, разное время готовности).
+function renderDifficultySignalBridge() {
+  const bridge = document.getElementById('diff-signal-bridge');
+  if (!bridge) return;
+  const mining = SIGNALS.filter(s => s.cat === 'mining').sort((a, b) => b.date.localeCompare(a.date));
+  if (!mining.length) return; // нет ни одного mining-сигнала — блок остаётся скрытым
+  const s = mining[0];
+  const titleEl = document.getElementById('diff-signal-title');
+  if (titleEl) { titleEl.textContent = sanitize(s.signal); titleEl.dataset.sigid = s.id; }
+  const dateEl = document.getElementById('diff-signal-date');
+  if (dateEl) dateEl.textContent = new Date(s.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  const tensionEl = document.getElementById('diff-signal-tension');
+  if (tensionEl) tensionEl.textContent = s.tension;
+  const clusterEl = document.getElementById('diff-signal-cluster');
+  if (clusterEl) {
+    const count = SIGNALS.filter(x => x.cluster === s.cluster).length;
+    clusterEl.textContent = sanitize(s.cluster) + ' · ' + count + ' сигнал' + ruPlural(count, '', 'а', 'ов');
+  }
+  bridge.style.display = 'block';
 }
 
 // ── CHARTS ──

@@ -4,14 +4,14 @@
     "narrative": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — в то время как впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "takeaway": "Впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "strength": "strong",
-    "confidence": 0.753,
+    "confidence": 0.742,
     "phase": "active",
-    "score": 149,
+    "score": 147,
     "signal_count": 18,
     "anchor_signal_id": "STR-2026-0701-002",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'в то время как'; confidence: 0.75; signals_used: 18; ignored_duplicates: ['STR-2026-0623-002', 'STR-2026-0706-003', 'STR-2026-0709-001']",
+    "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: active; bridge: 'в то время как'; confidence: 0.74; signals_used: 18; ignored_duplicates: ['STR-2026-0623-002', 'STR-2026-0706-003', 'STR-2026-0709-001']",
     "signals_used": [
       "STR-2026-0626-001",
       "STR-2026-0701-002",
@@ -19,8 +19,8 @@
       "STR-2026-0624-003",
       "STR-2026-0623-003",
       "STR-2026-0714-001",
-      "STR-2026-0712-001",
       "STR-2026-0709-002",
+      "STR-2026-0712-001",
       "STR-2026-0708-001",
       "STR-2026-0706-002",
       "STR-2026-0702-001",
@@ -37,9 +37,9 @@
       "STR-2026-0706-003",
       "STR-2026-0709-001"
     ],
-    "generated_at": "2026-07-19T20:11:54.395906+00:00",
+    "generated_at": "2026-07-20T03:31:15.448279+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260719_201154"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260720_033115"
   },
   "strategy_model_stress": {
     "tension": "Рынок BTC-обеспеченного кредита пережил первый стресс-тест и продолжает расти vs сам стресс-тест показал, что leverage превращает продукты 'стабильного дохода' в источник волатильности — уязвимость никуда не делась",
@@ -56,7 +56,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-19T20:11:54.399105+00:00"
+      "detected_at": "2026-07-20T03:31:15.451644+00:00"
     },
     "rationale": "Tension from STR-2026-0716-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.70; signals_used: 15; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -80,29 +80,29 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-19T20:11:54.399238+00:00",
+    "generated_at": "2026-07-20T03:31:15.451750+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260719_201154"
+    "synthesis_id": "synthesis_strategy_model_stress_20260720_033115"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
     "narrative": "Конфигурация декабря 2022 повторяется: массовая капитуляция розницы при сохраняющемся институциональном спросе — при этом базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "takeaway": "Базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "strength": "strong",
-    "confidence": 0.939,
+    "confidence": 0.924,
     "phase": "active",
-    "score": 121,
+    "score": 119,
     "signal_count": 12,
     "anchor_signal_id": "NAR-2026-0628-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: active; bridge: 'при этом'; confidence: 0.94; signals_used: 12; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
+    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: active; bridge: 'при этом'; confidence: 0.92; signals_used: 12; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
     "signals_used": [
       "NAR-2026-0628-001",
       "STR-2026-0622-005",
       "STR-2026-0619-001",
-      "STR-2026-0623-005",
       "MAC-2026-0618-001",
+      "STR-2026-0623-005",
       "STR-2026-0616-001",
       "MAC-2026-0624-001",
       "NAR-2026-0627-001",
@@ -115,9 +115,9 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-19T20:11:54.401271+00:00",
+    "generated_at": "2026-07-20T03:31:15.453733+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260719_201154"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260720_033115"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -139,23 +139,23 @@
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-19T20:11:54.403068+00:00",
+    "generated_at": "2026-07-20T03:31:15.455376+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260719_201154"
+    "synthesis_id": "synthesis_supply_scarcity_20260720_033115"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
     "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — однако bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "takeaway": "Bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "strength": "strong",
-    "confidence": 0.663,
+    "confidence": 0.652,
     "phase": "active",
-    "score": 124,
+    "score": 122,
     "signal_count": 17,
     "anchor_signal_id": "INF-2026-0609-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'однако'; confidence: 0.66; signals_used: 17; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0609-001 (contradicts: 2, weight: primary); partA from INF-2026-0625-001; phase: active; bridge: 'однако'; confidence: 0.65; signals_used: 17; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0609-001",
       "INF-2026-0625-001",
@@ -163,11 +163,11 @@
       "INF-2026-0709-001",
       "INF-2026-0715-001",
       "INF-2026-0706-001",
-      "INF-2026-0624-001",
       "INF-2026-0629-001",
       "STR-2026-0622-006",
-      "INF-2026-0623-001",
+      "INF-2026-0624-001",
       "INF-2026-0621-001",
+      "INF-2026-0623-001",
       "NAR-2026-0626-001",
       "INF-2026-0623-002",
       "INF-2026-0618-001",
@@ -176,9 +176,9 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-19T20:11:54.405152+00:00",
+    "generated_at": "2026-07-20T03:31:15.457306+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260719_201154"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260720_033115"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -198,8 +198,29 @@
       "NAR-2026-0715-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-19T20:11:54.406712+00:00",
+    "generated_at": "2026-07-20T03:31:15.458816+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260719_201154"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260720_033115"
+  },
+  "bitcoin_governance_debate": {
+    "tension": "Крупнейший институциональный держатель BTC публично требует не трогать консенсус ради борьбы со спамом vs фактическая поддержка BIP-110 майнерами — всего ~1%, то есть предложение не имеет шанса пройти в текущем виде",
+    "narrative": "Институциональный лагерь Bitcoin впервые формализует явную позицию по вопросу протокольного управления как таковому: снижение порога консенсусной активации (95%→55%) само по себе — прецедентный риск независимо от исхода конкретного BIP — институциональные держатели теперь публично защищают neutrality механизма изменения правил, не только сами правила — в условиях институциональный лагерь Bitcoin впервые формализует явную позицию по вопросу протокольного управления как таковому: снижение порога консенсусной активации (95%→55%) само по себе — прецедентный риск независимо от исхода конкретного BIP — институциональные держатели теперь публично защищают neutrality механизма изменения правил, не только сами правила",
+    "takeaway": "",
+    "strength": "moderate",
+    "confidence": 0.291,
+    "phase": "structural",
+    "score": 8,
+    "signal_count": 1,
+    "anchor_signal_id": "NAR-2026-0711-001",
+    "phase_changed": false,
+    "structural_change": {},
+    "rationale": "Tension from NAR-2026-0711-001 (contradicts: 0, weight: primary); partA from NAR-2026-0711-001; phase: structural; bridge: 'в условиях'; confidence: 0.29; signals_used: 1; ignored_duplicates: []",
+    "signals_used": [
+      "NAR-2026-0711-001"
+    ],
+    "signals_ignored": [],
+    "generated_at": "2026-07-20T03:31:15.459804+00:00",
+    "algorithm_version": "2.1.1",
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260720_033115"
   }
 }

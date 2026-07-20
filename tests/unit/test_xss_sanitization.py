@@ -388,6 +388,7 @@ SANITIZE_RATCHET_BASELINE = {
     "score.tension": 1,
     "score.total": 2,
     "score.weight": 1,
+    "sorted.length": 1,
     "v.pct": 2,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,

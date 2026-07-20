@@ -48,14 +48,14 @@
     "strategy.btc_holdings": {
       "value": 843775,
       "unit": "BTC",
-      "as_of": "2026-07-12",
-      "signal_id": "STR-2026-0713-001"
+      "as_of": "2026-07-19",
+      "signal_id": "STR-2026-0720-001"
     },
     "strategy.usd_reserve": {
-      "value": 3000000000,
+      "value": 3225000000,
       "unit": "USD",
-      "as_of": "2026-07-12",
-      "signal_id": "STR-2026-0713-001"
+      "as_of": "2026-07-19",
+      "signal_id": "STR-2026-0720-001"
     },
     "strive.btc_holdings": {
       "value": 19882,

@@ -37,9 +37,9 @@
       "STR-2026-0706-003",
       "STR-2026-0709-001"
     ],
-    "generated_at": "2026-07-20T03:31:15.448279+00:00",
+    "generated_at": "2026-07-20T18:00:29.828429+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260720_033115"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260720_180029"
   },
   "strategy_model_stress": {
     "tension": "Рынок BTC-обеспеченного кредита пережил первый стресс-тест и продолжает расти vs сам стресс-тест показал, что leverage превращает продукты 'стабильного дохода' в источник волатильности — уязвимость никуда не делась",
@@ -56,7 +56,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-20T03:31:15.451644+00:00"
+      "detected_at": "2026-07-20T18:00:29.831752+00:00"
     },
     "rationale": "Tension from STR-2026-0716-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.70; signals_used: 15; ignored_duplicates: ['STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -80,9 +80,9 @@
       "STR-2026-0622-007",
       "STR-2026-0622-003"
     ],
-    "generated_at": "2026-07-20T03:31:15.451750+00:00",
+    "generated_at": "2026-07-20T18:00:29.831877+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260720_033115"
+    "synthesis_id": "synthesis_strategy_model_stress_20260720_180029"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -115,33 +115,34 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "generated_at": "2026-07-20T03:31:15.453733+00:00",
+    "generated_at": "2026-07-20T18:00:29.834134+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260720_033115"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260720_180029"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
-    "narrative": "Ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float — несмотря на то что ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float",
+    "narrative": "Ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float — вопреки тому что ликвидное предложение BTC достигло структурного минимума: убеждённые держатели поглощают давление продавцов и не выходят — следующее ускорение спроса встретит сжатый float",
     "takeaway": "",
     "strength": "strong",
-    "confidence": 0.795,
+    "confidence": 0.818,
     "phase": "tension",
-    "score": 35,
-    "signal_count": 4,
+    "score": 45,
+    "signal_count": 5,
     "anchor_signal_id": "SUP-2026-0625-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from SUP-2026-0625-001 (contradicts: 2, weight: onchain); partA from SUP-2026-0625-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.80; signals_used: 4; ignored_duplicates: []",
+    "rationale": "Tension from SUP-2026-0625-001 (contradicts: 2, weight: onchain); partA from SUP-2026-0625-001; phase: tension; bridge: 'вопреки тому что'; confidence: 0.82; signals_used: 5; ignored_duplicates: []",
     "signals_used": [
       "SUP-2026-0625-001",
+      "SUP-2026-0719-001",
       "SUP-2026-0702-001",
       "SUP-2026-0629-001",
       "SUP-2026-0622-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-20T03:31:15.455376+00:00",
+    "generated_at": "2026-07-20T18:00:29.835962+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260720_033115"
+    "synthesis_id": "synthesis_supply_scarcity_20260720_180029"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -176,9 +177,9 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-20T03:31:15.457306+00:00",
+    "generated_at": "2026-07-20T18:00:29.838196+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260720_033115"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260720_180029"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -198,9 +199,9 @@
       "NAR-2026-0715-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-20T03:31:15.458816+00:00",
+    "generated_at": "2026-07-20T18:00:29.839866+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260720_033115"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260720_180029"
   },
   "bitcoin_governance_debate": {
     "tension": "Крупнейший институциональный держатель BTC публично требует не трогать консенсус ради борьбы со спамом vs фактическая поддержка BIP-110 майнерами — всего ~1%, то есть предложение не имеет шанса пройти в текущем виде",
@@ -219,8 +220,8 @@
       "NAR-2026-0711-001"
     ],
     "signals_ignored": [],
-    "generated_at": "2026-07-20T03:31:15.459804+00:00",
+    "generated_at": "2026-07-20T18:00:29.841193+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_bitcoin_governance_debate_20260720_033115"
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260720_180029"
   }
 }

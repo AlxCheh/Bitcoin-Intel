@@ -55,6 +55,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Тот же фикс, что в deploy.yml/build-facts.yml (2026-07-19):
+          # закрыть устаревшие незамерженные sync-PR перед созданием нового —
+          # иначе они виснут навсегда из-за strict required_status_checks.
+          # См. подробный комментарий в deploy.yml/synthesize.
+          for old_pr in $(gh pr list --state open --search "head:bot/sync-volume-" --json number --jq '.[] | .number'); do
+            echo "Закрываю устаревший sync-PR #$old_pr"
+            gh pr close "$old_pr" --delete-branch || true
+          done
+
           BRANCH="bot/sync-volume-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update daily BTC volume data"

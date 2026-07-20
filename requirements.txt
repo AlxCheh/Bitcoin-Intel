@@ -7,7 +7,7 @@
 # Development & Testing
 pytest>=9.1.1,<10.0.0
 pytest-cov>=5.0.0,<6.0.0         # Coverage measurement (Sprint 0 / GH Issue #77)
-hypothesis>=6.155.7,<7.0.0       # Property-based testing (T06)
+hypothesis>=6.157.1,<7.0.0       # Property-based testing (T06)
 flake8>=7.3.0,<8.0.0             # Линтер — критические ошибки в CI (IRB-B2)
 jsonschema>=4.26.0,<5.0.0         # Contract Tests против schemas/*.json (IRP v1 Wave 2 / REM-B3)
 

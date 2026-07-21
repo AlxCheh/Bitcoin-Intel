@@ -39,6 +39,7 @@ from config.settings import (
     FRESHNESS_SCORE, WEIGHT_SCORE, ROLE_SCORE, CONTRADICTION_BONUS,
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
     SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH, RELATIONSHIPS_PATH,
+    ENTITIES_PATH,
     LEGACY_LINKS_ENABLED, ENCODING, JSON_ENSURE_ASCII, DATE_FORMAT,
     ERROR_EXIT_CODES, NULL_DEFAULTS,
 )
@@ -183,6 +184,35 @@ def _load_contradicts_map() -> dict:
     return contradicts_map
 
 
+def _load_signal_entity_map() -> dict:
+    """
+    Строит {signal_id: entity_id} из ENTITIES.json.entities[].signal_refs[].
+
+    Фаза A плана entity-aware усилений синтезатора (2026-07-20, эксперимент на
+    btc_treasury_competition). Используется deduplicate_signals() для более
+    точного ключа дедупликации в мульти-акторных кластерах — см. докстринг
+    deduplicate_signals() для полного обоснования.
+
+    Вызывается ОДИН РАЗ в main() и передаётся в synthesize_cluster() как
+    параметр — §17: synthesize_cluster() не читает файлы сам, тот же паттерн,
+    что _load_contradicts_map(). DEGRADE GRACEFULLY: файл отсутствует/повреждён
+    → safe_read_json возвращает {}, map пустой — дедупликация продолжает
+    работать по старому ключу (actor) для всех сигналов, не падает.
+
+    Сигнал, не упомянутый ни в одной сущности (агрегатные сигналы вроде
+    «Топ-100 компаний», не про одну конкретную компанию), в map не попадает —
+    deduplicate_signals() для него использует actor как раньше.
+    """
+    raw = safe_read_json(ENTITIES_PATH, default={})
+    entities = raw.get("entities", []) if isinstance(raw, dict) else raw
+    signal_entity_map: dict = {}
+    for entity in entities:
+        entity_id = entity.get("id", "")
+        for sid in entity.get("signal_refs", []):
+            signal_entity_map[sid] = entity_id
+    return signal_entity_map
+
+
 def _get_contradicts(signal: dict, contradicts_map: dict) -> list:
     """
     Возвращает id сигналов, с которыми signal противоречит.
@@ -298,22 +328,44 @@ def _capitalize(text: str) -> str:
     return text[0].upper() + text[1:]
 
 
-def deduplicate_signals(signals: list[dict]) -> tuple[list[dict], list[str]]:
+def deduplicate_signals(
+    signals: list[dict],
+    signal_entity_map: Optional[dict] = None,
+) -> tuple[list[dict], list[str]]:
     """
     §16: Удаляет дублирующие сигналы перед синтезом.
-    Дубликат = одинаковый (date, actor, cluster, dir).
+    Дубликат = одинаковый (date, entity_or_actor, cluster, dir).
+
+    Фаза A плана entity-aware усилений (2026-07-20). Раньше ключ был
+    (date, actor, cluster, dir) — слишком груб для мульти-акторного кластера:
+    в btc_treasury_competition (9+ компаний, все actor='corporate') это ложно
+    схлопывало сигналы РАЗНЫХ компаний в один день в "дубликаты" и роняло их
+    из синтеза. Подтверждено на реальных данных: 3 пары сигналов о разных
+    компаниях (Strive/H100, OranjeBTC/Strive, Q2-агрегат/CRYL) ошибочно
+    считались дублями только из-за совпадения date+actor+dir.
+
+    signal_entity_map (опционально, {signal_id: entity_id} из
+    _load_signal_entity_map(), §17 — передаётся вызывающим, не читается
+    здесь) уточняет ключ до конкретной сущности там, где сигнал с ней связан.
+    Сигнал без записи в map (агрегатные сигналы не про одну компанию, либо
+    map не передан вовсе — None по умолчанию) использует actor как раньше —
+    100% обратная совместимость для однокомпонентных кластеров и для любого
+    вызова без нового параметра.
+
     Из группы оставляет сигнал с наибольшим weight_score.
 
     Returns:
         (deduplicated, ignored_ids)
     """
+    signal_entity_map = signal_entity_map or {}
     seen:        dict[tuple, dict] = {}
     ignored_ids: list[str]         = []
 
     for signal in signals:
+        entity_or_actor = signal_entity_map.get(signal.get("id", ""), signal.get("actor", ""))
         key = (
             signal.get("date", ""),
-            signal.get("actor", ""),
+            entity_or_actor,
             signal.get("cluster", ""),
             signal.get("dir", ""),
         )
@@ -437,14 +489,15 @@ def synthesize_cluster(
     signals:            list[dict],
     previous_synthesis: Optional[dict] = None,   # §17: передаётся снаружи
     contradicts_map:    Optional[dict] = None,    # §17: передаётся снаружи, см. _load_contradicts_map()
+    signal_entity_map:  Optional[dict] = None,    # §17: передаётся снаружи, см. _load_signal_entity_map()
 ) -> SynthesisResult:
     """
     12-шаговый алгоритм синтеза нарратива для кластера.
 
-    §17: previous_synthesis и contradicts_map передаются как параметры —
-    synthesizer не читает файлы сам. Это гарантирует соблюдение архитектурного
-    контракта: Delivery Context не записывает, Synthesis Context не читает
-    файлы напрямую.
+    §17: previous_synthesis, contradicts_map и signal_entity_map передаются
+    как параметры — synthesizer не читает файлы сам. Это гарантирует
+    соблюдение архитектурного контракта: Delivery Context не записывает,
+    Synthesis Context не читает файлы напрямую.
 
     Args:
         cluster_key:        ключ кластера
@@ -453,6 +506,11 @@ def synthesize_cluster(
         contradicts_map:    dict {signal_id: {ids противоречий}} из
                              relationships.json или None → {} (загружает caller
                              через _load_contradicts_map(), см. main())
+        signal_entity_map:  dict {signal_id: entity_id} из ENTITIES.json или
+                             None → {} (загружает caller через
+                             _load_signal_entity_map(), см. main()) — Фаза A
+                             плана entity-aware усилений, уточняет ключ
+                             дедупликации в мульти-акторных кластерах
 
     Raises:
         EmptyClusterError: если нет активных сигналов в окне WINDOW_DAYS_DEFAULT
@@ -466,7 +524,7 @@ def synthesize_cluster(
     )
 
     # §16: Дедупликация перед синтезом
-    signals, ignored_ids = deduplicate_signals(signals)
+    signals, ignored_ids = deduplicate_signals(signals, signal_entity_map)
 
     # ШАГ 1: Фильтрация по окну и статусу
     # DEGRADE GRACEFULLY: corrupt signal → skip + WARNING
@@ -719,6 +777,8 @@ def main() -> None:
 
     # §17: загружаем relationships вне synthesize_cluster(), один раз на весь прогон
     contradicts_map = _load_contradicts_map()
+    # §17: то же для карты сущностей — Фаза A плана entity-aware усилений
+    signal_entity_map = _load_signal_entity_map()
 
     for cluster_key, signals in clusters.items():
         try:
@@ -729,6 +789,7 @@ def main() -> None:
                 cluster_key, signals,
                 previous_synthesis=previous,
                 contradicts_map=contradicts_map,
+                signal_entity_map=signal_entity_map,
             )
 
             # Сохранить в synthesis_store/

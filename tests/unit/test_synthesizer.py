@@ -205,3 +205,143 @@ def test_get_contradicts_result_is_sorted_deterministic(monkeypatch):
 
     assert result == sorted(result), "Должен быть отсортирован для детерминизма"
     assert result == ["B-1", "M-1", "Z-1"]
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Фаза A плана entity-aware усилений (2026-07-20) — эксперимент на кластере
+# btc_treasury_competition (21 сигнал, см. обсуждение в чате).
+#
+# Ключ дедупликации (date, actor, cluster, dir) слишком груб для кластера
+# с несколькими компаниями одного actor-типа ('corporate') — реально ронял
+# 3 пары РАЗНЫХ сигналов о РАЗНЫХ компаниях как "дубликаты" только из-за
+# совпадения даты+actor+dir. Тесты ниже используют настоящие ID из
+# signals.json/ENTITIES.json (не синтетику) — прямая проверка, что находка
+# действительно устранена, а не только теоретически.
+# ═══════════════════════════════════════════════════════════════════════
+
+def test_deduplicate_signals_entity_map_prevents_real_false_positives(tmp_path, monkeypatch):
+    """
+    Три пары сигналов из btc_treasury_competition, ранее ложно
+    схлопывавшиеся как "дубликаты" (см. rationale synthesis_cache.json на
+    момент находки: ignored_duplicates содержал все три вторых элемента пар
+    ниже). Настоящие ID сигналов, ENTITIES.json собран здесь же во временной
+    директории (isolated_environment из conftest.py делает CWD временным для
+    КАЖДОГО теста и кладёт пустой ENTITIES.json — читать реальный файл
+    репозитория из теста нельзя, см. докстринг conftest.py). С
+    signal_entity_map, построенной из этого файла, все 6 сигналов выживают.
+    """
+    import json as json_module
+    from scripts.synthesizer import deduplicate_signals, _load_signal_entity_map
+
+    entities = {"entities": [
+        {"id": "strive",    "signal_refs": ["STR-2026-0623-002", "STR-2026-0706-003"]},
+        {"id": "oranjebtc", "signal_refs": ["STR-2026-0706-002"]},
+        {"id": "cryl",      "signal_refs": ["STR-2026-0709-002"]},
+        # STR-2026-0624-001 (H100) и STR-2026-0709-001 (агрегат Q2) намеренно
+        # НЕ упомянуты — воспроизводит реальный случай: не каждый сигнал
+        # привязан к сущности, такие используют фолбэк на actor.
+    ]}
+    (tmp_path / "ENTITIES.json").write_text(
+        json_module.dumps(entities, ensure_ascii=False), encoding="utf-8"
+    )
+
+    signal_entity_map = _load_signal_entity_map()
+
+    def sig(id_, date, dir_="pos"):
+        return {"id": id_, "date": date, "actor": "corporate",
+                "cluster": "btc_treasury_competition", "dir": dir_, "weight": "primary"}
+
+    signals = [
+        sig("STR-2026-0623-002", "2026-06-23"),  # Strive
+        sig("STR-2026-0624-001", "2026-06-23"),  # H100 (не в ENTITIES.json — фолбэк на actor)
+        sig("STR-2026-0706-002", "2026-07-06"),  # OranjeBTC
+        sig("STR-2026-0706-003", "2026-07-06"),  # Strive
+        sig("STR-2026-0709-001", "2026-07-09"),  # агрегат Q2 (не привязан к 1 компании)
+        sig("STR-2026-0709-002", "2026-07-09"),  # CRYL
+    ]
+
+    deduped, ignored = deduplicate_signals(signals, signal_entity_map)
+
+    assert ignored == [], f"Ложные дубликаты всё ещё возникают: {ignored}"
+    assert len(deduped) == 6
+    assert {s["id"] for s in deduped} == {s["id"] for s in signals}
+
+
+def test_deduplicate_signals_still_collapses_true_duplicate_same_entity():
+    """
+    Фикс не должен ослаблять защиту: два сигнала ОДНОЙ сущности, та же
+    дата+dir — по-прежнему считаются дублями (это и есть настоящий дубль,
+    ровно то, для чего механизм создавался изначально).
+    """
+    from scripts.synthesizer import deduplicate_signals
+
+    signal_entity_map = {"SIG-A": "strive", "SIG-B": "strive"}
+    signals = [
+        {"id": "SIG-A", "date": "2026-07-01", "actor": "corporate",
+         "cluster": "btc_treasury_competition", "dir": "pos", "weight": "media"},
+        {"id": "SIG-B", "date": "2026-07-01", "actor": "corporate",
+         "cluster": "btc_treasury_competition", "dir": "pos", "weight": "primary"},
+    ]
+
+    deduped, ignored = deduplicate_signals(signals, signal_entity_map)
+
+    assert ignored == ["SIG-A"], "SIG-A (media, ниже весом) должен быть выброшен как дубль SIG-B (primary)"
+    assert len(deduped) == 1
+    assert deduped[0]["id"] == "SIG-B"
+
+
+def test_deduplicate_signals_backward_compatible_default_none():
+    """
+    Вызов без signal_entity_map (или с None) — прежнее поведение 1-в-1:
+    ключ по actor, как до Фазы A. Обратная совместимость для любого
+    существующего вызова без нового параметра.
+    """
+    from scripts.synthesizer import deduplicate_signals
+
+    signals = [
+        {"id": "SIG-A", "date": "2026-07-01", "actor": "corporate",
+         "cluster": "btc_treasury_competition", "dir": "pos", "weight": "media"},
+        {"id": "SIG-B", "date": "2026-07-01", "actor": "corporate",
+         "cluster": "btc_treasury_competition", "dir": "pos", "weight": "primary"},
+    ]
+
+    deduped_default, ignored_default = deduplicate_signals(signals)
+    deduped_none,    ignored_none    = deduplicate_signals(signals, None)
+
+    assert ignored_default == ["SIG-A"] == ignored_none
+    assert len(deduped_default) == 1 == len(deduped_none)
+
+
+def test_load_signal_entity_map_builds_correctly_from_entities_json(tmp_path):
+    """
+    _load_signal_entity_map() строит {signal_id: entity_id} корректно.
+    ENTITIES.json собран здесь же во временной директории (см. докстринг
+    conftest.py — реальный файл репозитория тестам недоступен по дизайну,
+    isolated_environment всегда подставляет пустой placeholder).
+    """
+    import json as json_module
+    from scripts.synthesizer import _load_signal_entity_map
+
+    entities = {"entities": [
+        {"id": "oranjebtc", "signal_refs": ["STR-2026-0706-002"]},
+        {"id": "cryl",      "signal_refs": ["STR-2026-0709-002", "STR-2026-0715-002"]},
+    ]}
+    (tmp_path / "ENTITIES.json").write_text(
+        json_module.dumps(entities, ensure_ascii=False), encoding="utf-8"
+    )
+
+    m = _load_signal_entity_map()
+    assert isinstance(m, dict)
+    assert len(m) == 3
+    assert m.get("STR-2026-0706-002") == "oranjebtc"
+    assert m.get("STR-2026-0709-002") == "cryl"
+    assert m.get("STR-2026-0715-002") == "cryl"
+
+
+def test_load_signal_entity_map_degrades_gracefully_on_missing_file(monkeypatch, tmp_path):
+    """DEGRADE GRACEFULLY: несуществующий путь → пустой dict, не исключение."""
+    import scripts.synthesizer as synthesizer_module
+
+    monkeypatch.setattr(synthesizer_module, "ENTITIES_PATH", str(tmp_path / "nope.json"))
+    m = synthesizer_module._load_signal_entity_map()
+    assert m == {}

@@ -39,6 +39,7 @@ from config.settings import (
     FRESHNESS_SCORE, WEIGHT_SCORE, ROLE_SCORE, CONTRADICTION_BONUS,
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
     MULTI_ENTITY_THRESHOLD, MINORITY_ANCHOR_SHARE,
+    COMPLICATION_DOMINANCE_RATIO,
     SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH, RELATIONSHIPS_PATH,
     ENTITIES_PATH,
     LEGACY_LINKS_ENABLED, ENCODING, JSON_ENSURE_ASCII, DATE_FORMAT,
@@ -311,14 +312,33 @@ def _rank_signals(signals: list[dict], contradicts_map: dict) -> list[tuple[dict
 
 
 def _detect_phase(signals: list[dict]) -> str:
-    """ШАГ 3: определяет фазу кластера по распределению narrative_role."""
+    """
+    ШАГ 3: определяет фазу кластера по распределению narrative_role.
+
+    Фаза C плана entity-aware усилений (2026-07-20). До этой правки условие
+    "trigger>0 И complication>0 → active" срабатывало независимо от
+    СООТНОШЕНИЯ — кластер с 5 trigger/15 complication читался неотличимо
+    от кластера с 1 trigger/1 complication, хотя первый явно "утяжелился"
+    осложнениями. Добавлена проверка: если complication перевешивает
+    trigger в COMPLICATION_DOMINANCE_RATIO раз и более — фаза "tension",
+    даже при наличии хотя бы одного trigger. Resolution по-прежнему
+    побеждает безусловно и первым — эта проверка её не касается.
+
+    Порог — измеримое свойство распределения ролей внутри кластера, не
+    имя кластера — работает одинаково для любого кластера, который в
+    будущем накопит похожий перевес.
+    """
     roles  = [s.get("narrative_role", "background") for s in signals]
     counts = {r: roles.count(r) for r in set(roles)}
     if counts.get("resolution", 0) > 0:
         return "resolution"
-    if counts.get("trigger", 0) > 0 and counts.get("complication", 0) > 0:
+    trigger_count      = counts.get("trigger", 0)
+    complication_count = counts.get("complication", 0)
+    if trigger_count > 0 and complication_count > 0:
+        if complication_count >= COMPLICATION_DOMINANCE_RATIO * trigger_count:
+            return "tension"
         return "active"
-    if counts.get("complication", 0) > counts.get("trigger", 0):
+    if complication_count > trigger_count:
         return "tension"
     return "structural"
 

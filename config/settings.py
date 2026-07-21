@@ -137,6 +137,15 @@ SCORE_STRONG   = 12   # strong
 SCORE_MODERATE =  6   # moderate
 # ниже SCORE_MODERATE → weak
 
+# ─── Фаза C плана entity-aware усилений (2026-07-20) ────────────────────────
+# Найдено на эксперименте: _detect_phase() при ЛЮБОМ trigger>0 И complication>0
+# безусловно возвращает "active", независимо от соотношения — кластер с
+# 5 trigger/15 complication (btc_treasury_competition, реальные данные)
+# читается неотличимо от кластера с 1 trigger/1 complication. Порог ниже —
+# явное соотношение "во сколько раз complication должен перевесить trigger,
+# чтобы считать кластер утяжелившимся осложнениями, а не просто активным".
+COMPLICATION_DOMINANCE_RATIO = 3   # complication >= 3x trigger → phase="tension", не "active"
+
 def get_strength(score_total: int) -> str:
     if score_total >= SCORE_STRONG:
         return "strong"

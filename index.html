@@ -2135,12 +2135,6 @@ header {
       </div>
       <div id="mstr-body" class="instrument-body">
 
-        <div class="instrument-stat-grid">
-          <div class="instrument-stat"><div class="instrument-stat-label">ТИП</div><div class="instrument-stat-val">Обыкновенная акция</div></div>
-          <div class="instrument-stat"><div class="instrument-stat-label">BTC-РЕЗЕРВ</div><div class="instrument-stat-val" style="color:var(--btc)"><span data-fact-key="strategy.btc_holdings">847 363</span> BTC</div></div>
-          <div class="instrument-stat"><div class="instrument-stat-label">NAV-СТАТУС</div><div class="instrument-stat-val" style="color:var(--red)">Дисконт 0.83×</div></div>
-        </div>
-
         <div class="instrument-text">
           MSTR — обыкновенная акция Strategy (бывш. MicroStrategy). Фактически работает как инструмент BTC-экспозиции с левереджем: компания конвертирует привлечённый капитал в биткоин и держит его на балансе. Стоит ниже STRC в капитальной структуре — при ликвидации держатели MSTR получают выплаты после привилегированных акционеров.
         </div>
@@ -2318,15 +2312,10 @@ header {
           <div><div class="instrument-stat-strip-label">ОБЕСПЕЧЕНИЕ</div><div class="instrument-stat-strip-val" style="color:var(--btc)">4–5× BTC</div></div>
           <div><div class="instrument-stat-strip-label">ДИВИДЕНДЫ</div><div class="instrument-stat-strip-val" style="color:var(--txt)">$1,2 млрд/год</div></div>
           <div><div class="instrument-stat-strip-label">СТАТУС</div><div class="instrument-stat-strip-val" style="color:var(--red)">Ниже номинала</div></div>
+          <div><div class="instrument-stat-strip-label">USD-РЕЗЕРВ</div><div class="instrument-stat-strip-val" data-fact-key="strategy.usd_reserve" data-fact-format="usd_b" style="color:var(--txt)">$1,4 млрд</div></div>
         </div>
       </div>
       <div id="strc-body" class="instrument-body">
-
-        <div class="instrument-stat-grid">
-          <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">ТИП</div><div class="instrument-stat-val">Вечная привилегированная акция</div></div>
-          <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">ОБЕСПЕЧЕНИЕ</div><div class="instrument-stat-val" style="color:var(--btc)">BTC-резерв 4–5×</div></div>
-          <div class="instrument-stat" style="min-width:120px"><div class="instrument-stat-label">USD-РЕЗЕРВ</div><div class="instrument-stat-val" data-fact-key="strategy.usd_reserve" data-fact-format="usd_b">$1,4 млрд</div></div>
-        </div>
 
         <div class="instrument-text">
           STRC — гибридный инструмент между корпоративной облигацией и BTC-экспозицией. Выпускается Strategy для привлечения капитала без прямой продажи биткоина. Держатели получают переменный дивиденд и приоритет перед обычными акционерами при выплатах. Дивиденды кумулятивные — пропущенные нельзя просто отменить.
@@ -2348,11 +2337,9 @@ header {
 
         <div class="instrument-label">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
         <div class="instrument-badges">
-          <span class="instrument-badge dim">BTC-резерв: <span data-fact-key="strategy.btc_holdings">847 363</span> BTC</span>
-          <span class="instrument-badge dim">USD-резерв: <span data-fact-key="strategy.usd_reserve" data-fact-format="usd_b">$1,4 млрд</span></span>
+          <span class="instrument-badge dim">BTC-резерв компании: <span data-fact-key="strategy.btc_holdings">847 363</span> BTC</span>
           <span class="instrument-badge dim">Покрытие: ~32 мес.</span>
           <span class="instrument-badge red">Ниже номинала: $84–87 (июнь 2026)</span>
-          <span class="instrument-badge dim">Дивиденды: $1,2 млрд/год</span>
         </div>
 
       </div>

@@ -38,6 +38,7 @@ from config.settings import (
     get_strength,
     FRESHNESS_SCORE, WEIGHT_SCORE, ROLE_SCORE, CONTRADICTION_BONUS,
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
+    MULTI_ENTITY_THRESHOLD, MINORITY_ANCHOR_SHARE,
     SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH, RELATIONSHIPS_PATH,
     ENTITIES_PATH,
     LEGACY_LINKS_ENABLED, ENCODING, JSON_ENSURE_ASCII, DATE_FORMAT,
@@ -130,6 +131,11 @@ class SynthesisResult:
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
     algorithm_version: str   = ALGORITHM_VERSION
+    # Фаза B плана entity-aware усилений (2026-07-20) — чисто диагностические
+    # поля, не меняют tension/anchor/narrative. См. _compute_entity_diversity().
+    entity_count:        int   = 0
+    anchor_entity_share: float = 1.0
+    is_minority_anchor:  bool  = False
 
 
 # ─── Вспомогательные ──────────────────────────────────────────────────────────
@@ -211,6 +217,41 @@ def _load_signal_entity_map() -> dict:
         for sid in entity.get("signal_refs", []):
             signal_entity_map[sid] = entity_id
     return signal_entity_map
+
+
+def _compute_entity_diversity(
+    active_signals: list[dict],
+    anchor_id: str,
+    signal_entity_map: dict,
+) -> tuple[int, float]:
+    """
+    Фаза B плана entity-aware усилений (2026-07-20). Только измерение —
+    не влияет на выбор tension/anchor/narrative (это осталось в Шаге 6,
+    не тронуто). Использует ту же identity-логику, что deduplicate_signals()
+    (Фаза A): entity_id из signal_entity_map, фолбэк на actor.
+
+    Returns:
+        (entity_count, anchor_entity_share)
+        entity_count — число уникальных identity среди active_signals
+        anchor_entity_share — доля active_signals с той же identity, что anchor
+    """
+    def identity(s: dict) -> str:
+        return signal_entity_map.get(s.get("id", ""), s.get("actor", ""))
+
+    identities = [identity(s) for s in active_signals]
+    entity_count = len(set(identities))
+
+    if not active_signals:
+        return entity_count, 1.0
+
+    anchor_signal = next((s for s in active_signals if s.get("id") == anchor_id), None)
+    if anchor_signal is None:
+        return entity_count, 1.0
+
+    anchor_identity = identity(anchor_signal)
+    matching = sum(1 for ident in identities if ident == anchor_identity)
+    anchor_entity_share = matching / len(active_signals)
+    return entity_count, anchor_entity_share
 
 
 def _get_contradicts(signal: dict, contradicts_map: dict) -> list:
@@ -517,6 +558,7 @@ def synthesize_cluster(
     """
     if contradicts_map is None:
         contradicts_map = {}
+    signal_entity_map = signal_entity_map or {}
 
     logger.debug(
         f"Synthesizing cluster '{cluster_key}' ({len(signals)} signals)",
@@ -656,6 +698,17 @@ def synthesize_cluster(
     # ШАГ 12: Rationale
     anchor_id  = (tension_source or anchor_trigger).get("id", "?")
     anchor_obj = tension_source or anchor_trigger
+
+    # Фаза B: диагностика периферийности anchor — только измерение, не влияет
+    # ни на что выше (tension/anchor уже выбраны на Шаге 6, не переопределяются)
+    entity_count, anchor_entity_share = _compute_entity_diversity(
+        active_signals, anchor_id, signal_entity_map
+    )
+    is_minority_anchor = (
+        entity_count >= MULTI_ENTITY_THRESHOLD
+        and anchor_entity_share < MINORITY_ANCHOR_SHARE
+    )
+
     rationale  = (
         f"Tension from {anchor_id} "
         f"(contradicts: {len(_get_contradicts(anchor_obj, contradicts_map))}, "
@@ -691,6 +744,9 @@ def synthesize_cluster(
         signals_used=signals_used,
         signals_ignored=ignored_ids,
         uncertainty=uncertainty,
+        entity_count=entity_count,
+        anchor_entity_share=anchor_entity_share,
+        is_minority_anchor=is_minority_anchor,
     )
 
 
@@ -742,6 +798,9 @@ def _save_synthesis(cluster_key: str, result: SynthesisResult,
         "signals_used":     result.signals_used,
         "signals_ignored":  result.signals_ignored,
         "uncertainty":      result.uncertainty,
+        "entity_count":        result.entity_count,
+        "anchor_entity_share": round(result.anchor_entity_share, 3),
+        "is_minority_anchor":  result.is_minority_anchor,
         "generated_at":     result.generated_at,
         "algorithm_version":result.algorithm_version,
     }
@@ -819,6 +878,9 @@ def main() -> None:
                 "rationale":        result.rationale,
                 "signals_used":     result.signals_used,
                 "signals_ignored":  result.signals_ignored,
+                "entity_count":        result.entity_count,
+                "anchor_entity_share": round(result.anchor_entity_share, 3),
+                "is_minority_anchor":  result.is_minority_anchor,
                 "generated_at":     result.generated_at,
                 "algorithm_version":result.algorithm_version,
                 "synthesis_id":     synthesis_id,

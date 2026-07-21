@@ -345,3 +345,110 @@ def test_load_signal_entity_map_degrades_gracefully_on_missing_file(monkeypatch,
     monkeypatch.setattr(synthesizer_module, "ENTITIES_PATH", str(tmp_path / "nope.json"))
     m = synthesizer_module._load_signal_entity_map()
     assert m == {}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Фаза B плана entity-aware усилений (2026-07-20) — диагностика периферийности
+# anchor. Только измерение, НЕ меняет выбор tension/anchor/narrative (Шаг 6
+# не тронут). Пороги (MULTI_ENTITY_THRESHOLD, MINORITY_ANCHOR_SHARE) —
+# измеримые свойства кластера, не имя конкретного кластера.
+#
+# Синтетические, но структурно верные данные (не полный реальный датасет —
+# тесты не должны зависеть от того, как signals.json выглядит сегодня;
+# реальные production-числа проверены отдельно, вручную, при реализации —
+# см. commit message): 13 уникальных сущностей / anchor_entity_share≈0.095
+# для btc_treasury_competition, 2 сущности для strategy_model_stress.
+# ═══════════════════════════════════════════════════════════════════════
+
+def _minimal_signal(id_, date, narrative_role, dir_="pos", contradicts=None):
+    return {
+        "id": id_, "date": date, "cat": "ownership", "catLabel": "🏛️",
+        "dir": dir_, "horizon": "mid", "theme": "institutionalization",
+        "weight": "primary", "actor": "corporate", "flow": "neutral",
+        "signal": f"тестовый сигнал {id_}", "data": [], "context": "", "caveat": "",
+        "narrative_role": narrative_role,
+        "tension": f"tension от {id_}" if narrative_role != "background" else "",
+        "macro_implication": f"macro implication сигнала {id_}. Второе предложение.",
+        "cluster": "test_multi_entity_cluster",
+        "links": {"confirms": [], "contradicts": contradicts or [], "context_chain": []},
+    }
+
+
+def test_synthesize_cluster_flags_minority_anchor_for_multi_entity_cluster():
+    """
+    Мульти-акторный кластер (6 уникальных сущностей — выше порога 5): один
+    сигнал ("minority") побеждает как anchor по MAX(contradicts), но
+    представляет только 1 из 6 сигналов (~0.17... ниже уточним под 0.15) —
+    is_minority_anchor должен сработать.
+    """
+    from scripts.synthesizer import synthesize_cluster
+
+    signals = [
+        _minimal_signal("SIG-MINORITY", "2026-07-01", "complication"),
+        _minimal_signal("SIG-B", "2026-07-02", "trigger"),
+        _minimal_signal("SIG-C", "2026-07-03", "complication"),
+        _minimal_signal("SIG-D", "2026-07-04", "complication"),
+        _minimal_signal("SIG-E", "2026-07-05", "complication"),
+        _minimal_signal("SIG-F", "2026-07-06", "complication"),
+        _minimal_signal("SIG-G", "2026-07-07", "complication"),  # 7 сигналов, 1 minority
+    ]
+    signal_entity_map = {
+        "SIG-MINORITY": "entity_minority",
+        "SIG-B": "entity_b", "SIG-C": "entity_c", "SIG-D": "entity_d",
+        "SIG-E": "entity_e", "SIG-F": "entity_f", "SIG-G": "entity_g",
+    }
+    # LEGACY_LINKS_ENABLED=False в этой среде — контрадикты берутся из
+    # contradicts_map (путь relationships.json), links.contradicts в самом
+    # сигнале не используется. Передаём явно, чтобы SIG-MINORITY реально
+    # выиграл MAX(contradicts) на Шаге 6, как задумано тестом.
+    contradicts_map = {"SIG-MINORITY": {"SIG-B", "SIG-C", "SIG-D"}}
+
+    result = synthesize_cluster(
+        "test_multi_entity_cluster", signals,
+        contradicts_map=contradicts_map,
+        signal_entity_map=signal_entity_map,
+    )
+
+    assert result.entity_count == 7
+    assert result.anchor_signal_id == "SIG-MINORITY"
+    assert result.anchor_entity_share == pytest.approx(1 / 7, abs=0.01)
+    assert result.is_minority_anchor is True
+
+
+def test_synthesize_cluster_no_minority_flag_below_entity_threshold():
+    """
+    Кластер с 2 уникальными сущностями (ниже порога 5, как реальный
+    strategy_model_stress) — is_minority_anchor структурно не может быть
+    True, даже если anchor представляет меньшинство сигналов.
+    """
+    from scripts.synthesizer import synthesize_cluster
+
+    signals = [
+        _minimal_signal("SIG-1", "2026-07-01", "complication", contradicts=["SIG-2"]),
+        _minimal_signal("SIG-2", "2026-07-02", "trigger"),
+        _minimal_signal("SIG-3", "2026-07-03", "complication"),
+    ]
+    signal_entity_map = {"SIG-1": "entity_a", "SIG-2": "entity_a", "SIG-3": "entity_b"}
+
+    result = synthesize_cluster(
+        "test_multi_entity_cluster", signals,
+        signal_entity_map=signal_entity_map,
+    )
+
+    assert result.entity_count == 2
+    assert result.is_minority_anchor is False
+
+
+def test_synthesize_cluster_entity_fields_default_safely_without_map():
+    """Без signal_entity_map (None) — фолбэк на actor, поля не падают."""
+    from scripts.synthesizer import synthesize_cluster
+
+    signals = [
+        _minimal_signal("SIG-1", "2026-07-01", "trigger"),
+        _minimal_signal("SIG-2", "2026-07-02", "complication"),
+    ]
+    result = synthesize_cluster("test_multi_entity_cluster", signals)
+
+    assert result.entity_count == 1  # оба actor='corporate' — фолбэк схлопывает в одну identity
+    assert result.is_minority_anchor is False
+    assert 0.0 <= result.anchor_entity_share <= 1.0

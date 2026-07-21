@@ -452,3 +452,61 @@ def test_synthesize_cluster_entity_fields_default_safely_without_map():
     assert result.entity_count == 1  # оба actor='corporate' — фолбэк схлопывает в одну identity
     assert result.is_minority_anchor is False
     assert 0.0 <= result.anchor_entity_share <= 1.0
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Фаза C плана entity-aware усилений (2026-07-20) — гранулярность phase.
+#
+# До этой правки "trigger>0 И complication>0 → active" срабатывало
+# независимо от соотношения. Найдено на реальных данных: btc_treasury_
+# competition (5 trigger / 15 complication, ratio=3.0) и
+# etf_institutional_flow (3/9, ratio=3.0) читались как generic "active",
+# неотличимо от свежего сбалансированного кластера. COMPLICATION_DOMINANCE_
+# RATIO=3 — граница "во сколько раз должно перевесить, чтобы считать
+# кластер утяжелившимся осложнениями".
+# ═══════════════════════════════════════════════════════════════════════
+
+def _roles(*role_list):
+    return [{"narrative_role": r} for r in role_list]
+
+
+def test_detect_phase_tension_when_complications_dominate_at_exact_threshold():
+    """Ровно на границе (complication == RATIO × trigger) — уже 'tension', не 'active' (>=, не >)."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("trigger", "complication", "complication", "complication")  # 1:3, ratio=3.0
+    assert _detect_phase(signals) == "tension"
+
+
+def test_detect_phase_active_when_ratio_below_threshold():
+    """Ниже порога (ratio=2) — прежнее поведение 'active' сохранено, не задето."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("trigger", "complication", "complication")  # 1:2, ratio=2.0
+    assert _detect_phase(signals) == "active"
+
+
+def test_detect_phase_active_when_balanced_one_to_one():
+    """1 trigger : 1 complication — классический 'active', не должно было измениться."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("trigger", "complication")
+    assert _detect_phase(signals) == "active"
+
+
+def test_detect_phase_resolution_wins_regardless_of_dominance_ratio():
+    """Resolution побеждает безусловно и первым — Фаза C её не касается."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("trigger", "complication", "complication", "complication", "resolution")
+    assert _detect_phase(signals) == "resolution"
+
+
+def test_detect_phase_tension_with_zero_triggers_unaffected():
+    """Ветка 'complication > trigger при trigger=0' — уже существовала, не тронута Фазой C."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("complication", "complication")
+    assert _detect_phase(signals) == "tension"
+
+
+def test_detect_phase_structural_when_no_complications_or_triggers():
+    """Только background — 'structural', не тронуто Фазой C."""
+    from scripts.synthesizer import _detect_phase
+    signals = _roles("background", "background")
+    assert _detect_phase(signals) == "structural"

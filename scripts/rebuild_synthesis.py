@@ -43,6 +43,7 @@ def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict:
     """
     from scripts.synthesizer import (
         synthesize_cluster, _load_contradicts_map, _load_signal_entity_map,
+        _find_cross_cluster_entities,
     )
 
     raw     = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
@@ -161,6 +162,14 @@ def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict:
           f"{stats['errors']} ошибок")
 
     if apply:
+        # ADR-017: top-level ключ, считается на ПОЛНОМ signals (до
+        # cluster_filter) — даже если --cluster ограничивает пересчёт одним
+        # кластером, кросс-кластерная картина обязана оставаться полной,
+        # иначе --apply --cluster X молча обнулил бы отчёт для остальных.
+        cross_cluster = _find_cross_cluster_entities(signals, signal_entity_map)
+        new_cache["_cross_cluster_entities"] = {
+            eid: sorted(cs) for eid, cs in cross_cluster.items()
+        }
         atomic_write_json_safe(SYNTHESIS_CACHE_PATH, new_cache)
         print(f"\n✓ synthesis_cache.json обновлён ({len(new_cache)} кластеров)")
         print("  Рекомендуется: проверить сайт и утвердить изменения")

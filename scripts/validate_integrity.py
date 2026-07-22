@@ -106,13 +106,17 @@ def validate() -> bool:
     if cache_path.exists():
         try:
             cache = json.loads(cache_path.read_text(encoding="utf-8"))
-            no_tension = [k for k, v in cache.items() if not v.get("tension")]
+            # ADR-017: ключи с ведущим "_" — top-level метаданные (напр.
+            # _cross_cluster_entities), не per-cluster записи; у них нет
+            # и не должно быть "tension" — не считаем их кластерами.
+            cluster_entries = {k: v for k, v in cache.items() if not k.startswith("_")}
+            no_tension = [k for k, v in cluster_entries.items() if not v.get("tension")]
             if no_tension:
                 warnings.append(
                     f"synthesis_cache.json: clusters without tension: {no_tension}"
                 )
             chk = sha256_file(cache_path)
-            print(f"✓ synthesis_cache.json: {len(cache)} clusters | "
+            print(f"✓ synthesis_cache.json: {len(cluster_entries)} clusters | "
                   f"sha256: {chk[:16]}…")
         except Exception as e:
             errors.append(f"synthesis_cache.json: {e}")

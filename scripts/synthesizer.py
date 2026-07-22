@@ -40,6 +40,7 @@ from config.settings import (
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
     MULTI_ENTITY_THRESHOLD, MINORITY_ANCHOR_SHARE,
     COMPLICATION_DOMINANCE_RATIO,
+    CROSS_CLUSTER_PRIMARY_MIN_SIGNALS, CROSS_CLUSTER_SECONDARY_MIN_SIGNALS,
     SIGNALS_PATH, SYNTHESIS_CACHE_PATH, SYNTHESIS_STORE_PATH, RELATIONSHIPS_PATH,
     ENTITIES_PATH,
     LEGACY_LINKS_ENABLED, ENCODING, JSON_ENSURE_ASCII, DATE_FORMAT,
@@ -253,6 +254,73 @@ def _compute_entity_diversity(
     matching = sum(1 for ident in identities if ident == anchor_identity)
     anchor_entity_share = matching / len(active_signals)
     return entity_count, anchor_entity_share
+
+
+def _find_cross_cluster_entities(
+    all_signals: list[dict],
+    signal_entity_map: dict,
+    primary_min: int = CROSS_CLUSTER_PRIMARY_MIN_SIGNALS,
+    secondary_min: int = CROSS_CLUSTER_SECONDARY_MIN_SIGNALS,
+) -> dict[str, set[str]]:
+    """
+    ADR-017 / находка 3 плана entity-aware усилений (2026-07-20/22). Только
+    измерение — вызывается СНАРУЖИ synthesize_cluster(), после того как все
+    кластеры уже синтезированы независимо (контракт §17, docs/NIES.md, не
+    нарушается: ни один кластер не узнаёт о существовании других изнутри
+    своего синтеза). Не меняет выбор tension/anchor/narrative ни в одном
+    кластере.
+
+    Находит сущности с общей центральностью сразу для >= 2 независимых
+    нарративов, которую сейчас никто не фиксирует (подтверждённый случай:
+    'strategy' в strategy_model_stress И bitcoin_governance_debate).
+
+    ПОРОГ — асимметричный (Вариант 2, ADR-017 amendment 2026-07-22).
+    Изначальный план требовал >= primary_min сигналов В КАЖДОМ из >= 2
+    кластеров — но реальный мотивирующий случай ('strategy': 16 сигналов
+    в strategy_model_stress, 1 в bitcoin_governance_debate через
+    NAR-2026-0711-001) сам не проходит симметричный порог. Отсекать
+    находку порогом, введённым ради неё же, — внутреннее противоречие.
+    Асимметрия: сущность должна встречаться в >= 2 разных кластерах
+    (secondary_min сигналов достаточно для учёта присутствия), и хотя бы
+    в ОДНОМ из них иметь весомое присутствие (>= primary_min) — так
+    отсекается случай "1 сигнал и там, и там" (шумное совпадение), но не
+    отсекается "много в одном, один вскользь в другом" (реальный кейс).
+
+    Args:
+        all_signals: ПОЛНЫЙ список сигналов (не отфильтрованный по одному
+            кластеру) — иначе кросс-кластерность физически не обнаружить.
+        signal_entity_map: {signal_id: entity_id} из _load_signal_entity_map(),
+            та же идентичность, что использует Фаза A/B.
+        primary_min: минимум сигналов хотя бы в одном кластере (весомое
+            присутствие, не разовое упоминание).
+        secondary_min: минимум сигналов, чтобы засчитать присутствие
+            сущности в остальных кластерах отчёта.
+
+    Returns:
+        {entity_id: {кластеры, где у сущности >= secondary_min сигналов}}
+        — только для сущностей, у которых таких кластеров >= 2 И хотя бы
+        один из них проходит primary_min. Сигналы без entity_id (не в
+        signal_entity_map — агрегатные сигналы) не участвуют, тот же
+        фолбэк-принцип, что в остальных Фазах.
+    """
+    entity_cluster_counts: dict[str, dict[str, int]] = {}
+    for s in all_signals:
+        eid = signal_entity_map.get(s.get("id", ""))
+        cluster = s.get("cluster")
+        if not eid or not cluster:
+            continue
+        counts = entity_cluster_counts.setdefault(eid, {})
+        counts[cluster] = counts.get(cluster, 0) + 1
+
+    result: dict[str, set[str]] = {}
+    for eid, counts in entity_cluster_counts.items():
+        present = {c for c, n in counts.items() if n >= secondary_min}
+        if len(present) < 2:
+            continue
+        if not any(counts[c] >= primary_min for c in present):
+            continue
+        result[eid] = present
+    return result
 
 
 def _get_contradicts(signal: dict, contradicts_map: dict) -> list:
@@ -934,6 +1002,14 @@ def main() -> None:
             failed += 1
 
     # Записать synthesis_cache.json
+    # ADR-017: top-level ключ, не per-cluster — про отношение между
+    # кластерами, а не свойство одного. Считается на ПОЛНОМ all_signals,
+    # не на отфильтрованном подмножестве.
+    cross_cluster = _find_cross_cluster_entities(all_signals, signal_entity_map)
+    results["_cross_cluster_entities"] = {
+        eid: sorted(clusters) for eid, clusters in cross_cluster.items()
+    }
+
     os.makedirs(os.path.dirname(SYNTHESIS_CACHE_PATH), exist_ok=True)
     atomic_write_json_safe(SYNTHESIS_CACHE_PATH, results)
 

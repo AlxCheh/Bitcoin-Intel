@@ -41,12 +41,22 @@ def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict:
 
     Возвращает статистику: {total, changed, unchanged, errors}
     """
-    from scripts.synthesizer import synthesize_cluster
+    from scripts.synthesizer import (
+        synthesize_cluster, _load_contradicts_map, _load_signal_entity_map,
+    )
 
     raw     = safe_read_json(SIGNALS_PATH, default=[], raise_on_corrupt=True)
     signals = raw.get("signals", raw) if isinstance(raw, dict) else raw
 
     old_cache = safe_read_json(SYNTHESIS_CACHE_PATH, default={})
+
+    # §17: загружаем те же карты, что main() — иначе синтез здесь слеп к
+    # реальным contradicts-связям (relationships.json) и к entity-identity
+    # (ENTITIES.json), и dry-run диф врёт о том, что реально изменится.
+    # Обнаружено 2026-07-22: без них anchor/tension расходится с продом в
+    # 5 из 7 живых кластеров, не только количеством сигналов.
+    contradicts_map   = _load_contradicts_map()
+    signal_entity_map = _load_signal_entity_map()
 
     # Группировка по кластерам
     clusters: dict[str, list] = {}
@@ -75,7 +85,11 @@ def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict:
             old = old_cache.get(cluster_key, {})
 
             # Новый синтез с текущим алгоритмом
-            result = synthesize_cluster(cluster_key, cluster_signals)
+            result = synthesize_cluster(
+                cluster_key, cluster_signals,
+                contradicts_map=contradicts_map,
+                signal_entity_map=signal_entity_map,
+            )
 
             new = {
                 "tension":          result.tension,
@@ -88,6 +102,9 @@ def rebuild(cluster_filter: str | None = None, apply: bool = False) -> dict:
                 "signal_count":     result.signal_count,
                 "anchor_signal_id": result.anchor_signal_id,
                 "uncertainty":      result.uncertainty,
+                "entity_count":        result.entity_count,
+                "anchor_entity_share": round(result.anchor_entity_share, 3),
+                "is_minority_anchor":  result.is_minority_anchor,
                 "generated_at":     datetime.now(timezone.utc).isoformat(),
             }
 

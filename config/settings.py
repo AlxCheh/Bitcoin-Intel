@@ -54,7 +54,7 @@ def calculate_max_possible_score(n: int) -> int:
     return max(n * MAX_PER_SIGNAL, 1)  # минимум 1 — защита от деления на ноль
 
 def calculate_confidence(score_total: int, n_signals: int,
-                          has_contradicts: bool, all_stale: bool,
+                          contradicts_share: float, all_stale: bool,
                           has_tension: bool) -> float:
     """
     Нормализованная уверенность синтеза [0.1, 1.0].
@@ -62,12 +62,35 @@ def calculate_confidence(score_total: int, n_signals: int,
     Параметры:
         score_total    — суммарный score кластера
         n_signals      — число сигналов в кластере
-        has_contradicts — есть ли хоть один сигнал с непустым contradicts
+        contradicts_share — доля сигналов кластера с хотя бы одним
+                            contradicts-сигналом (0.0-1.0)
         all_stale      — все сигналы старше 30 дней
         has_tension    — у победителя есть tension (не fallback)
 
-    >>> calculate_confidence(55, 5, True, False, True)  # идеальный случай
+    >>> calculate_confidence(55, 5, 1.0, False, True)  # идеальный случай
     1.0
+
+    НАХОДКА (2026-07-21, продолжение entity-aware экспериментов): было
+    has_contradicts: bool — "есть хоть один сигнал с contradicts или нет".
+    Реальные данные показали разброс от 0% (leverage_deleveraging_cycle) до
+    54% (etf_institutional_flow) сигналов кластера с contradicts-связями —
+    бинарный флаг не различал кластер с 1 связью из 5 и кластер с 7 из 13,
+    хотя разница в фактической перекрёстной подтверждённости огромна.
+
+    ОТЛИЧИЕ ОТ ADR-011 (docs/ADR-011-confidence-calibration-deferred.md,
+    2026-06-30 — важно прочитать перед повторным изменением этой функции):
+    та комиссия отклонила КАЛИБРОВКУ КОЭФФициентов формулы (0.8/0.7/0.6/0.5)
+    под данные — на выборке 5-8 кластеров это было бы подгонкой под шум.
+    Это изменение — НЕ калибровка коэффициентов: границы 0.8 (было at
+    has_contradicts=False) и 1.0 (было at has_contradicts=True) сохранены
+    буквально теми же, что уже были приняты и не пересчитаны заново —
+    меняется только ВХОДНАЯ переменная (с бинарной на непрерывную долю),
+    линейно интерполируя между уже существующими границами. Ни одно новое
+    число не введено и не подобрано под текущие данные. См. также
+    scripts/quality_report.py — счётчик MIN_SYNTHESES_FOR_CALIBRATION
+    (порог калибровки коэффициентов) этим изменением не затронут и не
+    закрыт — это разные вопросы: ЧТО формула получает на вход (это
+    изменение) vs КАКИЕ веса она использует (по-прежнему ждёт 30 синтезов).
     """
     max_score = calculate_max_possible_score(n_signals)
     if max_score == 0:
@@ -78,8 +101,7 @@ def calculate_confidence(score_total: int, n_signals: int,
     # Снижающие модификаторы
     if n_signals == 1:
         raw *= 0.5
-    if not has_contradicts:
-        raw *= 0.8
+    raw *= (0.8 + 0.2 * contradicts_share)   # было: if not has_contradicts: raw *= 0.8
     if all_stale:
         raw *= 0.7
     if not has_tension:

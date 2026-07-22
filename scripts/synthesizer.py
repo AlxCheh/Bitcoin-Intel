@@ -688,7 +688,13 @@ def synthesize_cluster(
     # ШАГ 11: Confidence
     all_scores   = [sc for _, sc in ranked]
     total_score  = sum(sc.total for sc in all_scores)
-    has_contradicts = any(_get_contradicts(s, contradicts_map) for s in active_signals)
+    # Находка 2026-07-21: было has_contradicts=any(...) — бинарный флаг не
+    # различал кластер с 1 contradicts-связью из 5 и с 7 из 13 сигналов.
+    # См. обоснование отличия от ADR-011 в докстринге calculate_confidence().
+    contradicts_share = (
+        sum(1 for s in active_signals if _get_contradicts(s, contradicts_map)) / len(active_signals)
+        if active_signals else 0.0
+    )
     all_stale    = all(
         _age_days(s.get("date", "2000-01-01")) > STALE_THRESHOLD
         for s in active_signals
@@ -696,7 +702,7 @@ def synthesize_cluster(
     confidence = calculate_confidence(
         score_total=total_score,
         n_signals=len(active_signals),
-        has_contradicts=has_contradicts,
+        contradicts_share=contradicts_share,
         all_stale=all_stale,
         has_tension=bool(tension_source),
     )

@@ -106,6 +106,11 @@ def main() -> None:
         print(f"✗ Не удалось прочитать входные файлы: {e}")
         sys.exit(2)
 
+    # ADR-017: ключи с ведущим "_" — top-level метаданные (напр.
+    # _cross_cluster_entities), не per-cluster записи synthesis — у них нет
+    # generated_at по определению, не считаем это проблемой freshness.
+    cache = {k: v for k, v in cache.items() if not k.startswith("_")}
+
     staleness_problems = check_absolute_staleness(cache, args.stale_days)
     desync_problems = check_signal_cache_desync(signals, cache)
     all_problems = staleness_problems + desync_problems

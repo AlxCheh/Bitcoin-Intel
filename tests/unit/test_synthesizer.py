@@ -76,21 +76,21 @@ def test_confidence_always_in_range():
 
 def test_confidence_higher_with_contradicts():
     """Кластер с contradicts получает выше confidence."""
-    with_c = calculate_confidence(20, 3, has_contradicts=True,  all_stale=False, has_tension=True)
-    without = calculate_confidence(20, 3, has_contradicts=False, all_stale=False, has_tension=True)
+    with_c = calculate_confidence(20, 3, contradicts_share=1.0, all_stale=False, has_tension=True)
+    without = calculate_confidence(20, 3, contradicts_share=0.0, all_stale=False, has_tension=True)
     assert with_c > without
 
 
 def test_confidence_lower_when_stale():
     """Устаревшие сигналы снижают confidence."""
-    fresh = calculate_confidence(20, 3, has_contradicts=True, all_stale=False, has_tension=True)
-    stale = calculate_confidence(20, 3, has_contradicts=True, all_stale=True,  has_tension=True)
+    fresh = calculate_confidence(20, 3, contradicts_share=1.0, all_stale=False, has_tension=True)
+    stale = calculate_confidence(20, 3, contradicts_share=1.0, all_stale=True,  has_tension=True)
     assert fresh > stale
 
 
 def test_confidence_minimum_floor():
     """Confidence не опускается ниже 0.1 даже при худших данных."""
-    result = calculate_confidence(0, 1, has_contradicts=False, all_stale=True, has_tension=False)
+    result = calculate_confidence(0, 1, contradicts_share=0.0, all_stale=True, has_tension=False)
     assert result >= 0.1
 
 

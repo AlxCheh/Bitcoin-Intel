@@ -1763,6 +1763,15 @@ header {
   line-height: 1.5;
   margin-bottom: 8px;
 }
+.dash-narrative-minority-anchor {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-style: italic;
+  color: var(--amber);
+  line-height: 1.4;
+  margin: -3px 0 8px;
+  cursor: help;
+}
 
 .dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
@@ -6069,6 +6078,24 @@ function renderDashboard() {
     return warnings;
   }
 
+  // N07 ARR v3: is_minority_anchor / entity_count / anchor_entity_share
+  // (Фаза B, scripts/synthesizer.py, 2026-07) считаются с момента слияния
+  // PR #399, но нигде не отображались на UI — читатель не мог отличить
+  // tension, за которым стоит большинство сущностей кластера, от tension,
+  // где победивший сигнал представляет лишь периферийную долю (напр.
+  // 2 сигнала из 21). Диагностика — не отбор: не меняет что показано как
+  // tension, только помечает его репрезентативность. Присутствует только
+  // когда синтез пришёл из Python-кеша (JS live-фоллбэк не считает
+  // entity-diversity, тот же паттерн что uncertainty выше) — поэтому ?.
+  // везде ниже, отсутствие поля не ошибка.
+  function buildMinorityAnchorWarning(synthesis) {
+    const s = synthesis || {};
+    if (!s.is_minority_anchor) return null;
+    const pct = Math.round((s.anchor_entity_share || 0) * 100);
+    return '⚠ Якорь — периферийная сущность: ' + pct + '% сигналов кластера'
+      + (s.entity_count ? ' (' + s.entity_count + ' сущностей всего)' : '');
+  }
+
   // Разворот карточки нарратива: список сигналов signals_used/signals_ignored,
   // каждый id кликабелен — переход во вкладку Дайджест + скролл к карточке
   // сигнала (переиспользует существующий pendingScrollSignal-паттерн, см.
@@ -6112,6 +6139,11 @@ function renderDashboard() {
     // отсутствие uncertainty ошибкой.
     const uncertainty = synthesis.uncertainty || {};
     const warnings = buildUncertaintyWarnings(uncertainty).map(sanitize);
+    const minorityWarning = buildMinorityAnchorWarning(synthesis);
+    const minorityWarningHtml = minorityWarning
+      ? '<div class="dash-narrative-minority-anchor" title="Победивший tension определяется по числу contradicts-связей одного сигнала, не по доле сущностей в кластере — см. CLAUDE.md, раздел Нарративный синтез">'
+        + sanitize(minorityWarning) + '</div>'
+      : '';
 
     const item = document.createElement('div');
     item.className = 'dash-narrative-item ' + dirCls;
@@ -6134,6 +6166,7 @@ function renderDashboard() {
       + '</div>'
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
       + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightEntities(tension) + '</div>' : '')
+      + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
       + '<div class="dash-sum-counts" style="margin:5px 0">'

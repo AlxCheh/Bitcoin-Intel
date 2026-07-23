@@ -3738,14 +3738,28 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <!-- HASHRATE CHART (расширен строкой сетевых метрик из бывшей "Метрики сети") -->
+    <!-- HASHRATE CHART (расширен строкой сетевых метрик из бывшей "Метрики сети")
+         Редизайн 2026-07-23: Chart.js bar-график заменён на SVG-график того
+         же оформления, что "Сложность сети" (градиентная заливка, линия
+         var(--btc), точка на последнем значении, без осей/грида Chart.js) —
+         по прямому запросу привести к единому визуальному языку графиков.
+         Линия здесь ПЛАВНАЯ (не ступенчатая, как diff-chart): точки —
+         помесячные средние, данные по природе непрерывны, а не скачут
+         дискретно раз в ретаргет — ступень исказила бы это так же, как
+         прежняя сглаженная линия искажала сложность (см. комментарий
+         у diff-chart выше). -->
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Хешрейт сети</span>
         <span class="chart-meta" id="hashrate-chart-meta">EH/s · 3 ГОДА</span>
       </div>
-      <div class="chart-inner">
-        <canvas id="hashrateChart" height="160"></canvas>
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em" id="hashrate-chart-caption">ИСТОРИЯ · —</span>
+          <span class="chart-meta">EH/s</span>
+        </div>
+        <svg id="hashrateChart" width="100%" viewBox="0 0 600 100" preserveAspectRatio="none" style="display:block"></svg>
+        <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="hashrate-chart-labels"></div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)">
         <div style="padding:10px 8px;border-right:1px solid var(--line);text-align:center">
@@ -7395,9 +7409,11 @@ async function fetchRemainingSupply() {
 // не входит в сам механизм, но той же природы баг — статичный массив,
 // который никто не обновлял).
 async function fetchHashrateHistory() {
-  const canvas = document.getElementById('hashrateChart');
+  const svg    = document.getElementById('hashrateChart');
   const meta   = document.getElementById('hashrate-chart-meta');
-  if (!canvas) return;
+  const capEl  = document.getElementById('hashrate-chart-caption');
+  const labelsEl = document.getElementById('hashrate-chart-labels');
+  if (!svg) return;
   try {
     const res = await fetch('https://mempool.space/api/v1/mining/hashrate/3y');
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -7406,51 +7422,54 @@ async function fetchHashrateHistory() {
     if (!points.length) throw new Error('empty hashrates');
 
     // Сырые данные — примерно ежедневные за 3 года; агрегируем по месяцам,
-    // иначе на баре не поместится и не читается.
+    // иначе на графике не поместится и не читается.
     const monthly = {};
     points.forEach(p => {
       const d = new Date(p.timestamp * 1000);
       const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-      if (!monthly[key]) monthly[key] = { sum: 0, n: 0 };
+      if (!monthly[key]) monthly[key] = { sum: 0, n: 0, ts: p.timestamp * 1000 };
       monthly[key].sum += p.avgHashrate;
       monthly[key].n += 1;
     });
     const labels = Object.keys(monthly).sort();
     const values = labels.map(k => (monthly[k].sum / monthly[k].n) / 1e18); // H/s → EH/s
+    const n = values.length;
 
     if (meta) meta.textContent = 'EH/s · ' + labels[0].slice(2).replace('-', '/') +
       ' – ' + labels[labels.length - 1].slice(2).replace('-', '/');
+    if (capEl) capEl.textContent = 'ИСТОРИЯ · ' + n + ' МЕСЯЦ' + ruPlural(n, '', 'А', 'ЕВ');
 
-    const grid = 'rgba(26,31,42,1)';
-    const tick = '#7A8BA0';
-    const font = "'IBM Plex Mono', monospace";
-    new Chart(canvas.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: labels.map(l => l.slice(2).replace('-', '/')),
-        datasets: [{
-          data: values,
-          backgroundColor: 'rgba(247,147,26,0.65)',
-          borderColor: '#F7931A', borderWidth: 1, borderRadius: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#0C0F14', borderColor: '#1A1F2A', borderWidth: 1,
-            titleColor: tick, bodyColor: '#F7931A',
-            titleFont: { family: font, size: 10 }, bodyFont: { family: font, size: 11 },
-            callbacks: { label: ctx => ctx.parsed.y.toFixed(0) + ' EH/s' }
-          }
-        },
-        scales: {
-          x: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 10 }, maxTicksLimit: 12 } },
-          y: { grid: { color: grid }, ticks: { color: tick, font: { family: font, size: 11 }, callback: v => v + ' EH' } }
-        }
-      }
-    });
+    // ── SVG-график того же оформления, что diff-chart (Сложность сети):
+    // градиентная заливка + линия var(--btc) + точка на последнем значении,
+    // без осей/сетки/тултипов Chart.js. Линия плавная (не ступенчатая) —
+    // помесячное среднее непрерывно по природе, в отличие от сложности,
+    // которая меняется скачком на ретаргете.
+    const W = 600, H = 100, Pt = 6, Pb = 4;
+    const minV = Math.min(...values), maxV = Math.max(...values);
+    const range = maxV - minV || 1;
+    const pts = values.map((v, i) => ({
+      x: n > 1 ? (i / (n - 1)) * W : W / 2,
+      y: Pt + (1 - (v - minV) / range) * (H - Pt - Pb),
+    }));
+    const lineD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+    const areaD = lineD + ` L${W},${H} L0,${H} Z`;
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--btc)" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="var(--btc)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#hg)"/>
+      <path d="${lineD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="${pts[n-1].x.toFixed(1)}" cy="${pts[n-1].y.toFixed(1)}" r="3" fill="var(--btc)"/>
+    `;
+    if (labelsEl) {
+      const pickIdx = [0, Math.floor((n - 1) / 2), n - 1];
+      labelsEl.innerHTML = pickIdx.map(i =>
+        `<span style="font-size:10px;color:#7A8BA0">${labels[i].slice(2).replace('-', '/')}</span>`
+      ).join('');
+    }
   } catch (e) {
     if (meta) meta.textContent = 'ДАННЫЕ НЕДОСТУПНЫ';
     console.warn('fetchHashrateHistory:', e);

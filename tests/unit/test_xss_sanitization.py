@@ -390,6 +390,9 @@ SANITIZE_RATCHET_BASELINE = {
     "s.entity_count": 1,
     "score.weight": 1,
     "sorted.length": 1,
+    "(items.length - step)": 1,
+    "groupItems.length": 1,
+    "filteredCompact.length": 1,
     "v.pct": 2,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,
@@ -401,6 +404,8 @@ SANITIZE_RATCHET_BASELINE = {
     "d.label": 1,
     "flowMeta.icon": 1,
     "flowMeta.label": 1,
+    "link.label": 1,
+    "link.tab": 1,
     "meta.label": 1,
     "phaseInfo.border": 1,
     "phaseInfo.color": 2,
@@ -434,7 +439,7 @@ SANITIZE_RATCHET_BASELINE = {
     # был бы вреден (внёс бы &quot; в промпт)
     "s.event": 1,
     "t.key": 1,
-    "t.label": 2,
+    "t.label": 3,
     "t.note": 1,
     "tab.label": 1,
     "top100.as_of": 1,

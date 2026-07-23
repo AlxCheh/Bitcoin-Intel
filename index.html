@@ -532,6 +532,82 @@ header {
 .eco-archive .eco-list .eco-card { opacity: 0.65; }
 .eco-archive .eco-list .eco-card:hover { opacity: 1; }
 
+/* Редизайн 2026-07-23: группировка полных карточек по типу (A) +
+   компактные строки для corporate/fund/government (B из "два уровня") +
+   "показать ещё" (B из трёх добавок) — см. обсуждение в чате про раздутие
+   блока "Экосистема Bitcoin". Полные карточки остаются только для
+   l2/protocol/infrastructure/exchange — это единственно растущий, но
+   физически ограниченный (не как компании) пласт объектов. */
+.eco-group-head {
+  padding: 8px 14px 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--btc);
+  background: var(--bg2);
+  border-top: 1px solid rgba(247,147,26,0.2);
+}
+.eco-group-head:first-child { border-top: none; }
+
+.eco-show-more {
+  width: 100%;
+  padding: 8px 14px;
+  background: var(--bg3);
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+}
+.eco-show-more:hover { color: var(--btc); background: var(--bg2); }
+
+/* Компактная секция — corporate/fund/government: одна строка вместо
+   карточки, т.к. у companies уже есть детальная "Топ-100 держателей",
+   а у fund/government нет данных, оправдывающих полную карточку. */
+.eco-compact-section { border-top: 1px solid rgba(247,147,26,0.2); }
+.eco-compact-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.eco-compact-row:hover { background: var(--bg3); }
+.eco-compact-name {
+  flex: 1;
+  color: var(--txt);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.eco-compact-fact {
+  color: var(--slate);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.eco-compact-link {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--btc);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 2px 0;
+  white-space: nowrap;
+}
+.eco-compact-link:hover { text-decoration: underline; }
+
 /* ══════════════════════════════════
    REVENUE ENGINES
 ══════════════════════════════════ */
@@ -3439,7 +3515,7 @@ function toggleNav(id) {
 
     <div id="tech-toc"></div>
 
-    <div class="panel" style="margin-top:12px;scroll-margin-top:64px" id="eco-panel">
+    <div class="panel collapsed" style="margin-top:12px;scroll-margin-top:64px" id="eco-panel">
       <div class="panel-head collapsible" data-collapse-target="eco-panel">
         <span class="panel-title">Экосистема Bitcoin</span>
         <span class="panel-head-right"><span class="panel-tag" id="eco-count">—</span><span class="panel-collapse-arrow">▾</span></span>
@@ -3449,6 +3525,7 @@ function toggleNav(id) {
       </div>
       <div class="eco-tabs" id="eco-tabs"></div>
       <div class="eco-list" id="eco-list"></div>
+      <div class="eco-compact-section" id="eco-compact-section" style="display:none"></div>
       <details class="eco-archive" id="eco-archive">
         <summary class="eco-archive-summary">Архив <span id="eco-archive-count">(0)</span></summary>
         <div class="eco-list" id="eco-archive-list"></div>
@@ -4348,21 +4425,55 @@ function synthesizeNarrativeAdvanced(key, cl) {
 
 
 // ── ECOSYSTEM RENDER ──────────────────────────────────────────────────
+// Редизайн 2026-07-23 (обсуждение в чате: блок "стал неприлично большим
+// и неинформативным"). Решение в два уровня:
+//   1. Полная карточка — только l2/protocol/infrastructure/exchange.
+//      Это единственно растущий, но физически ограниченный пласт
+//      объектов (в отличие от компаний, реальных Bitcoin L2 и протоколов
+//      не бывает бесконечно много) — и группируется по типу (A).
+//   2. Компактная строка-ссылка — corporate/fund/government. У companies
+//      уже есть детальная "Топ-100 держателей" (BTC/%supply/mNAV) —
+//      полная карточка с одной строкой summary дублирует её беднее.
+//      У fund/government своего отдельного дома на сайте нет, но полная
+//      карточка для них избыточна не менее.
+// Плюс общий механизм "показать ещё N" (B) — применяется к любой секции
+// независимо от группировки, снимает проблему роста базы без решения
+// вопроса отбора (который остался открытым).
 const ECO_TYPES = [
   { key: 'all',            label: 'ВСЕ' },
   { key: 'l2',             label: 'L2' },
   { key: 'protocol',       label: 'ПРОТОКОЛЫ' },
   { key: 'infrastructure', label: 'ИНФРА' },
-  { key: 'corporate',      label: 'КОРП' },
-  { key: 'fund',           label: 'ФОНДЫ' },
   { key: 'exchange',       label: 'БИРЖИ' },
 ];
 
-const ECO_TYPE_LABEL = { l2: 'L2', protocol: 'PROTOCOL', corporate: 'CORP', fund: 'FUND', infrastructure: 'INFRA', exchange: 'EXCHANGE' };
+// Типы, уходящие в компактную секцию вместо полной карточки.
+const ECO_COMPACT_TYPES = new Set(['corporate', 'fund', 'government']);
+
+const ECO_TYPE_LABEL = {
+  l2: 'L2', protocol: 'PROTOCOL', infrastructure: 'INFRA', exchange: 'EXCHANGE',
+  corporate: 'CORP', fund: 'FUND', government: 'GOV',
+};
 const ECO_STATUS_LABEL = { active: 'ACTIVE', closed: 'CLOSED', pending: 'PENDING' };
+
+// Куда ведёт "→" в компактной строке. corporate → Топ-100 держателей
+// (детальные BTC/%supply/mNAV уже там). government → Структура владения
+// (там есть категория 'governments' в разбивке по типам держателей —
+// более релевантная цель, чем Топ-100, который строго про компании).
+// fund — целевой панели пока нет, ссылки нет (не придумываем несуществующее).
+const ECO_COMPACT_LINK = {
+  corporate:  { tab: 'holders', title: 'Топ-100 держателей BTC',         label: '→ Топ-100' },
+  government: { tab: 'holders', title: 'Структура владения · 2009–2026', label: '→ Структура владения' },
+};
+
+const ECO_GROUP_SHOW_MORE_STEP   = 6; // карточек на группу до кнопки "показать ещё"
+const ECO_COMPACT_SHOW_MORE_STEP = 8; // строк в компактной секции до кнопки
 
 let ecoFilter = 'all';
 let ecoSearch = '';
+// Какие секции сейчас полностью развёрнуты (ключ группы -> true). Сбрасывается
+// при смене таба, чтобы новый таб не наследовал случайно чужой expanded-стейт.
+let ecoExpandedGroups = new Set();
 
 function ecoCardHtml(e) {
   const metrics = (e.profile?.metrics || []).slice(0, 2);
@@ -4381,43 +4492,117 @@ function ecoCardHtml(e) {
     + '</div>';
 }
 
+// Компактная строка: имя + тип-бейдж + BTC-холдинги (если факт отслеживается
+// — через универсальный data-fact-key механизм, applyFactsToDOM() заполнит
+// сам, если факта нет — остаётся пустым, это не ошибка) + ссылка на детальную
+// панель, если применимо для этого типа.
+function ecoCompactRowHtml(e) {
+  const typeLabel = ECO_TYPE_LABEL[e.type] || sanitize(e.type).toUpperCase();
+  const link = ECO_COMPACT_LINK[e.type];
+  const linkTitleEscaped = link ? link.title.replace(/'/g, "\\'") : '';
+  return '<div class="eco-compact-row" data-entity-id="' + sanitize(e.id) + '">'
+    + '<span class="eco-badge">' + typeLabel + '</span>'
+    + '<span class="eco-compact-name">' + sanitize(e.name) + '</span>'
+    + '<span class="eco-compact-fact" data-fact-key="' + sanitize(e.id) + '.btc_holdings" data-fact-format="k"></span>'
+    + (e.status !== 'active' ? '<span class="eco-badge ' + sanitize(e.status) + '">' + (ECO_STATUS_LABEL[e.status] || sanitize(e.status)) + '</span>' : '')
+    + (link ? '<button class="eco-compact-link" onclick="siteMapGoTo(\'' + link.tab + '\',\'' + linkTitleEscaped + '\')">' + link.label + '</button>' : '')
+    + '</div>';
+}
+
 function ecoMatchesSearch(e, q) {
   if (!q) return true;
   return e.name.toLowerCase().includes(q) || (e.summary || '').toLowerCase().includes(q);
 }
 
+// Общий рендер секции (группа полных карточек ИЛИ компактный список) с
+// порогом "показать ещё". Поиск полностью отключает порог — не хотим,
+// чтобы явный поиск объекта упирался в лимит показа.
+function renderEcoSection(items, htmlFn, step, groupKey, hasSearch) {
+  const expanded = hasSearch || ecoExpandedGroups.has(groupKey);
+  const shown = expanded ? items : items.slice(0, step);
+  let html = shown.map(htmlFn).join('');
+  if (!expanded && items.length > step) {
+    html += '<button class="eco-show-more" data-eco-expand="' + groupKey + '">Показать ещё ' + (items.length - step) + '</button>';
+  }
+  return html;
+}
+
 function renderEcosystem() {
-  const tabsEl     = document.getElementById('eco-tabs');
-  const listEl     = document.getElementById('eco-list');
-  const countEl    = document.getElementById('eco-count');
-  const archiveEl  = document.getElementById('eco-archive');
-  const archiveList = document.getElementById('eco-archive-list');
-  const archiveCount = document.getElementById('eco-archive-count');
+  const tabsEl        = document.getElementById('eco-tabs');
+  const listEl        = document.getElementById('eco-list');
+  const compactWrap   = document.getElementById('eco-compact-section');
+  const countEl       = document.getElementById('eco-count');
+  const archiveEl     = document.getElementById('eco-archive');
+  const archiveList   = document.getElementById('eco-archive-list');
+  const archiveCount  = document.getElementById('eco-archive-count');
   if (!tabsEl || !listEl || !ENTITIES.length) return;
 
   const q = ecoSearch.trim().toLowerCase();
+  const hasSearch = !!q;
   const active = ENTITIES.filter(e => e.status !== 'closed');
   const closed = ENTITIES.filter(e => e.status === 'closed');
 
-  // Табы по типам считаем от активных сущностей — архив фильтр по типу не уважает
-  const presentTypes = new Set(active.map(e => e.type));
+  // Табы — только для полнокарточных типов; corporate/fund/government
+  // всегда в компактной секции, вне зависимости от выбранного таба.
+  const fullActive = active.filter(e => !ECO_COMPACT_TYPES.has(e.type));
+  const presentTypes = new Set(fullActive.map(e => e.type));
   const tabs = ECO_TYPES.filter(t => t.key === 'all' || presentTypes.has(t.key));
   tabsEl.innerHTML = tabs.map(t =>
     '<button class="eco-tab' + (ecoFilter === t.key ? ' active' : '') + '" data-eco-filter="' + t.key + '">' + t.label + '</button>'
   ).join('');
 
-  const filtered = active
+  const filteredFull = fullActive
     .filter(e => ecoFilter === 'all' || e.type === ecoFilter)
     .filter(e => ecoMatchesSearch(e, q))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
-  countEl.textContent = filtered.length + ' ' + ruPlural(filtered.length, 'ОБЪЕКТ', 'ОБЪЕКТА', 'ОБЪЕКТОВ');
+  // Компактная секция показывается только во вкладке "ВСЕ" — при выборе
+  // конкретного полнокарточного типа (L2/ПРОТОКОЛЫ/...) она не относится
+  // к делу и не показывается.
+  const filteredCompact = ecoFilter === 'all'
+    ? active.filter(e => ECO_COMPACT_TYPES.has(e.type)).filter(e => ecoMatchesSearch(e, q)).sort((a, b) => a.name.localeCompare(b.name, 'ru'))
+    : [];
 
-  listEl.innerHTML = filtered.length
-    ? filtered.map(ecoCardHtml).join('')
-    : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
+  const totalShown = filteredFull.length + filteredCompact.length;
+  countEl.textContent = totalShown + ' ' + ruPlural(totalShown, 'ОБЪЕКТ', 'ОБЪЕКТА', 'ОБЪЕКТОВ');
 
-  // Архив: все закрытые, только поиск, без фильтра по типу
+  // Группировка по типу (A) — только при "ВСЕ", где типы смешаны; для
+  // одного выбранного таба группировка избыточна (и так один тип).
+  let listHtml = '';
+  if (!filteredFull.length) {
+    listHtml = ecoFilter === 'all' && filteredCompact.length ? '' : '<div class="eco-empty">НЕТ ОБЪЕКТОВ</div>';
+  } else if (ecoFilter === 'all') {
+    ECO_TYPES.forEach(t => {
+      if (t.key === 'all') return;
+      const groupItems = filteredFull.filter(e => e.type === t.key);
+      if (!groupItems.length) return;
+      listHtml += '<div class="eco-group-head">' + t.label + ' · ' + groupItems.length + '</div>';
+      listHtml += renderEcoSection(groupItems, ecoCardHtml, ECO_GROUP_SHOW_MORE_STEP, 'full-' + t.key, hasSearch);
+    });
+  } else {
+    listHtml = renderEcoSection(filteredFull, ecoCardHtml, ECO_GROUP_SHOW_MORE_STEP, 'full-' + ecoFilter, hasSearch);
+  }
+  listEl.innerHTML = listHtml;
+
+  if (compactWrap) {
+    if (filteredCompact.length) {
+      compactWrap.innerHTML =
+        '<div class="eco-group-head">КОМПАНИИ · ФОНДЫ · ПРАВИТЕЛЬСТВА · ' + filteredCompact.length + '</div>'
+        + renderEcoSection(filteredCompact, ecoCompactRowHtml, ECO_COMPACT_SHOW_MORE_STEP, 'compact', hasSearch);
+      compactWrap.style.display = '';
+    } else {
+      compactWrap.innerHTML = '';
+      compactWrap.style.display = 'none';
+    }
+  }
+
+  // Спаны eco-compact-fact уже в DOM — заполняем сразу, если facts.json
+  // уже подъехал (idempotent, дёшево; не полагаемся на порядок вызова
+  // относительно fetchFacts() из loadSignals()).
+  applyFactsToDOM();
+
+  // Архив — без изменений в логике: закрытые объекты редки (сейчас 2),
+  // полная карточка независимо от типа, порог "показать ещё" не нужен.
   const filteredClosed = closed
     .filter(e => ecoMatchesSearch(e, q))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
@@ -4435,6 +4620,7 @@ function renderEcosystem() {
 
 function setEcoFilter(key) {
   ecoFilter = key;
+  ecoExpandedGroups.clear(); // новый таб не наследует чужой "показать ещё"
   renderEcosystem();
 }
 
@@ -4443,10 +4629,15 @@ function setEcoSearch(value) {
   renderEcosystem();
 }
 
-// Делегирование для eco-tabs
+// Делегирование для eco-tabs и "показать ещё"
 document.addEventListener('click', function(ev) {
   const tab = ev.target.closest('[data-eco-filter]');
-  if (tab) setEcoFilter(tab.getAttribute('data-eco-filter'));
+  if (tab) { setEcoFilter(tab.getAttribute('data-eco-filter')); return; }
+  const expandBtn = ev.target.closest('[data-eco-expand]');
+  if (expandBtn) {
+    ecoExpandedGroups.add(expandBtn.getAttribute('data-eco-expand'));
+    renderEcosystem();
+  }
 });
 
 // Живой поиск по экосистеме

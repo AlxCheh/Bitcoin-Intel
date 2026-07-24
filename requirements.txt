@@ -5,6 +5,7 @@
 # scripts/fetch_volume.py (карточка объёма торгов на сайте, GitHub Action
 # update-volume.yml), которому нужен HTTP-клиент для CoinGecko API.
 requests>=2.32.0,<3.0.0            # scripts/fetch_volume.py — CoinGecko market_chart
+scikit-learn>=1.5.0,<2.0.0          # scripts/find_similar_signals.py — TF-IDF (ADR-018, Фаза 1)
 
 # Development & Testing
 pytest>=9.1.1,<10.0.0

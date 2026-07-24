@@ -14,7 +14,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-07-24T21:44:40.540417+00:00"
+      "detected_at": "2026-07-24T22:26:06.778710+00:00"
     },
     "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: tension; bridge: 'что усугубляется тем что'; confidence: 0.61; signals_used: 21; ignored_duplicates: []",
     "signals_used": [
@@ -44,9 +44,9 @@
     "entity_count": 13,
     "anchor_entity_share": 0.095,
     "is_minority_anchor": true,
-    "generated_at": "2026-07-24T21:44:40.540637+00:00",
+    "generated_at": "2026-07-24T22:26:06.778926+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260724_214440"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260724_222606"
   },
   "strategy_model_stress": {
     "tension": "Резерв пополняется исключительно дилюцией акций (2-я неделя подряд, $225 млн целевым траншем) vs BTC-резерв остаётся неприкосновенным несмотря на то, что неделей ранее компания уже продавала BTC ради тех же обязательств — двухнедельная выборка закрывает открытый вопрос предшественника в пользу дилюции",
@@ -63,7 +63,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-24T21:44:40.543800+00:00"
+      "detected_at": "2026-07-24T22:26:06.782299+00:00"
     },
     "rationale": "Tension from STR-2026-0720-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.57; signals_used: 15; ignored_duplicates: ['STR-2026-0622-004', 'STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -91,9 +91,9 @@
     "entity_count": 2,
     "anchor_entity_share": 0.867,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-24T21:44:40.543952+00:00",
+    "generated_at": "2026-07-24T22:26:06.782417+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260724_214440"
+    "synthesis_id": "synthesis_strategy_model_stress_20260724_222606"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -110,7 +110,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-07-24T21:44:40.546314+00:00"
+      "detected_at": "2026-07-24T22:26:06.784459+00:00"
     },
     "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'вопреки тому что'; confidence: 0.79; signals_used: 14; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
     "signals_used": [
@@ -136,9 +136,9 @@
     "entity_count": 5,
     "anchor_entity_share": 0.643,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-24T21:44:40.546509+00:00",
+    "generated_at": "2026-07-24T22:26:06.784637+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260724_214440"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260724_222606"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -164,9 +164,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-24T21:44:40.548368+00:00",
+    "generated_at": "2026-07-24T22:26:06.786454+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260724_214440"
+    "synthesis_id": "synthesis_supply_scarcity_20260724_222606"
   },
   "btc_infrastructure_growth": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -210,9 +210,9 @@
     "entity_count": 19,
     "anchor_entity_share": 0.043,
     "is_minority_anchor": true,
-    "generated_at": "2026-07-24T21:44:40.551038+00:00",
+    "generated_at": "2026-07-24T22:26:06.788935+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260724_214440"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260724_222606"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -235,34 +235,35 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-24T21:44:40.552456+00:00",
+    "generated_at": "2026-07-24T22:26:06.790689+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260724_214440"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260724_222606"
   },
   "bitcoin_governance_debate": {
     "tension": "Foundry не занимает собственную позицию по BIP-110, а делегирует решение хешрейт-взвешенному голосованию клиентов vs фактическая поддержка майнеров уже ~0,6–1%, что делает формальный демократический процесс почти предрешённым по факту",
-    "narrative": "Институциональный лагерь Bitcoin впервые формализует явную позицию по вопросу протокольного управления как таковому: снижение порога консенсусной активации (95%→55%) само по себе — прецедентный риск независимо от исхода конкретного BIP — институциональные держатели теперь публично защищают neutrality механизма изменения правил, не только сами правила — в то время как крупнейший майнинг-пул институционализирует хешрейт-взвешенное голосование как механизм консенсусных решений вместо одностороннего диктата — создаёт измеримый прецедент для будущих спорных софтфорков, независимо от исхода конкретно BIP-110",
+    "narrative": "Институциональный лагерь Bitcoin впервые формализует явную позицию по вопросу протокольного управления как таковому: снижение порога консенсусной активации (95%→55%) само по себе — прецедентный риск независимо от исхода конкретного BIP — институциональные держатели теперь публично защищают neutrality механизма изменения правил, не только сами правила — тогда как крупнейший майнинг-пул институционализирует хешрейт-взвешенное голосование как механизм консенсусных решений вместо одностороннего диктата — создаёт измеримый прецедент для будущих спорных софтфорков, независимо от исхода конкретно BIP-110",
     "takeaway": "Крупнейший майнинг-пул институционализирует хешрейт-взвешенное голосование как механизм консенсусных решений вместо одностороннего диктата — создаёт измеримый прецедент для будущих спорных софтфорков, независимо от исхода конкретно BIP-110",
     "strength": "strong",
-    "confidence": 0.618,
+    "confidence": 0.63,
     "phase": "active",
-    "score": 17,
-    "signal_count": 2,
+    "score": 26,
+    "signal_count": 3,
     "anchor_signal_id": "NAR-2026-0717-002",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from NAR-2026-0717-002 (contradicts: 0, weight: primary); partA from NAR-2026-0711-001; phase: active; bridge: 'в то время как'; confidence: 0.62; signals_used: 2; ignored_duplicates: []",
+    "rationale": "Tension from NAR-2026-0717-002 (contradicts: 0, weight: primary); partA from NAR-2026-0711-001; phase: active; bridge: 'тогда как'; confidence: 0.63; signals_used: 3; ignored_duplicates: []",
     "signals_used": [
       "NAR-2026-0717-002",
+      "NAR-2026-0717-003",
       "NAR-2026-0711-001"
     ],
     "signals_ignored": [],
-    "entity_count": 2,
-    "anchor_entity_share": 0.5,
+    "entity_count": 3,
+    "anchor_entity_share": 0.333,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-24T21:44:40.553590+00:00",
+    "generated_at": "2026-07-24T22:26:06.791939+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_bitcoin_governance_debate_20260724_214440"
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260724_222606"
   },
   "_cross_cluster_entities": {
     "strategy": [

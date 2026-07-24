@@ -439,7 +439,7 @@ SANITIZE_RATCHET_BASELINE = {
     # был бы вреден (внёс бы &quot; в промпт)
     "s.event": 1,
     "t.key": 1,
-    "t.label": 3,
+    "t.label": 2,
     "t.note": 1,
     "tab.label": 1,
     "top100.as_of": 1,

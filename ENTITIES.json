@@ -649,24 +649,27 @@
       "name": "RGB Protocol",
       "type": "protocol",
       "status": "active",
-      "summary": "Протокол выпуска и передачи активов (включая стейблкоины) на Bitcoin через client-side validation, интегрированный с Lightning Network для мгновенных приватных расчётов",
+      "summary": "Протокол выпуска и передачи активов (включая стейблкоины) на Bitcoin через client-side validation — почти 10 лет разработки от миланской лаборатории (2015) до запуска на mainnet (июль 2025), интегрирован с Lightning Network для мгновенных приватных расчётов",
       "profile": {
         "what": "Client-side validation протокол, якорящий безопасность в UTXO-модели Bitcoin; версия v0.11.1 используется Tether/UTEXO для нативного выпуска USDT",
         "metrics": [
-          "В разработке с 2016 года (истоки — single-use seals Питера Тодда, 2014)",
+          "v0.11.1 запущен на основной сети Bitcoin 17 июля 2025 — поддержка 5 стандартных схем, полная интеграция с Lightning",
+          "В разработке с 2016 года (истоки — single-use seals Питера Тодда, 2014; миланская лаборатория, 2015)",
           "Не успел к буму 2017 года — упущенное окно, давшее Tron доминирование в USDT-расчётах",
-          "С 2022 года открытый код курирует Federico Tenga (Bitfinex R&D Strategist)"
+          "С 2022 года открытый код курирует Federico Tenga (Bitfinex R&D Strategist)",
+          "RGB Protocol Association (некоммерческая, Швейцария) сформирована 14 июля 2025 — Bitfinex, Bitmask/DIBA, Boosty Labs, Fulgur Ventures и др."
         ],
         "links_to": [
           "bitcoin",
           "lightning"
         ],
-        "notable": "Название изначально расшифровывалось как 'Riccardo Giacomo Bitcoin' (в честь разработчиков Giacomo Zucco и Riccardo Casatta), позже переосмыслено как 'Really Good Bitcoin'"
+        "notable": "Название изначально расшифровывалось как 'Riccardo Giacomo Bitcoin' (в честь разработчиков Giacomo Zucco и Riccardo Casatta), позже переосмыслено как 'Really Good Bitcoin'. Некоммерческая, community-driven модель разработки — контраст с венчурно-финансируемым конкурентом Taproot Assets (Lightning Labs, \u0000М раунда) — в разы медленнее, но результат уже использует Tether для нативного USDT на Bitcoin."
       },
       "signal_refs": [
-        "INF-2026-0706-001"
+        "INF-2026-0706-001",
+        "INF-2026-0717-001"
       ],
-      "last_updated": "2026-07-06"
+      "last_updated": "2026-07-17"
     },
     {
       "id": "utexo",

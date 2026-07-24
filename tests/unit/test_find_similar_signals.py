@@ -125,6 +125,54 @@ class TestSignalTextField:
     def test_handles_missing_fields_gracefully(self):
         assert signal_text({}) == ""
 
+    def test_strips_embedded_signal_ids(self):
+        """Найдено при ручной инспекции TF-IDF-весов: ID других сигналов,
+        упомянутые в context, засоряли словарь как ложные "редкие термины"."""
+        s = {
+            "signal": "заголовок",
+            "context": "продолжение эпизода NAR-2026-0711-001 и STR-2026-0706-002",
+        }
+        text = signal_text(s)
+        assert "NAR-2026-0711-001" not in text
+        assert "STR-2026-0706-002" not in text
+        assert "заголовок" in text
+        assert "продолжение эпизода" in text
+
+    def test_does_not_strip_short_non_id_hyphenated_tokens(self):
+        """Паттерн ID специфичен (буквы-YYYY-MMDD-NNN) — не должен случайно
+        резать обычные слова с дефисом."""
+        s = {"signal": "BIP-110 — не то же самое, что какой-то текст"}
+        text = signal_text(s)
+        assert "BIP-110" in text
+        assert "какой-то" in text
+
+
+class TestStopWords:
+
+    def test_common_prepositions_excluded_from_similarity_weight(self):
+        """Найдено при ручной инспекции: частые предлоги/союзы (через, на,
+        же) получали ненулевой TF-IDF вес и вносили шум в каждое сравнение
+        независимо от содержания. Проверяем, что после фикса общее слово
+        'через' не завышает сходство двух иначе не связанных сигналов."""
+        target = {
+            "id": "TGT-010", "cluster": "cluster_a",
+            "signal": "Уникальное_Слово_Альфа через что-то",
+        }
+        unrelated_shared_stopword = {
+            "id": "UNR-010", "cluster": "cluster_b",
+            "signal": "Совершенно_Другое_Слово_Бета через что-то ещё",
+        }
+        genuinely_similar = {
+            "id": "SIM-010", "cluster": "cluster_b",
+            "signal": "Уникальное_Слово_Альфа фигурирует снова",
+        }
+        signals = [target, unrelated_shared_stopword, genuinely_similar]
+
+        ranked = find_similar("TGT-010", signals, top_n=5)
+        ranked_ids = [s["id"] for s, _score in ranked]
+
+        assert ranked_ids[0] == "SIM-010"
+
 
 class TestRealDataSmoke:
     """Не падает на реальном signals.json, возвращает валидную структуру."""

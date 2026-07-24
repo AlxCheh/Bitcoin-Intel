@@ -539,17 +539,23 @@ header {
    l2/protocol/infrastructure/exchange — это единственно растущий, но
    физически ограниченный (не как компании) пласт объектов. */
 .eco-group-head {
-  padding: 8px 14px 4px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  padding: 9px 14px 3px;
+  border-top: 1px solid var(--line);
+}
+.eco-group-head:first-child { border-top: none; }
+.eco-group-head span {
   font-family: var(--mono);
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--btc);
-  background: var(--bg2);
-  border-top: 1px solid rgba(247,147,26,0.2);
+  color: var(--dim);
 }
-.eco-group-head:first-child { border-top: none; }
+.eco-group-head .eco-group-slash { color: var(--slate); margin: 0 5px; }
+.eco-group-head .eco-group-count { color: var(--btc); }
 
 .eco-show-more {
   width: 100%;
@@ -4576,7 +4582,7 @@ function renderEcosystem() {
       if (t.key === 'all') return;
       const groupItems = filteredFull.filter(e => e.type === t.key);
       if (!groupItems.length) return;
-      listHtml += '<div class="eco-group-head">' + t.label + ' · ' + groupItems.length + '</div>';
+      listHtml += '<div class="eco-group-head"><span>' + sanitize(t.label) + '</span><span class="eco-group-slash">/</span><span class="eco-group-count">' + groupItems.length + '</span></div>';
       listHtml += renderEcoSection(groupItems, ecoCardHtml, ECO_GROUP_SHOW_MORE_STEP, 'full-' + t.key, hasSearch);
     });
   } else {
@@ -4587,7 +4593,7 @@ function renderEcosystem() {
   if (compactWrap) {
     if (filteredCompact.length) {
       compactWrap.innerHTML =
-        '<div class="eco-group-head">КОМПАНИИ · ФОНДЫ · ПРАВИТЕЛЬСТВА · ' + filteredCompact.length + '</div>'
+        '<div class="eco-group-head"><span>КОМПАНИИ / ФОНДЫ / ПРАВИТЕЛЬСТВА</span><span class="eco-group-slash">/</span><span class="eco-group-count">' + filteredCompact.length + '</span></div>'
         + renderEcoSection(filteredCompact, ecoCompactRowHtml, ECO_COMPACT_SHOW_MORE_STEP, 'compact', hasSearch);
       compactWrap.style.display = '';
     } else {

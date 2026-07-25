@@ -1,15 +1,14 @@
 {
-  "updated_at": "2026-07-25T16:18:03Z",
+  "updated_at": "2026-07-25T19:19:15Z",
   "source": "mempool.space (посчитано самостоятельно из nVersion, не сторонний агрегатор)",
-  "note": "ЧЕРНОВИК для превью вёрстки — снимок реальных публичных данных (bip110monitor.com, тот же метод расчёта — nVersion бит 4), не результат нашего собственного скрипта. Заменится реальными данными после первого прогона scripts/fetch_bip110_signaling.py в CI.",
   "current": {
     "period": 475,
-    "tip_height": 959579,
+    "tip_height": 959595,
     "period_start_height": 957600,
-    "blocks_counted": 1980,
+    "blocks_counted": 1996,
     "period_size": 2016,
     "signaling_blocks": 25,
-    "signal_pct": 1.26,
+    "signal_pct": 1.2525,
     "threshold_pct": 55.0,
     "deadline_block": 961632
   }

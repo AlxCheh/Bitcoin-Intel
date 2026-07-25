@@ -24,6 +24,11 @@ import pytest
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+# (только JS, CSS остался внутри index.html) — читаем оба файла в исходном
+# порядке исполнения.
+APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
+APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
@@ -51,7 +56,7 @@ def _extract_function(html: str, signature: str) -> str:
 
 @pytest.fixture(scope="module")
 def freshness_source() -> str:
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
     recent_match = re.search(r"let FRESHNESS_RECENT_DAYS\s*=\s*(\d+);", html)
     assert recent_match, "FRESHNESS_RECENT_DAYS not found in index.html"
     globals_src = f"const FRESHNESS_RECENT_DAYS = {recent_match.group(1)};\n"

@@ -41,6 +41,12 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from build_facts import load_signals, superseded_values  # noqa: E402
 
 INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в отдельные файлы (только JS, CSS
+# остался внутри — см. обсуждение в чате и CLAUDE.md). Захардкоженные
+# значения фактов теперь могут оказаться в JS-коде тоже, не только в
+# HTML-разметке — сканируем оба JS-файла вдобавок к index.html, иначе
+# именно там появится слепое пятно этого стража.
+JS_APP_FILES = [REPO_ROOT / "js" / "app-early.js", REPO_ROOT / "js" / "app-main.js"]
 TREASURY_PATH = REPO_ROOT / "TREASURY_HOLDERS.json"
 
 FACT_KEY_TAG_RE = re.compile(r'<(\w+)[^>]*\bdata-fact-key="[^"]*"[^>]*>.*?</\1>', re.S)
@@ -85,14 +91,15 @@ def find_stale_occurrences() -> list[tuple[str, object, str]]:
 
     findings = []
 
-    html_raw = INDEX_HTML.read_text(encoding="utf-8")
-    html_safe = strip_safe_spans(html_raw)
-    for key, stale_values in stale_map.items():
-        for val in stale_values:
-            for variant in number_variants(val):
-                if variant in html_safe:
-                    findings.append((key, val, f"index.html (вариант '{variant}')"))
-                    break  # одного найденного варианта достаточно для этого значения
+    for path in [INDEX_HTML] + JS_APP_FILES:
+        raw = path.read_text(encoding="utf-8")
+        safe = strip_safe_spans(raw)
+        for key, stale_values in stale_map.items():
+            for val in stale_values:
+                for variant in number_variants(val):
+                    if variant in safe:
+                        findings.append((key, val, f"{path} (вариант '{variant}')"))
+                        break  # одного найденного варианта достаточно для этого значения
 
     if TREASURY_PATH.exists():
         treasury = json.loads(TREASURY_PATH.read_text(encoding="utf-8"))

@@ -165,6 +165,7 @@ def test_check_stale_facts_catches_injected_stale_copy(tmp_path, monkeypatch):
     fake_html = tmp_path / "index.html"
     fake_html.write_text('<div class="stat-val">847 363 BTC</div>', encoding="utf-8")
     monkeypatch.setattr(csf, "INDEX_HTML", fake_html)
+    monkeypatch.setattr(csf, "JS_APP_FILES", [])  # изолируем от реальных js/app-*.js
     fake_treasury = tmp_path / "TREASURY_HOLDERS.json"
     fake_treasury.write_text('{"holders": []}', encoding="utf-8")
     monkeypatch.setattr(csf, "TREASURY_PATH", fake_treasury)

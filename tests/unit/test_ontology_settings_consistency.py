@@ -77,7 +77,13 @@ def test_js_reads_freshness_thresholds_from_ontology_json():
     Дефолты всё ещё должны совпадать с STALE_THRESHOLD на случай, если
     ontology.json недоступен — иначе деградация будет тихо неверной.
     """
-    html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+    # 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+    # (только JS, CSS остался внутри index.html) — этот тест проверяет JS-
+    # источник, читаем оба файла.
+    html = (
+        (REPO_ROOT / "js" / "app-early.js").read_text(encoding="utf-8")
+        + (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    )
 
     assert "let FRESHNESS_FRESH_DAYS  = 7;" in html or "let FRESHNESS_FRESH_DAYS = 7;" in html, (
         "FRESHNESS_FRESH_DAYS default missing or changed — "

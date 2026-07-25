@@ -22,6 +22,17 @@ import pytest
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+# (только JS — CSS остался внутри index.html). sanitize()/highlightEntities()
+# и остальной проверяемый здесь код теперь живут там же — читаем оба файла
+# в исходном порядке исполнения (early грузится в браузере раньше main).
+APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
+APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
+
+
+def _read_js_source() -> str:
+    return APP_EARLY_JS.read_text(encoding="utf-8") + "\n" + APP_MAIN_JS.read_text(encoding="utf-8")
+
 
 NODE_AVAILABLE = shutil.which("node") is not None
 
@@ -65,7 +76,7 @@ def _run_js(js_code: str) -> dict:
 @pytest.fixture(scope="module")
 def sanitize_and_highlight_source() -> str:
     """Реальный исходник sanitize() + highlightEntities() из index.html."""
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = _read_js_source()
     sanitize_fn   = _extract_function(html, "sanitize(str)")
     highlight_fn  = _extract_function(html, "highlightEntities(text)")
     return sanitize_fn + "\n\n" + highlight_fn
@@ -156,7 +167,7 @@ console.log(JSON.stringify({ out }));
 @pytest.fixture(scope="module")
 def sanitize_strong_source() -> str:
     """Реальный исходник sanitize() + sanitizeStrong() из index.html."""
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = _read_js_source()
     sanitize_fn = _extract_function(html, "sanitize(str)")
     strong_fn   = _extract_function(html, "sanitizeStrong(str)")
     return sanitize_fn + "\n\n" + strong_fn
@@ -250,7 +261,7 @@ def test_all_signal_text_fields_pass_through_sanitize_or_highlight():
     Эта проверка — защита от регрессии: если кто-то добавит новое поле сигнала
     в innerHTML без оборачивания, тест укажет на конкретную непрошедшую строку.
     """
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = _read_js_source()
 
     # Паттерны небезопасной прямой вставки — поле сигнала сразу после '+' без
     # sanitize(...)/highlightEntities(...) перед закрывающей кавычкой/конкатенацией.
@@ -321,11 +332,6 @@ _MATH_RE = re.compile(r"^Math\.\w+")
 # Контур: property-access (поля объектов данных); палитра C.* — константы кода.
 _IN_SCOPE_RE = re.compile(r"^\(?[a-zA-Z_$][\w$]*\.[\w$.]+")
 _CODE_CONST_RE = re.compile(r"^C\.\w+$")
-
-
-def _extract_all_script_js(html: str) -> str:
-    """Содержимое всех <script>-блоков index.html одной строкой."""
-    return "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S))
 
 
 def _find_unsanitized_property_concats(js: str) -> dict:
@@ -461,8 +467,11 @@ def test_no_new_unsanitized_property_concats_ratchet():
     (или рост счётчика существующего) без sanitize-обёртки ломает тест.
     Двусторонняя сверка не даёт baseline протухать.
     """
-    html = INDEX_HTML.read_text(encoding="utf-8")
-    current = _find_unsanitized_property_concats(_extract_all_script_js(html))
+    # 2026-07-25: _read_js_source() уже возвращает чистый JS (не обёрнутый
+    # в <script> теги — JS вынесен в отдельные файлы), _extract_all_script_js()
+    # здесь больше не нужна — раньше она вырезала <script>...</script> из
+    # HTML, сейчас html уже и есть искомое содержимое.
+    current = _find_unsanitized_property_concats(_read_js_source())
 
     new_or_grown = {
         expr: n for expr, n in current.items()

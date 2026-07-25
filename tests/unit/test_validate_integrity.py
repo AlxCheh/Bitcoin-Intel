@@ -43,6 +43,17 @@ def _entity(id_: str, signal_refs: list[str]) -> dict:
     return {"id": id_, "name": id_, "type": "l2", "signal_refs": signal_refs}
 
 
+def _engine(id_: str, entity_id: str, entity_name: str) -> dict:
+    return {"id": id_, "entity_id": entity_id, "entity_name": entity_name}
+
+
+def _write_revenue_engines(engines: list[dict]) -> None:
+    Path("REVENUE_ENGINES.json").write_text(
+        json.dumps({"meta": {}, "engines": engines}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
 class TestEntitiesCountRegression:
     """ENTITIES.json раньше считался как len(raw_dict) == 2, а не len(entities)."""
 
@@ -118,3 +129,70 @@ class TestSignalRefsReferentialIntegrity:
         captured = capsys.readouterr()
         assert ok
         assert "signal_refs" not in captured.out  # секция вообще не печаталась
+
+
+class TestRevenueEnginesEntityIntegrity:
+    """LLM Wiki Пара 2 (2026-07-25): REVENUE_ENGINES.json.entity_id/entity_name
+    должны быть согласованы с ENTITIES.json — та же дисциплина, что уже есть
+    для signal_refs выше, распространённая на новую пару файлов."""
+
+    def test_valid_engine_entity_link_passes(self, capsys):
+        _write_signals([])
+        _write_entities([_entity("e1", [])])
+        _write_revenue_engines([_engine("eng1", "e1", "e1")])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert ok
+        assert "все entity_id/entity_name согласованы" in captured.out
+
+    def test_orphan_entity_id_fails_validation(self, capsys):
+        """entity_id ссылается на несуществующую сущность."""
+        _write_signals([])
+        _write_entities([_entity("e1", [])])
+        _write_revenue_engines([_engine("eng1", "nonexistent", "Ghost Corp")])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "entity_id без соответствующей записи" in captured.out
+        assert "eng1→nonexistent" in captured.out
+
+    def test_entity_name_drift_fails_validation(self, capsys):
+        """Регрессия: именно этот случай был найден и исправлен при внедрении
+        проверки (strive_sata.entity_name разошёлся с ENTITIES.json.strive.name)."""
+        _write_signals([])
+        _write_entities([_entity("strive", [])])  # name == "strive"
+        _write_revenue_engines([_engine("strive_sata", "strive", "Strive (ASST)")])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "entity_name разошёлся" in captured.out
+        assert "Strive (ASST)" in captured.out
+
+    def test_multiple_engines_all_checked_independently(self, capsys):
+        _write_signals([])
+        _write_entities([_entity("e1", []), _entity("e2", [])])
+        _write_revenue_engines([
+            _engine("eng1", "e1", "e1"),   # корректный — не должен попасть в ошибку
+            _engine("eng2", "e2", "WRONG NAME"),  # разошёлся — должен быть найден
+        ])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "eng2" in captured.out
+        assert "WRONG NAME" in captured.out
+
+    def test_missing_revenue_engines_file_skips_check_silently(self, capsys):
+        """Файл REVENUE_ENGINES.json может отсутствовать (напр. в изолированном
+        тестовом окружении без него) — не должно ломать остальную валидацию."""
+        _write_signals([])
+        _write_entities([_entity("e1", [])])
+        # REVENUE_ENGINES.json намеренно не создаём
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert ok
+        assert "REVENUE_ENGINES.json" not in captured.out

@@ -18,13 +18,17 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import pytest
-from scripts.find_similar_signals import find_similar, signal_text, load_signals
+from scripts.find_similar_signals import (
+    find_similar, signal_text, load_signals,
+    build_signal_entity_map, find_shared_entity_candidates,
+    is_opposite_dir_same_theme,
+)
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-def _sig(id_, cluster, signal="", context="", tension="", macro_implication=""):
-    return {
+def _sig(id_, cluster, signal="", context="", tension="", macro_implication="", dir_=None, theme=None):
+    s = {
         "id": id_,
         "cluster": cluster,
         "signal": signal,
@@ -32,6 +36,11 @@ def _sig(id_, cluster, signal="", context="", tension="", macro_implication=""):
         "tension": tension,
         "macro_implication": macro_implication,
     }
+    if dir_ is not None:
+        s["dir"] = dir_
+    if theme is not None:
+        s["theme"] = theme
+    return s
 
 
 class TestSimilarityRanking:
@@ -172,6 +181,129 @@ class TestStopWords:
         ranked_ids = [s["id"] for s, _score in ranked]
 
         assert ranked_ids[0] == "SIM-010"
+
+
+class TestBigrams:
+
+    def test_bigram_phrase_boosts_genuine_similarity(self):
+        """Найдено в обсуждении: одиночные слова часто недостаточно
+        специфичны. Проверяем, что словосочетание ("консенсусный порог")
+        помогает отличить содержательно похожий сигнал от того, что
+        просто делит одно из двух слов с целевым."""
+        target = _sig(
+            "TGT-020", "cluster_a",
+            signal="Спор о консенсусный порог активации софтфорка",
+        )
+        shares_phrase = _sig(
+            "SIM-020", "cluster_b",
+            signal="Новый спор про консенсусный порог для другого предложения",
+        )
+        shares_one_word_only = _sig(
+            "UNR-020", "cluster_b",
+            signal="Порог входа на биржу снижен для розничных инвесторов",
+        )
+        signals = [target, shares_phrase, shares_one_word_only]
+
+        ranked = find_similar("TGT-020", signals, top_n=5)
+        ranked_ids = [s["id"] for s, _score in ranked]
+
+        assert ranked_ids[0] == "SIM-020"
+
+
+class TestEntityOverlap:
+
+    def test_build_signal_entity_map_from_signal_refs(self):
+        entities = [
+            {"id": "strategy", "signal_refs": ["STR-001", "STR-002"]},
+            {"id": "rgb_protocol", "signal_refs": ["INF-001"]},
+        ]
+        m = build_signal_entity_map(entities)
+        assert m["STR-001"] == {"strategy"}
+        assert m["STR-002"] == {"strategy"}
+        assert m["INF-001"] == {"rgb_protocol"}
+        assert "NOPE-001" not in m
+
+    def test_signal_referenced_by_multiple_entities(self):
+        entities = [
+            {"id": "strategy", "signal_refs": ["SIG-001"]},
+            {"id": "bitcoin", "signal_refs": ["SIG-001"]},
+        ]
+        m = build_signal_entity_map(entities)
+        assert m["SIG-001"] == {"strategy", "bitcoin"}
+
+    def test_find_shared_entity_candidates_finds_cross_cluster_match(self):
+        target = _sig("TGT-030", "cluster_a", signal="что-то про Strategy")
+        shares_entity_different_words = _sig(
+            "SIM-030", "cluster_b", signal="Совершенно другими словами про ту же компанию"
+        )
+        no_shared_entity = _sig("UNR-030", "cluster_b", signal="Другая история")
+        signals = [target, shares_entity_different_words, no_shared_entity]
+
+        signal_entity_map = {
+            "TGT-030": {"strategy"},
+            "SIM-030": {"strategy"},
+            "UNR-030": {"rgb_protocol"},
+        }
+
+        results = find_shared_entity_candidates("TGT-030", signals, signal_entity_map)
+        result_ids = [s["id"] for s, _shared in results]
+
+        assert "SIM-030" in result_ids
+        assert "UNR-030" not in result_ids
+
+    def test_find_shared_entity_candidates_respects_same_cluster_exclusion(self):
+        target = _sig("TGT-031", "cluster_a", signal="что-то")
+        same_cluster = _sig("SC-031", "cluster_a", signal="что-то ещё")
+        signals = [target, same_cluster]
+        signal_entity_map = {"TGT-031": {"strategy"}, "SC-031": {"strategy"}}
+
+        results = find_shared_entity_candidates("TGT-031", signals, signal_entity_map)
+        assert results == []
+
+        results_included = find_shared_entity_candidates(
+            "TGT-031", signals, signal_entity_map, same_cluster_ok=True
+        )
+        assert len(results_included) == 1
+
+    def test_find_shared_entity_candidates_unknown_id_raises(self):
+        with pytest.raises(ValueError, match="не найден"):
+            find_shared_entity_candidates("NOPE-999", [_sig("A-001", "cluster_a")], {})
+
+    def test_find_shared_entity_candidates_empty_when_target_has_no_entities(self):
+        target = _sig("TGT-032", "cluster_a", signal="что-то")
+        other = _sig("OC-032", "cluster_b", signal="что-то ещё")
+        signals = [target, other]
+        signal_entity_map = {"OC-032": {"strategy"}}  # target не привязан ни к одной сущности
+
+        results = find_shared_entity_candidates("TGT-032", signals, signal_entity_map)
+        assert results == []
+
+
+class TestOppositeDirSameTheme:
+
+    def test_flags_opposite_dir_same_theme(self):
+        target = _sig("TGT-040", "cluster_a", dir_="pos", theme="institutionalization")
+        candidate = _sig("CAND-040", "cluster_b", dir_="neg", theme="institutionalization")
+        assert is_opposite_dir_same_theme(target, candidate) is True
+
+    def test_does_not_flag_same_dir(self):
+        target = _sig("TGT-041", "cluster_a", dir_="pos", theme="institutionalization")
+        candidate = _sig("CAND-041", "cluster_b", dir_="pos", theme="institutionalization")
+        assert is_opposite_dir_same_theme(target, candidate) is False
+
+    def test_does_not_flag_different_theme(self):
+        target = _sig("TGT-042", "cluster_a", dir_="pos", theme="institutionalization")
+        candidate = _sig("CAND-042", "cluster_b", dir_="neg", theme="infrastructure")
+        assert is_opposite_dir_same_theme(target, candidate) is False
+
+    def test_neu_never_flagged_as_opposite(self):
+        """neu — 'нет направления', не третья полярность; не должен
+        считаться противоположностью ни pos, ни neg."""
+        target = _sig("TGT-043", "cluster_a", dir_="neu", theme="institutionalization")
+        candidate = _sig("CAND-043", "cluster_b", dir_="pos", theme="institutionalization")
+        assert is_opposite_dir_same_theme(target, candidate) is False
+        candidate2 = _sig("CAND-044", "cluster_b", dir_="neg", theme="institutionalization")
+        assert is_opposite_dir_same_theme(target, candidate2) is False
 
 
 class TestRealDataSmoke:

@@ -3913,7 +3913,44 @@ function toggleNav(id) {
       </div>
     </div>
 
-    <!-- ══ БЛОК 2: КЛЮЧЕВЫЕ МЕТРИКИ (вариант C) ══ -->
+    <!-- BIP-110 СИГНАЛИНГ (data/bip110_signaling.json, mempool.space) —
+         добавлено 2026-07-25 по обсуждению в чате. Не client-side live-
+         fetch (как diff-chart/hashrateChart) — период сложности 2016
+         блоков, публичный тариф mempool.space отдаёт максимум 15 блоков
+         за вызов, ~135 запросов на полный период. Делать это в браузере
+         КАЖДОГО посетителя нагружало бы mempool.space пропорционально
+         трафику сайта — вместо этого один периодический прогон в CI
+         (scripts/fetch_bip110_signaling.py), клиент читает готовый
+         маленький JSON. Привязано к истории NAR-2026-0717-002 (голосование
+         Foundry) — тот же блок-дедлайн 961 632, порог 55%.
+         ⚠️ Данные на момент коммита — черновик (снимок bip110monitor.com,
+         не результат нашего скрипта) до первого прогона CI. -->
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head">
+        <span class="panel-title">BIP-110 Сигналинг</span>
+        <span class="chart-meta" id="bip110-period-label">ПЕРИОД —</span>
+      </div>
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--line)">
+        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;margin-bottom:6px">СИГНАЛИНГ ЗА ПЕРИОД</div>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <span style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--btc);letter-spacing:-.02em" id="bip110-pct">—</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--dim)">% (нужно 55%)</span>
+        </div>
+        <div style="margin-top:6px;font-size:11px;font-family:var(--mono);color:var(--dim)" id="bip110-blocks">—</div>
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--dim);margin-bottom:5px">
+            <span>ПРОГРЕСС К 55%</span>
+            <span id="bip110-deadline">ДЕДЛАЙН БЛОК 961 632</span>
+          </div>
+          <div style="height:3px;background:var(--line2);border-radius:2px;overflow:hidden">
+            <div class="bar-fill" id="bip110-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:10px;font-family:var(--mono);color:var(--dim)">
+          Контекст спора — <span class="unit-note-link" onclick="goToDigest('bitcoin_governance_debate')">В ДАЙДЖЕСТ →</span>
+        </div>
+      </div>
+    </div>
     <div style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;background:var(--bg2)">
       <div class="panel-head" style="margin:0">
         <span class="panel-title">Ключевые метрики</span>
@@ -5016,6 +5053,7 @@ let TREASURY_HOLDERS = [];
 let TOP_ADDRESSES = [];
 let TOP_ADDRESSES_META = {};
 let taExpanded = false; // "показать ещё" — тот же паттерн, что Экосистема Bitcoin
+let BIP110_SIGNALING = {};
 let TREASURY_META = {};
 let thSearch = '';
 let thSortKey = 'btc';
@@ -5820,7 +5858,7 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp, taResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp, taResp, bipResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
@@ -5830,7 +5868,8 @@ async function loadSignals() {
       fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now()),
       fetch('THEORY_TOPICS.json?v=' + Date.now()),
       fetch('THEORY_ESSAYS.json?v=' + Date.now()),
-      fetch('data/top_addresses.json?v=' + Date.now())
+      fetch('data/top_addresses.json?v=' + Date.now()),
+      fetch('data/bip110_signaling.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5894,6 +5933,13 @@ async function loadSignals() {
       console.warn('data/top_addresses.json load error, panel stays empty:', e);
       TOP_ADDRESSES = [];
       TOP_ADDRESSES_META = {};
+    }
+    try {
+      const bipData = await bipResp.json();
+      BIP110_SIGNALING = bipData.current || {};
+    } catch(e) {
+      console.warn('data/bip110_signaling.json load error, panel stays empty:', e);
+      BIP110_SIGNALING = {};
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -6679,7 +6725,7 @@ let LATEST_BLOCKS = [];
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
   if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
-  if (id === 'analytics') initCharts();
+  if (id === 'analytics') { initCharts(); renderBip110Signaling(); }
   if (id === 'market')    renderSignals();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');
@@ -7620,6 +7666,31 @@ function initCharts() {
   setInterval(fetchDifficulty, 300000); // refresh every 5 min
   fetchVolumeData();  // объём торгов — статичный data/volume.json, обновляется раз в сутки GitHub Action'ом
   fetchHashrateHistory();  // живой график вместо статичного массива 2016–2025 (см. функцию ниже)
+}
+
+// BIP-110 сигналинг — читает статичный data/bip110_signaling.json (обновляется
+// раз в 3 часа GitHub Action'ом scripts/fetch_bip110_signaling.py). Не live-fetch
+// в браузере — см. подробный комментарий у панели в HTML про то, почему.
+function renderBip110Signaling() {
+  const periodEl   = document.getElementById('bip110-period-label');
+  const pctEl      = document.getElementById('bip110-pct');
+  const blocksEl   = document.getElementById('bip110-blocks');
+  const barEl      = document.getElementById('bip110-bar');
+  if (!periodEl || !pctEl || !blocksEl || !barEl) return;
+
+  const c = BIP110_SIGNALING;
+  if (!c || c.signal_pct == null) {
+    periodEl.textContent = 'ПЕРИОД —';
+    pctEl.textContent = '—';
+    blocksEl.textContent = 'Нет данных';
+    return;
+  }
+
+  periodEl.textContent = 'ПЕРИОД ' + c.period;
+  pctEl.textContent = c.signal_pct.toFixed(2);
+  blocksEl.textContent = c.signaling_blocks + ' из ' + c.blocks_counted + ' блоков сигналят (высота ' + c.tip_height + ')';
+  const barPct = Math.min(100, (c.signal_pct / (c.threshold_pct || 55)) * 100);
+  barEl.style.width = barPct.toFixed(1) + '%';
 }
 
 // Объём торгов BTC/USD — читает статичный data/volume.json (обновляется раз в

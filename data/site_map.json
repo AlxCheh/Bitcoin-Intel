@@ -145,6 +145,23 @@
       ]
     },
     {
+      "id": "e097",
+      "title": "BIP-110 Сигналинг",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "facts",
+      "kind": "widget",
+      "keywords": [
+        "bip-110",
+        "сигналинг",
+        "майнеры",
+        "softfork",
+        "foundry"
+      ]
+    },
+    {
       "id": "e010",
       "title": "Ключевые метрики",
       "cluster": "live",

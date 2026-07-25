@@ -36,6 +36,7 @@ KNOWN_SYNC_PR_WORKFLOWS = {
     "build-facts.yml": "bot/sync-facts-",
     "update-volume.yml": "bot/sync-volume-",
     "update-top-addresses.yml": "bot/sync-top-addresses-",
+    "update-bip110-signaling.yml": "bot/sync-bip110-",
 }
 
 

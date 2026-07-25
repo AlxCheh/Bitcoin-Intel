@@ -388,6 +388,8 @@ SANITIZE_RATCHET_BASELINE = {
     "score.tension": 1,
     "score.total": 2,
     "s.entity_count": 1,
+    "c.blocks_counted": 1,
+    "c.tip_height": 1,
     "e.rank": 1,
     "score.weight": 1,
     "(TOP_ADDRESSES.length - TA_SHOW_MORE_STEP)": 1,

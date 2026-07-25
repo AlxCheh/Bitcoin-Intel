@@ -37,8 +37,23 @@ def _load_manifest():
 
 
 def _load_index_html():
+    """
+    Возвращает index.html + оба JS-файла (js/app-early.js, js/app-main.js)
+    одной строкой. ВАЖНО (2026-07-25): JS вынесен из index.html в отдельные
+    файлы (только JS — CSS остался внутри index.html), но некоторые panel-
+    title встречаются как ЛИТЕРАЛЬНЫЙ текст внутри JS-шаблонных строк
+    (например, "Пулы последних 10 блоков" — заголовок рендерится JS, но
+    сам текст заголовка фиксирован, не собирается из данных) — раньше это
+    ловилось "бесплатно", потому что весь inline JS был частью одного
+    index.html; теперь нужно явно включать оба JS-файла в скан, иначе такие
+    записи манифеста ложно считались бы удалёнными.
+    """
     with open(os.path.join(ROOT, "index.html"), encoding="utf-8") as f:
-        return f.read()
+        html = f.read()
+    for js_name in ("app-early.js", "app-main.js"):
+        with open(os.path.join(ROOT, "js", js_name), encoding="utf-8") as f:
+            html += "\n" + f.read()
+    return html
 
 
 def _extract_static_titles(html: str) -> set:

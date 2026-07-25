@@ -22,6 +22,11 @@ import pytest
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+# (только JS, CSS остался внутри index.html) — читаем оба файла в исходном
+# порядке исполнения.
+APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
+APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
@@ -60,13 +65,13 @@ def _run(js_source: str, call: str):
 
 @pytest.fixture(scope="module")
 def phase_label_source() -> str:
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
     return _extract_function(html, "formatPhaseLabel")
 
 
 @pytest.fixture(scope="module")
 def uncertainty_warnings_source() -> str:
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
     return _extract_function(html, "buildUncertaintyWarnings")
 
 
@@ -162,7 +167,7 @@ class TestJSFallbackRationale:
     @pytest.fixture(scope="class")
     @staticmethod
     def synth_source():
-        html = INDEX_HTML.read_text(encoding="utf-8")
+        html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
         fresh = re.search(r"let FRESHNESS_FRESH_DAYS\s*=\s*(\d+);", html).group(1)
         recent = re.search(r"let FRESHNESS_RECENT_DAYS\s*=\s*(\d+);", html).group(1)
         globals_src = (

@@ -24,7 +24,13 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+# (только JS — CSS остался внутри index.html, см. CLAUDE.md). Функции
+# по-прежнему исполняются из РЕАЛЬНОГО, задеплоенного исходника — просто
+# теперь он живёт в двух файлах, конкатенируем в исходном порядке (early
+# грузится и исполняется раньше main в браузере, порядок сохранён и здесь).
+APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
+APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 
 NODE_AVAILABLE = shutil.which("node") is not None
 
@@ -32,7 +38,7 @@ NODE_AVAILABLE = shutil.which("node") is not None
 def _extract_function(html: str, name: str) -> str:
     """Извлекает `function <name>(...) {...}` по балансу фигурных скобок."""
     start = html.find(f"function {name}")
-    assert start != -1, f"Function '{name}' not found in index.html — renamed or removed?"
+    assert start != -1, f"Function '{name}' not found in js/app-*.js — renamed or removed?"
     brace_open = html.find("{", start)
     depth = 0
     i = brace_open
@@ -58,7 +64,7 @@ def _run_js(js_code: str) -> dict:
 
 @pytest.fixture(scope="module")
 def html_source() -> str:
-    return INDEX_HTML.read_text(encoding="utf-8")
+    return APP_EARLY_JS.read_text(encoding="utf-8") + "\n" + APP_MAIN_JS.read_text(encoding="utf-8")
 
 
 # ═══════════════════════════════════════════════════════════════════════

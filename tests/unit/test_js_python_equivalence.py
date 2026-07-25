@@ -63,6 +63,11 @@ import pytest
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
+# 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
+# (только JS, CSS остался внутри index.html) — читаем оба файла в исходном
+# порядке исполнения.
+APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
+APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
 GOLDEN     = REPO_ROOT / "tests" / "golden" / "fixtures" / "golden_signals.json"
 
 NODE_AVAILABLE = shutil.which("node") is not None
@@ -102,7 +107,7 @@ def js_synthesize_source() -> str:
     функция читает их как глобалы, в изолированном Node-сниппете их нужно
     объявить явно, иначе ReferenceError при вызове.
     """
-    html = INDEX_HTML.read_text(encoding="utf-8")
+    html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
     fresh_match = re.search(r"let FRESHNESS_FRESH_DAYS\s*=\s*(\d+);", html)
     recent_match = re.search(r"let FRESHNESS_RECENT_DAYS\s*=\s*(\d+);", html)
     assert fresh_match and recent_match, (

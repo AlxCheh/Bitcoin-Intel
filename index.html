@@ -3756,7 +3756,15 @@ function toggleNav(id) {
 <section class="section" id="tab-analytics">
   <div class="page">
 
-    <!-- VOLUME CHART — бары + AVG-линия + статистика + топ-3 таблица -->
+    <!-- VOLUME CHART — редизайн 2026-07-25: бары+AVG-линия заменены на тот
+         же SVG-график оформления, что "Сложность сети" (градиентная заливка,
+         линия var(--btc), точка на последнем значении, без баров/дашед-линии
+         среднего) — по прямому запросу привести к единому визуальному языку
+         графиков (тот же паттерн уже применён к "Хешрейт сети" ранее).
+         Побочный эффект: теряется по-дневная зелёный/красный расцветка
+         баров (рост/падение к предыдущему дню) — тот же осознанный
+         компромисс, что и для хешрейта, в пользу консистентности. Строка
+         статистики (HIGH/LOW/MEDIAN/AVG) и топ-3 таблица не изменились. -->
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">Объём торгов BTC/USD</span>
@@ -3767,8 +3775,13 @@ function toggleNav(id) {
         <span style="font-family:var(--mono);font-size:12px;margin-left:8px" id="volume-change">—</span>
       </div>
       <div id="volume-stats-row" style="display:flex;gap:20px;padding:8px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap"></div>
-      <div class="chart-inner" style="padding:10px 20px">
-        <svg id="volumeChart" width="100%" viewBox="0 0 700 130" preserveAspectRatio="none" style="display:block"></svg>
+      <div style="border-bottom:1px solid var(--line)">
+        <div style="padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:8px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em" id="volume-chart-caption">ИСТОРИЯ · —</span>
+          <span class="chart-meta">USD</span>
+        </div>
+        <svg id="volumeChart" width="100%" viewBox="0 0 600 100" preserveAspectRatio="none" style="display:block"></svg>
+        <div style="display:flex;justify-content:space-between;padding:4px 14px 8px;font-size:10px;color:var(--dim);font-family:var(--mono)" id="volume-chart-labels"></div>
       </div>
       <div style="padding:8px 14px 0;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.06em;border-top:1px solid var(--line)">ТОП-3 ДНЯ ПО ОБЪЁМУ</div>
       <div style="overflow-x:auto">
@@ -7868,6 +7881,8 @@ async function fetchVolumeData() {
   const elCurrent  = document.getElementById('volume-current');
   const elChange   = document.getElementById('volume-change');
   const elMeta     = document.getElementById('volume-chart-meta');
+  const elCaption  = document.getElementById('volume-chart-caption');
+  const elLabels   = document.getElementById('volume-chart-labels');
   const elStats    = document.getElementById('volume-stats-row');
   const elTop3Body = document.getElementById('volume-top3-body');
   const svg        = document.getElementById('volumeChart');
@@ -7906,26 +7921,39 @@ async function fetchVolumeData() {
                            cell('MEDIAN', fmtVolumeUsd(medV)) + cell('AVG', fmtVolumeUsd(avgV));
     }
 
-    // ── Бары (цвет = рост/падение к предыдущему дню) + линия среднего ──
-    const W = 700, PH = 130, N = history.length;
-    const bw = (W / N) * 0.7, gap = (W / N) * 0.3;
-    let bars = '';
-    history.forEach((h, i) => {
-      const x = i * (W / N) + gap / 2;
-      const hgt = (h.volume_usd / maxV) * (PH - 10);
-      const y = PH - hgt;
-      const prev = i > 0 ? history[i - 1].volume_usd : h.volume_usd;
-      const col = h.volume_usd >= prev ? 'var(--grn)' : 'var(--red)';
-      bars += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) +
-              '" height="' + hgt.toFixed(1) + '" fill="' + col + '" opacity="0.85"><title>' +
-              h.date + ': ' + fmtVolumeUsd(h.volume_usd) + '</title></rect>';
-    });
-    const avgY = 10 + (1 - avgV / maxV) * (PH - 20);
-    svg.innerHTML = bars +
-      '<line x1="0" y1="' + avgY.toFixed(1) + '" x2="' + W + '" y2="' + avgY.toFixed(1) +
-      '" stroke="var(--dim)" stroke-width="1" stroke-dasharray="4,3"/>' +
-      '<text x="' + (W - 4) + '" y="' + (avgY - 4).toFixed(1) +
-      '" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="var(--dim)">AVG</text>';
+    // ── SVG-график того же оформления, что diff-chart (Сложность сети):
+    // градиентная заливка + линия var(--btc) + точка на последнем значении,
+    // без баров/дашед-линии среднего/тултипов. Линия плавная (не ступенчатая)
+    // — дневной объём торгов непрерывен по природе, тот же принцип, что
+    // уже применён к hashrateChart.
+    const n = history.length;
+    if (elCaption) elCaption.textContent = 'ИСТОРИЯ · ' + n + ' ' + ruPlural(n, 'ДЕНЬ', 'ДНЯ', 'ДНЕЙ');
+
+    const W = 600, H = 100, Pt = 6, Pb = 4;
+    const range = maxV - minV || 1;
+    const pts = history.map((h, i) => ({
+      x: n > 1 ? (i / (n - 1)) * W : W / 2,
+      y: Pt + (1 - (h.volume_usd - minV) / range) * (H - Pt - Pb),
+    }));
+    const lineD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+    const areaD = lineD + ` L${W},${H} L0,${H} Z`;
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--btc)" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="var(--btc)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#vg)"/>
+      <path d="${lineD}" fill="none" stroke="var(--btc)" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="${pts[n-1].x.toFixed(1)}" cy="${pts[n-1].y.toFixed(1)}" r="3" fill="var(--btc)"/>
+    `;
+    if (elLabels) {
+      const pickIdx = [0, Math.floor((n - 1) / 2), n - 1];
+      elLabels.innerHTML = pickIdx.map(i =>
+        `<span>${sanitize(history[i].date.slice(5))}</span>`
+      ).join('');
+    }
 
     // ── Топ-3 дня по объёму ──
     if (elTop3Body) {

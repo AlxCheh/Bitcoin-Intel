@@ -5345,6 +5345,16 @@ function closeEntityPopup() {
 // ── SIGNALS BASE (загружается из signals.json) ──
 // Схема записи: { date, cat, catLabel, dir (neg|pos|neu), signal, data:[], context, caveat, source }
 let SIGNALS = [];
+// КРИТИЧНО: объявлена здесь (не рядом с initCharts() ниже по файлу),
+// потому что restoreLastActiveTab() (см. ниже) может СИНХРОННО вызвать
+// showTab('analytics') -> triggerTabData() -> initCharts() ещё во время
+// разбора этого же script-блока, до того как исполнение дойдёт до более
+// поздней строки с "let chartsInited". Обнаружено 2026-07-25: если
+// bi_active_tab в localStorage равен 'analytics', necaught ReferenceError
+// (temporal dead zone) в этой точке обрывал ВЕСЬ оставшийся синхронный
+// код скрипта, включая последующий вызов loadSignals() — сайт переставал
+// загружать вообще что-либо, не только вкладку МЕТРИКИ.
+let chartsInited = false;
 let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -7671,7 +7681,6 @@ function renderDifficultySignalBridge() {
 }
 
 // ── CHARTS ──
-let chartsInited = false;
 function initCharts() {
   if (chartsInited) return;
   chartsInited = true;

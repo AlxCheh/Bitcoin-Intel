@@ -1397,6 +1397,23 @@
       ]
     },
     {
+      "id": "e096",
+      "title": "Топ-100 богатейших адресов",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "holders",
+      "tab_label": "ХОЛДЕРЫ",
+      "source": "static",
+      "kind": "table",
+      "keywords": [
+        "адреса",
+        "кошельки",
+        "биржи",
+        "киты",
+        "blockchair"
+      ]
+    },
+    {
       "id": "e094",
       "title": "Накопленные разборы",
       "cluster": "analysis",

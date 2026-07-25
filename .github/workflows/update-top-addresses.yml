@@ -1,0 +1,81 @@
+name: Update Top Addresses Data
+
+# ⚠️ ПЕРВЫЙ ЗАПУСК ЭТОГО WORKFLOW — ПРОВЕРОЧНЫЙ. scripts/fetch_top_addresses.py
+# написан по задокументированному, но лично не проверенному синтаксису
+# Blockchair API (интерактивная сессия не имела сетевого доступа к
+# blockchair.com — см. шапку скрипта и обсуждение 2026-07-25). Если первый
+# прогон здесь упадёт на шаге "Fetch top addresses data" — это ожидаемо
+# и означает, что реальный формат ответа API отличается от предполагаемого;
+# исправить build_top_addresses_payload() по сообщению об ошибке, не
+# отключать эту проверку.
+
+on:
+  schedule:
+    # 07:00 UTC ежедневно (сдвинуто на час от update-volume, чтобы не
+    # соревноваться за rate limit одновременно, хотя разные API)
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-top-addresses:
+    name: Fetch and commit top addresses data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests --quiet
+
+      - name: Fetch top addresses data
+        run: python3 scripts/fetch_top_addresses.py
+
+      - name: Validate data/top_addresses.json
+        run: python3 -m json.tool data/top_addresses.json > /dev/null && echo "OK data/top_addresses.json"
+
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          git add data/top_addresses.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit top addresses data via PR (not direct push to main)
+        if: steps.diffcheck.outputs.changed == 'true'
+        # Тот же паттерн, что update-volume.yml/deploy.yml/build-facts.yml:
+        # main защищён Branch Protection — коммит в отдельную ветку → PR →
+        # auto-merge после зелёного "validate". SYNTHESIS_BOT_TOKEN (не
+        # GITHUB_TOKEN) — иначе PR/push от штатного GITHUB_TOKEN не порождает
+        # новый workflow run, "validate" на PR не запустится, auto-merge
+        # зависнет в ожидании статуса, который никогда не придёт.
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          for old_pr in $(gh pr list --state open --search "head:bot/sync-top-addresses-" --json number --jq '.[] | .number'); do
+            echo "Закрываю устаревший sync-PR #$old_pr"
+            gh pr close "$old_pr" --delete-branch || true
+          done
+
+          BRANCH="bot/sync-top-addresses-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update top addresses data (Blockchair)"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: sync top addresses data ($(date -u +%Y-%m-%d))" \
+            --body "Автообновление data/top_addresses.json (scripts/fetch_top_addresses.py). ⚠️ Если это первый успешный прогон — стоит вручную сверить структуру ответа Blockchair с предположениями в скрипте перед мержем. Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

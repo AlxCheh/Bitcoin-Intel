@@ -1,0 +1,81 @@
+name: Update BIP-110 Signaling Data
+
+# ⚠️ ПЕРВЫЙ ЗАПУСК — ПРОВЕРОЧНЫЙ. scripts/fetch_bip110_signaling.py считает
+# сигналинг напрямую из mempool.space (уже используется сайтом для diff-
+# chart/hashrateChart) — но пагинация по 15 блоков назад до начала периода
+# лично не проверялась (сессия без сетевого доступа к mempool.space).
+# Если шаг "Fetch BIP-110 signaling data" упадёт — см. сообщение об ошибке
+# в логе, скорее всего формат ответа /api/v1/blocks/:height отличается от
+# предполагаемого в scripts/fetch_bip110_signaling.py.
+
+on:
+  schedule:
+    # каждые 3 часа — метрика меняется с каждым блоком (~раз в 10 минут),
+    # но полный пересчёт периода (~135 запросов) не должен гоняться слишком
+    # часто из вежливости к бесплатному API
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-bip110-signaling:
+    name: Fetch and commit BIP-110 signaling data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests --quiet
+
+      - name: Fetch BIP-110 signaling data
+        run: python3 scripts/fetch_bip110_signaling.py
+
+      - name: Validate data/bip110_signaling.json
+        run: python3 -m json.tool data/bip110_signaling.json > /dev/null && echo "OK data/bip110_signaling.json"
+
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          git add data/bip110_signaling.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit BIP-110 signaling data via PR (not direct push to main)
+        if: steps.diffcheck.outputs.changed == 'true'
+        # Тот же паттерн, что update-volume.yml/update-top-addresses.yml:
+        # main защищён Branch Protection — коммит в отдельную ветку → PR →
+        # auto-merge после зелёного "validate". SYNTHESIS_BOT_TOKEN (не
+        # GITHUB_TOKEN) — иначе PR/push от штатного GITHUB_TOKEN не порождает
+        # новый workflow run, "validate" на PR не запустится, auto-merge
+        # зависнет в ожидании статуса, который никогда не придёт.
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          for old_pr in $(gh pr list --state open --search "head:bot/sync-bip110-" --json number --jq '.[] | .number'); do
+            echo "Закрываю устаревший sync-PR #$old_pr"
+            gh pr close "$old_pr" --delete-branch || true
+          done
+
+          BRANCH="bot/sync-bip110-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update BIP-110 signaling data"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: sync BIP-110 signaling data ($(date -u +%Y-%m-%dT%H:%M))" \
+            --body "Автообновление data/bip110_signaling.json (scripts/fetch_bip110_signaling.py). ⚠️ Если это первый успешный прогон — стоит вручную сверить итоговый % с bip110monitor.com перед мержем. Auto-merge после зелёного validate."
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

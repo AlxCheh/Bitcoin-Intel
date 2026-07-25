@@ -35,6 +35,7 @@ KNOWN_SYNC_PR_WORKFLOWS = {
     "deploy.yml": "bot/sync-synthesis-",
     "build-facts.yml": "bot/sync-facts-",
     "update-volume.yml": "bot/sync-volume-",
+    "update-top-addresses.yml": "bot/sync-top-addresses-",
 }
 
 

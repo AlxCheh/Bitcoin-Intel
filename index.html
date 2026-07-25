@@ -466,6 +466,41 @@ header {
 .eco-badge.closed  { color: var(--red); border-color: rgba(194,96,96,0.3); }
 .eco-badge.pending { color: var(--amber); border-color: rgba(200,168,75,0.3); }
 
+/* Топ-100 богатейших адресов (data/top_addresses.json, Blockchair) —
+   те же .eco-badge/.eco-compact-row паттерны, что "Экосистема Bitcoin",
+   плюс цвет категории слева (биржа/потеряно-конфисковано/неизвестно),
+   чтобы не вводить новый визуальный язык (иконки-квадраты из превью)
+   там, где уже есть устоявшийся — бейджи. */
+.ta-meta {
+  padding: 6px 14px 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--dim);
+  line-height: 1.5;
+  border-bottom: 1px solid var(--line);
+}
+.ta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  border-left: 2px solid transparent;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.ta-row:hover { background: var(--bg3); }
+.ta-row.cat-exchange         { border-left-color: var(--grn); }
+.ta-row.cat-lost_confiscated { border-left-color: var(--red); }
+.ta-row.cat-unknown          { border-left-color: var(--slate); }
+.ta-rank { width: 22px; color: var(--slate); flex-shrink: 0; }
+.ta-body { flex: 1; min-width: 0; }
+.ta-name { color: var(--txt); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ta-addr { font-size: 9px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.ta-bal { text-align: right; flex-shrink: 0; }
+.ta-btc { color: var(--btc); font-weight: 700; }
+.ta-pct { font-size: 9px; color: var(--dim); }
+
 .eco-card-summary {
   font-size: 11px;
   color: var(--dim);
@@ -3495,6 +3530,20 @@ function toggleNav(id) {
       </div>
     </div>
 
+    <!-- Топ-100 богатейших адресов (data/top_addresses.json, Blockchair) —
+         добавлено 2026-07-25 по обсуждению в чате. ⚠️ Источник ещё не
+         верифицирован реальным прогоном (см. scripts/fetch_top_addresses.py
+         шапку) — на момент коммита data/top_addresses.json содержит черновик
+         на реальных цифрах bitinfocharts, не live Blockchair-данные. -->
+    <div class="panel collapsed" style="margin-top:12px;scroll-margin-top:64px" id="top-addr-panel">
+      <div class="panel-head collapsible" data-collapse-target="top-addr-panel">
+        <span class="panel-title">Топ-100 богатейших адресов</span>
+        <span class="panel-head-right"><span class="panel-tag" id="ta-count">—</span><span class="panel-collapse-arrow">▾</span></span>
+      </div>
+      <div class="ta-meta" id="ta-meta">—</div>
+      <div id="ta-list"></div>
+    </div>
+
     <div style="height:650px" aria-hidden="true"></div>
 
   </div>
@@ -4964,6 +5013,9 @@ function renderBitcoinFunctions() {
 
 
 let TREASURY_HOLDERS = [];
+let TOP_ADDRESSES = [];
+let TOP_ADDRESSES_META = {};
+let taExpanded = false; // "показать ещё" — тот же паттерн, что Экосистема Bitcoin
 let TREASURY_META = {};
 let thSearch = '';
 let thSortKey = 'btc';
@@ -5032,6 +5084,64 @@ function setThSearch(value) {
   thSearch = value;
   renderTreasuryHolders();
 }
+
+// ── ТОП-100 БОГАТЕЙШИХ АДРЕСОВ (data/top_addresses.json, Blockchair) ────
+// Добавлено 2026-07-25. Компактные строки с цветной полосой категории
+// (биржа/потеряно-конфисковано/неизвестно) — тот же язык бейджей, что
+// "Экосистема Bitcoin", не отдельная новая иконография. "Показать ещё" —
+// тот же порог/паттерн, что renderEcoSection() (см. ту секцию файла).
+const TA_SHOW_MORE_STEP = 10;
+const TA_CATEGORY_LABEL = { exchange: 'БИРЖА', lost_confiscated: 'ПОТЕРЯНО/КОНФИСКОВАНО', unknown: 'НЕИЗВЕСТНО' };
+
+function taRowHtml(e) {
+  const name = e.label ? sanitize(e.label) : sanitize(e.address.slice(0, 10) + '…' + e.address.slice(-6));
+  const addrShort = e.label ? sanitize(e.address.slice(0, 14) + '…' + e.address.slice(-6)) : '';
+  const catLabel = TA_CATEGORY_LABEL[e.category] || 'НЕИЗВЕСТНО';
+  return '<div class="ta-row cat-' + sanitize(e.category) + '">'
+    + '<span class="ta-rank">' + e.rank + '</span>'
+    + '<div class="ta-body">'
+    +   '<div class="ta-name">' + name + '<span class="eco-badge" style="margin-left:6px">' + catLabel + '</span></div>'
+    +   (addrShort ? '<div class="ta-addr">' + addrShort + '</div>' : '')
+    + '</div>'
+    + '<div class="ta-bal">'
+    +   '<div class="ta-btc">' + e.balance_btc.toLocaleString('ru-RU', {maximumFractionDigits: 0}) + ' BTC</div>'
+    +   '<div class="ta-pct">' + e.pct_of_supply.toFixed(3) + '%</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderTopAddresses() {
+  const countEl = document.getElementById('ta-count');
+  const metaEl  = document.getElementById('ta-meta');
+  const listEl  = document.getElementById('ta-list');
+  if (!countEl || !metaEl || !listEl) return;
+
+  if (!TOP_ADDRESSES.length) {
+    countEl.textContent = '—';
+    metaEl.textContent = 'Нет данных';
+    listEl.innerHTML = '<div class="eco-empty">НЕТ ДАННЫХ</div>';
+    return;
+  }
+
+  countEl.textContent = TOP_ADDRESSES.length + ' АДРЕСОВ';
+  const updated = TOP_ADDRESSES_META.updated_at ? new Date(TOP_ADDRESSES_META.updated_at).toLocaleDateString('ru-RU') : '—';
+  metaEl.innerHTML = 'Обновлено: <b>' + sanitize(updated) + '</b> · Источник: ' + sanitize(TOP_ADDRESSES_META.source || '—')
+    + (TOP_ADDRESSES_META.caveat ? '<br>⚠ ' + sanitize(TOP_ADDRESSES_META.caveat) : '');
+
+  const shown = taExpanded ? TOP_ADDRESSES : TOP_ADDRESSES.slice(0, TA_SHOW_MORE_STEP);
+  let html = shown.map(taRowHtml).join('');
+  if (!taExpanded && TOP_ADDRESSES.length > TA_SHOW_MORE_STEP) {
+    html += '<button class="eco-show-more" id="ta-show-more">Показать ещё ' + (TOP_ADDRESSES.length - TA_SHOW_MORE_STEP) + '</button>';
+  }
+  listEl.innerHTML = html;
+}
+
+document.addEventListener('click', function(ev) {
+  if (ev.target && ev.target.id === 'ta-show-more') {
+    taExpanded = true;
+    renderTopAddresses();
+  }
+});
 
 function setThSort(key) {
   if (thSortKey === key) {
@@ -5710,7 +5820,7 @@ function initPriceChart() {
 
 async function loadSignals() {
   try {
-    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp] = await Promise.all([
+    const [sigResp, entResp, cacheResp, ontResp, reResp, thResp, bfResp, ttResp, teResp, taResp] = await Promise.all([
       fetch('signals.json?v=' + Date.now()),
       fetch('ENTITIES.json?v=' + Date.now()),
       fetch('data/synthesis_cache.json?v=' + Date.now()),
@@ -5719,7 +5829,8 @@ async function loadSignals() {
       fetch('TREASURY_HOLDERS.json?v=' + Date.now()),
       fetch('BITCOIN_FUNCTIONS.json?v=' + Date.now()),
       fetch('THEORY_TOPICS.json?v=' + Date.now()),
-      fetch('THEORY_ESSAYS.json?v=' + Date.now())
+      fetch('THEORY_ESSAYS.json?v=' + Date.now()),
+      fetch('data/top_addresses.json?v=' + Date.now())
     ]);
     const data = await sigResp.json();
     const entData = await entResp.json();
@@ -5774,6 +5885,15 @@ async function loadSignals() {
     } catch(e) {
       console.warn('THEORY_ESSAYS.json load error, panels stay empty:', e);
       THEORY_ESSAYS = [];
+    }
+    try {
+      const taData = await taResp.json();
+      TOP_ADDRESSES = taData.entries || [];
+      TOP_ADDRESSES_META = { updated_at: taData.updated_at, source: taData.source, caveat: taData.caveat };
+    } catch(e) {
+      console.warn('data/top_addresses.json load error, panel stays empty:', e);
+      TOP_ADDRESSES = [];
+      TOP_ADDRESSES_META = {};
     }
     // Поддержка нового формата {meta, signals} и старого массива
     if (Array.isArray(data)) {
@@ -6568,7 +6688,7 @@ function triggerTabData(id) {
       if (!LATEST_BLOCKS.length) fetchBlocks();
     }
   }
-  if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); }
+  if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderTopAddresses(); }
   if (id === 'lightning') renderTheoryTopics();
   if (id === 'theory') { renderTheoryEssays(); renderTheoryTopics(); }
   if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }

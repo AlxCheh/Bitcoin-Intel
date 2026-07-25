@@ -101,6 +101,50 @@ def validate() -> bool:
                 f"все валидны"
             )
 
+    # ── LLM Wiki Пара 2: REVENUE_ENGINES.json ↔ ENTITIES.json ────────────────
+    # 2026-07-25: первый шаг к глобальной базе знаний (обсуждение в чате) —
+    # entity_id в REVENUE_ENGINES.json уже фактический внешний ключ на
+    # ENTITIES.json, entity_name — производная копия канонического имени
+    # (не независимое поле). Раньше не проверялось вообще: если сущность
+    # переименована/удалена в ENTITIES.json, а REVENUE_ENGINES.json не
+    # обновлён — тихое рассогласование, тот же класс риска, что уже был
+    # закрыт для signal_refs выше. Найден и исправлен один реальный дрейф
+    # при внедрении этой проверки (strive_sata.entity_name: "Strive (ASST)"
+    # → "Strive", не совпадало с ENTITIES.json.strive.name).
+    revenue_engines_path = Path("REVENUE_ENGINES.json")
+    if revenue_engines_path.exists():
+        try:
+            re_raw = json.loads(revenue_engines_path.read_text(encoding="utf-8"))
+            engines = re_raw.get("engines", re_raw) if isinstance(re_raw, dict) else re_raw
+            entities_by_id = {e.get("id"): e for e in entities}
+
+            orphan_entity_ids = []
+            name_mismatches = []
+            for eng in engines:
+                eid = eng.get("entity_id")
+                ent = entities_by_id.get(eid)
+                if ent is None:
+                    orphan_entity_ids.append((eng.get("id", "?"), eid))
+                elif eng.get("entity_name") != ent.get("name"):
+                    name_mismatches.append(
+                        (eng.get("id", "?"), eng.get("entity_name"), ent.get("name"))
+                    )
+
+            if orphan_entity_ids:
+                errors.append(
+                    "REVENUE_ENGINES.json: entity_id без соответствующей записи "
+                    "в ENTITIES.json: " + ", ".join(f"{e}→{eid}" for e, eid in orphan_entity_ids)
+                )
+            if name_mismatches:
+                errors.append(
+                    "REVENUE_ENGINES.json: entity_name разошёлся с ENTITIES.json.name: "
+                    + ", ".join(f"{e} ('{a}' vs '{b}')" for e, a, b in name_mismatches)
+                )
+            if not orphan_entity_ids and not name_mismatches:
+                print(f"✓ REVENUE_ENGINES.json ↔ ENTITIES.json: {len(engines)} движков, все entity_id/entity_name согласованы")
+        except Exception as e:
+            errors.append(f"REVENUE_ENGINES.json: {e}")
+
     # ── synthesis_cache.json ──────────────────────────────────────────────────
     cache_path = Path("data/synthesis_cache.json")
     if cache_path.exists():

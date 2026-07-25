@@ -248,7 +248,7 @@
     {
       "id": "strive_sata",
       "entity_id": "strive",
-      "entity_name": "Strive (ASST)",
+      "entity_name": "Strive",
       "name": "SATA — Variable Rate Series A Perpetual Preferred Stock",
       "mechanism_type": "preferred_equity_dividend",
       "summary": "Бессрочная привилегированная акция с variable-rate кумулятивным дивидендом; приток от размещения финансирует покупку BTC — структурный аналог STRC у Strategy, но без долга в капитальной структуре на момент последнего обновления",

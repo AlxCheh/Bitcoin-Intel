@@ -379,8 +379,6 @@ SANITIZE_RATCHET_BASELINE = {
     "counts.neg": 3,
     "counts.neu": 2,
     "counts.pos": 3,
-    "e.drop_pct": 1,
-    "e.years": 1,
     "engine.history.length": 1,
     "filteredClosed.length": 1,
     "first.cat.pct": 3,
@@ -403,7 +401,7 @@ SANITIZE_RATCHET_BASELINE = {
     "(items.length - step)": 1,
     "groupItems.length": 1,
     "filteredCompact.length": 1,
-    "v.pct": 2,
+    "v.pct": 1,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,
     "(freshness.stale ? 'var(--red)' : 'var(--dim)')": 1,
@@ -446,17 +444,16 @@ SANITIZE_RATCHET_BASELINE = {
     # не-HTML контекст: сборка текстового промпта AI-анализатора
     # (snapshotText) — детектор не различает HTML/текст, sanitize здесь
     # был бы вреден (внёс бы &quot; в промпт)
-    "s.event": 1,
     "t.key": 1,
     "t.label": 2,
     "t.note": 1,
     "tab.label": 1,
     "top100.as_of": 1,
     "w.event": 1,
-    "w.label": 2,
+    "w.label": 1,
     "w.note": 1,
-    "w.wave": 2,
-    "w.year": 2,
+    "w.wave": 1,
+    "w.year": 1,
 }
 
 

@@ -434,7 +434,6 @@ SANITIZE_RATCHET_BASELINE = {
     "item.target": 2,
     "item.title": 1,
     "last.date": 2,
-    "n.event": 1,
     "p.country": 1,
     "p.history": 1,
     "p.name": 1,

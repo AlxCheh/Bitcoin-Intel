@@ -1145,6 +1145,55 @@ let SIGNALS = [];
 let chartsInited = false;
 let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 
+// 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
+// той же причине, что chartsInited выше — bi_active_tab='signals' в
+// localStorage синхронно вызывал triggerTabData → renderPresetSignals(),
+// который обращался к PRESET_SIGNALS_LIST ДО того, как исполнение доходило
+// до её исходного (более позднего) объявления — необработанный
+// ReferenceError (TDZ) обрывал весь оставшийся синхронный код скрипта,
+// включая loadSignals(). Заодно перенесены соседние объявления того же
+// функционального блока (ANALYSIS_STEPS/analysisResult/currentStepIdx/
+// AI_STOP_WORDS/CLUSTER_LABELS_AI) — по той же логике профилактически,
+// не только упавшая переменная.
+const PRESET_SIGNALS_LIST = [
+  'Крупное государство продаёт BTC',
+  'ETFs поглощают продажи без падения цены',
+  'Халвинг приближается',
+  'Компании начинают покупать BTC',
+  'Цена не реагирует на негативные новости',
+  'Новый исторический максимум добытых BTC'
+];
+
+const ANALYSIS_STEPS = [
+  { key: 'tension',         label: '01 — Тензия кластера' },
+  { key: 'narrative',       label: '02 — Вывод синтеза' },
+  { key: 'related_signals', label: '03 — Подтверждающие сигналы' },
+  { key: 'caveats',         label: '04 — Оговорки' }
+];
+
+let analysisResult = null;
+let currentStepIdx = 0;
+
+const AI_STOP_WORDS = new Set([
+  'и','в','во','не','что','он','на','я','с','со','как','а','то','все','она',
+  'так','его','но','да','ты','к','у','же','вы','за','бы','по','только','её',
+  'мне','было','вот','от','меня','ещё','нет','о','из','ему','когда','даже',
+  'ну','если','уже','или','быть','был','до','вас','для','мы','их','чем',
+  'была','без','раз','себе','под','будет','этот','того','этого','какой',
+  'этом','это','также','через','есть','можно','при','об','этой','этих',
+  'какие','какая','какое','сколько','кто','где','почему','зачем'
+]);
+
+const CLUSTER_LABELS_AI = {
+  strategy_model_stress:       '🏦 Strategy: модель под давлением',
+  etf_institutional_flow:      '📊 ETF: институциональный поток',
+  btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
+  btc_infrastructure_growth:   '🔗 Инфраструктура',
+  supply_scarcity:             '⬛ Предложение',
+  leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
+  bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
+};
+
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
 // ontology.json (та же логика, что Python config/settings.py STALE_THRESHOLD,
 // см. tests/unit/test_ontology_settings_consistency.py). Дефолты ниже —
@@ -2590,7 +2639,24 @@ function showTab(id, btn, keepCluster) {
   let saved = null;
   try { saved = localStorage.getItem('bi_active_tab'); } catch (e) {}
   if (saved && document.getElementById('tab-' + saved)) {
-    showTab(saved, null);
+    // 2026-07-26: try/catch — второй раз подряд находим let/const,
+    // объявленную НИЖЕ по файлу, но синхронно затронутую именно этим
+    // ранним восстановлением вкладки (temporal dead zone): сначала
+    // 'analytics'→chartsInited, теперь 'signals'→PRESET_SIGNALS_LIST
+    // (renderPresetSignals() внутри triggerTabData). Без этой защиты
+    // необработанное исключение здесь обрывает ВЕСЬ оставшийся синхронный
+    // код скрипта, включая loadSignals() чуть ниже — сайт не грузит вообще
+    // ничего, не только восстанавливаемую вкладку. Обе конкретные причины
+    // исправлены точечно (перенос объявлений раньше), но независимо от
+    // того, найдём ли мы когда-нибудь ТРЕТЬЮ такую переменную — этот catch
+    // не даст ей повторить тот же катастрофический масштаб поломки.
+    try {
+      showTab(saved, null);
+    } catch (e) {
+      console.warn('restoreLastActiveTab: showTab(' + saved + ') упал, откатываюсь на ОБЗОР:', e);
+      renderSubnav('live', 'home');
+      currentTabId = 'home';
+    }
   } else {
     // Не showTab('home') — home и так инициализируется отдельно ниже
     // (fetchProdCost/initPriceChart/fetchBlocks на верхнем уровне);
@@ -3896,25 +3962,12 @@ function renderEmission() {
 // ══════════════════════════════════════════════════════
 // ANALYSIS / SIGNALS — AI-анализатор
 // ══════════════════════════════════════════════════════
-
-const PRESET_SIGNALS_LIST = [
-  'Крупное государство продаёт BTC',
-  'ETFs поглощают продажи без падения цены',
-  'Халвинг приближается',
-  'Компании начинают покупать BTC',
-  'Цена не реагирует на негативные новости',
-  'Новый исторический максимум добытых BTC'
-];
-
-const ANALYSIS_STEPS = [
-  { key: 'tension',         label: '01 — Тензия кластера' },
-  { key: 'narrative',       label: '02 — Вывод синтеза' },
-  { key: 'related_signals', label: '03 — Подтверждающие сигналы' },
-  { key: 'caveats',         label: '04 — Оговорки' }
-];
-
-let analysisResult = null;
-let currentStepIdx = 0;
+// PRESET_SIGNALS_LIST/ANALYSIS_STEPS/analysisResult/currentStepIdx/
+// AI_STOP_WORDS/CLUSTER_LABELS_AI — перенесены выше (см. рядом с
+// chartsInited) после того, как найден и исправлен TDZ-краш: 2026-07-26,
+// bi_active_tab='signals' → triggerTabData → renderPresetSignals() →
+// PRESET_SIGNALS_LIST (была объявлена здесь, ПОСЛЕ этой точки исполнения) —
+// та же причина, что раньше ловили на chartsInited (bi_active_tab='analytics').
 
 function renderPresetSignals() {
   const wrap = document.getElementById('preset-signals');
@@ -3946,25 +3999,6 @@ function selectPreset(btn) {
 // Метод сопоставления — простое пересечение ключевых слов (без стоп-слов),
 // не эмбеддинги/TF-IDF — по объёму данных (7 кластеров) этого достаточно,
 // тот же принцип "сначала простой шаг", что уже применялся к ADR-018 Фазе 1.
-const AI_STOP_WORDS = new Set([
-  'и','в','во','не','что','он','на','я','с','со','как','а','то','все','она',
-  'так','его','но','да','ты','к','у','же','вы','за','бы','по','только','её',
-  'мне','было','вот','от','меня','ещё','нет','о','из','ему','когда','даже',
-  'ну','если','уже','или','быть','был','до','вас','для','мы','их','чем',
-  'была','без','раз','себе','под','будет','этот','того','этого','какой',
-  'этом','это','также','через','есть','можно','при','об','этой','этих',
-  'какие','какая','какое','сколько','кто','где','почему','зачем'
-]);
-
-const CLUSTER_LABELS_AI = {
-  strategy_model_stress:       '🏦 Strategy: модель под давлением',
-  etf_institutional_flow:      '📊 ETF: институциональный поток',
-  btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
-  btc_infrastructure_growth:   '🔗 Инфраструктура',
-  supply_scarcity:             '⬛ Предложение',
-  leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
-  bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
-};
 
 function aiTokenize(text) {
   return (text || '')

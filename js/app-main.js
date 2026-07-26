@@ -3907,10 +3907,10 @@ const PRESET_SIGNALS_LIST = [
 ];
 
 const ANALYSIS_STEPS = [
-  { key: 'interpretation',    label: '01 — Интерпретация' },
-  { key: 'historical_analog', label: '02 — Исторический аналог' },
-  { key: 'structural_cause',  label: '03 — Структурная причина' },
-  { key: 'caveats',           label: '04 — Оговорки' }
+  { key: 'tension',         label: '01 — Тензия кластера' },
+  { key: 'narrative',       label: '02 — Вывод синтеза' },
+  { key: 'related_signals', label: '03 — Подтверждающие сигналы' },
+  { key: 'caveats',         label: '04 — Оговорки' }
 ];
 
 let analysisResult = null;
@@ -3932,113 +3932,116 @@ function selectPreset(btn) {
   analyzeSignal();
 }
 
-async function analyzeSignal() {
+// 2026-07-25 (обсуждение в чате, "Вариант C"): раньше analyzeSignal() делал
+// живой fetch к api.anthropic.com БЕЗ API-ключа — гарантированно падал на
+// любом вопросе (401 authentication_error, ключ отсутствовал в заголовках;
+// зашить реальный ключ владельца в публичный клиентский JS нельзя — его
+// увидит любой посетитель через просмотр кода страницы). Три варианта
+// обсуждались: (A) ключ в коде — риск утечки, отклонено; (B) BYOK — каждый
+// посетитель вводит свой ключ; (C) вообще без LLM-вызова — локальный анализ
+// прямо по уже связанным и проанализированным данным сайта (тензии
+// нарративных кластеров, data/synthesis_cache.json, + реальные сигналы того
+// кластера как подтверждение) — выбран пользователем.
+//
+// Метод сопоставления — простое пересечение ключевых слов (без стоп-слов),
+// не эмбеддинги/TF-IDF — по объёму данных (7 кластеров) этого достаточно,
+// тот же принцип "сначала простой шаг", что уже применялся к ADR-018 Фазе 1.
+const AI_STOP_WORDS = new Set([
+  'и','в','во','не','что','он','на','я','с','со','как','а','то','все','она',
+  'так','его','но','да','ты','к','у','же','вы','за','бы','по','только','её',
+  'мне','было','вот','от','меня','ещё','нет','о','из','ему','когда','даже',
+  'ну','если','уже','или','быть','был','до','вас','для','мы','их','чем',
+  'была','без','раз','себе','под','будет','этот','того','этого','какой',
+  'этом','это','также','через','есть','можно','при','об','этой','этих',
+  'какие','какая','какое','сколько','кто','где','почему','зачем'
+]);
+
+const CLUSTER_LABELS_AI = {
+  strategy_model_stress:       '🏦 Strategy: модель под давлением',
+  etf_institutional_flow:      '📊 ETF: институциональный поток',
+  btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
+  btc_infrastructure_growth:   '🔗 Инфраструктура',
+  supply_scarcity:             '⬛ Предложение',
+  leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
+  bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
+};
+
+function aiTokenize(text) {
+  return (text || '')
+    .toLowerCase()
+    .match(/[а-яёa-z0-9]+/g) || [];
+}
+
+function aiSignificantTokens(text) {
+  return aiTokenize(text).filter(w => w.length > 2 && !AI_STOP_WORDS.has(w));
+}
+
+// Экспортирована на window для теста (tests/unit/test_ai_local_analyzer_equivalence.py,
+// тот же паттерн JS↔Python эквивалентности, что уже используется для других
+// чистых функций — см. ADR-010).
+function localAnalyzeSignal(input) {
+  const inputTokens = new Set(aiSignificantTokens(input));
+
+  const scored = Object.entries(SYNTHESIS_CACHE)
+    .filter(([key]) => !key.startsWith('_') && key !== 'meta')
+    .map(([key, cl]) => {
+      const clusterTokens = aiSignificantTokens((cl && cl.tension || '') + ' ' + (cl && cl.narrative || ''));
+      const overlap = clusterTokens.filter(t => inputTokens.has(t)).length;
+      return { key, cl: cl || {}, overlap };
+    })
+    .sort((a, b) => b.overlap - a.overlap);
+
+  const top = scored[0];
+  const matched = !!(top && top.overlap > 0);
+
+  if (!matched) {
+    return {
+      signal: input,
+      matched: false,
+      tension: 'Прямого совпадения по ключевым словам не найдено — вот все активные кластеры сейчас:',
+      narrative: scored.map(s => (CLUSTER_LABELS_AI[s.key] || s.key)).join('\n'),
+      related_signals: [],
+      caveats: 'Локальный анализ работает через простое пересечение ключевых слов, не через понимание смысла вопроса — попробуй переформулировать ближе к терминам сайта (казначейство, ETF, предложение, майнинг, левередж, консенсус).'
+    };
+  }
+
+  const relatedSignals = (SIGNALS || [])
+    .filter(s => s.cluster === top.key)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .slice(0, 3)
+    .map(s => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
+
+  const caveatsText = relatedSignals
+    .filter(s => s.caveat)
+    .slice(0, 2)
+    .map(s => s.id + ': ' + s.caveat)
+    .join('\n\n') || 'Оговорок не зафиксировано в подтверждающих сигналах этого кластера.';
+
+  return {
+    signal: input,
+    matched: true,
+    cluster_label: CLUSTER_LABELS_AI[top.key] || top.key,
+    tension: top.cl.tension || '—',
+    narrative: top.cl.narrative || '—',
+    related_signals: relatedSignals,
+    caveats: caveatsText
+  };
+}
+
+function analyzeSignal() {
   const input = document.getElementById('sig-input').value.trim();
   if (!input) return;
 
-  document.getElementById('analysis-result').style.display = 'none';
-  document.getElementById('analysis-loading').style.display = 'block';
-  analysisResult = null;
+  analysisResult = localAnalyzeSignal(input);
   currentStepIdx = 0;
-
-  const snapshotText = HOLDERS_DATA.snapshots.map(s => {
-    const cats = Object.entries(s.categories)
-      .filter(([,v]) => v !== null)
-      .map(([k,v]) => k + ': ' + v.pct + '% · ' + v.btc.toLocaleString('ru-RU') + ' BTC')
-      .join(', ');
-    return s.date + ' [' + s.event + ']: ' + cats;
-  }).join('\n');
-
-  const emissionText = HOLDERS_DATA.emission
-    .map(e => e.period + ': −' + e.drop_pct + '% за ' + e.years + ' лет')
-    .join(', ');
-
-  const wavesText = HOLDERS_DATA.institutional_waves
-    .map(w => 'Волна ' + w.wave + ' (' + w.year + '): ' + w.label + ' — ' + w.note)
-    .join('\n');
-
-  // 2026-07-25 (обсуждение в чате): контекст для AI-анализатора теперь строится
-  // из уже связанных и проанализированных данных (data/synthesis_cache.json —
-  // тензии активных нарративных кластеров + кросс-кластерные сущности, ADR-017),
-  // а не из статичных HOLDERS_DATA.narratives/CROSSLINKS, которые не обновлялись
-  // с 21 июня 2026 и обрывались на событии Oct 2024 — не знали ни про Satsuma,
-  // ни про Strive/SATA, ни про голосование Foundry по BIP-110. Пользователь
-  // задаёт любой вопрос — ответ формируется на актуальном срезе корпуса, не на
-  // замороженном тексте почти годичной давности.
-  const CLUSTER_LABELS_AI = {
-    strategy_model_stress:       '🏦 Strategy: модель под давлением',
-    etf_institutional_flow:      '📊 ETF: институциональный поток',
-    btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
-    btc_infrastructure_growth:   '🔗 Инфраструктура',
-    supply_scarcity:             '⬛ Предложение',
-    leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
-    bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
-  };
-
-  const clusterText = Object.entries(SYNTHESIS_CACHE)
-    .filter(([key]) => !key.startsWith('_') && key !== 'meta')
-    .map(([key, cl]) => {
-      const label = CLUSTER_LABELS_AI[key] || key;
-      const tension = (cl && cl.tension) || '—';
-      const narrative = ((cl && cl.narrative) || '—').slice(0, 350);
-      return label + '\n  Напряжение: ' + tension + '\n  Вывод: ' + narrative;
-    })
-    .join('\n\n');
-
-  const crossClusterEntities = SYNTHESIS_CACHE._cross_cluster_entities || {};
-  const bridgeText = Object.entries(crossClusterEntities)
-    .map(([entityId, clusters]) =>
-      entityId + ' — одновременно в: ' + clusters.map(c => CLUSTER_LABELS_AI[c] || c).join(', ')
-    )
-    .join('\n') || 'Кросс-кластерных сущностей не найдено на текущем срезе';
-
-  const knowledgeBase = [
-    'Ты — аналитик Bitcoin. Отвечаешь ТОЛЬКО по теме Bitcoin.',
-    '',
-    'СТРУКТУРА ВЛАДЕНИЯ (последний снэпшот):',
-    snapshotText,
-    '',
-    'ЭМИССИОННАЯ КРИВАЯ:',
-    emissionText,
-    '',
-    'ИНСТИТУЦИОНАЛЬНЫЕ ВОЛНЫ:',
-    wavesText,
-    '',
-    'АКТИВНЫЕ НАРРАТИВНЫЕ КЛАСТЕРЫ (тензия + вывод из связанного и проанализированного корпуса сигналов):',
-    clusterText,
-    '',
-    'СУЩНОСТИ, СВЯЗЫВАЮЩИЕ НЕСКОЛЬКО КЛАСТЕРОВ ОДНОВРЕМЕННО:',
-    bridgeText,
-    '',
-    'ФОРМАТ ОТВЕТА — строго JSON без markdown:',
-    '{"signal":"...","interpretation":"...","historical_analog":"...","structural_cause":"...","caveats":"..."}'
-  ].join('\n');
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: knowledgeBase,
-        messages: [{ role: 'user', content: 'Проанализируй сигнал: "' + input + '"' }]
-      })
-    });
-    const data = await resp.json();
-    const text = (data.content || []).map(i => i.text || '').join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-    analysisResult = JSON.parse(clean);
-    showAnalysisResult();
-  } catch(e) {
-    document.getElementById('analysis-loading').style.display = 'none';
-    alert('Ошибка анализа. Попробуй ещё раз.');
-  }
+  showAnalysisResult();
 }
 
 function showAnalysisResult() {
   document.getElementById('analysis-loading').style.display = 'none';
   document.getElementById('result-signal-title').textContent = analysisResult.signal;
+  const tagEl = document.querySelector('#analysis-result .panel-tag');
+  if (tagEl) tagEl.textContent = analysisResult.matched ? ('НАЙДЕНО: ' + (analysisResult.cluster_label || '').toUpperCase()) : 'НЕ НАЙДЕНО ПРЯМОГО СОВПАДЕНИЯ';
   document.getElementById('result-steps').innerHTML = '';
   currentStepIdx = 0;
   renderStep(0);
@@ -4051,9 +4054,27 @@ function renderStep(idx) {
   const wrap = document.getElementById('result-steps');
   const div = document.createElement('div');
   div.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--line)';
+
+  let bodyHtml;
+  const value = analysisResult[step.key];
+  if (step.key === 'related_signals') {
+    if (!value || !value.length) {
+      bodyHtml = '<p style="font-size:13px;color:var(--dim);line-height:1.6">Нет сигналов этого кластера в базе.</p>';
+    } else {
+      bodyHtml = value.map(s =>
+        '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line2)">'
+        + '<div style="font-family:var(--mono);font-size:10px;color:var(--btc)">' + sanitize(s.id) + ' · ' + sanitize(s.date) + '</div>'
+        + '<div style="font-size:13px;color:var(--txt);margin-top:2px">' + sanitize(s.title) + '</div>'
+        + '</div>'
+      ).join('');
+    }
+  } else {
+    bodyHtml = '<p style="font-size:13px;color:var(--dim);line-height:1.6;white-space:pre-line">' + sanitize(value || '—') + '</p>';
+  }
+
   div.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--btc);letter-spacing:0.15em;margin-bottom:6px">'
     + step.label + '</div>'
-    + '<p style="font-size:13px;color:var(--dim);line-height:1.6">' + analysisResult[step.key] + '</p>';
+    + bodyHtml;
   wrap.appendChild(div);
 }
 

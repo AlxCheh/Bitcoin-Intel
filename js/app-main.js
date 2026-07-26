@@ -3949,10 +3949,6 @@ async function analyzeSignal() {
     return s.date + ' [' + s.event + ']: ' + cats;
   }).join('\n');
 
-  const narrativeText = HOLDERS_DATA.narratives
-    .map(n => n.date + ' · ' + n.event + ' → ' + n.effect)
-    .join('\n');
-
   const emissionText = HOLDERS_DATA.emission
     .map(e => e.period + ': −' + e.drop_pct + '% за ' + e.years + ' лет')
     .join(', ');
@@ -3961,18 +3957,46 @@ async function analyzeSignal() {
     .map(w => 'Волна ' + w.wave + ' (' + w.year + '): ' + w.label + ' — ' + w.note)
     .join('\n');
 
-  const crossText = CROSSLINKS.strong_pairs
-    .map(p => p.pair.join(' ↔ ') + ': ' + p.note)
-    .join('\n');
+  // 2026-07-25 (обсуждение в чате): контекст для AI-анализатора теперь строится
+  // из уже связанных и проанализированных данных (data/synthesis_cache.json —
+  // тензии активных нарративных кластеров + кросс-кластерные сущности, ADR-017),
+  // а не из статичных HOLDERS_DATA.narratives/CROSSLINKS, которые не обновлялись
+  // с 21 июня 2026 и обрывались на событии Oct 2024 — не знали ни про Satsuma,
+  // ни про Strive/SATA, ни про голосование Foundry по BIP-110. Пользователь
+  // задаёт любой вопрос — ответ формируется на актуальном срезе корпуса, не на
+  // замороженном тексте почти годичной давности.
+  const CLUSTER_LABELS_AI = {
+    strategy_model_stress:       '🏦 Strategy: модель под давлением',
+    etf_institutional_flow:      '📊 ETF: институциональный поток',
+    btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
+    btc_infrastructure_growth:   '🔗 Инфраструктура',
+    supply_scarcity:             '⬛ Предложение',
+    leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
+    bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
+  };
+
+  const clusterText = Object.entries(SYNTHESIS_CACHE)
+    .filter(([key]) => !key.startsWith('_') && key !== 'meta')
+    .map(([key, cl]) => {
+      const label = CLUSTER_LABELS_AI[key] || key;
+      const tension = (cl && cl.tension) || '—';
+      const narrative = ((cl && cl.narrative) || '—').slice(0, 350);
+      return label + '\n  Напряжение: ' + tension + '\n  Вывод: ' + narrative;
+    })
+    .join('\n\n');
+
+  const crossClusterEntities = SYNTHESIS_CACHE._cross_cluster_entities || {};
+  const bridgeText = Object.entries(crossClusterEntities)
+    .map(([entityId, clusters]) =>
+      entityId + ' — одновременно в: ' + clusters.map(c => CLUSTER_LABELS_AI[c] || c).join(', ')
+    )
+    .join('\n') || 'Кросс-кластерных сущностей не найдено на текущем срезе';
 
   const knowledgeBase = [
     'Ты — аналитик Bitcoin. Отвечаешь ТОЛЬКО по теме Bitcoin.',
     '',
-    'СТРУКТУРА ВЛАДЕНИЯ (снэпшоты 2009–2024):',
+    'СТРУКТУРА ВЛАДЕНИЯ (последний снэпшот):',
     snapshotText,
-    '',
-    'КЛЮЧЕВЫЕ СОБЫТИЯ:',
-    narrativeText,
     '',
     'ЭМИССИОННАЯ КРИВАЯ:',
     emissionText,
@@ -3980,10 +4004,11 @@ async function analyzeSignal() {
     'ИНСТИТУЦИОНАЛЬНЫЕ ВОЛНЫ:',
     wavesText,
     '',
-    'ПЕРЕКРЁСТНЫЕ СВЯЗИ:',
-    crossText,
+    'АКТИВНЫЕ НАРРАТИВНЫЕ КЛАСТЕРЫ (тензия + вывод из связанного и проанализированного корпуса сигналов):',
+    clusterText,
     '',
-    'ПРИОРИТЕТЫ ПРИ КОНФЛИКТЕ: ' + CROSSLINKS.priorities.join(' > '),
+    'СУЩНОСТИ, СВЯЗЫВАЮЩИЕ НЕСКОЛЬКО КЛАСТЕРОВ ОДНОВРЕМЕННО:',
+    bridgeText,
     '',
     'ФОРМАТ ОТВЕТА — строго JSON без markdown:',
     '{"signal":"...","interpretation":"...","historical_analog":"...","structural_cause":"...","caveats":"..."}'

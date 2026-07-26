@@ -4029,12 +4029,32 @@ function localAnalyzeSignal(input) {
 }
 
 function analyzeSignal() {
-  const input = document.getElementById('sig-input').value.trim();
-  if (!input) return;
-
-  analysisResult = localAnalyzeSignal(input);
-  currentStepIdx = 0;
-  showAnalysisResult();
+  // 2026-07-26: раньше здесь не было try/catch вообще — любое исключение
+  // (включая случай, если #sig-input вдруг не найден) проваливалось молча —
+  // пользователь видит "ничего не происходит", ни я, ни он не может понять
+  // причину без доступа к консоли браузера, которой на мобильном обычно нет.
+  // Теперь любая ошибка видна прямо на экране — достаточно скриншота, не
+  // нужен доступ к devtools.
+  try {
+    const input = document.getElementById('sig-input').value.trim();
+    if (!input) return;
+    analysisResult = localAnalyzeSignal(input);
+    currentStepIdx = 0;
+    showAnalysisResult();
+  } catch (e) {
+    document.getElementById('analysis-loading').style.display = 'none';
+    document.getElementById('result-signal-title').textContent = document.getElementById('sig-input') ? document.getElementById('sig-input').value : '—';
+    const tagEl = document.querySelector('#analysis-result .panel-tag');
+    if (tagEl) tagEl.textContent = 'ОШИБКА';
+    document.getElementById('result-steps').innerHTML =
+      '<div style="padding:12px 14px;border-bottom:1px solid var(--line)">'
+      + '<div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:0.15em;margin-bottom:6px">ОШИБКА ВЫПОЛНЕНИЯ</div>'
+      + '<p style="font-size:12px;color:var(--dim);line-height:1.6;font-family:var(--mono);white-space:pre-wrap">'
+      + sanitize(String(e && e.stack || e))
+      + '</p></div>';
+    document.getElementById('analysis-result').style.display = 'block';
+    updateNextBtn();
+  }
 }
 
 function showAnalysisResult() {

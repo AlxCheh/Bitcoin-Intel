@@ -1181,7 +1181,12 @@ const AI_STOP_WORDS = new Set([
   'ну','если','уже','или','быть','был','до','вас','для','мы','их','чем',
   'была','без','раз','себе','под','будет','этот','того','этого','какой',
   'этом','это','также','через','есть','можно','при','об','этой','этих',
-  'какие','какая','какое','сколько','кто','где','почему','зачем'
+  'какие','какая','какое','сколько','кто','где','почему','зачем',
+  // 2026-07-26: найдено на реальном примере — "Сколько BTC у Stratagy?"
+  // ложно совпало с кластером про Сальвадор ЕДИНСТВЕННО по слову "btc"
+  // (встречается в тексте почти любого кластера — центральное слово всего
+  // сайта, ноль различающей способности для этой конкретной задачи).
+  'btc','bitcoin','биткоин','биткойн','биткоина','биткойна','биткоину','биткойну'
 ]);
 
 const CLUSTER_LABELS_AI = {
@@ -4010,12 +4015,92 @@ function aiSignificantTokens(text) {
   return aiTokenize(text).filter(w => w.length > 2 && !AI_STOP_WORDS.has(w));
 }
 
+// 2026-07-26: найдено на реальном примере ("Сколько BTC у Stratagy?" —
+// опечатка в "Strategy") — простое пересечение слов с текстом тензии
+// кластера не может ответить на вопрос про КОНКРЕТНУЮ компанию: тензия
+// кластера btc_treasury_competition — это общий нарратив (напр. про
+// Сальвадор), не про Strategy отдельно, а опечатка "Stratagy" не совпадает
+// с "Strategy" как строка вообще. Реальная точность здесь выше, если
+// сначала попробовать узнать КОНКРЕТНУЮ сущность (ENTITIES.json — уже
+// готовый список компаний/протоколов) через нечёткое сравнение (терпимое
+// к опечаткам), и ответить её собственными данными (profile.summary,
+// signal_refs) — гораздо точнее общей тензии кластера.
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+    }
+    prev = cur;
+  }
+  return prev[n];
+}
+
+function findMatchingEntity(inputTokens) {
+  let best = null, bestDist = Infinity;
+  for (const e of (ENTITIES || [])) {
+    const candidates = [
+      (e.id || '').toLowerCase(),
+      (e.name || '').replace(/\s*\(.*?\)\s*/g, '').toLowerCase()
+    ].filter(Boolean);
+    for (const token of inputTokens) {
+      for (const cand of candidates) {
+        if (Math.abs(token.length - cand.length) > 3) continue; // дёшево отсекаем заведомо далёкие пары
+        const dist = levenshtein(token, cand);
+        const threshold = Math.max(1, Math.floor(cand.length * 0.25)); // терпимость ~25% длины слова
+        if (dist <= threshold && dist < bestDist) {
+          bestDist = dist;
+          best = e;
+        }
+      }
+    }
+  }
+  return best;
+}
+
 // Экспортирована на window для теста (tests/unit/test_ai_local_analyzer_equivalence.py,
 // тот же паттерн JS↔Python эквивалентности, что уже используется для других
 // чистых функций — см. ADR-010).
 function localAnalyzeSignal(input) {
-  const inputTokens = new Set(aiSignificantTokens(input));
+  const inputTokensArr = aiSignificantTokens(input);
+  const inputTokens = new Set(inputTokensArr);
 
+  // ПРИОРИТЕТ 1 — узнанная сущность (нечёткое сравнение, терпимое к
+  // опечаткам). Отвечает её собственными данными — точнее, чем тензия
+  // всего кластера, если вопрос про конкретную компанию/протокол.
+  const matchedEntity = findMatchingEntity(inputTokensArr);
+  if (matchedEntity) {
+    const relatedSignals = (SIGNALS || [])
+      .filter(s => (matchedEntity.signal_refs || []).includes(s.id))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+      .slice(0, 3)
+      .map(s => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
+    const metricsText = (matchedEntity.profile && matchedEntity.profile.metrics || []).join('\n');
+    const caveatsText = relatedSignals
+      .filter(s => s.caveat)
+      .slice(0, 2)
+      .map(s => s.id + ': ' + s.caveat)
+      .join('\n\n') || 'Оговорок не зафиксировано в сигналах об этой сущности.';
+
+    return {
+      signal: input,
+      matched: true,
+      cluster_label: '🏢 ' + (matchedEntity.name || matchedEntity.id),
+      tension: matchedEntity.summary || '—',
+      narrative: metricsText || '—',
+      related_signals: relatedSignals,
+      caveats: caveatsText
+    };
+  }
+
+  // ПРИОРИТЕТ 2 (fallback) — конкретная сущность не узнана, ищем по
+  // пересечению ключевых слов тензию/вывод самого релевантного кластера.
   const scored = Object.entries(SYNTHESIS_CACHE)
     .filter(([key]) => !key.startsWith('_') && key !== 'meta')
     .map(([key, cl]) => {
@@ -4035,7 +4120,7 @@ function localAnalyzeSignal(input) {
       tension: 'Прямого совпадения по ключевым словам не найдено — вот все активные кластеры сейчас:',
       narrative: scored.map(s => (CLUSTER_LABELS_AI[s.key] || s.key)).join('\n'),
       related_signals: [],
-      caveats: 'Локальный анализ работает через простое пересечение ключевых слов, не через понимание смысла вопроса — попробуй переформулировать ближе к терминам сайта (казначейство, ETF, предложение, майнинг, левередж, консенсус).'
+      caveats: 'Локальный анализ работает через простое пересечение ключевых слов, не через понимание смысла вопроса — попробуй переформулировать ближе к терминам сайта (казначейство, ETF, предложение, майнинг, левередж, консенсус) или назвать конкретную компанию/протокол.'
     };
   }
 

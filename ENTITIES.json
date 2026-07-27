@@ -1147,6 +1147,29 @@
         "STR-2026-0725-003"
       ],
       "last_updated": "2026-07-20"
+    },
+    {
+      "id": "galaxy_digital",
+      "name": "Galaxy Digital (GLXY)",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная (Nasdaq: GLXY) компания цифровых активов — запустила Bitcoin Quantum Readiness Initiative, до $5 млн на пост-квантовую готовность Bitcoin",
+      "profile": {
+        "what": "Финансовые услуги в цифровых активах; в июле 2026 учредила координационную инициативу с грантовым пулом, исследовательской программой и консультативным советом для защиты Bitcoin от квантовых угроз",
+        "metrics": [
+          "Bitcoin Quantum Readiness Initiative: до $5 млн грантов (non-dilutive, milestone-based)",
+          "Consultative council: Barry Sanders (U Calgary), Damien Bérubé (MIT), Eran Tromer (Boston University)",
+          "CEO Mike Novogratz призвал майнинг-пулы и кастодианов к со-финансированию"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Первая отраслевая (не продуктовая) координационная инициатива по квантовой готовности Bitcoin — открытый приём заявок на гранты, публичный призыв к со-финансированию другими игроками"
+      },
+      "signal_refs": [
+        "INF-2026-0721-001"
+      ],
+      "last_updated": "2026-07-21"
     }
   ]
 }

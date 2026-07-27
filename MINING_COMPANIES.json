@@ -33,7 +33,11 @@
       "btc_treasury_policy": "hold",
       "ai_hpc_diversification": "major",
       "notable": "Казначейство 13 924 BTC явно не продаётся под AI-лизинговую сделку ($6,6 млрд законтрактованной выручки, Сандерсвилл). Номинальная мощность — рекордные 50 EH/s, но операционный хешрейт отстаёт (42,6 EH/s) — разрыв номинал/утилизация расширяется.",
-      "signal_refs": ["STR-2026-0715-001", "INF-2026-0714-001", "INF-2026-0714-003"],
+      "signal_refs": [
+        "STR-2026-0715-001",
+        "INF-2026-0714-001",
+        "INF-2026-0714-003"
+      ],
       "last_updated": "2026-07-14"
     },
     {
@@ -45,7 +49,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "full_pivot",
       "notable": "Бывш. Celsius Mining. BTC-майнинговое оборудование в Ward County (Техас, 234 МВт) демонтировано в декабре 2025 — площадка полностью переведена под AI/HPC-лизинг (Nscale, ~$1,95-2,6 млрд законтрактованной выручки).",
-      "signal_refs": ["INF-2026-0629-001"],
+      "signal_refs": [
+        "INF-2026-0629-001"
+      ],
       "last_updated": "2026-06-29"
     },
     {
@@ -57,7 +63,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "partial",
       "notable": "Бывш. Bitfarms (ребрендинг 1 апреля 2026 после редомициляции в США). Кампус Sherbrooke (96 МВт из 170 заявленных в Квебеке) переводится с BTC-майнинга на HPC/AI — рекатегоризация существующей мощности, не новое строительство. Остальные площадки (Baie-Comeau + 4 меньших) остаются майнингом.",
-      "signal_refs": ["INF-2026-0713-001"],
+      "signal_refs": [
+        "INF-2026-0713-001"
+      ],
       "last_updated": "2026-07-13"
     },
     {
@@ -69,7 +77,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "none",
       "notable": "Собственный флот майнинга растёт (+1200 устройств S21 XP), несмотря на сокращение арендованной/хостируемой мощности — не зафиксирована AI/HPC-диверсификация.",
-      "signal_refs": ["INF-2026-0714-003"],
+      "signal_refs": [
+        "INF-2026-0714-003"
+      ],
       "last_updated": "2026-07-14"
     },
     {
@@ -81,7 +91,10 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "none",
       "notable": "В первую очередь производитель майнингового оборудования, майнинг — часть бизнеса. Снижение добычи в июне 2026 объяснено плановым обслуживанием сети, не диверсификацией.",
-      "signal_refs": ["STR-2026-0714-001", "INF-2026-0714-003"],
+      "signal_refs": [
+        "STR-2026-0714-001",
+        "INF-2026-0714-003"
+      ],
       "last_updated": "2026-07-14"
     },
     {
@@ -93,7 +106,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "major",
       "notable": "Расширяет AI/HPC мощности параллельно с BTC-майнингом на фоне давления на маржу (майнерский доход на 37-м перцентиле диапазона с 2023).",
-      "signal_refs": ["INF-2026-0618-001"],
+      "signal_refs": [
+        "INF-2026-0618-001"
+      ],
       "last_updated": "2026-06-15"
     },
     {
@@ -105,7 +120,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "major",
       "notable": "Та же диверсификация, что IREN — расширение AI/HPC параллельно с BTC-майнингом на фоне давления на маржу.",
-      "signal_refs": ["INF-2026-0618-001"],
+      "signal_refs": [
+        "INF-2026-0618-001"
+      ],
       "last_updated": "2026-06-15"
     },
     {
@@ -141,7 +158,9 @@
       "btc_treasury_policy": "unknown",
       "ai_hpc_diversification": "unknown",
       "notable": "MOU с Antalpha на $10,8 млн в майнинг-инфраструктуру (INF-2026-0625-002) — операционная политика резерва и AI-диверсификация отдельно не проверялись.",
-      "signal_refs": ["INF-2026-0625-002"],
+      "signal_refs": [
+        "INF-2026-0625-002"
+      ],
       "last_updated": "2026-07-26"
     },
     {
@@ -186,11 +205,13 @@
       "name": "Hut 8 Corp",
       "ticker": "HUT",
       "exchange": "Nasdaq",
-      "btc_treasury_policy": "unknown",
-      "ai_hpc_diversification": "unknown",
-      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 5,07% активов WGMI на 27 марта 2026. Операционные факты отдельно не проверялись.",
-      "signal_refs": [],
-      "last_updated": "2026-07-26"
+      "btc_treasury_policy": "hold",
+      "ai_hpc_diversification": "major",
+      "notable": "Сохраняет майнинг ПОЛНОСТЬЮ (60% в American Bitcoin Corp, держит 10 667 BTC на 31 марта 2026), одновременно строит крупнейший в MINING_COMPANIES.json AI-портфель — $19,6 млрд законтрактованной стоимости (Beacon Point + River Bend). Целевая цена от Benchmark поднята дважды за месяц (5→$165→$195).",
+      "signal_refs": [
+        "INF-2026-0723-001"
+      ],
+      "last_updated": "2026-07-23"
     },
     {
       "id": "hive_digital",

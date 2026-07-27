@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "description": "Публичные компании, чей основной или значимый бизнес — биткоин-майнинг. Дополняет ENTITIES.json — фокус не на компании целиком, а на двух конкретных операционных фактах: политика по BTC-резерву (держат/продают) и статус AI/HPC-диверсификации. Не включает хешрейт и другие быстро меняющиеся метрики — для них нужен отдельный периодический механизм (по образцу data/bip110_signaling.json), не ручное обновление по сигналам.",
+    "methodology_reference": "Критерий включения ориентирован на методологию CoinShares Bitcoin Mining Index (см. STR-2026-0721-001, docs/BACKLOG.md находка №1) — публично торгуется на признанной бирже, основной или значимый бизнес — BTC-майнинг. Из 5 факторов индекса (хешрейт, прибыльность, финансовая устойчивость, экологическая эффективность, governance) здесь не воспроизводится ни один напрямую — это не рейтинг качества, а фактологический справочник по двум конкретным полям.",
+    "field_values": {
+      "btc_treasury_policy": {
+        "hold": "Явно зафиксировано в сигнале — компания сохраняет BTC-резерв, не продаёт под конкретную сделку/событие",
+        "sell": "Явно зафиксировано в сигнале — компания продаёт добытый или резервный BTC",
+        "mixed": "Зафиксированы оба поведения в разных сигналах/периодах",
+        "unknown": "Не зафиксировано напрямую в обработанных сигналах — не значит 'продаёт' или 'держит', значит 'мы не проверяли'"
+      },
+      "ai_hpc_diversification": {
+        "none": "Явно не диверсифицируется — продолжает чистый BTC-майнинг",
+        "partial": "Часть мощностей переведена/сдана под AI/HPC, часть остаётся BTC-майнингом",
+        "major": "Крупная, но не единственная AI/HPC-сделка — BTC-майнинг остаётся значимой частью бизнеса",
+        "full_pivot": "Полностью перешла на AI/HPC — BTC-майнинговое оборудование демонтировано/выведено",
+        "unknown": "Не зафиксировано напрямую в обработанных сигналах"
+      }
+    },
+    "excluded_pending_confirmation": [
+      "GoMining — упомянута в сигналах (INF-2026-0625-001) как участник майнинг-пула, публичный листинг на признанной бирже не подтверждён",
+      "DMND — оператор майнинг-пула/хешрейт-маркетплейса, не публичная майнинговая компания в смысле этого файла"
+    ],
+    "last_updated": "2026-07-26"
+  },
+  "miners": [
+    {
+      "id": "cleanspark",
+      "entity_id": "cleanspark",
+      "name": "CleanSpark",
+      "ticker": "CLSK",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "hold",
+      "ai_hpc_diversification": "major",
+      "notable": "Казначейство 13 924 BTC явно не продаётся под AI-лизинговую сделку ($6,6 млрд законтрактованной выручки, Сандерсвилл). Номинальная мощность — рекордные 50 EH/s, но операционный хешрейт отстаёт (42,6 EH/s) — разрыв номинал/утилизация расширяется.",
+      "signal_refs": ["STR-2026-0715-001", "INF-2026-0714-001", "INF-2026-0714-003"],
+      "last_updated": "2026-07-14"
+    },
+    {
+      "id": "ionic_digital",
+      "entity_id": "ionic_digital",
+      "name": "Ionic Digital",
+      "ticker": "IOND",
+      "exchange": "Nasdaq (прямой листинг, S-1 подана 29.06.2026)",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "full_pivot",
+      "notable": "Бывш. Celsius Mining. BTC-майнинговое оборудование в Ward County (Техас, 234 МВт) демонтировано в декабре 2025 — площадка полностью переведена под AI/HPC-лизинг (Nscale, ~$1,95-2,6 млрд законтрактованной выручки).",
+      "signal_refs": ["INF-2026-0629-001"],
+      "last_updated": "2026-06-29"
+    },
+    {
+      "id": "keel",
+      "entity_id": "keel",
+      "name": "Keel Infrastructure",
+      "ticker": "KEEL",
+      "exchange": "Nasdaq/TSX",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "partial",
+      "notable": "Бывш. Bitfarms (ребрендинг 1 апреля 2026 после редомициляции в США). Кампус Sherbrooke (96 МВт из 170 заявленных в Квебеке) переводится с BTC-майнинга на HPC/AI — рекатегоризация существующей мощности, не новое строительство. Остальные площадки (Baie-Comeau + 4 меньших) остаются майнингом.",
+      "signal_refs": ["INF-2026-0713-001"],
+      "last_updated": "2026-07-13"
+    },
+    {
+      "id": "bitfufu",
+      "entity_id": "bitfufu",
+      "name": "BitFuFu",
+      "ticker": "FUFU",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "none",
+      "notable": "Собственный флот майнинга растёт (+1200 устройств S21 XP), несмотря на сокращение арендованной/хостируемой мощности — не зафиксирована AI/HPC-диверсификация.",
+      "signal_refs": ["INF-2026-0714-003"],
+      "last_updated": "2026-07-14"
+    },
+    {
+      "id": "canaan",
+      "entity_id": "canaan",
+      "name": "Canaan Inc.",
+      "ticker": "CAN",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "none",
+      "notable": "В первую очередь производитель майнингового оборудования, майнинг — часть бизнеса. Снижение добычи в июне 2026 объяснено плановым обслуживанием сети, не диверсификацией.",
+      "signal_refs": ["STR-2026-0714-001", "INF-2026-0714-003"],
+      "last_updated": "2026-07-14"
+    },
+    {
+      "id": "iren",
+      "entity_id": "iren",
+      "name": "IREN Limited",
+      "ticker": "IREN",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "major",
+      "notable": "Расширяет AI/HPC мощности параллельно с BTC-майнингом на фоне давления на маржу (майнерский доход на 37-м перцентиле диапазона с 2023).",
+      "signal_refs": ["INF-2026-0618-001"],
+      "last_updated": "2026-06-15"
+    },
+    {
+      "id": "terawulf",
+      "entity_id": "terawulf",
+      "name": "TeraWulf",
+      "ticker": "WULF",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "major",
+      "notable": "Та же диверсификация, что IREN — расширение AI/HPC параллельно с BTC-майнингом на фоне давления на маржу.",
+      "signal_refs": ["INF-2026-0618-001"],
+      "last_updated": "2026-06-15"
+    },
+    {
+      "id": "mara_holdings",
+      "entity_id": "mara_holdings",
+      "name": "MARA Holdings (MARA)",
+      "ticker": "MARA",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Не зафиксировано напрямую в обработанных сигналах на момент создания файла — известна как крупный держатель BTC через ENTITIES.json/facts.json, но операционная политика майнинг-резерва отдельно не проверялась.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "riot_platforms",
+      "entity_id": "riot_platforms",
+      "name": "Riot Platforms",
+      "ticker": "RIOT",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Не зафиксировано напрямую в обработанных сигналах на момент создания файла.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "bitplanet",
+      "entity_id": "bitplanet",
+      "name": "Bitplanet",
+      "ticker": null,
+      "exchange": "Южная Корея (KOSDAQ, тикер не подтверждён в обработанных сигналах)",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "MOU с Antalpha на $10,8 млн в майнинг-инфраструктуру (INF-2026-0625-002) — операционная политика резерва и AI-диверсификация отдельно не проверялись.",
+      "signal_refs": ["INF-2026-0625-002"],
+      "last_updated": "2026-07-26"
+    }
+  ]
+}

@@ -145,6 +145,65 @@ def validate() -> bool:
         except Exception as e:
             errors.append(f"REVENUE_ENGINES.json: {e}")
 
+    # ── MINING_COMPANIES.json ↔ ENTITIES.json / signals.json ──────────────────
+    # 2026-07-26: новый справочник публичных биткоин-майнеров (по запросу
+    # пользователя, продолжение находки №1 из docs/BACKLOG.md — методология
+    # CoinShares Bitcoin Mining Index). Тот же паттерн проверки, что уже
+    # работает для REVENUE_ENGINES.json (Пара 2 LLM Wiki) — entity_id как
+    # внешний ключ, name сверяется с каноническим ENTITIES.json.name, плюс
+    # проверка signal_refs (тот же класс, что ENTITIES.json.signal_refs выше)
+    # и отсутствие дублирующихся id внутри самого файла.
+    mining_companies_path = Path("MINING_COMPANIES.json")
+    if mining_companies_path.exists():
+        try:
+            mc_raw = json.loads(mining_companies_path.read_text(encoding="utf-8"))
+            miners = mc_raw.get("miners", mc_raw) if isinstance(mc_raw, dict) else mc_raw
+            entities_by_id = {e.get("id"): e for e in entities}
+
+            duplicate_ids = []
+            seen_ids = set()
+            orphan_entity_ids = []
+            name_mismatches = []
+            bad_signal_refs = []
+            for m in miners:
+                mid = m.get("id", "?")
+                if mid in seen_ids:
+                    duplicate_ids.append(mid)
+                seen_ids.add(mid)
+
+                eid = m.get("entity_id")
+                ent = entities_by_id.get(eid)
+                if ent is None:
+                    orphan_entity_ids.append((mid, eid))
+                elif m.get("name") != ent.get("name"):
+                    name_mismatches.append((mid, m.get("name"), ent.get("name")))
+
+                for sid in m.get("signal_refs", []):
+                    if sid not in signal_ids:
+                        bad_signal_refs.append((mid, sid))
+
+            if duplicate_ids:
+                errors.append("MINING_COMPANIES.json: дублирующиеся id внутри файла: " + ", ".join(duplicate_ids))
+            if orphan_entity_ids:
+                errors.append(
+                    "MINING_COMPANIES.json: entity_id без соответствующей записи "
+                    "в ENTITIES.json: " + ", ".join(f"{m}→{eid}" for m, eid in orphan_entity_ids)
+                )
+            if name_mismatches:
+                errors.append(
+                    "MINING_COMPANIES.json: name разошёлся с ENTITIES.json.name: "
+                    + ", ".join(f"{m} ('{a}' vs '{b}')" for m, a, b in name_mismatches)
+                )
+            if bad_signal_refs:
+                errors.append(
+                    "MINING_COMPANIES.json: signal_refs без соответствующего сигнала: "
+                    + ", ".join(f"{m}→{sid}" for m, sid in bad_signal_refs)
+                )
+            if not (duplicate_ids or orphan_entity_ids or name_mismatches or bad_signal_refs):
+                print(f"✓ MINING_COMPANIES.json ↔ ENTITIES.json/signals.json: {len(miners)} майнеров, всё согласовано")
+        except Exception as e:
+            errors.append(f"MINING_COMPANIES.json: {e}")
+
     # ── synthesis_cache.json ──────────────────────────────────────────────────
     cache_path = Path("data/synthesis_cache.json")
     if cache_path.exists():

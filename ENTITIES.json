@@ -1336,6 +1336,28 @@
       },
       "signal_refs": [],
       "last_updated": "2026-07-26"
+    },
+    {
+      "id": "lightning_labs",
+      "name": "Lightning Labs",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Разработчик ключевого Lightning-стека (lnd, Loop, Taproot Assets) — выпустила Wavelength, некастодиальный API-набор для встраивания BTC/Lightning в приложения и AI-агентов",
+      "profile": {
+        "what": "Компания-разработчик core Lightning Network софта — lnd (основная нода-реализация), Loop (ликвидность/своп-сервис), Taproot Assets (протокол активов на Lightning)",
+        "metrics": [
+          "Wavelength (альфа, 21 июля 2026) — некастодиальный API, Ark-подобный settlement, AI-native через MCP+L402",
+          "Mainnet — только по приглашениям на старте, доступно на Signet/testnet"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Wavelength — первый в нашей базе явно AI-agent-native некастодиальный платёжный toolkit (машины платят машинам микроплатежами через MCP)"
+      },
+      "signal_refs": [
+        "INF-2026-0721-002"
+      ],
+      "last_updated": "2026-07-21"
     }
   ]
 }

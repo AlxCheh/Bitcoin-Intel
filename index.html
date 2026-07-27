@@ -3368,9 +3368,16 @@ header {
         <span class="panel-tag">РУЧНОЙ ВВОД</span>
       </div>
       <div style="padding:12px 14px;display:flex;gap:8px">
-        <input id="sig-input" placeholder="Например: государство продаёт большой объём BTC..."
-          style="flex:1;background:var(--bg3);border:1px solid var(--line2);border-radius:4px;
-                 color:var(--txt);padding:10px 14px;font-size:13px;font-family:var(--mono);outline:none"/>
+        <div style="position:relative;flex:1">
+          <input id="sig-input" placeholder="Например: государство продаёт большой объём BTC..."
+            oninput="updateClearBtn()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--line2);border-radius:4px;
+                   color:var(--txt);padding:10px 32px 10px 14px;font-size:13px;font-family:var(--mono);outline:none;box-sizing:border-box"/>
+          <button id="sig-input-clear" onclick="clearSigInput()" title="Очистить"
+            style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);
+                   background:none;border:none;color:var(--dim);font-size:16px;line-height:1;
+                   cursor:pointer;padding:4px 6px">×</button>
+        </div>
         <button onclick="analyzeSignal()"
           style="background:var(--btc);border:none;border-radius:4px;color:#000;
                  padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;
@@ -4165,7 +4172,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=efe28646fd"></script>
+<script src="js/app-main.js?v=c7ff683f11"></script>
 
 <div class="ep-overlay" id="ep-overlay" onclick="closeEntityPopup()"></div>
 <div class="entity-popup" id="entity-popup">

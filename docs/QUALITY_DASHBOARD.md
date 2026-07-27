@@ -2,9 +2,9 @@
 
 > Автогенерируется еженедельно из `scripts/quality_report.py` (MON05). Не редактировать вручную — правки затрутся следующим запуском `.github/workflows/quality-dashboard.yml`.
 
-**Сгенерировано:** 2026-07-20 · **Сигналов:** 77
+**Сгенерировано:** 2026-07-27 · **Сигналов:** 94
 
-## 🟢 Health Score: 94.5/100 (Grade A)
+## 🟢 Health Score: 90.5/100 (Grade A)
 
 ### Покрытие полей
 
@@ -19,25 +19,25 @@
 
 | Период | Доля |
 |--------|------|
-| last_30_days | `████████████████░░░░` 80% |
-| last_90_days | `████████████████████` 99% |
+| last_30_days | `██████████░░░░░░░░░░` 51% |
+| last_90_days | `███████████████████░` 96% |
 
 ### Качество
 
 | Метрика | Доля |
 |---------|------|
 | tension_formula_valid | `████████████████████` 99% |
-| signals_with_links | `██████████████████░░` 88% |
+| signals_with_links | `██████████████████░░` 90% |
 
 ### Распределение
 
-**По направлению (dir):** neg: 20, neu: 18, pos: 39
+**По направлению (dir):** neg: 26, neu: 24, pos: 44
 
-**По кластеру:** bitcoin_governance_debate: 1, btc_infrastructure_growth: 17, btc_treasury_competition: 21, etf_institutional_flow: 15, leverage_deleveraging_cycle: 2, strategy_model_stress: 17, supply_scarcity: 4
+**По кластеру:** bitcoin_governance_debate: 4, btc_infrastructure_growth: 25, btc_treasury_competition: 23, etf_institutional_flow: 17, leverage_deleveraging_cycle: 2, strategy_model_stress: 18, supply_scarcity: 5
 
-**По весу источника (weight):** market: 16, media: 11, onchain: 5, primary: 45
+**По весу источника (weight):** market: 16, media: 12, onchain: 6, primary: 60
 
-**По роли (narrative_role):** background: 12, complication: 44, resolution: 2, trigger: 19
+**По роли (narrative_role):** background: 16, complication: 56, resolution: 3, trigger: 19
 
 ### Calibration Readiness (ADR-011)
 

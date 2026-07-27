@@ -1235,6 +1235,101 @@
         "INF-2026-0618-001"
       ],
       "last_updated": "2026-06-15"
+    },
+    {
+      "id": "cipher_mining",
+      "name": "Cipher Mining",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная биткоин-майнинговая компания (Nasdaq: CIFR) — крупнейшая позиция в WGMI (17,34%), не проверялась отдельно в обработанных сигналах",
+      "profile": {
+        "what": "Публичная майнинговая компания",
+        "metrics": [
+          "Крупнейшая позиция в WGMI (CoinShares Bitcoin Mining ETF, США) — 17,34% активов на 27 марта 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Найдена при сверке состава WGMI с MINING_COMPANIES.json (2026-07-26) — операционная политика резерва и AI-диверсификация отдельно не проверялись"
+      },
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "core_scientific",
+      "name": "Core Scientific",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная биткоин-майнинговая компания (Nasdaq: CORZ) — не проверялась отдельно в обработанных сигналах",
+      "profile": {
+        "what": "Публичная майнинговая компания",
+        "metrics": [
+          "7,81% активов WGMI на 27 марта 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Найдена при сверке состава WGMI с MINING_COMPANIES.json (2026-07-26) — операционная политика резерва и AI-диверсификация отдельно не проверялись"
+      },
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "bitdeer",
+      "name": "Bitdeer Technologies",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная биткоин-майнинговая компания (Nasdaq: BTDR) — не проверялась отдельно в обработанных сигналах",
+      "profile": {
+        "what": "Публичная майнинговая компания",
+        "metrics": [
+          "5,85% активов WGMI на 27 марта 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Найдена при сверке состава WGMI с MINING_COMPANIES.json (2026-07-26) — операционная политика резерва и AI-диверсификация отдельно не проверялись"
+      },
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "hut8",
+      "name": "Hut 8 Corp",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная биткоин-майнинговая компания (Nasdaq: HUT) — не проверялась отдельно в обработанных сигналах",
+      "profile": {
+        "what": "Публичная майнинговая компания",
+        "metrics": [
+          "5,07% активов WGMI на 27 марта 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Найдена при сверке состава WGMI с MINING_COMPANIES.json (2026-07-26) — операционная политика резерва и AI-диверсификация отдельно не проверялись"
+      },
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "hive_digital",
+      "name": "HIVE Digital Technologies",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Публичная биткоин-майнинговая компания (тикер HIVE) — не проверялась отдельно в обработанных сигналах",
+      "profile": {
+        "what": "Публичная майнинговая компания",
+        "metrics": [
+          "4,62% активов WGMI на 27 марта 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Найдена при сверке состава WGMI с MINING_COMPANIES.json (2026-07-26) — операционная политика резерва и AI-диверсификация отдельно не проверялись"
+      },
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
     }
   ]
 }

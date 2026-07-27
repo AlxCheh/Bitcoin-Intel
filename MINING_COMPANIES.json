@@ -143,6 +143,66 @@
       "notable": "MOU с Antalpha на $10,8 млн в майнинг-инфраструктуру (INF-2026-0625-002) — операционная политика резерва и AI-диверсификация отдельно не проверялись.",
       "signal_refs": ["INF-2026-0625-002"],
       "last_updated": "2026-07-26"
+    },
+    {
+      "id": "cipher_mining",
+      "entity_id": "cipher_mining",
+      "name": "Cipher Mining",
+      "ticker": "CIFR",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26) — крупнейшая позиция в WGMI (17,34% активов на 27 марта 2026), но не в MINING_COMPANIES.json на момент первой версии файла. Операционные факты отдельно не проверялись.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "core_scientific",
+      "entity_id": "core_scientific",
+      "name": "Core Scientific",
+      "ticker": "CORZ",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 7,81% активов WGMI на 27 марта 2026. Операционные факты отдельно не проверялись.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "bitdeer",
+      "entity_id": "bitdeer",
+      "name": "Bitdeer Technologies",
+      "ticker": "BTDR",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 5,85% активов WGMI на 27 марта 2026. Операционные факты отдельно не проверялись.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "hut8",
+      "entity_id": "hut8",
+      "name": "Hut 8 Corp",
+      "ticker": "HUT",
+      "exchange": "Nasdaq",
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 5,07% активов WGMI на 27 марта 2026. Операционные факты отдельно не проверялись.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
+    },
+    {
+      "id": "hive_digital",
+      "entity_id": "hive_digital",
+      "name": "HIVE Digital Technologies",
+      "ticker": "HIVE",
+      "exchange": null,
+      "btc_treasury_policy": "unknown",
+      "ai_hpc_diversification": "unknown",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 4,62% активов WGMI на 27 марта 2026. Биржа не подтверждена в обработанных сигналах. Операционные факты отдельно не проверялись.",
+      "signal_refs": [],
+      "last_updated": "2026-07-26"
     }
   ]
 }

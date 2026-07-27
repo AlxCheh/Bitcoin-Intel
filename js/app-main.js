@@ -4172,6 +4172,8 @@ function analyzeSignal() {
       + sanitize(String(e && e.stack || e))
       + '</p></div>';
     document.getElementById('analysis-result').style.display = 'block';
+    const presetPanel = document.getElementById('preset-signals-panel');
+    if (presetPanel) presetPanel.style.display = 'none';
     updateNextBtn();
   }
 }
@@ -4185,6 +4187,8 @@ function showAnalysisResult() {
   currentStepIdx = 0;
   renderStep(0);
   document.getElementById('analysis-result').style.display = 'block';
+  const presetPanel = document.getElementById('preset-signals-panel');
+  if (presetPanel) presetPanel.style.display = 'none';
   updateNextBtn();
 }
 
@@ -4240,6 +4244,8 @@ function resetAnalysis() {
   document.getElementById('sig-input').value = '';
   analysisResult = null;
   currentStepIdx = 0;
+  const presetPanel = document.getElementById('preset-signals-panel');
+  if (presetPanel) presetPanel.style.display = '';
 }
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──

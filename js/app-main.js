@@ -1164,15 +1164,7 @@ const PRESET_SIGNALS_LIST = [
   'Новый исторический максимум добытых BTC'
 ];
 
-const ANALYSIS_STEPS = [
-  { key: 'tension',         label: '01 — Тензия кластера' },
-  { key: 'narrative',       label: '02 — Вывод синтеза' },
-  { key: 'related_signals', label: '03 — Подтверждающие сигналы' },
-  { key: 'caveats',         label: '04 — Оговорки' }
-];
-
 let analysisResult = null;
-let currentStepIdx = 0;
 
 const AI_STOP_WORDS = new Set([
   'и','в','во','не','что','он','на','я','с','со','как','а','то','все','она',
@@ -4214,7 +4206,6 @@ function analyzeSignal() {
     const input = document.getElementById('sig-input').value.trim();
     if (!input) return;
     analysisResult = localAnalyzeSignal(input);
-    currentStepIdx = 0;
     showAnalysisResult();
   } catch (e) {
     document.getElementById('analysis-loading').style.display = 'none';
@@ -4230,7 +4221,6 @@ function analyzeSignal() {
     document.getElementById('analysis-result').style.display = 'block';
     const presetPanel = document.getElementById('preset-signals-panel');
     if (presetPanel) presetPanel.style.display = 'none';
-    updateNextBtn();
   }
 }
 
@@ -4239,60 +4229,54 @@ function showAnalysisResult() {
   document.getElementById('result-signal-title').textContent = analysisResult.signal;
   const tagEl = document.querySelector('#analysis-result .panel-tag');
   if (tagEl) tagEl.textContent = analysisResult.matched ? ('НАЙДЕНО: ' + (analysisResult.cluster_label || '').toUpperCase()) : 'НЕ НАЙДЕНО ПРЯМОГО СОВПАДЕНИЯ';
-  document.getElementById('result-steps').innerHTML = '';
-  currentStepIdx = 0;
-  renderStep(0);
+  renderFullAnswer();
   document.getElementById('analysis-result').style.display = 'block';
   const presetPanel = document.getElementById('preset-signals-panel');
   if (presetPanel) presetPanel.style.display = 'none';
-  updateNextBtn();
 }
 
-function renderStep(idx) {
-  const step = ANALYSIS_STEPS[idx];
+// 2026-07-26 (по запросу пользователя): полноценный связный ответ сразу,
+// не разбитый на шаги "01/02/03/04" с кнопкой ДАЛЕЕ — та стеснённая подача
+// имитировала внутреннюю схему обработки сигналов (Шаги 3-6 CLAUDE.md),
+// что было уместно для ПРОЗРАЧНОСТИ рассуждения при РУЧНОЙ обработке
+// сигналов мной, но избыточно и неудобно для читателя, ожидающего просто
+// ответ на свой вопрос. Важно: без живого LLM (Вариант C — бессерверно,
+// см. обсуждение в чате) это по-прежнему СОБРАННЫЙ из тех же реальных
+// данных текст (tension+narrative+related_signals+caveats), не свободная
+// генерация — просто показан весь сразу, одним блоком, а не по частям.
+function renderFullAnswer() {
   const wrap = document.getElementById('result-steps');
-  const div = document.createElement('div');
-  div.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--line)';
+  const r = analysisResult;
 
-  let bodyHtml;
-  const value = analysisResult[step.key];
-  if (step.key === 'related_signals') {
-    if (!value || !value.length) {
-      bodyHtml = '<p style="font-size:13px;color:var(--dim);line-height:1.6">Нет сигналов этого кластера в базе.</p>';
-    } else {
-      bodyHtml = value.map(s =>
-        '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line2)">'
-        + '<div style="font-family:var(--mono);font-size:10px;color:var(--btc)">' + sanitize(s.id) + ' · ' + sanitize(s.date) + '</div>'
-        + '<div style="font-size:13px;color:var(--txt);margin-top:2px">' + sanitize(s.title) + '</div>'
-        + '</div>'
-      ).join('');
-    }
-  } else {
-    bodyHtml = '<p style="font-size:13px;color:var(--dim);line-height:1.6;white-space:pre-line">' + sanitize(value || '—') + '</p>';
+  const mainText = [r.tension, r.narrative].filter(Boolean).join('\n\n');
+
+  let signalsHtml = '';
+  if (r.related_signals && r.related_signals.length) {
+    signalsHtml = '<div style="padding:12px 14px;border-top:1px solid var(--line)">'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em;margin-bottom:8px">ПОДТВЕРЖДАЮЩИЕ СИГНАЛЫ</div>'
+      + r.related_signals.map(s =>
+          '<div style="margin-bottom:8px">'
+          + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc)">' + sanitize(s.id) + ' · ' + sanitize(s.date) + '</span>'
+          + '<div style="font-size:12px;color:var(--txt);margin-top:1px">' + sanitize(s.title) + '</div>'
+          + '</div>'
+        ).join('')
+      + '</div>';
   }
 
-  div.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--btc);letter-spacing:0.15em;margin-bottom:6px">'
-    + step.label + '</div>'
-    + bodyHtml;
-  wrap.appendChild(div);
-}
-
-function showNextStep() {
-  if (currentStepIdx < ANALYSIS_STEPS.length - 1) {
-    currentStepIdx++;
-    renderStep(currentStepIdx);
-    updateNextBtn();
+  let caveatsHtml = '';
+  if (r.caveats) {
+    caveatsHtml = '<div style="padding:12px 14px;border-top:1px solid var(--line)">'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:6px">⚠ ОГОВОРКИ</div>'
+      + '<p style="font-size:12px;color:var(--dim);line-height:1.6;white-space:pre-line">' + sanitize(r.caveats) + '</p>'
+      + '</div>';
   }
-}
 
-function updateNextBtn() {
-  const btn = document.getElementById('btn-next');
-  if (currentStepIdx >= ANALYSIS_STEPS.length - 1) {
-    btn.style.display = 'none';
-  } else {
-    btn.style.display = '';
-    btn.textContent = 'ДАЛЕЕ → ' + ANALYSIS_STEPS[currentStepIdx + 1].label;
-  }
+  wrap.innerHTML =
+    '<div style="padding:14px">'
+    + '<p style="font-size:14px;color:var(--txt);line-height:1.7;white-space:pre-line">' + sanitize(mainText || '—') + '</p>'
+    + '</div>'
+    + signalsHtml
+    + caveatsHtml;
 }
 
 // Крестик очистки поля ввода — по запросу пользователя (2026-07-26).
@@ -4315,7 +4299,6 @@ function resetAnalysis() {
   document.getElementById('analysis-result').style.display = 'none';
   document.getElementById('sig-input').value = '';
   analysisResult = null;
-  currentStepIdx = 0;
   const presetPanel = document.getElementById('preset-signals-panel');
   if (presetPanel) presetPanel.style.display = '';
   updateClearBtn();

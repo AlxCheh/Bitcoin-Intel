@@ -3987,6 +3987,7 @@ function renderPresetSignals() {
 
 function selectPreset(btn) {
   document.getElementById('sig-input').value = btn.dataset.signal;
+  updateClearBtn();
   analyzeSignal();
 }
 
@@ -4239,6 +4240,22 @@ function updateNextBtn() {
   }
 }
 
+// Крестик очистки поля ввода — по запросу пользователя (2026-07-26).
+function updateClearBtn() {
+  const input = document.getElementById('sig-input');
+  const btn = document.getElementById('sig-input-clear');
+  if (!input || !btn) return;
+  btn.style.display = input.value ? 'block' : 'none';
+}
+
+function clearSigInput() {
+  const input = document.getElementById('sig-input');
+  if (!input) return;
+  input.value = '';
+  input.focus();
+  updateClearBtn();
+}
+
 function resetAnalysis() {
   document.getElementById('analysis-result').style.display = 'none';
   document.getElementById('sig-input').value = '';
@@ -4246,6 +4263,7 @@ function resetAnalysis() {
   currentStepIdx = 0;
   const presetPanel = document.getElementById('preset-signals-panel');
   if (presetPanel) presetPanel.style.display = '';
+  updateClearBtn();
 }
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──

@@ -196,3 +196,94 @@ class TestRevenueEnginesEntityIntegrity:
         captured = capsys.readouterr()
         assert ok
         assert "REVENUE_ENGINES.json" not in captured.out
+
+
+def _miner(id_: str, entity_id: str, name: str, signal_refs: list[str] | None = None) -> dict:
+    return {
+        "id": id_, "entity_id": entity_id, "name": name,
+        "signal_refs": signal_refs or [],
+    }
+
+
+def _write_mining_companies(miners: list[dict]) -> None:
+    Path("MINING_COMPANIES.json").write_text(
+        json.dumps({"meta": {}, "miners": miners}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+class TestMiningCompaniesIntegrity:
+    """MINING_COMPANIES.json (2026-07-26) — тот же паттерн, что Пара 2
+    LLM Wiki (REVENUE_ENGINES.json ↔ ENTITIES.json), плюс проверка
+    signal_refs (тот же класс, что ENTITIES.json.signal_refs) и дублей id
+    внутри самого файла."""
+
+    def test_valid_miner_passes(self, capsys):
+        _write_signals([_signal("INF-2026-0629-001")])
+        _write_entities([_entity("e1", ["INF-2026-0629-001"])])
+        _write_mining_companies([_miner("m1", "e1", "e1", ["INF-2026-0629-001"])])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert ok
+        assert "всё согласовано" in captured.out
+
+    def test_orphan_entity_id_fails(self, capsys):
+        _write_signals([])
+        _write_entities([_entity("e1", [])])
+        _write_mining_companies([_miner("m1", "nonexistent", "Ghost Miner")])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "entity_id без соответствующей записи" in captured.out
+        assert "m1→nonexistent" in captured.out
+
+    def test_name_drift_fails(self, capsys):
+        """Регрессия: именно этот случай был найден и исправлен при внедрении
+        проверки (ionic_digital/keel — name содержал историческую приставку,
+        не совпадавшую с ENTITIES.json.name)."""
+        _write_signals([])
+        _write_entities([_entity("keel", [])])  # name == "keel"
+        _write_mining_companies([_miner("m1", "keel", "Keel Infrastructure (экс-Bitfarms)")])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "name разошёлся" in captured.out
+
+    def test_duplicate_miner_id_fails(self, capsys):
+        _write_signals([])
+        _write_entities([_entity("e1", []), _entity("e2", [])])
+        _write_mining_companies([
+            _miner("m1", "e1", "e1"),
+            _miner("m1", "e2", "e2"),  # дублирующийся id внутри файла
+        ])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "дублирующиеся id" in captured.out
+        assert "m1" in captured.out
+
+    def test_bad_signal_ref_fails(self, capsys):
+        _write_signals([_signal("INF-2026-0001-001")])
+        _write_entities([_entity("e1", [])])
+        _write_mining_companies([_miner("m1", "e1", "e1", ["INF-2026-9999-999"])])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "signal_refs без соответствующего сигнала" in captured.out
+        assert "m1→INF-2026-9999-999" in captured.out
+
+    def test_missing_mining_companies_file_skips_check_silently(self, capsys):
+        """Файл может отсутствовать — не должен ломать остальную валидацию."""
+        _write_signals([])
+        _write_entities([_entity("e1", [])])
+        # MINING_COMPANIES.json намеренно не создаём
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert ok
+        assert "MINING_COMPANIES.json" not in captured.out

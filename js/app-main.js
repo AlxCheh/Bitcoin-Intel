@@ -3974,15 +3974,70 @@ function renderEmission() {
 // PRESET_SIGNALS_LIST (была объявлена здесь, ПОСЛЕ этой точки исполнения) —
 // та же причина, что раньше ловили на chartsInited (bi_active_tab='analytics').
 
+// 2026-07-26 (по запросу пользователя): готовые сигналы теперь строятся из
+// РЕАЛЬНЫХ данных, а не фиксированного списка примеров — используют оба
+// слоя, что мы построили для самого анализатора (сущности + тензии
+// кластеров), поэтому клик по любой кнопке гарантированно ведёт к
+// содержательному результату через тот же findMatchingEntity()/keyword-overlap.
+//
+// ВАЖНО про порядок вызова: renderPresetSignals() вызывается ПЕРВЫЙ раз
+// синхронно при restoreLastActiveTab() (см. комментарий там) — то есть ДО
+// того, как loadSignals() успевает заполнить ENTITIES/SYNTHESIS_CACHE/SIGNALS
+// реальными данными. generatePresetSignals() поэтому явно проверяет пустоту
+// и отдаёт PRESET_SIGNALS_LIST (статичный, старый список) как временную
+// заглушку на этот первый рендер — triggerTabData(currentTabId) после
+// loadSignals() (см. там же) вызовет renderPresetSignals() второй раз, уже
+// с настоящими данными.
+//
+// Подобрано намеренно, не произвольно:
+// - Сущности — топ-3 по числу signal_refs (гарантия, что у них реально
+//   есть чем ответить через findMatchingEntity(), не пустой список related_signals)
+// - Кластеры — первая часть тензии (до " vs ") как есть, не человекочитаемая
+//   подпись CLUSTER_LABELS_AI: проверено эмпирически (2026-07-26) — подпись
+//   4 из 7 кластеров вообще не пересекается словами с их собственной
+//   тензией/выводом (та же ловушка, что уже чинили для сущностей чуть выше) —
+//   сама тензия гарантированно пересекается сама с собой.
+function generatePresetSignals() {
+  const hasEntities = Array.isArray(ENTITIES) && ENTITIES.length > 0;
+  const hasClusters = SYNTHESIS_CACHE && Object.keys(SYNTHESIS_CACHE).some(k => !k.startsWith('_') && k !== 'meta');
+  if (!hasEntities || !hasClusters) return PRESET_SIGNALS_LIST;
+
+  const presets = [];
+
+  const topEntities = [...ENTITIES]
+    .filter(e => (e.signal_refs || []).length > 0)
+    .sort((a, b) => (b.signal_refs || []).length - (a.signal_refs || []).length)
+    .slice(0, 3);
+  topEntities.forEach(e => {
+    const cleanName = (e.name || e.id).replace(/\s*\(.*?\)\s*/g, '');
+    presets.push('Сколько BTC у ' + cleanName + '?');
+  });
+
+  const clusterEntries = Object.entries(SYNTHESIS_CACHE).filter(([k]) => !k.startsWith('_') && k !== 'meta');
+  const clusterSignalCounts = {};
+  (SIGNALS || []).forEach(s => { if (s.cluster) clusterSignalCounts[s.cluster] = (clusterSignalCounts[s.cluster] || 0) + 1; });
+  const topClusters = clusterEntries
+    .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
+    .slice(0, 3);
+  topClusters.forEach(([, cl]) => {
+    const firstClause = (cl.tension || '').split(' vs ')[0].trim();
+    if (firstClause) presets.push(firstClause.length > 70 ? firstClause.slice(0, 70) + '…' : firstClause);
+  });
+
+  return presets.length ? presets : PRESET_SIGNALS_LIST;
+}
+
 function renderPresetSignals() {
   const wrap = document.getElementById('preset-signals');
   if (!wrap) return;
-  wrap.innerHTML = PRESET_SIGNALS_LIST.map(s =>
-    '<button onclick="selectPreset(this)" data-signal="' + s + '" '
-    + 'style="background:transparent;border:1px solid var(--line2);border-radius:20px;'
-    + 'color:var(--dim);padding:6px 14px;font-size:11px;cursor:pointer;'
-    + 'font-family:var(--mono);letter-spacing:0.03em">' + s + '</button>'
-  ).join('');
+  const list = generatePresetSignals();
+  wrap.innerHTML = list.map(s => {
+    const safe = sanitize(s);
+    return '<button onclick="selectPreset(this)" data-signal="' + safe + '" '
+      + 'style="background:transparent;border:1px solid var(--line2);border-radius:20px;'
+      + 'color:var(--dim);padding:6px 14px;font-size:11px;cursor:pointer;'
+      + 'font-family:var(--mono);letter-spacing:0.03em">' + safe + '</button>';
+  }).join('');
 }
 
 function selectPreset(btn) {

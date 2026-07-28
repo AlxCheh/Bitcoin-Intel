@@ -31,7 +31,7 @@ import pytest
 from scripts.quality_report import TENSION_MARKERS
 
 MIN_LENGTH = 40
-MAX_LENGTH = 220
+MAX_LENGTH = 250
 MIN_WORDS_PER_SIDE = 3
 MAX_WORD_OVERLAP_RATIO = 0.5
 

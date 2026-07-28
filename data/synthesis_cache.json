@@ -14,7 +14,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-07-28T14:03:20.274179+00:00"
+      "detected_at": "2026-07-28T17:52:00.285297+00:00"
     },
     "rationale": "Tension from STR-2026-0701-002 (contradicts: 1, weight: primary); partA from STR-2026-0626-001; phase: tension; bridge: 'вопреки тому что'; confidence: 0.59; signals_used: 23; ignored_duplicates: []",
     "signals_used": [
@@ -46,9 +46,9 @@
     "entity_count": 14,
     "anchor_entity_share": 0.087,
     "is_minority_anchor": true,
-    "generated_at": "2026-07-28T14:03:20.274463+00:00",
+    "generated_at": "2026-07-28T17:52:00.285404+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260728_140320"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260728_175200"
   },
   "strategy_model_stress": {
     "tension": "Резерв пополняется исключительно дилюцией акций (2-я неделя подряд, $225 млн целевым траншем) vs BTC-резерв остаётся неприкосновенным несмотря на то, что неделей ранее компания уже продавала BTC ради тех же обязательств — двухнедельная выборка закрывает открытый вопрос предшественника в пользу дилюции",
@@ -65,7 +65,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-28T14:03:20.277643+00:00"
+      "detected_at": "2026-07-28T17:52:00.359736+00:00"
     },
     "rationale": "Tension from STR-2026-0720-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'после чего'; confidence: 0.55; signals_used: 15; ignored_duplicates: ['STR-2026-0622-004', 'STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -93,28 +93,28 @@
     "entity_count": 2,
     "anchor_entity_share": 0.867,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-28T14:03:20.277791+00:00",
+    "generated_at": "2026-07-28T17:52:00.359823+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_strategy_model_stress_20260728_140320"
+    "synthesis_id": "synthesis_strategy_model_stress_20260728_175200"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
-    "narrative": "Конфигурация декабря 2022 повторяется: массовая капитуляция розницы при сохраняющемся институциональном спросе — что усугубляется тем что базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
+    "narrative": "Конфигурация декабря 2022 повторяется: массовая капитуляция розницы при сохраняющемся институциональном спросе — несмотря на то что базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "takeaway": "Базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "strength": "strong",
-    "confidence": 0.763,
+    "confidence": 0.741,
     "phase": "tension",
-    "score": 138,
-    "signal_count": 15,
+    "score": 144,
+    "signal_count": 16,
     "anchor_signal_id": "NAR-2026-0628-001",
     "phase_changed": true,
     "structural_change": {
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-07-28T14:03:20.281316+00:00"
+      "detected_at": "2026-07-28T17:52:00.426196+00:00"
     },
-    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'что усугубляется тем что'; confidence: 0.76; signals_used: 15; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
+    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.74; signals_used: 16; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
     "signals_used": [
       "NAR-2026-0628-001",
       "STR-2026-0622-005",
@@ -128,6 +128,7 @@
       "STR-2026-0716-002",
       "NAR-2026-0627-001",
       "STR-2026-0623-004",
+      "NAR-2026-0626-001",
       "STR-2026-0707-002",
       "NAR-2026-0629-002",
       "STR-2026-0620-001"
@@ -136,12 +137,12 @@
       "STR-2026-0618-002",
       "STR-2026-0624-004"
     ],
-    "entity_count": 6,
-    "anchor_entity_share": 0.6,
+    "entity_count": 7,
+    "anchor_entity_share": 0.562,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-28T14:03:20.281502+00:00",
+    "generated_at": "2026-07-28T17:52:00.426311+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260728_140320"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260728_175200"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -167,36 +168,34 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-28T14:03:20.283553+00:00",
+    "generated_at": "2026-07-28T17:52:00.430675+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_supply_scarcity_20260728_140320"
+    "synthesis_id": "synthesis_supply_scarcity_20260728_175200"
   },
   "btc_infrastructure_growth": {
     "tension": "Майнеры диверсифицируются в AI как стратегию выживания vs продолжают продавать BTC-резервы для финансирования этой же диверсификации — именно то, что предсказывалось как риск в предыдущем сигнале",
     "narrative": "Децентрализация Bitcoin-майнинга переходит от теории к практике: контроль над транзакционным слоем начинает смещаться от пулов к майнерам, устраняя главную регуляторную уязвимость сети — в результате чего bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "takeaway": "Bitcoin развивается по двум несовместимым трекам: резервный актив и платёжная сеть работают, DeFi-слой не находит аудитории — BTC-держатели не хотят быть пользователями, они хотят быть владельцами",
     "strength": "strong",
-    "confidence": 0.516,
+    "confidence": 0.51,
     "phase": "resolution",
-    "score": 195,
-    "signal_count": 28,
+    "score": 165,
+    "signal_count": 25,
     "anchor_signal_id": "INF-2026-0722-001",
     "phase_changed": true,
     "structural_change": {
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-07-28T14:03:20.285876+00:00"
+      "detected_at": "2026-07-28T17:52:00.432425+00:00"
     },
-    "rationale": "Tension from INF-2026-0722-001 (contradicts: 0, weight: market); partA from INF-2026-0625-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.52; signals_used: 28; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0722-001 (contradicts: 0, weight: market); partA from INF-2026-0625-001; phase: resolution; bridge: 'в результате чего'; confidence: 0.51; signals_used: 25; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0609-001",
       "INF-2026-0625-001",
       "INF-2026-0722-002",
-      "INF-2026-0721-001",
       "INF-2026-0721-002",
       "INF-2026-0711-001",
-      "INF-2026-0709-001",
       "INF-2026-0715-001",
       "INF-2026-0706-001",
       "INF-2026-0723-001",
@@ -209,7 +208,6 @@
       "INF-2026-0722-001",
       "STR-2026-0622-006",
       "INF-2026-0623-001",
-      "NAR-2026-0626-001",
       "INF-2026-0621-001",
       "INF-2026-0623-002",
       "INF-2026-0618-001",
@@ -220,12 +218,12 @@
       "INF-2026-0620-001"
     ],
     "signals_ignored": [],
-    "entity_count": 24,
-    "anchor_entity_share": 0.107,
+    "entity_count": 21,
+    "anchor_entity_share": 0.12,
     "is_minority_anchor": true,
-    "generated_at": "2026-07-28T14:03:20.286081+00:00",
+    "generated_at": "2026-07-28T17:52:00.432563+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_btc_infrastructure_growth_20260728_140320"
+    "synthesis_id": "synthesis_btc_infrastructure_growth_20260728_175200"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -248,9 +246,34 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-28T14:03:20.288451+00:00",
+    "generated_at": "2026-07-28T17:52:00.433914+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260728_140320"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260728_175200"
+  },
+  "quantum_security": {
+    "tension": "Готовиться нужно задолго до реальной угрозы — времени на миграцию в последний момент не будет vs рыночные лидеры расходятся в оценке срочности: «десятилетия в запасе» против «Q-Day» уже в 2030-м",
+    "narrative": "Институциональная подготовка к quantum-risk начинается на уровне кастодиального слоя раньше протокольного консенсуса (BIP-360/361 всё ещё Draft) — практика опережает стандарт — в то время как впервые появляется не единичная инициатива одной компании (BitGo), а координационный, финансируемый механизм (грант-пул + консультативный совет + публикуемые исследования) — институционализация квантовой готовности как отраслевой, не частной задачи",
+    "takeaway": "Впервые появляется не единичная инициатива одной компании (BitGo), а координационный, финансируемый механизм (грант-пул + консультативный совет + публикуемые исследования) — институционализация квантовой готовности как отраслевой, не частной задачи",
+    "strength": "strong",
+    "confidence": 0.618,
+    "phase": "active",
+    "score": 17,
+    "signal_count": 2,
+    "anchor_signal_id": "INF-2026-0721-001",
+    "phase_changed": false,
+    "structural_change": {},
+    "rationale": "Tension from INF-2026-0721-001 (contradicts: 0, weight: primary); partA from INF-2026-0709-001; phase: active; bridge: 'в то время как'; confidence: 0.62; signals_used: 2; ignored_duplicates: []",
+    "signals_used": [
+      "INF-2026-0721-001",
+      "INF-2026-0709-001"
+    ],
+    "signals_ignored": [],
+    "entity_count": 2,
+    "anchor_entity_share": 0.5,
+    "is_minority_anchor": false,
+    "generated_at": "2026-07-28T17:52:00.435062+00:00",
+    "algorithm_version": "2.1.1",
+    "synthesis_id": "synthesis_quantum_security_20260728_175200"
   },
   "bitcoin_governance_debate": {
     "tension": "Foundry не занимает собственную позицию по BIP-110, а делегирует решение хешрейт-взвешенному голосованию клиентов vs фактическая поддержка майнеров уже ~0,6–1%, что делает формальный демократический процесс почти предрешённым по факту",
@@ -274,9 +297,9 @@
     "entity_count": 3,
     "anchor_entity_share": 0.333,
     "is_minority_anchor": false,
-    "generated_at": "2026-07-28T14:03:20.290464+00:00",
+    "generated_at": "2026-07-28T17:52:00.436087+00:00",
     "algorithm_version": "2.1.1",
-    "synthesis_id": "synthesis_bitcoin_governance_debate_20260728_140320"
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260728_175200"
   },
   "_cross_cluster_entities": {
     "strategy": [

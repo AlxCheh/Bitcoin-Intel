@@ -1667,7 +1667,7 @@
         ]
       },
       "narrative_role": "complication",
-      "cluster": "btc_infrastructure_growth",
+      "cluster": "etf_institutional_flow",
       "tension": "США легализовали $90 трлн рынок perps через BTC-первым — vs Hyperliquid и офшор имеют годы форы по ликвидности, а спреды и funding решат реальный приток",
       "macro_implication": "BTC закрепился как единственный актив с полным стеком американской регулируемой инфраструктуры: spot ETF → корпоративные казначейства → perp futures. Каждый новый слой увеличивает структурный спрос независимо от цикла"
     },

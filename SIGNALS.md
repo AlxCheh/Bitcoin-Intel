@@ -2720,7 +2720,7 @@
 
 ---
 
-## NAR-2026-0626-001 · 📰 НАРРАТИВ · 2026-06-03 · 🟢 pos · long · `btc_infrastructure_growth`
+## NAR-2026-0626-001 · 📰 НАРРАТИВ · 2026-06-03 · 🟢 pos · long · `etf_institutional_flow`
 
 **Сигнал:** Kalshi запустил первые в истории США CFTC-regulated crypto perps — BTCPERP живёт с 3 июня, BTC единственный с полным onshore-стеком
 

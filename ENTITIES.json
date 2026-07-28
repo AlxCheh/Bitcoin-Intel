@@ -1358,6 +1358,28 @@
         "INF-2026-0721-002"
       ],
       "last_updated": "2026-07-21"
+    },
+    {
+      "id": "liquid_network",
+      "name": "Liquid Network",
+      "type": "l2",
+      "status": "active",
+      "summary": "Федеративный Bitcoin-сайдчейн (технический провайдер — Blockstream) — запустила hosted API-сервис агрегации видимости мемпула для 0-conf-расчётов",
+      "profile": {
+        "what": "Layer-2 сайдчейн для эмиссии цифровых активов и быстрых расчётов; блоки производят functionary operators федерации, финализация — 2 подтверждения (~2 минуты)",
+        "metrics": [
+          "0-conf API (июль 2026) — REST + WebSocket, тиры наблюдения bridge/public/functionary",
+          "Работает надёжно только для non-RBF транзакций"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Доверительная модель — федерация functionary operators, не полностью trustless; 0-conf сервис явно оговаривает допущение честности участников, не гарантирует расчёт"
+      },
+      "signal_refs": [
+        "INF-2026-0722-002"
+      ],
+      "last_updated": "2026-07-22"
     }
   ]
 }

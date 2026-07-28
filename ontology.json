@@ -54,6 +54,11 @@
       "label": "L2: программируемость Bitcoin",
       "theme": "infrastructure",
       "description": "Программируемые активы и DeFi поверх Bitcoin — Stacks, RGB, Taproot Assets"
+    },
+    "mining_ai_diversification": {
+      "label": "Майнинг и AI: гибридная модель",
+      "theme": "infrastructure",
+      "description": "Эволюция бизнес-модели майнеров через диверсификацию в AI/HPC-инфраструктуру и что это значит для их BTC-резервов"
     }
   },
   "themes": {

@@ -1191,7 +1191,8 @@ const CLUSTER_LABELS_AI = {
   bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе',
   quantum_security:            '🔐 Q-Day: квантовая угроза',
   mining_operations:           '⛏️ Майнинг: операции и безопасность',
-  layer2_programmability:      '🔗 L2: программируемость Bitcoin'
+  layer2_programmability:      '🔗 L2: программируемость Bitcoin',
+  mining_ai_diversification:   '🤖 Майнинг и AI: гибридная модель'
 };
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -1907,6 +1908,7 @@ function renderSignals() {
     quantum_security:         '🔐 Q-DAY',
     mining_operations:        '⛏️ МАЙНИНГ',
     layer2_programmability:   '🔗 L2',
+    mining_ai_diversification: '🤖 МАЙНИНГ И AI',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
@@ -2200,6 +2202,7 @@ function renderDashboard() {
     quantum_security:         '🔐 КВАНТОВАЯ УГРОЗА',
     mining_operations:        '⛏️ МАЙНИНГ: ОПЕРАЦИИ И БЕЗОПАСНОСТЬ',
     layer2_programmability:   '🔗 L2: ПРОГРАММИРУЕМОСТЬ BITCOIN',
+    mining_ai_diversification: '🤖 МАЙНИНГ И AI: ГИБРИДНАЯ МОДЕЛЬ',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',

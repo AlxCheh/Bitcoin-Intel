@@ -192,8 +192,9 @@
 | `quantum_security` | Превентивная подготовка протокола и экосистемы к угрозе криптографически значимых квантовых компьютеров |
 | `mining_operations` | Децентрализация транзакционного слоя — хешрейт, сложность сети, консолидация/закрытие пулов |
 | `layer2_programmability` | Программируемые активы и DeFi поверх Bitcoin — Stacks, RGB, Taproot Assets |
+| `mining_ai_diversification` | Эволюция бизнес-модели майнеров через диверсификацию в AI/HPC-инфраструктуру и что это значит для их BTC-резервов |
 
-> **В планировании (2026-07-27):** `btc_infrastructure_growth` разросся до 30% базы, содержательно неоднороден (5 подтем) — план разделения и открытые вопросы → [docs/PLAN-infrastructure-cluster-split.md](docs/PLAN-infrastructure-cluster-split.md). Три кластера выполнены (`quantum_security`, `mining_operations`, `layer2_programmability`), 2026-07-27. Оставшиеся 2 (`mining_ai_diversification`, `lightning_payments`) — по одному, по плану.
+> **В планировании (2026-07-27):** `btc_infrastructure_growth` разросся до 30% базы, содержательно неоднороден (5 подтем) — план разделения и открытые вопросы → [docs/PLAN-infrastructure-cluster-split.md](docs/PLAN-infrastructure-cluster-split.md). Четыре кластера выполнены (`quantum_security`, `mining_operations`, `layer2_programmability`, `mining_ai_diversification`), 2026-07-27. Остался последний (`lightning_payments`) — по плану.
 
 - Актуальное число сигналов кластера считается по `signals.json` — в этом файле счётчики не ведутся
 - Новый кластер создаётся когда появляется 2+ сигнала с общим `tension` которого нет в существующих

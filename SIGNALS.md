@@ -1179,7 +1179,7 @@
 
 ---
 
-## INF-2026-0706-001 · 🔗 LAYER 2 · 2026-07-06 · 🟢 pos · mid · `btc_infrastructure_growth`
+## INF-2026-0706-001 · 🔗 LAYER 2 · 2026-07-06 · 🟢 pos · mid · `layer2_programmability`
 
 **Сигнал:** USDT возвращается на Bitcoin через RGB и UTEXO — приватные расчёты в Lightning
 
@@ -2108,7 +2108,7 @@
 
 ---
 
-## STR-2026-0622-006 · 🔗 LAYER 2 · 2026-06-22 · 🟢 pos · mid · `btc_infrastructure_growth`
+## STR-2026-0622-006 · 🔗 LAYER 2 · 2026-06-22 · 🟢 pos · mid · `layer2_programmability`
 
 **Сигнал:** STRC токенизируется в DeFi: Saturn, Apyx и Buck строят продукты на базе Pendle
 
@@ -2338,7 +2338,7 @@
 
 ---
 
-## INF-2026-0620-001 · 🔗 LAYER 2 · 2026-06-20 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0620-001 · 🔗 LAYER 2 · 2026-06-20 · 🟢 pos · long · `layer2_programmability`
 
 **Сигнал:** Stacks SIP-034: пропускная способность Bitcoin DeFi выросла до 30x
 
@@ -2693,7 +2693,7 @@
 
 ---
 
-## INF-2026-0609-001 · 🔗 LAYER 2 · 2026-06-09 · 🔴 neg · long · `btc_infrastructure_growth`
+## INF-2026-0609-001 · 🔗 LAYER 2 · 2026-06-09 · 🔴 neg · long · `layer2_programmability`
 
 **Сигнал:** Bitcoin L2 Botanix закрывается после года на мейннете — технически сеть работала, но пользователи предпочли wBTC на Ethereum Bitcoin-нативному DeFi
 
@@ -2750,7 +2750,7 @@
 
 ---
 
-## INF-2026-0717-001 · 🔗 LAYER 2 · 2025-07-17 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0717-001 · 🔗 LAYER 2 · 2025-07-17 · 🟢 pos · long · `layer2_programmability`
 
 **Сигнал:** RGB Protocol достиг основной сети Bitcoin — почти десять лет от миланской лаборатории до продакшена
 

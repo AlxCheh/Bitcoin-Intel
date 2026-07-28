@@ -154,7 +154,7 @@
 
 ---
 
-## INF-2026-0721-001 · 🔗 LAYER 2 · 2026-07-21 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0721-001 · 🔗 LAYER 2 · 2026-07-21 · 🟢 pos · long · `quantum_security`
 
 **Сигнал:** Galaxy (GLXY) выделила $5 млн на подготовку Биткоина к квантовой угрозе
 
@@ -884,7 +884,7 @@
 
 ---
 
-## INF-2026-0709-001 · 🔗 LAYER 2 · 2026-07-09 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0709-001 · 🔗 LAYER 2 · 2026-07-09 · 🟢 pos · long · `quantum_security`
 
 **Сигнал:** BitGo добавил защиту от квантовых рисков в кастодиан биткоина
 
@@ -2720,7 +2720,7 @@
 
 ---
 
-## NAR-2026-0626-001 · 📰 НАРРАТИВ · 2026-06-03 · 🟢 pos · long · `btc_infrastructure_growth`
+## NAR-2026-0626-001 · 📰 НАРРАТИВ · 2026-06-03 · 🟢 pos · long · `etf_institutional_flow`
 
 **Сигнал:** Kalshi запустил первые в истории США CFTC-regulated crypto perps — BTCPERP живёт с 3 июня, BTC единственный с полным onshore-стеком
 
@@ -2833,7 +2833,7 @@
 
 ---
 
-## INF-2026-0725-001 · 🔗 LAYER 2 · 2010-07-16 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0725-001 · 🔗 LAYER 2 · 2010-07-16 · 🟢 pos · long · `quantum_security`
 
 **Сигнал:** Сатоши Накамото предвидел защиту Bitcoin хешированием за 16 лет до страхов о квантовой угрозе
 

@@ -1187,8 +1187,9 @@ const CLUSTER_LABELS_AI = {
   btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
   btc_infrastructure_growth:   '🔗 Инфраструктура',
   supply_scarcity:             '⬛ Предложение',
-  leverage_deleveraging_cycle: '⚡ Левередж: циклы на плече',
-  bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе'
+  leverage_deleveraging_cycle: '💥 Левередж: циклы на плече',
+  bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе',
+  quantum_security:            '🔐 Q-Day: квантовая угроза'
 };
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -1899,8 +1900,9 @@ function renderSignals() {
     btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА',
     btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
-    leverage_deleveraging_cycle: '⚡ ДЕЛЕВЕРИДЖ',
+    leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
+    quantum_security:         '🔐 Q-DAY',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
@@ -2189,8 +2191,9 @@ function renderDashboard() {
     btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
     btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
-    leverage_deleveraging_cycle: '⚡ ДЕЛЕВЕРИДЖ: ЦИКЛЫ НА ПЛЕЧЕ',
+    leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ: ЦИКЛЫ НА ПЛЕЧЕ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ: СПОР О КОНСЕНСУСЕ',
+    quantum_security:         '🔐 КВАНТОВАЯ УГРОЗА',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',

@@ -35,6 +35,23 @@ MAX_LENGTH = 250
 MIN_WORDS_PER_SIDE = 3
 MAX_WORD_OVERLAP_RATIO = 0.5
 
+# 2026-07-27: найдено пользователем на реальном примере (INF-2026-0722-001) —
+# tension ссылался на "предыдущий сигнал", не называя, какой конкретно.
+# context_chain корректно указывал ID, но сам tension показывается на
+# карточке как САМОСТОЯТЕЛЬНЫЙ заголовок (золотая полоса) — читатель не
+# видит рядом ID из context_chain, отсылка повисает без антецедента.
+# Правило: tension описывает конфликт ТЕКУЩЕГО сигнала целиком сам по
+# себе — если нужен контекст другого сигнала, это работа context/
+# macro_implication/context_chain, не tension. Не пытаемся чинить это
+# вставкой ID сигнала в tension (загромождает золотую полосу) — правильный
+# фикс — не делать отсылку в tension вообще.
+BACKREFERENCE_PHRASES = [
+    "в предыдущем сигнале", "как и в предыдущем", "как предсказывалось",
+    "как уже предсказывалось", "как уже отмечалось", "как ранее",
+    "в прошлом сигнале", "что уже фиксировалось", "как обсуждалось ранее",
+    "как уже фиксировал", "предсказывалось как риск", "как уже говорилось",
+]
+
 # Мини-стоп-лист — не NLP-грамматика, просто самые частые служебные слова,
 # которые не несут различительной информации о механизме по обе стороны.
 STOPWORDS = {
@@ -65,6 +82,15 @@ def has_two_distinct_mechanisms(tension: str) -> tuple[bool, str]:
     """
     if not (MIN_LENGTH <= len(tension) <= MAX_LENGTH):
         return False, f"длина {len(tension)} вне диапазона [{MIN_LENGTH}, {MAX_LENGTH}]"
+
+    tension_lower = tension.lower()
+    for phrase in BACKREFERENCE_PHRASES:
+        if phrase in tension_lower:
+            return False, (
+                f"безымянная отсылка к другому сигналу ('{phrase}') — tension должен "
+                f"быть самостоятельным, отсылки к другим сигналам — в context/"
+                f"macro_implication/context_chain, не сюда"
+            )
 
     marker = _find_marker(tension)
     if marker is None:

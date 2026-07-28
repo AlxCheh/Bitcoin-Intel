@@ -1190,7 +1190,8 @@ const CLUSTER_LABELS_AI = {
   leverage_deleveraging_cycle: '💥 Левередж: циклы на плече',
   bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе',
   quantum_security:            '🔐 Q-Day: квантовая угроза',
-  mining_operations:           '⛏️ Майнинг: операции и безопасность'
+  mining_operations:           '⛏️ Майнинг: операции и безопасность',
+  layer2_programmability:      '🔗 L2: программируемость Bitcoin'
 };
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -1905,6 +1906,7 @@ function renderSignals() {
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
     quantum_security:         '🔐 Q-DAY',
     mining_operations:        '⛏️ МАЙНИНГ',
+    layer2_programmability:   '🔗 L2',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
@@ -2197,6 +2199,7 @@ function renderDashboard() {
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ: СПОР О КОНСЕНСУСЕ',
     quantum_security:         '🔐 КВАНТОВАЯ УГРОЗА',
     mining_operations:        '⛏️ МАЙНИНГ: ОПЕРАЦИИ И БЕЗОПАСНОСТЬ',
+    layer2_programmability:   '🔗 L2: ПРОГРАММИРУЕМОСТЬ BITCOIN',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',

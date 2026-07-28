@@ -49,6 +49,11 @@
       "label": "Майнинг: операции и безопасность",
       "theme": "infrastructure",
       "description": "Децентрализация транзакционного слоя — хешрейт, сложность сети, консолидация/закрытие пулов"
+    },
+    "layer2_programmability": {
+      "label": "L2: программируемость Bitcoin",
+      "theme": "infrastructure",
+      "description": "Программируемые активы и DeFi поверх Bitcoin — Stacks, RGB, Taproot Assets"
     }
   },
   "themes": {

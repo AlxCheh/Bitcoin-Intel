@@ -1909,13 +1909,6 @@ function renderSignals() {
     layer2_programmability:   '🔗 L2',
     mining_ai_diversification: '🤖 МАЙНИНГ И AI',
     lightning_payments:       '⚡ LIGHTNING',
-    institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
-    infrastructure:           '🔗 ИНФРАСТРУКТУРА',
-    supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
-    macro:                    '📉 МАКРО',
-    narrative:                '📰 НАРРАТИВ',
-    onchain:                  '📊 ON-CHAIN',
-    layer2:                   '🔗 ИНФРАСТРУКТУРА',
   };
   const cats = {};
   const catCounts = {};
@@ -2203,13 +2196,6 @@ function renderDashboard() {
     layer2_programmability:   '🔗 L2: ПРОГРАММИРУЕМОСТЬ BITCOIN',
     mining_ai_diversification: '🤖 МАЙНИНГ И AI: ГИБРИДНАЯ МОДЕЛЬ',
     lightning_payments:       '⚡ LIGHTNING: ПЛАТЕЖИ И РАСЧЁТЫ',
-    institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
-    infrastructure:           '🔗 ИНФРАСТРУКТУРА',
-    supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
-    macro:                    '📉 МАКРО',
-    narrative:                '📰 НАРРАТИВ',
-    onchain:                  '📊 ON-CHAIN',
-    layer2:                   '🔗 ИНФРАСТРУКТУРА',
   };
 
   // Собираем кластеры

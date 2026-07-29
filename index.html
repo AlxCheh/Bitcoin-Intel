@@ -1879,6 +1879,22 @@ header {
   line-height: 1.5;
   margin-bottom: 8px;
 }
+/* 2026-07-28: выделение "vs" в тензии — Вариант 2 (бейдж-капсула),
+   утверждён пользователем после превью 5 вариантов. Используется и в
+   "Главных нарративах" (ОБЗОР), и в "Все нарративы". */
+.tension-vs-badge {
+  display: inline-block;
+  background: var(--btc);
+  color: #0C0F14;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  margin: 0 2px;
+}
 .dash-narrative-minority-anchor {
   font-family: var(--mono);
   font-size: 9px;
@@ -4166,7 +4182,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=b8ff18e0ee"></script>
+<script src="js/app-main.js?v=bf5dd1d23b"></script>
 
 <div class="ep-overlay" id="ep-overlay" onclick="closeEntityPopup()"></div>
 <div class="entity-popup" id="entity-popup">

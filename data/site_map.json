@@ -1436,7 +1436,7 @@
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
       "tab": "base",
-      "tab_label": "АРХИВ",
+      "tab_label": "ВСЕ НАРРАТИВЫ",
       "source": "signals",
       "kind": "text",
       "keywords": [
@@ -1453,7 +1453,7 @@
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
       "tab": "base",
-      "tab_label": "АРХИВ",
+      "tab_label": "ВСЕ НАРРАТИВЫ",
       "source": "signals",
       "kind": "list",
       "keywords": [

@@ -20,11 +20,6 @@
       "theme": "institutionalization",
       "description": "Корпоративное накопление BTC выходит за пределы Strategy"
     },
-    "btc_infrastructure_growth": {
-      "label": "Рост инфраструктуры BTC",
-      "theme": "infrastructure",
-      "description": "Рост инфраструктуры: Lightning, L2, транзакции"
-    },
     "supply_scarcity": {
       "label": "Дефицит предложения",
       "theme": "supply",
@@ -59,6 +54,11 @@
       "label": "Майнинг и AI: гибридная модель",
       "theme": "infrastructure",
       "description": "Эволюция бизнес-модели майнеров через диверсификацию в AI/HPC-инфраструктуру и что это значит для их BTC-резервов"
+    },
+    "lightning_payments": {
+      "label": "Lightning: платежи и расчёты",
+      "theme": "infrastructure",
+      "description": "Компромисс скорость/доверие в around-Bitcoin расчётных системах — Lightning, некастодиальные кошельки, 0-conf"
     }
   },
   "themes": {

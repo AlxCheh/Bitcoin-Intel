@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.25 · **Обновлено:** 2026-07-27
+> **Версия:** v8.26 · **Обновлено:** 2026-07-27
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -185,7 +185,6 @@
 | `strategy_model_stress` | Устойчивость модели Strategy под давлением долга |
 | `etf_institutional_flow` | Потоки капитала через ETF и институциональные структуры |
 | `btc_treasury_competition` | Корпоративное накопление BTC выходит за пределы Strategy |
-| `btc_infrastructure_growth` | Рост инфраструктуры: Lightning, L2, транзакции |
 | `supply_scarcity` | Дефицит предложения: потерянные монеты, эмиссия, цикличность |
 | `leverage_deleveraging_cycle` | Циклы принудительного делевериджа на плечевых деривативах вокруг макро-катализаторов |
 | `bitcoin_governance_debate` | Споры о консенсусных изменениях и механизме управления протоколом Bitcoin |
@@ -193,8 +192,9 @@
 | `mining_operations` | Децентрализация транзакционного слоя — хешрейт, сложность сети, консолидация/закрытие пулов |
 | `layer2_programmability` | Программируемые активы и DeFi поверх Bitcoin — Stacks, RGB, Taproot Assets |
 | `mining_ai_diversification` | Эволюция бизнес-модели майнеров через диверсификацию в AI/HPC-инфраструктуру и что это значит для их BTC-резервов |
+| `lightning_payments` | Компромисс скорость/доверие в around-Bitcoin расчётных системах — Lightning, некастодиальные кошельки, 0-conf |
 
-> **В планировании (2026-07-27):** `btc_infrastructure_growth` разросся до 30% базы, содержательно неоднороден (5 подтем) — план разделения и открытые вопросы → [docs/PLAN-infrastructure-cluster-split.md](docs/PLAN-infrastructure-cluster-split.md). Четыре кластера выполнены (`quantum_security`, `mining_operations`, `layer2_programmability`, `mining_ai_diversification`), 2026-07-27. Остался последний (`lightning_payments`) — по плану.
+> **План завершён (2026-07-27):** `btc_infrastructure_growth` (30% базы, 5 содержательно разных подтем) полностью разделён на 5 новых кластеров — `quantum_security`, `mining_operations`, `layer2_programmability`, `mining_ai_diversification`, `lightning_payments`. Исходный кластер упразднён полностью (0 сигналов после последнего переноса) — удалён из `ontology.json` и обоих словарей подписей. `NAR-2026-0626-001` (Kalshi) отдельно переклассифицирован в `etf_institutional_flow`. Полная история решений → [docs/PLAN-infrastructure-cluster-split.md](docs/PLAN-infrastructure-cluster-split.md).
 
 - Актуальное число сигналов кластера считается по `signals.json` — в этом файле счётчики не ведутся
 - Новый кластер создаётся когда появляется 2+ сигнала с общим `tension` которого нет в существующих

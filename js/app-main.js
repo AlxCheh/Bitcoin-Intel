@@ -1184,7 +1184,7 @@ const AI_STOP_WORDS = new Set([
 const CLUSTER_LABELS_AI = {
   strategy_model_stress:       '🏦 Strategy: модель под давлением',
   etf_institutional_flow:      '📊 ETF: институциональный поток',
-  btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
+  btc_treasury_competition:    '💰 Казначейства: конкуренция',
   supply_scarcity:             '⬛ Предложение',
   leverage_deleveraging_cycle: '💥 Левередж: циклы на плече',
   bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе',
@@ -1900,7 +1900,7 @@ function renderSignals() {
   const DIGEST_CLUSTER_LABELS = {
     strategy_model_stress:    '🏦 STRATEGY',
     etf_institutional_flow:   '📊 ETF',
-    btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА',
+    btc_treasury_competition: '💰 КАЗНАЧЕЙСТВА',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
     leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
@@ -2194,7 +2194,7 @@ function renderDashboard() {
   const CLUSTER_LABELS = {
     strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
     etf_institutional_flow:   '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК',
-    btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
+    btc_treasury_competition: '💰 КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
     leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ: ЦИКЛЫ НА ПЛЕЧЕ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ: СПОР О КОНСЕНСУСЕ',

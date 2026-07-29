@@ -38,7 +38,7 @@
 
 ---
 
-## INF-2026-0722-002 · 🔗 LAYER 2 · 2026-07-22 · 🟢 pos · mid · `btc_infrastructure_growth`
+## INF-2026-0722-002 · 🔗 LAYER 2 · 2026-07-22 · 🟢 pos · mid · `lightning_payments`
 
 **Сигнал:** 0-conf для Elements и Liquid: технический разбор
 
@@ -123,7 +123,7 @@
 
 ---
 
-## INF-2026-0721-002 · 🔗 LAYER 2 · 2026-07-21 · 🟢 pos · mid · `btc_infrastructure_growth`
+## INF-2026-0721-002 · 🔗 LAYER 2 · 2026-07-21 · 🟢 pos · mid · `lightning_payments`
 
 **Сигнал:** Wavelength: Lightning Labs добавляет биткоин в любое приложение одним вызовом API
 
@@ -429,7 +429,7 @@
 
 ---
 
-## INF-2026-0716-002 · 🔗 LAYER 2 · 2026-07-16 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0716-002 · 🔗 LAYER 2 · 2026-07-16 · 🔴 neg · mid · `lightning_payments`
 
 **Сигнал:** Cloudflare запустил x402-монетизацию для AI-агентов только на стейблкоинах — bitcoin остаётся теоретической опцией
 
@@ -459,7 +459,7 @@
 
 ---
 
-## INF-2026-0716-001 · 🔗 LAYER 2 · 2026-07-16 · 🟢 pos · mid · `btc_infrastructure_growth`
+## INF-2026-0716-001 · 🔗 LAYER 2 · 2026-07-16 · 🟢 pos · mid · `lightning_payments`
 
 **Сигнал:** Breez и Turnkey запустили enclave-based non-custodial BTC-кошельки для backend-приложений
 
@@ -1001,7 +1001,7 @@
 
 ---
 
-## INF-2026-0715-001 · 🔗 LAYER 2 · 2026-07-07 · 🟢 pos · short · `btc_infrastructure_growth`
+## INF-2026-0715-001 · 🔗 LAYER 2 · 2026-07-07 · 🟢 pos · short · `lightning_payments`
 
 **Сигнал:** Polymarket включил мгновенные пополнения в BTC через Lightning на базе Spark
 
@@ -2000,7 +2000,7 @@
 
 ---
 
-## INF-2026-0623-002 · 📊 ON-CHAIN · 2026-06-23 · ⚪ neu · mid · `btc_infrastructure_growth`
+## INF-2026-0623-002 · 📊 ON-CHAIN · 2026-06-23 · ⚪ neu · mid · `lightning_payments`
 
 **Сигнал:** 23 июня — третий по величине день по числу транзакций в истории Bitcoin (862 979), но рекорд почти целиком объясняется Runes-спамом
 
@@ -2262,7 +2262,7 @@
 
 ---
 
-## INF-2026-0622-001 · 📊 ON-CHAIN · 2026-06-22 · ⚪ neu · mid · `btc_infrastructure_growth`
+## INF-2026-0622-001 · 📊 ON-CHAIN · 2026-06-22 · ⚪ neu · mid · `lightning_payments`
 
 **Сигнал:** 80% ежедневных транзакций Bitcoin — переводы менее 0,01 BTC — исторический максимум доли микротранзакций
 
@@ -2287,7 +2287,7 @@
 
 ---
 
-## INF-2026-0621-001 · 🔗 LAYER 2 · 2026-06-21 · 🟢 pos · mid · `btc_infrastructure_growth`
+## INF-2026-0621-001 · 🔗 LAYER 2 · 2026-06-21 · 🟢 pos · mid · `lightning_payments`
 
 **Сигнал:** Lightning Network: $1,17 млрд за ноябрь — исторический максимум объёма
 
@@ -2450,7 +2450,7 @@
 
 ---
 
-## INF-2026-0623-001 · 🔗 LAYER 2 · 2026-06-19 · 🟢 pos · long · `btc_infrastructure_growth`
+## INF-2026-0623-001 · 🔗 LAYER 2 · 2026-06-19 · 🟢 pos · long · `lightning_payments`
 
 **Сигнал:** GoMining запустила GoBTC Pay — платёжный протокол где мерчант получает BTC по умолчанию, а не фиат
 

@@ -1185,14 +1185,14 @@ const CLUSTER_LABELS_AI = {
   strategy_model_stress:       '🏦 Strategy: модель под давлением',
   etf_institutional_flow:      '📊 ETF: институциональный поток',
   btc_treasury_competition:    '🏛️ Казначейства: конкуренция',
-  btc_infrastructure_growth:   '🔗 Инфраструктура',
   supply_scarcity:             '⬛ Предложение',
   leverage_deleveraging_cycle: '💥 Левередж: циклы на плече',
   bitcoin_governance_debate:   '⚖️ Управление: спор о консенсусе',
   quantum_security:            '🔐 Q-Day: квантовая угроза',
   mining_operations:           '⛏️ Майнинг: операции и безопасность',
   layer2_programmability:      '🔗 L2: программируемость Bitcoin',
-  mining_ai_diversification:   '🤖 Майнинг и AI: гибридная модель'
+  mining_ai_diversification:   '🤖 Майнинг и AI: гибридная модель',
+  lightning_payments:          '⚡ Lightning: платежи и расчёты'
 };
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -1901,7 +1901,6 @@ function renderSignals() {
     strategy_model_stress:    '🏦 STRATEGY',
     etf_institutional_flow:   '📊 ETF',
     btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА',
-    btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
     leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
@@ -1909,6 +1908,7 @@ function renderSignals() {
     mining_operations:        '⛏️ МАЙНИНГ',
     layer2_programmability:   '🔗 L2',
     mining_ai_diversification: '🤖 МАЙНИНГ И AI',
+    lightning_payments:       '⚡ LIGHTNING',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',
@@ -2195,7 +2195,6 @@ function renderDashboard() {
     strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
     etf_institutional_flow:   '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК',
     btc_treasury_competition: '🏛️ КАЗНАЧЕЙСТВА: КОНКУРЕНЦИЯ',
-    btc_infrastructure_growth:'🔗 ИНФРАСТРУКТУРА',
     supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
     leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ: ЦИКЛЫ НА ПЛЕЧЕ',
     bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ: СПОР О КОНСЕНСУСЕ',
@@ -2203,6 +2202,7 @@ function renderDashboard() {
     mining_operations:        '⛏️ МАЙНИНГ: ОПЕРАЦИИ И БЕЗОПАСНОСТЬ',
     layer2_programmability:   '🔗 L2: ПРОГРАММИРУЕМОСТЬ BITCOIN',
     mining_ai_diversification: '🤖 МАЙНИНГ И AI: ГИБРИДНАЯ МОДЕЛЬ',
+    lightning_payments:       '⚡ LIGHTNING: ПЛАТЕЖИ И РАСЧЁТЫ',
     institutionalization:     '🏦 ИНСТИТУЦИОНАЛЫ',
     infrastructure:           '🔗 ИНФРАСТРУКТУРА',
     supply:                   '⬛ ПРЕДЛОЖЕНИЕ',

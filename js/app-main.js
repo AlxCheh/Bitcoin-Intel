@@ -1145,6 +1145,15 @@ let SIGNALS = [];
 let chartsInited = false;
 let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 
+// 2026-07-28: полная аналитика по кластерам (АРХИВ, все N кластеров,
+// ступенчато — топ-3 полной карточкой + остальные компактно). Объявлены
+// рано по той же причине, что chartsInited/PRESET_SIGNALS_LIST выше —
+// triggerTabData('base') может быть вызван СИНХРОННО при восстановлении
+// вкладки (bi_active_tab='base' в localStorage), до того как обычное
+// линейное исполнение дошло бы до этой точки ниже по файлу.
+const CLUSTER_WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
+const CLUSTER_ROLE_RANK   = { trigger: 4, complication: 3, resolution: 2, background: 0 };
+
 // 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
 // той же причине, что chartsInited выше — bi_active_tab='signals' в
 // localStorage синхронно вызывал triggerTabData → renderPresetSignals(),
@@ -2469,6 +2478,124 @@ function goToDigest(clusterKey) {
   window.scrollTo(0, 0);
 }
 
+// 2026-07-28 (по запросу пользователя): «Главные нарративы» на ОБЗОРЕ
+// показывают только топ-4 кластера по score — при 11 реальных кластерах
+// это осмысленное усечение для дайджеста, но не даёт увидеть остальные.
+// Полная аналитика — отдельная секция в ANALYSIS → АРХИВ (вкладка была
+// пустой заглушкой, естественное место). Решения пользователя: (1)
+// ступенчато — топ-N полной карточкой + остальные компактным списком,
+// не всё в одном формате; (2) score — только порядок показа, не фильтр
+// включения (в отличие от renderDashboard(), здесь нет ни SCORE_MIN,
+// ни жёсткого MAX_SHOWN — показываются ВСЕ кластеры, что есть в SIGNALS,
+// значит масштабируется автоматически при появлении новых кластеров).
+//
+// scoreClusterSignals()/computeAllClusterScores() — та же формула, что
+// renderDashboard() использует внутри себя (freshness+weight+tension+
+// roles) — сознательно НЕ рефакторили renderDashboard() под общий код:
+// этот файл уже дважды ловил TDZ-баги от переупорядочивания существующей
+// логики в этой сессии, риск регресса в уже отлаженной "Главных
+// нарративах" не оправдан ради устранения дублирования формулы в ~15
+// строк. Если формула скоринга когда-нибудь изменится — обновить оба
+// места (здесь и внутри renderDashboard()).
+function scoreClusterSignals(signals) {
+  let freshness = 0, weight = 0, tension = 0, roles = 0;
+  const today = new Date();
+  signals.forEach(s => {
+    const days = s.date ? Math.floor((today - new Date(s.date)) / 86400000) : 999;
+    freshness += days <= FRESHNESS_FRESH_DAYS ? 3 : days <= FRESHNESS_RECENT_DAYS ? 1 : 0;
+    weight += CLUSTER_WEIGHT_RANK[s.weight] || 1;
+    if (s.links && s.links.contradicts && s.links.contradicts.length) tension += 5;
+    if (s.tension) tension += 2;
+    roles += CLUSTER_ROLE_RANK[s.narrative_role] || 0;
+  });
+  return { total: freshness + weight + tension + roles, freshness, weight, tension, roles };
+}
+
+function computeAllClusterScores() {
+  const clusters = {};
+  (SIGNALS || []).forEach(s => {
+    const cl = s.cluster || s.theme || 'narrative';
+    if (!clusters[cl]) clusters[cl] = { signals: [], pos: 0, neg: 0, neu: 0 };
+    clusters[cl].signals.push(s);
+    clusters[cl][s.dir] = (clusters[cl][s.dir] || 0) + 1;
+  });
+  return Object.keys(clusters)
+    .map(key => ({ key, cl: clusters[key], score: scoreClusterSignals(clusters[key].signals) }))
+    .sort((a, b) => b.score.total - a.score.total);
+}
+
+function renderClusterFullAnalytics() {
+  const listEl = document.getElementById('archive-cluster-list');
+  if (!listEl) return;
+  if (!SIGNALS || !SIGNALS.length) {
+    listEl.innerHTML = '<div style="padding:24px 14px;text-align:center;color:var(--dim);font-size:12px;font-family:var(--mono)">Сигналы ещё загружаются…</div>';
+    return;
+  }
+
+  const scored = computeAllClusterScores();
+  const FEATURED_COUNT = 3;
+  const featured = scored.slice(0, FEATURED_COUNT);
+  const rest = scored.slice(FEATURED_COUNT);
+
+  const totalEl = document.getElementById('archive-cluster-total');
+  if (totalEl) {
+    const n = scored.length;
+    totalEl.textContent = n + ' КЛАСТЕР' + (n === 1 ? '' : (n >= 2 && n <= 4) ? 'А' : 'ОВ');
+  }
+
+  listEl.innerHTML = '';
+
+  featured.forEach(({ key, cl, score }) => {
+    const cached = SYNTHESIS_CACHE[key];
+    const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
+    const label = CLUSTER_LABELS_AI[key] || sanitize(key).toUpperCase();
+    const tension = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '—';
+    const macro = synthesis.narrative || '—';
+
+    const div = document.createElement('div');
+    div.className = 'panel';
+    div.style.marginBottom = '10px';
+    div.innerHTML =
+        '<div class="panel-head"><span class="panel-title">' + sanitize(label) + '</span>'
+      +   '<span class="panel-tag">' + cl.signals.length + ' СИГН. · score ' + score.total + '</span></div>'
+      + '<div style="padding:12px 14px">'
+      +   '<p style="font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:8px">' + highlightEntities(tension) + '</p>'
+      +   '<p style="font-size:12px;color:var(--dim);line-height:1.6">' + highlightEntities(macro) + '</p>'
+      +   '<div style="margin-top:8px"><span class="dash-narrative-link" data-cl="' + key + '" style="cursor:pointer;color:var(--btc);font-size:11px;font-family:var(--mono)">СМОТРЕТЬ В ДАЙДЖЕСТЕ →</span></div>'
+      + '</div>';
+    div.querySelector('[data-cl]').addEventListener('click', function () { goToDigest(this.dataset.cl); });
+    listEl.appendChild(div);
+  });
+
+  if (rest.length) {
+    const wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.innerHTML = '<div class="panel-head"><span class="panel-title">Остальные кластеры</span><span class="panel-tag">' + rest.length + '</span></div>';
+    const body = document.createElement('div');
+    rest.forEach(({ key, cl }) => {
+      const cached = SYNTHESIS_CACHE[key];
+      const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
+      const label = CLUSTER_LABELS_AI[key] || sanitize(key).toUpperCase();
+      const tension = synthesis.tension || '—';
+
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:10px 14px;border-top:1px solid var(--line);cursor:pointer';
+      row.innerHTML =
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+        +   '<span style="font-size:12px;color:var(--txt);font-weight:600">' + sanitize(label) + '</span>'
+        +   '<span style="font-size:10px;color:var(--dim);font-family:var(--mono)">' + cl.signals.length + '</span>'
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--dim);line-height:1.5;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'
+        +   sanitize(tension)
+        + '</div>';
+      row.addEventListener('click', function () { goToDigest(key); });
+      body.appendChild(row);
+    });
+    wrap.appendChild(body);
+    listEl.appendChild(wrap);
+  }
+}
+
 // ── TABS ──
 
 // ── Инициализация крошки ──
@@ -2596,6 +2723,7 @@ function triggerTabData(id) {
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
   if (id === 'signals')   renderPresetSignals();
+  if (id === 'base')      renderClusterFullAnalytics();
 }
 
 function showTab(id, btn, keepCluster) {

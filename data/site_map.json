@@ -1432,7 +1432,24 @@
     },
     {
       "id": "e094",
-      "title": "Накопленные разборы",
+      "title": "Аналитика по всем кластерам",
+      "cluster": "analysis",
+      "cluster_label": "ANALYSIS",
+      "tab": "base",
+      "tab_label": "АРХИВ",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "кластеры",
+        "аналитика",
+        "нарративы",
+        "архив",
+        "тензия"
+      ]
+    },
+    {
+      "id": "e098",
+      "title": "Остальные кластеры",
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
       "tab": "base",
@@ -1440,8 +1457,8 @@
       "source": "signals",
       "kind": "list",
       "keywords": [
-        "архив",
-        "разборы"
+        "кластеры",
+        "компактный список"
       ]
     }
   ]

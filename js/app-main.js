@@ -1081,6 +1081,17 @@ function highlightEntities(text) {
   return result;
 }
 
+// 2026-07-28 (по запросу пользователя, утверждено превью 5 вариантов) —
+// выделение "vs" в тензии бейджем-капсулой. Применяется ПОСЛЕ
+// highlightEntities() (которая сама делает sanitize() входного текста) —
+// не до, иначе injected-теги бейджа сами были бы заэкранированы
+// повторным sanitize() внутри highlightEntities(). Проверено — ни одна
+// сущность не содержит "vs" как отдельное слово в id/name (иначе
+// регулярка задела бы её случайно).
+function highlightVs(html) {
+  return html.replace(/\bvs\b/g, '<span class="tension-vs-badge">VS</span>');
+}
+
 // Делегирование — один обработчик на весь документ
 document.addEventListener('click', function(ev) {
   const el = ev.target.closest('[data-entity-id]');
@@ -1145,7 +1156,7 @@ let SIGNALS = [];
 let chartsInited = false;
 let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 
-// 2026-07-28: полная аналитика по кластерам (АРХИВ, все N кластеров,
+// 2026-07-28: полная аналитика по кластерам (ВСЕ НАРРАТИВЫ, все N кластеров,
 // ступенчато — топ-3 полной карточкой + остальные компактно). Объявлены
 // рано по той же причине, что chartsInited/PRESET_SIGNALS_LIST выше —
 // triggerTabData('base') может быть вызван СИНХРОННО при восстановлении
@@ -2406,7 +2417,7 @@ function renderDashboard() {
       +   '</div>'
       + '</div>'
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
-      + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightEntities(tension) + '</div>' : '')
+      + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightVs(highlightEntities(tension)) + '</div>' : '')
       + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
@@ -2481,7 +2492,7 @@ function goToDigest(clusterKey) {
 // 2026-07-28 (по запросу пользователя): «Главные нарративы» на ОБЗОРЕ
 // показывают только топ-4 кластера по score — при 11 реальных кластерах
 // это осмысленное усечение для дайджеста, но не даёт увидеть остальные.
-// Полная аналитика — отдельная секция в ANALYSIS → АРХИВ (вкладка была
+// Полная аналитика — отдельная секция в ANALYSIS → ВСЕ НАРРАТИВЫ (вкладка была
 // пустой заглушкой, естественное место). Решения пользователя: (1)
 // ступенчато — топ-N полной карточкой + остальные компактным списком,
 // не всё в одном формате; (2) score — только порядок показа, не фильтр
@@ -2559,7 +2570,7 @@ function renderClusterFullAnalytics() {
         '<div class="panel-head"><span class="panel-title">' + sanitize(label) + '</span>'
       +   '<span class="panel-tag">' + cl.signals.length + ' СИГН. · score ' + score.total + '</span></div>'
       + '<div style="padding:12px 14px">'
-      +   '<p style="font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:8px">' + highlightEntities(tension) + '</p>'
+      +   '<p style="font-size:13px;color:var(--txt);line-height:1.6;margin-bottom:8px">' + highlightVs(highlightEntities(tension)) + '</p>'
       +   '<p style="font-size:12px;color:var(--dim);line-height:1.6">' + highlightEntities(macro) + '</p>'
       +   '<div style="margin-top:8px"><span class="dash-narrative-link" data-cl="' + key + '" style="cursor:pointer;color:var(--btc);font-size:11px;font-family:var(--mono)">СМОТРЕТЬ В ДАЙДЖЕСТЕ →</span></div>'
       + '</div>';
@@ -2586,7 +2597,7 @@ function renderClusterFullAnalytics() {
         +   '<span style="font-size:10px;color:var(--dim);font-family:var(--mono)">' + cl.signals.length + '</span>'
         + '</div>'
         + '<div style="font-size:11px;color:var(--dim);line-height:1.5;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'
-        +   sanitize(tension)
+        +   highlightVs(sanitize(tension))
         + '</div>';
       row.addEventListener('click', function () { goToDigest(key); });
       body.appendChild(row);
@@ -2616,7 +2627,7 @@ const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
   macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['history','ЭМИССИЯ']] },
-  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','АРХИВ']] }
+  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','ВСЕ НАРРАТИВЫ']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',

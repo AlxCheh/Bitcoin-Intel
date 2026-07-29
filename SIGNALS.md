@@ -8,7 +8,7 @@
 
 ---
 
-## INF-2026-0723-001 · ⛏️ МАЙНИНГ · 2026-07-23 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0723-001 · ⛏️ МАЙНИНГ · 2026-07-23 · 🔴 neg · mid · `mining_ai_diversification`
 
 **Сигнал:** Benchmark повысил целевую цену Hut 8 после сделки майнера по AI-дата-центру на $9,8 млрд
 
@@ -68,7 +68,7 @@
 
 ---
 
-## INF-2026-0722-001 · ⛏️ МАЙНИНГ · 2026-07-22 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0722-001 · ⛏️ МАЙНИНГ · 2026-07-22 · 🔴 neg · mid · `mining_ai_diversification`
 
 **Сигнал:** Публичные майнеры — чистые продавцы BTC-резервов ради AI-капекса
 
@@ -546,7 +546,7 @@
 
 ---
 
-## INF-2026-0714-003 · ⛏️ МАЙНИНГ · 2026-07-14 · ⚪ neu · short · `btc_infrastructure_growth`
+## INF-2026-0714-003 · ⛏️ МАЙНИНГ · 2026-07-14 · ⚪ neu · short · `mining_ai_diversification`
 
 **Сигнал:** CleanSpark, BitFuFu и Canaan синхронно снизили добычу BTC за июнь — несмотря на падение сложности сети более чем на 10%
 
@@ -575,7 +575,7 @@
 
 ---
 
-## INF-2026-0714-002 · ⛏️ МАЙНИНГ · 2026-07-14 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0714-002 · ⛏️ МАЙНИНГ · 2026-07-14 · 🔴 neg · mid · `mining_ai_diversification`
 
 **Сигнал:** Мораторий Нью-Йорка на дата-центры от 50 МВт — первый в стране регуляторный прецедент против AI-пивота майнеров
 
@@ -606,7 +606,7 @@
 
 ---
 
-## INF-2026-0714-001 · ⛏️ МАЙНИНГ · 2026-07-14 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0714-001 · ⛏️ МАЙНИНГ · 2026-07-14 · 🔴 neg · mid · `mining_ai_diversification`
 
 **Сигнал:** CleanSpark подписала 20-летний AI-лизинг дата-центра на $6,6 млрд — крупнейшая пока сделка майнер→AI-инфраструктура в базе, но хешрейт компании при этом на историческом максимуме
 
@@ -671,7 +671,7 @@
 
 ---
 
-## INF-2026-0713-001 · ⛏️ МАЙНИНГ · 2026-07-13 · 🔴 neg · long · `btc_infrastructure_growth`
+## INF-2026-0713-001 · ⛏️ МАЙНИНГ · 2026-07-13 · 🔴 neg · long · `mining_ai_diversification`
 
 **Сигнал:** Keel Infrastructure (бывш. Bitfarms) объединит три биткоин-площадки в Квебеке в единый AI-кампус на 96 МВт
 
@@ -1520,7 +1520,7 @@
 
 ---
 
-## INF-2026-0629-001 · ⛏️ МАЙНИНГ · 2026-06-29 · 🔴 neg · long · `btc_infrastructure_growth`
+## INF-2026-0629-001 · ⛏️ МАЙНИНГ · 2026-06-29 · 🔴 neg · long · `mining_ai_diversification`
 
 **Сигнал:** Ionic Digital (экс-Celsius Mining) подала S-1 на прямой листинг Nasdaq (IOND) на фоне полного разворота площадки Ward County от BTC-майнинга к AI/HPC
 
@@ -2666,7 +2666,7 @@
 
 ---
 
-## INF-2026-0618-001 · 🔗 LAYER 2 · 2026-06-15 · 🔴 neg · mid · `btc_infrastructure_growth`
+## INF-2026-0618-001 · 🔗 LAYER 2 · 2026-06-15 · 🔴 neg · mid · `mining_ai_diversification`
 
 **Сигнал:** Майнеры BTC диверсифицируются в AI/HPC — IREN и TeraWulf сокращают BTC-операции расширяя дата-центры
 

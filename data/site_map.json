@@ -1333,7 +1333,7 @@
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
       "tab": "signals",
-      "tab_label": "SIGNALS",
+      "tab_label": "АНАЛИЗАТОР",
       "source": "tool",
       "kind": "tool",
       "keywords": [
@@ -1348,7 +1348,7 @@
       "cluster": "analysis",
       "cluster_label": "ANALYSIS",
       "tab": "signals",
-      "tab_label": "SIGNALS",
+      "tab_label": "АНАЛИЗАТОР",
       "source": "tool",
       "kind": "tool",
       "keywords": [

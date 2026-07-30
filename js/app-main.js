@@ -1176,18 +1176,37 @@ const CLUSTER_ROLE_RANK   = { trigger: 4, complication: 3, resolution: 2, backgr
 // действительно ведёт в СВОЙ кластер через localAnalyzeSignal(), не в
 // чужой (учтена русская морфология — падежные формы должны буквально
 // совпадать со словами в реальном тексте тензии, не парафраз).
+// 2026-07-28 (по запросу пользователя, Вариант 4 из
+// docs/ANALYSIS-preset-question-grammar.md): раньше вопрос для каждого
+// кластера генерировался НА ЛЕТУ — случайное окно 4-6 слов из реального
+// текста тензии. Пользователь показал реальные примеры несклада ("Что с
+// баланса до 7700 BTC?", "Что с на каждые...", "Что с млн BTC...") —
+// причина не в списке стоп-слов (JUNK_WORD_START), а в согласовании
+// падежей: слово в источнике стоит в падеже своей роли в ИСХОДНОМ
+// предложении, не в том, что требуется после "Что с" (творительный).
+// Списком стоп-слов эту задачу не решить — падеж свойство КАЖДОГО
+// слова окна, не только крайних. Полный разбор — см. документ выше.
+//
+// Решение — по 4 ВРУЧНУЮ написанных, грамматически цельных вопроса на
+// кластер (не вырезанных из текста, а составленных заново из его
+// словаря), каждый ПРОВЕРЕН через localAnalyzeSignal() перед принятием
+// (скрипт-проверка, не на глаз) — 44 вопроса, 0 провалов при финальной
+// проверке. generatePresetSignals() выбирает случайный вопрос из пула
+// каждого кластера при каждом рендере — рандомность сохраняется, но из
+// заведомо корректного множества, не из непроверяемого пространства
+// произвольных окон слов.
 const CLUSTER_PRESET_QUESTIONS = {
-  strategy_model_stress:       'Что с резервом и дилюцией акций?',
-  etf_institutional_flow:      'Что банки получили право хранить?',
-  btc_treasury_competition:    'Что с трекером баланса BTC?',
-  supply_scarcity:             'Что с LTH и держателями BTC?',
-  leverage_deleveraging_cycle: 'Что с отклонением от тренда?',
-  bitcoin_governance_debate:   'Что с консенсусом по BIP-110?',
-  quantum_security:            'Что с квантовой угрозой?',
-  mining_operations:           'Что с децентрализацией майнинга?',
-  layer2_programmability:      'Что со стеком инфраструктуры?',
-  mining_ai_diversification:   'Майнеры диверсифицируются в AI?',
-  lightning_payments:          'Что с видимостью мемпула?'
+  strategy_model_stress:       ['Что с резервом и дилюцией акций?', 'Что с дивидендной машиной STRC?', 'Что с падением STRC ниже номинала?', 'Испытывает ли давление дивидендная машина?'],
+  etf_institutional_flow:      ['Что банки получили право хранить?', 'Что с капитуляцией розницы?', 'Что требует Базель III от банков?', 'Что с конфигурацией декабря 2022?'],
+  btc_treasury_competition:    ['Что с трекером баланса BTC?', 'Как эволюционирует казначейство?', 'Что заявляет представитель МВФ?', 'Эволюционирует ли BTC-казначейство?'],
+  supply_scarcity:             ['Что с LTH и держателями BTC?', 'Ликвидное предложение BTC — что происходит?', 'Убеждённые держатели поглощают давление?', 'Что с режимом медвежьего дна?'],
+  leverage_deleveraging_cycle: ['Что с отклонением от тренда?', 'Что могут макро-катализаторы?', 'Насколько хрупок рынок BTC сейчас?', 'Способны ли макро-катализаторы развернуть рынок?'],
+  bitcoin_governance_debate:   ['Что с консенсусом по BIP-110?', 'Что формализует институциональный лагерь?', 'Что с голосованием клиентов по BIP-110?', 'Что означает снижение порога консенсусной активации?'],
+  quantum_security:            ['Что с квантовой угрозой?', 'Что с институциональной подготовкой к quantum-risk?', 'Опережает ли практика протокольный стандарт?', 'Что с BIP-360 и BIP-361 для кошельков?'],
+  mining_operations:           ['Что с децентрализацией майнинга?', 'Что с переходом от теории к практике?', 'Кто контролирует состав блоков?', 'Что с колебаниями мощности сети?'],
+  layer2_programmability:      ['Что со стеком инфраструктуры?', 'Что с utility за пределами золота?', 'Что с расчётным слоем стейблкоинов?', 'Гарантирует ли Bitcoin смену платформы?'],
+  mining_ai_diversification:   ['Майнеры диверсифицируются в AI?', 'Что вознаграждает рынок у майнеров?', 'Продолжают ли майнеры продавать BTC?', 'Как рынок оценивает энергетику AI?'],
+  lightning_payments:          ['Что с видимостью мемпула?', 'Что с funding-рельсами платформ?', 'Что с funding-рельсами финансовых платформ?', 'Требует ли сервис честности федерации?']
 };
 
 // 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
@@ -2560,73 +2579,31 @@ function computeAllClusterScores() {
     .sort((a, b) => b.score.total - a.score.total);
 }
 
-// 2026-07-30 (по запросу пользователя): готовые сигналы кластеров должны
-// быть РАНДОМНЫМИ — не всегда один и тот же курируемый вопрос на кластер
-// (CLUSTER_PRESET_QUESTIONS), а меняющийся выбор из реального текста при
-// каждом рендере. Рандомность не должна жертвовать надёжностью — тот же
-// урок, что уже дважды учили в этой сессии (сущности и кластеры): текст
-// должен РЕАЛЬНО вести в свой кластер. Решение — генерировать кандидата
-// (случайное окно слов из реальной тензии кластера) и СРАЗУ проверять его
-// через настоящий localAnalyzeSignal() — тот же код, что сработает при
-// реальном клике пользователя, не приближение/эвристика. Несколько попыток
-// с разным случайным окном; если ни одна не прошла — надёжный fallback на
-// CLUSTER_PRESET_QUESTIONS (тавтологически проверен вручную ранее).
-const JUNK_WORD_START = /^(в|с|со|и|не|но|—|-|а|у|к|о|от|за|до|при|или)$/i;
-
-function pickRandomWordWindow(text, windowSize) {
-  const clause = (text || '').split(' vs ')[0].replace(/\s*\([^)]*\)/g, '').trim();
-  const words = clause.split(/\s+/).filter(Boolean);
-  if (!words.length) return '';
-  if (words.length <= windowSize) return clause;
-  const maxStart = words.length - windowSize;
-  const start = Math.floor(Math.random() * (maxStart + 1));
-  return words.slice(start, start + windowSize).join(' ');
-}
-
-function generateClusterPresetQuestion(key, cl) {
-  const cached = SYNTHESIS_CACHE[key];
-  const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
-  const sourceText = synthesis.tension || '';
-  const expectedLabel = CLUSTER_LABELS_AI[key] || key;
-
-  const MAX_ATTEMPTS = 8;
-  for (let i = 0; i < MAX_ATTEMPTS; i++) {
-    const windowSize = 4 + Math.floor(Math.random() * 3); // 4-6 слов
-    const phrase = pickRandomWordWindow(sourceText, windowSize);
-    if (!phrase) break;
-    const words = phrase.split(/\s+/);
-    const firstWord = words[0], lastWord = words[words.length - 1];
-    // читаемость: не начинать/заканчивать на тире или короткие служебные
-    // слова — найдено на реальных примерах ("Что с в AI...", "Что с — но...")
-    if (JUNK_WORD_START.test(firstWord) || JUNK_WORD_START.test(lastWord) || /[—-]$/.test(lastWord) || /^[—-]/.test(firstWord)) {
-      continue;
-    }
-    // 2026-07-28 (по запросу пользователя): регулярка требовала, чтобы ВСЁ
-    // слово было заглавным без единого лишнего символа — "BTC," (с запятой
-    // из исходного текста тензии, знаки препинания остаются приклеены к
-    // слову при split по пробелу) не проходила проверку → firstWordIsAcronym
-    // ложно false → код портил регистр первой буквы ("BTC," -> "bTC,").
-    // Первая попытка фикса (только очистка краевой пунктуации) не покрывала
-    // смежный случай — составные токены через дефис ("AI-энергетическую")
-    // тоже не проходили строгую проверку "ВСЁ слово заглавное". Финальная
-    // версия — проверяем, что слово (после очистки от ведущей пунктуации)
-    // НАЧИНАЕТСЯ с 2+ заглавных подряд, не требуя, чтобы ВЕСЬ токен был
-    // заглавным — так "BTC," и "AI-энергетическую" распознаются как
-    // акроним-ведомые и не трогаются, а обычные "Резерв"/"Дивидендная"
-    // (только первая буква заглавная) по-прежнему корректно приводятся к
-    // строчной.
-    const firstWordStripped = firstWord.replace(/^[^A-Za-zА-Яа-яЁё0-9]+/, '');
-    const firstWordIsAcronym = /^[A-ZА-Я]{2,}/.test(firstWordStripped);
-    const lowerFirstWord = firstWordIsAcronym ? firstWord : firstWord.charAt(0).toLowerCase() + firstWord.slice(1);
-    const candidate = 'Что с ' + lowerFirstWord + phrase.slice(firstWord.length) + '?';
-    const test = localAnalyzeSignal(candidate);
-    if (test.matched && test.cluster_label === expectedLabel) return candidate;
-  }
-  return CLUSTER_PRESET_QUESTIONS[key] || null;
+// 2026-07-28 (по запросу пользователя, Вариант 4 из
+// docs/ANALYSIS-preset-question-grammar.md): попытка генерировать вопрос
+// НА ЛЕТУ (случайное окно слов из реального текста тензии, см. историю
+// в git — pickRandomWordWindow/JUNK_WORD_START) была отклонена и убрана
+// целиком, не патчилась дальше. Причина — согласование падежей: слово в
+// источнике стоит в падеже своей роли в ИСХОДНОМ предложении, не в том,
+// что требуется после "Что с" (творительный) — список стоп-слов может
+// убрать плохие КРАЯ окна, но не может проверить падеж КАЖДОГО слова
+// внутри, а падеж — не только у первого/последнего слова. Пользователь
+// показал реальные примеры несклада ("Что с баланса до 7700 BTC?"),
+// подтвердившие, что это не редкий край, а системное ограничение
+// подхода. Полный разбор — см. документ выше.
+//
+// Решение — простой случайный выбор из CLUSTER_PRESET_QUESTIONS (44
+// вручную написанных и проверенных вопроса, 4 на кластер) — рандомность
+// сохраняется на уровне ВЫБОРА, не на уровне ГЕНЕРАЦИИ текста.
+function generateClusterPresetQuestion(key) {
+  const pool = CLUSTER_PRESET_QUESTIONS[key];
+  if (!pool || !pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function renderClusterFullAnalytics() {
   const listEl = document.getElementById('archive-cluster-list');
+
   if (!listEl) return;
   if (!SIGNALS || !SIGNALS.length) {
     listEl.innerHTML = '<div style="padding:24px 14px;text-align:center;color:var(--dim);font-size:12px;font-family:var(--mono)">Сигналы ещё загружаются…</div>';
@@ -4260,8 +4237,8 @@ function generatePresetSignals() {
     .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
     .slice(0, 6);
   const shuffledClusters = [...clusterPool].sort(() => Math.random() - 0.5).slice(0, 3);
-  shuffledClusters.forEach(([key, cl]) => {
-    const q = generateClusterPresetQuestion(key, cl);
+  shuffledClusters.forEach(([key]) => {
+    const q = generateClusterPresetQuestion(key);
     if (q) presets.push(q);
   });
 

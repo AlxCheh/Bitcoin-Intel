@@ -2560,6 +2560,56 @@ function computeAllClusterScores() {
     .sort((a, b) => b.score.total - a.score.total);
 }
 
+// 2026-07-30 (по запросу пользователя): готовые сигналы кластеров должны
+// быть РАНДОМНЫМИ — не всегда один и тот же курируемый вопрос на кластер
+// (CLUSTER_PRESET_QUESTIONS), а меняющийся выбор из реального текста при
+// каждом рендере. Рандомность не должна жертвовать надёжностью — тот же
+// урок, что уже дважды учили в этой сессии (сущности и кластеры): текст
+// должен РЕАЛЬНО вести в свой кластер. Решение — генерировать кандидата
+// (случайное окно слов из реальной тензии кластера) и СРАЗУ проверять его
+// через настоящий localAnalyzeSignal() — тот же код, что сработает при
+// реальном клике пользователя, не приближение/эвристика. Несколько попыток
+// с разным случайным окном; если ни одна не прошла — надёжный fallback на
+// CLUSTER_PRESET_QUESTIONS (тавтологически проверен вручную ранее).
+const JUNK_WORD_START = /^(в|с|со|и|не|но|—|-|а|у|к|о|от|за|до|при|или)$/i;
+
+function pickRandomWordWindow(text, windowSize) {
+  const clause = (text || '').split(' vs ')[0].replace(/\s*\([^)]*\)/g, '').trim();
+  const words = clause.split(/\s+/).filter(Boolean);
+  if (!words.length) return '';
+  if (words.length <= windowSize) return clause;
+  const maxStart = words.length - windowSize;
+  const start = Math.floor(Math.random() * (maxStart + 1));
+  return words.slice(start, start + windowSize).join(' ');
+}
+
+function generateClusterPresetQuestion(key, cl) {
+  const cached = SYNTHESIS_CACHE[key];
+  const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
+  const sourceText = synthesis.tension || '';
+  const expectedLabel = CLUSTER_LABELS_AI[key] || key;
+
+  const MAX_ATTEMPTS = 8;
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    const windowSize = 4 + Math.floor(Math.random() * 3); // 4-6 слов
+    const phrase = pickRandomWordWindow(sourceText, windowSize);
+    if (!phrase) break;
+    const words = phrase.split(/\s+/);
+    const firstWord = words[0], lastWord = words[words.length - 1];
+    // читаемость: не начинать/заканчивать на тире или короткие служебные
+    // слова — найдено на реальных примерах ("Что с в AI...", "Что с — но...")
+    if (JUNK_WORD_START.test(firstWord) || JUNK_WORD_START.test(lastWord) || /[—-]$/.test(lastWord) || /^[—-]/.test(firstWord)) {
+      continue;
+    }
+    const firstWordIsAcronym = /^[A-ZА-Я]{2,}$/.test(firstWord);
+    const lowerFirstWord = firstWordIsAcronym ? firstWord : firstWord.charAt(0).toLowerCase() + firstWord.slice(1);
+    const candidate = 'Что с ' + lowerFirstWord + phrase.slice(firstWord.length) + '?';
+    const test = localAnalyzeSignal(candidate);
+    if (test.matched && test.cluster_label === expectedLabel) return candidate;
+  }
+  return CLUSTER_PRESET_QUESTIONS[key] || null;
+}
+
 function renderClusterFullAnalytics() {
   const listEl = document.getElementById('archive-cluster-list');
   if (!listEl) return;
@@ -4158,23 +4208,46 @@ function generatePresetSignals() {
 
   const presets = [];
 
-  const topEntities = [...ENTITIES]
+  // Сущности — случайные до 3 из пула топ-8 по покрытию сигналами, каждый
+  // кандидат СРАЗУ проверяется через localAnalyzeSignal() (та же
+  // дисциплина, что и для кластеров ниже) — найдено при внедрении
+  // рандома: многословные имена ("El Salvador", "Bitcoin Standard
+  // Treasury Company") не находятся через findMatchingEntity() —
+  // посимвольное сравнение токена ввода с многословным кандидатом не
+  // проходит порог Левенштейна. Раньше это не проявлялось, потому что
+  // топ-3 всегда были одно-словными (Strategy/Metaplanet/Strive) —
+  // рандомизация впервые вывела многословные имена в пул.
+  const entityPool = [...ENTITIES]
     .filter(e => (e.signal_refs || []).length > 0)
     .sort((a, b) => (b.signal_refs || []).length - (a.signal_refs || []).length)
-    .slice(0, 3);
-  topEntities.forEach(e => {
+    .slice(0, 8);
+  const shuffledEntityPool = [...entityPool].sort(() => Math.random() - 0.5);
+  let entityCount = 0;
+  for (const e of shuffledEntityPool) {
+    if (entityCount >= 3) break;
     const cleanName = (e.name || e.id).replace(/\s*\(.*?\)\s*/g, '');
-    presets.push('Сколько BTC у ' + cleanName + '?');
-  });
+    const candidate = 'Сколько BTC у ' + cleanName + '?';
+    if (localAnalyzeSignal(candidate).matched) {
+      presets.push(candidate);
+      entityCount++;
+    }
+  }
 
+  // Кластеры — случайные 3 из пула топ-6 по числу сигналов (та же логика
+  // пула). Вопрос для каждого генерируется на лету — случайное окно слов
+  // из реальной тензии, проверенное через localAnalyzeSignal() (см.
+  // generateClusterPresetQuestion выше).
   const clusterEntries = Object.entries(SYNTHESIS_CACHE).filter(([k]) => !k.startsWith('_') && k !== 'meta');
   const clusterSignalCounts = {};
   (SIGNALS || []).forEach(s => { if (s.cluster) clusterSignalCounts[s.cluster] = (clusterSignalCounts[s.cluster] || 0) + 1; });
-  const topClusters = clusterEntries
+  const clusterPool = clusterEntries
+    .filter(([k]) => (clusterSignalCounts[k] || 0) >= 2)
     .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
-    .slice(0, 3);
-  topClusters.forEach(([key]) => {
-    if (CLUSTER_PRESET_QUESTIONS[key]) presets.push(CLUSTER_PRESET_QUESTIONS[key]);
+    .slice(0, 6);
+  const shuffledClusters = [...clusterPool].sort(() => Math.random() - 0.5).slice(0, 3);
+  shuffledClusters.forEach(([key, cl]) => {
+    const q = generateClusterPresetQuestion(key, cl);
+    if (q) presets.push(q);
   });
 
   return presets.length ? presets : PRESET_SIGNALS_LIST;

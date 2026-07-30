@@ -4219,69 +4219,64 @@ function generatePresetSignals() {
   const hasClusters = SYNTHESIS_CACHE && Object.keys(SYNTHESIS_CACHE).some(k => !k.startsWith('_') && k !== 'meta');
   if (!hasEntities || !hasClusters) return PRESET_SIGNALS_LIST;
 
-  const presets = [];
-
-  // Сущности — случайные до 3 из пула топ-8 по покрытию сигналами, каждый
-  // кандидат СРАЗУ проверяется через localAnalyzeSignal() (та же
-  // дисциплина, что и для кластеров ниже) — найдено при внедрении
-  // рандома: многословные имена ("El Salvador", "Bitcoin Standard
-  // Treasury Company") не находятся через findMatchingEntity() —
-  // посимвольное сравнение токена ввода с многословным кандидатом не
-  // проходит порог Левенштейна. Раньше это не проявлялось, потому что
-  // топ-3 всегда были одно-словными (Strategy/Metaplanet/Strive) —
-  // рандомизация впервые вывела многословные имена в пул.
+  // 2026-07-28 (по запросу пользователя): раньше слоты были жёстко
+  // поделены "3 сущности + 3 кластера/сигнала" — состав всегда был
+  // одинаковой формы, менялось только содержание внутри неё. Теперь все
+  // ~6 слотов тянутся из ОДНОГО перемешанного пула (сущности + кластеры
+  // + сигнальные preset_question вместе) — состав тоже случаен: иногда
+  // больше сущностей, иногда больше кластерных вопросов, без фиксированной
+  // структуры. Каждый кандидат по-прежнему проверяется через
+  // localAnalyzeSignal() (или уже предпроверенный курируемый пул кластеров)
+  // непосредственно перед принятием — рандомность состава не жертвует
+  // надёжностью, тот же принцип, что уже применялся трижды в сессии.
   const entityPool = [...ENTITIES]
     .filter(e => (e.signal_refs || []).length > 0)
     .sort((a, b) => (b.signal_refs || []).length - (a.signal_refs || []).length)
-    .slice(0, 8);
-  const shuffledEntityPool = [...entityPool].sort(() => Math.random() - 0.5);
-  let entityCount = 0;
-  for (const e of shuffledEntityPool) {
-    if (entityCount >= 3) break;
-    const cleanName = (e.name || e.id).replace(/\s*\(.*?\)\s*/g, '');
-    const candidate = 'Сколько BTC у ' + cleanName + '?';
-    if (localAnalyzeSignal(candidate).matched) {
-      presets.push(candidate);
-      entityCount++;
-    }
-  }
+    .slice(0, 8)
+    .map(e => ({ type: 'entity', e }));
 
-  // Кластеры + сигнальные preset_question конкурируют за одни и те же 3
-  // слота (не добавляют лишних кнопок сверх итоговых ~6). Курируемый пул
-  // кластеров (CLUSTER_PRESET_QUESTIONS, 44 вопроса) — вручную написан и
-  // уже проверен при составлении (см. docs/ANALYSIS-preset-question-grammar.md).
-  // preset_question — опциональное поле сигнала (2026-07-28, CLAUDE.md
-  // схема, НЕ покрывается Immutability Policy), пишется автором при
-  // оформлении, ОБЯЗАН быть проверен через localAnalyzeSignal() перед
-  // записью (CLAUDE.md Шаг 7) — здесь перепроверяем ещё раз на лету
-  // (defense in depth, тот же принцип, что и для сущностей выше) на
-  // случай изменения кластера/тензии со временем после записи сигнала.
   const clusterEntries = Object.entries(SYNTHESIS_CACHE).filter(([k]) => !k.startsWith('_') && k !== 'meta');
   const clusterSignalCounts = {};
   (SIGNALS || []).forEach(s => { if (s.cluster) clusterSignalCounts[s.cluster] = (clusterSignalCounts[s.cluster] || 0) + 1; });
   const clusterPool = clusterEntries
     .filter(([k]) => (clusterSignalCounts[k] || 0) >= 2)
     .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
-    .slice(0, 6);
+    .slice(0, 6)
+    .map(([key]) => ({ type: 'cluster', key }));
 
-  const signalQuestionCandidates = (SIGNALS || []).filter(s => s.preset_question);
+  // preset_question — опциональное поле сигнала (CLAUDE.md схема, НЕ
+  // покрывается Immutability Policy), ОБЯЗАН быть проверен через
+  // localAnalyzeSignal() перед записью (Шаг 7) — здесь перепроверяем ещё
+  // раз на лету (defense in depth) на случай изменения кластера/тензии
+  // со временем после записи сигнала.
+  const signalQuestionPool = (SIGNALS || [])
+    .filter(s => s.preset_question)
+    .map(s => ({ type: 'signal', s }));
 
-  const combinedCandidates = [
-    ...clusterPool.map(([key]) => ({ type: 'cluster', key })),
-    ...signalQuestionCandidates.map(s => ({ type: 'signal', s }))
-  ];
-  const shuffledCombined = [...combinedCandidates].sort(() => Math.random() - 0.5);
+  const combined = [...entityPool, ...clusterPool, ...signalQuestionPool];
+  const shuffled = [...combined].sort(() => Math.random() - 0.5);
 
-  let clusterSlotCount = 0;
-  for (const candidate of shuffledCombined) {
-    if (clusterSlotCount >= 3) break;
-    if (candidate.type === 'cluster') {
-      const q = generateClusterPresetQuestion(candidate.key);
-      if (q) { presets.push(q); clusterSlotCount++; }
+  const presets = [];
+  const TOTAL_SLOTS = 6;
+  for (const candidate of shuffled) {
+    if (presets.length >= TOTAL_SLOTS) break;
+    let q = null;
+    if (candidate.type === 'entity') {
+      // Многословные имена ("El Salvador", "Bitcoin Standard Treasury
+      // Company") не находятся через findMatchingEntity() — посимвольное
+      // сравнение с многословным кандидатом не проходит порог
+      // Левенштейна — отсюда проверка перед принятием, не только для
+      // кластеров.
+      const cleanName = (candidate.e.name || candidate.e.id).replace(/\s*\(.*?\)\s*/g, '');
+      const attempt = 'Сколько BTC у ' + cleanName + '?';
+      if (localAnalyzeSignal(attempt).matched) q = attempt;
+    } else if (candidate.type === 'cluster') {
+      q = generateClusterPresetQuestion(candidate.key);
     } else {
-      const q = candidate.s.preset_question;
-      if (q && localAnalyzeSignal(q).matched) { presets.push(q); clusterSlotCount++; }
+      const attempt = candidate.s.preset_question;
+      if (attempt && localAnalyzeSignal(attempt).matched) q = attempt;
     }
+    if (q) presets.push(q);
   }
 
   return presets.length ? presets : PRESET_SIGNALS_LIST;

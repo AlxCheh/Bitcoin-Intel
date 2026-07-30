@@ -4246,10 +4246,16 @@ function generatePresetSignals() {
     }
   }
 
-  // Кластеры — случайные 3 из пула топ-6 по числу сигналов (та же логика
-  // пула). Вопрос для каждого генерируется на лету — случайное окно слов
-  // из реальной тензии, проверенное через localAnalyzeSignal() (см.
-  // generateClusterPresetQuestion выше).
+  // Кластеры + сигнальные preset_question конкурируют за одни и те же 3
+  // слота (не добавляют лишних кнопок сверх итоговых ~6). Курируемый пул
+  // кластеров (CLUSTER_PRESET_QUESTIONS, 44 вопроса) — вручную написан и
+  // уже проверен при составлении (см. docs/ANALYSIS-preset-question-grammar.md).
+  // preset_question — опциональное поле сигнала (2026-07-28, CLAUDE.md
+  // схема, НЕ покрывается Immutability Policy), пишется автором при
+  // оформлении, ОБЯЗАН быть проверен через localAnalyzeSignal() перед
+  // записью (CLAUDE.md Шаг 7) — здесь перепроверяем ещё раз на лету
+  // (defense in depth, тот же принцип, что и для сущностей выше) на
+  // случай изменения кластера/тензии со временем после записи сигнала.
   const clusterEntries = Object.entries(SYNTHESIS_CACHE).filter(([k]) => !k.startsWith('_') && k !== 'meta');
   const clusterSignalCounts = {};
   (SIGNALS || []).forEach(s => { if (s.cluster) clusterSignalCounts[s.cluster] = (clusterSignalCounts[s.cluster] || 0) + 1; });
@@ -4257,11 +4263,26 @@ function generatePresetSignals() {
     .filter(([k]) => (clusterSignalCounts[k] || 0) >= 2)
     .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
     .slice(0, 6);
-  const shuffledClusters = [...clusterPool].sort(() => Math.random() - 0.5).slice(0, 3);
-  shuffledClusters.forEach(([key]) => {
-    const q = generateClusterPresetQuestion(key);
-    if (q) presets.push(q);
-  });
+
+  const signalQuestionCandidates = (SIGNALS || []).filter(s => s.preset_question);
+
+  const combinedCandidates = [
+    ...clusterPool.map(([key]) => ({ type: 'cluster', key })),
+    ...signalQuestionCandidates.map(s => ({ type: 'signal', s }))
+  ];
+  const shuffledCombined = [...combinedCandidates].sort(() => Math.random() - 0.5);
+
+  let clusterSlotCount = 0;
+  for (const candidate of shuffledCombined) {
+    if (clusterSlotCount >= 3) break;
+    if (candidate.type === 'cluster') {
+      const q = generateClusterPresetQuestion(candidate.key);
+      if (q) { presets.push(q); clusterSlotCount++; }
+    } else {
+      const q = candidate.s.preset_question;
+      if (q && localAnalyzeSignal(q).matched) { presets.push(q); clusterSlotCount++; }
+    }
+  }
 
   return presets.length ? presets : PRESET_SIGNALS_LIST;
 }

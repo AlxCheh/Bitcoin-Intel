@@ -2601,7 +2601,22 @@ function generateClusterPresetQuestion(key, cl) {
     if (JUNK_WORD_START.test(firstWord) || JUNK_WORD_START.test(lastWord) || /[—-]$/.test(lastWord) || /^[—-]/.test(firstWord)) {
       continue;
     }
-    const firstWordIsAcronym = /^[A-ZА-Я]{2,}$/.test(firstWord);
+    // 2026-07-28 (по запросу пользователя): регулярка требовала, чтобы ВСЁ
+    // слово было заглавным без единого лишнего символа — "BTC," (с запятой
+    // из исходного текста тензии, знаки препинания остаются приклеены к
+    // слову при split по пробелу) не проходила проверку → firstWordIsAcronym
+    // ложно false → код портил регистр первой буквы ("BTC," -> "bTC,").
+    // Первая попытка фикса (только очистка краевой пунктуации) не покрывала
+    // смежный случай — составные токены через дефис ("AI-энергетическую")
+    // тоже не проходили строгую проверку "ВСЁ слово заглавное". Финальная
+    // версия — проверяем, что слово (после очистки от ведущей пунктуации)
+    // НАЧИНАЕТСЯ с 2+ заглавных подряд, не требуя, чтобы ВЕСЬ токен был
+    // заглавным — так "BTC," и "AI-энергетическую" распознаются как
+    // акроним-ведомые и не трогаются, а обычные "Резерв"/"Дивидендная"
+    // (только первая буква заглавная) по-прежнему корректно приводятся к
+    // строчной.
+    const firstWordStripped = firstWord.replace(/^[^A-Za-zА-Яа-яЁё0-9]+/, '');
+    const firstWordIsAcronym = /^[A-ZА-Я]{2,}/.test(firstWordStripped);
     const lowerFirstWord = firstWordIsAcronym ? firstWord : firstWord.charAt(0).toLowerCase() + firstWord.slice(1);
     const candidate = 'Что с ' + lowerFirstWord + phrase.slice(firstWord.length) + '?';
     const test = localAnalyzeSignal(candidate);

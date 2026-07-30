@@ -1230,6 +1230,27 @@ const CLUSTER_PRESET_QUESTIONS = {
   lightning_payments:          ['Что с видимостью мемпула?', 'Что с funding-рельсами платформ?', 'Что с funding-рельсами финансовых платформ?', 'Требует ли сервис честности федерации?']
 };
 
+// 2026-07-28: вынесено на уровень модуля из renderSignals() (была
+// локальная const, недоступная извне) — по запросу пользователя короткий
+// бейдж "Найдено: X" в результате анализатора (localAnalyzeSignal(),
+// отдельная top-level функция) должен использовать эти же короткие
+// подписи, не длинные CLUSTER_LABELS_AI. Та же TDZ-дисциплина, что и для
+// остальных ранних объявлений — localAnalyzeSignal() может быть вызвана
+// раньше, чем renderSignals() успела бы объявить локальную версию.
+const DIGEST_CLUSTER_LABELS = {
+  strategy_model_stress:    '🏦 STRATEGY',
+  etf_institutional_flow:   '📊 ETF',
+  btc_treasury_competition: '💰 КАЗНАЧЕЙСТВА',
+  supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
+  leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ',
+  bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
+  quantum_security:         '🔐 Q-DAY',
+  mining_operations:        '⛏️ МАЙНИНГ',
+  layer2_programmability:   '🔗 L2',
+  mining_ai_diversification: '🤖 МАЙНИНГ И AI',
+  lightning_payments:       '⚡ LIGHTNING',
+};
+
 // 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
 // той же причине, что chartsInited выше — bi_active_tab='signals' в
 // localStorage синхронно вызывал triggerTabData → renderPresetSignals(),
@@ -1981,20 +2002,9 @@ function renderSignals() {
     + '<button class="sig-fbtn' + (sigMode==='theme'?' active':'') + '" onclick="setSigMode(\'theme\')">🗂 ПО ТЕМЕ</button>'
     + '</div>';
 
-  // фильтры по кластеру
-  const DIGEST_CLUSTER_LABELS = {
-    strategy_model_stress:    '🏦 STRATEGY',
-    etf_institutional_flow:   '📊 ETF',
-    btc_treasury_competition: '💰 КАЗНАЧЕЙСТВА',
-    supply_scarcity:          '⬛ ПРЕДЛОЖЕНИЕ',
-    leverage_deleveraging_cycle: '💥 ДЕЛЕВЕРИДЖ',
-    bitcoin_governance_debate: '⚖️ УПРАВЛЕНИЕ',
-    quantum_security:         '🔐 Q-DAY',
-    mining_operations:        '⛏️ МАЙНИНГ',
-    layer2_programmability:   '🔗 L2',
-    mining_ai_diversification: '🤖 МАЙНИНГ И AI',
-    lightning_payments:       '⚡ LIGHTNING',
-  };
+  // фильтры по кластеру (DIGEST_CLUSTER_LABELS теперь на уровне модуля —
+  // см. рядом с CLUSTER_LABELS_AI выше по файлу; вынесено 2026-07-28,
+  // понадобилось из localAnalyzeSignal() для короткого бейджа "Найдено")
   const cats = {};
   const catCounts = {};
   const catDir = {};
@@ -2715,7 +2725,7 @@ const CLUSTERS = {
   live:      { label: 'LIVE',     tabs: [['home','ОБЗОР'],['market','ДАЙДЖЕСТ'],['analytics','МЕТРИКИ'],['pools','ПУЛЫ']] },
   knowledge: { label: 'ECOSYSTEM', tabs: [['tech','ТЕХНОЛОГИИ'],['instruments','ИНСТРУМЕНТЫ'],['lightning','LIGHTNING']] },
   macro:     { label: 'FUNDAMENTAL', tabs: [['theory','ТЕОРИЯ'],['macrocontext','МАКРОКОНТЕКСТ'],['history','ЭМИССИЯ']] },
-  analysis:  { label: 'ANALYSIS', tabs: [['signals','SIGNALS'],['holders','ХОЛДЕРЫ'],['base','ВСЕ НАРРАТИВЫ']] }
+  analysis:  { label: 'ANALYSIS', tabs: [['signals','АНАЛИЗАТОР'],['holders','ХОЛДЕРЫ'],['base','ВСЕ НАРРАТИВЫ']] }
 };
 const TAB_TO_CLUSTER = {
   home:'live', analytics:'live', pools:'live', market:'live',
@@ -4466,7 +4476,7 @@ function localAnalyzeSignal(input) {
   return {
     signal: input,
     matched: true,
-    cluster_label: CLUSTER_LABELS_AI[top.key] || top.key,
+    cluster_label: DIGEST_CLUSTER_LABELS[top.key] || top.key,
     tension: ensureSentencePunctuation(top.cl.tension) || '—',
     narrative: ensureSentencePunctuation(top.cl.narrative) || '—',
     related_signals: relatedSignals,
@@ -4507,7 +4517,13 @@ function showAnalysisResult() {
   document.getElementById('analysis-loading').style.display = 'none';
   document.getElementById('result-signal-title').textContent = analysisResult.signal;
   const tagEl = document.querySelector('#analysis-result .panel-tag');
-  if (tagEl) tagEl.textContent = analysisResult.matched ? ('НАЙДЕНО: ' + (analysisResult.cluster_label || '').toUpperCase()) : 'НЕ НАЙДЕНО ПРЯМОГО СОВПАДЕНИЯ';
+  // 2026-07-28 (по решению пользователя, Вариант 2 из превью): короткий
+  // бейдж — только эмодзи + краткая подпись кластера/сущности, без
+  // префикса "НАЙДЕНО:" и без принудительного uppercase (ломал вид
+  // сущностей типа "🏢 Strategy (MSTR)"). Раньше длинный текст
+  // ("НАЙДЕНО: ⚡ LIGHTNING: ПЛАТЕЖИ И РАСЧЁТЫ") сжимал заголовок вопроса
+  // в flex-строке, заставляя его переноситься на 2 строки.
+  if (tagEl) tagEl.textContent = analysisResult.matched ? (analysisResult.cluster_label || '') : 'НЕ НАЙДЕНО';
   renderFullAnswer();
   document.getElementById('analysis-result').style.display = 'block';
   const presetPanel = document.getElementById('preset-signals-panel');

@@ -4434,7 +4434,7 @@ function renderFullAnswer() {
 
   wrap.innerHTML =
     '<div style="padding:14px">'
-    + '<p style="font-size:14px;color:var(--txt);line-height:1.7;white-space:pre-line">' + sanitize(mainText || '—') + '</p>'
+    + '<p style="font-size:14px;color:var(--txt);line-height:1.7;white-space:pre-line">' + highlightVs(sanitize(mainText || '—')) + '</p>'
     + '</div>'
     + signalsHtml
     + caveatsHtml;

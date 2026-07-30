@@ -1092,6 +1092,27 @@ function highlightVs(html) {
   return html.replace(/\bvs\b/g, '<span class="tension-vs-badge">VS</span>');
 }
 
+// 2026-07-28 (по запросу пользователя): tension/macro_implication/summary/
+// metrics в исходных данных (signals.json/ENTITIES.json) в основном без
+// точки в конце — проверено: 223/231 полей ENTITIES.json, 170/200 полей
+// signals.json. Редактировать сами данные ретроактивно нельзя для
+// tension/macro_implication (Immutability Policy, NIES AD-7 — уже учтены
+// в синтезе), да и в ENTITIES.json это отдельная миграция на 200+ правок.
+// Решение — нормализация ТОЛЬКО на уровне отображения: добавляем точку в
+// конце каждой непустой строки многострочного текста, если там уже нет
+// финальной пунктуации (. ! ? …). Применяется к СЫРОМУ тексту, до
+// sanitize()/highlightEntities()/highlightVs() — просто вставляет литерал
+// ".", дальше текст проходит все обычные преобразования как есть.
+function ensureSentencePunctuation(text) {
+  if (!text) return text;
+  return text.split('\n').map(line => {
+    const trimmed = line.replace(/\s+$/, '');
+    if (!trimmed) return line;
+    if (/[.!?…]$/.test(trimmed)) return trimmed;
+    return trimmed + '.';
+  }).join('\n');
+}
+
 // Делегирование — один обработчик на весь документ
 document.addEventListener('click', function(ev) {
   const el = ev.target.closest('[data-entity-id]');
@@ -2420,8 +2441,8 @@ function renderDashboard() {
     const isHot  = score.total >= SCORE_HOT;
     const bdId   = 'nbd-' + idx;
     const label  = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
-    const macroText = synthesis.narrative || '—';
-    const tension   = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '';
+    const macroText = ensureSentencePunctuation(synthesis.narrative) || '—';
+    const tension   = synthesis.tension ? ensureSentencePunctuation(synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1)) : '';
     // synthesis доступен для takeaway и strength
     const freshness = formatSynthesisFreshness(synthesis);
     const phaseInfo = formatPhaseLabel(synthesis.phase);
@@ -2627,8 +2648,8 @@ function renderClusterFullAnalytics() {
     const cached = SYNTHESIS_CACHE[key];
     const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
     const label = CLUSTER_LABELS_AI[key] || sanitize(key).toUpperCase();
-    const tension = synthesis.tension ? synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1) : '—';
-    const macro = synthesis.narrative || '—';
+    const tension = synthesis.tension ? ensureSentencePunctuation(synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1)) : '—';
+    const macro = ensureSentencePunctuation(synthesis.narrative) || '—';
 
     const div = document.createElement('div');
     div.className = 'panel';
@@ -2654,7 +2675,7 @@ function renderClusterFullAnalytics() {
       const cached = SYNTHESIS_CACHE[key];
       const synthesis = (cached && cached.tension) ? cached : synthesizeNarrativeAdvanced(key, cl);
       const label = CLUSTER_LABELS_AI[key] || sanitize(key).toUpperCase();
-      const tension = synthesis.tension || '—';
+      const tension = ensureSentencePunctuation(synthesis.tension) || '—';
 
       const row = document.createElement('div');
       row.style.cssText = 'padding:10px 14px;border-top:1px solid var(--line);cursor:pointer';
@@ -4355,18 +4376,18 @@ function localAnalyzeSignal(input) {
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
       .slice(0, 3)
       .map(s => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
-    const metricsText = (matchedEntity.profile && matchedEntity.profile.metrics || []).join('\n');
-    const caveatsText = relatedSignals
+    const metricsText = ensureSentencePunctuation((matchedEntity.profile && matchedEntity.profile.metrics || []).join('\n'));
+    const caveatsText = ensureSentencePunctuation(relatedSignals
       .filter(s => s.caveat)
       .slice(0, 2)
       .map(s => s.id + ': ' + s.caveat)
-      .join('\n\n') || 'Оговорок не зафиксировано в сигналах об этой сущности.';
+      .join('\n\n')) || 'Оговорок не зафиксировано в сигналах об этой сущности.';
 
     return {
       signal: input,
       matched: true,
       cluster_label: '🏢 ' + (matchedEntity.name || matchedEntity.id),
-      tension: matchedEntity.summary || '—',
+      tension: ensureSentencePunctuation(matchedEntity.summary) || '—',
       narrative: metricsText || '—',
       related_signals: relatedSignals,
       caveats: caveatsText
@@ -4404,18 +4425,18 @@ function localAnalyzeSignal(input) {
     .slice(0, 3)
     .map(s => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
 
-  const caveatsText = relatedSignals
+  const caveatsText = ensureSentencePunctuation(relatedSignals
     .filter(s => s.caveat)
     .slice(0, 2)
     .map(s => s.id + ': ' + s.caveat)
-    .join('\n\n') || 'Оговорок не зафиксировано в подтверждающих сигналах этого кластера.';
+    .join('\n\n')) || 'Оговорок не зафиксировано в подтверждающих сигналах этого кластера.';
 
   return {
     signal: input,
     matched: true,
     cluster_label: CLUSTER_LABELS_AI[top.key] || top.key,
-    tension: top.cl.tension || '—',
-    narrative: top.cl.narrative || '—',
+    tension: ensureSentencePunctuation(top.cl.tension) || '—',
+    narrative: ensureSentencePunctuation(top.cl.narrative) || '—',
     related_signals: relatedSignals,
     caveats: caveatsText
   };

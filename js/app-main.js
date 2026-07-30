@@ -4549,6 +4549,12 @@ function resetAnalysis() {
   const presetPanel = document.getElementById('preset-signals-panel');
   if (presetPanel) presetPanel.style.display = '';
   updateClearBtn();
+  // 2026-07-28 (по запросу пользователя): при клике "НОВЫЙ СИГНАЛ" готовые
+  // сигналы должны перемешиваться заново, не оставаться теми же, что были
+  // до анализа — renderPresetSignals() уже содержит случайный выбор
+  // (сущности + курируемый пул вопросов на кластер), просто не вызывалась
+  // повторно здесь раньше.
+  renderPresetSignals();
 }
 
 // ── Инициализация MACRO и ANALYSIS при открытии вкладок ──

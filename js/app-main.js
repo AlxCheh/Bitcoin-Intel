@@ -4419,11 +4419,27 @@ function localAnalyzeSignal(input) {
     };
   }
 
+  // 2026-07-28 (по запросу пользователя): "Подтверждающие сигналы" раньше
+  // брали просто 3 САМЫХ СВЕЖИХ сигнала во всём кластере — не обязательно
+  // те, что реально относятся к показанной тензии. Реальный пример: вопрос
+  // "Как эволюционирует казначейство?" матчился на btc_treasury_competition,
+  // показывал тензию именно про Сальвадор (STR-2026-0701-002) — но список
+  // "подтверждающих" сигналов состоял из Strive/Satsuma/Canaan (просто
+  // более свежие даты в том же широком кластере), ни один не про Сальвадор.
+  // Пользователь не мог понять, о какой стране речь, глядя только на текст.
+  // Исправлено — сигналы ранжируются по пересечению значимых слов с самой
+  // ТЕНЗИЕЙ (тот же aiSignificantTokens, что и основной матчинг), не только
+  // по дате; дата — тай-брейк при равной релевантности.
+  const tensionTokens = new Set(aiSignificantTokens(top.cl.tension || ''));
   const relatedSignals = (SIGNALS || [])
     .filter(s => s.cluster === top.key)
-    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .map(s => ({
+      s,
+      relevance: aiSignificantTokens((s.signal || '') + ' ' + (s.tension || '')).filter(t => tensionTokens.has(t)).length
+    }))
+    .sort((a, b) => b.relevance - a.relevance || (b.s.date || '').localeCompare(a.s.date || ''))
     .slice(0, 3)
-    .map(s => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
+    .map(({ s }) => ({ id: s.id, date: s.date, title: s.signal, caveat: s.caveat }));
 
   const caveatsText = ensureSentencePunctuation(relatedSignals
     .filter(s => s.caveat)

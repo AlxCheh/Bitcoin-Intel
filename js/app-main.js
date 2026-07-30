@@ -1165,6 +1165,31 @@ let SYNTHESIS_CACHE = {}; // Путь 3: кеш Python-синтеза
 const CLUSTER_WEIGHT_RANK = { onchain: 4, primary: 3, market: 2, media: 1 };
 const CLUSTER_ROLE_RANK   = { trigger: 4, complication: 3, resolution: 2, background: 0 };
 
+// 2026-07-28 (по запросу пользователя): готовые сигналы для кластеров
+// раньше строились как сырые обрывки тензии (первые 70 симв. до " vs ") —
+// на скриншоте пользователь показал, что это выглядит криво (перенос на
+// 2 строки в таблеточной кнопке, обрезание посреди числа "$2...", смесь
+// стилей с короткими вопросами про сущности). Курируемый список коротких
+// вопросов — не эвристика из подписи кластера (подпись часто не
+// пересекается словами с реальной тензией, см. коммит про сущности
+// раньше в этой же сессии). Каждый вопрос ПРОВЕРЕН вручную —
+// действительно ведёт в СВОЙ кластер через localAnalyzeSignal(), не в
+// чужой (учтена русская морфология — падежные формы должны буквально
+// совпадать со словами в реальном тексте тензии, не парафраз).
+const CLUSTER_PRESET_QUESTIONS = {
+  strategy_model_stress:       'Что с резервом и дилюцией акций?',
+  etf_institutional_flow:      'Что банки получили право хранить?',
+  btc_treasury_competition:    'Что с трекером баланса BTC?',
+  supply_scarcity:             'Что с LTH и держателями BTC?',
+  leverage_deleveraging_cycle: 'Что с отклонением от тренда?',
+  bitcoin_governance_debate:   'Что с консенсусом по BIP-110?',
+  quantum_security:            'Что с квантовой угрозой?',
+  mining_operations:           'Что с децентрализацией майнинга?',
+  layer2_programmability:      'Что со стеком инфраструктуры?',
+  mining_ai_diversification:   'Майнеры диверсифицируются в AI?',
+  lightning_payments:          'Что с видимостью мемпула?'
+};
+
 // 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
 // той же причине, что chartsInited выше — bi_active_tab='signals' в
 // localStorage синхронно вызывал triggerTabData → renderPresetSignals(),
@@ -4121,11 +4146,11 @@ function renderEmission() {
 // Подобрано намеренно, не произвольно:
 // - Сущности — топ-3 по числу signal_refs (гарантия, что у них реально
 //   есть чем ответить через findMatchingEntity(), не пустой список related_signals)
-// - Кластеры — первая часть тензии (до " vs ") как есть, не человекочитаемая
-//   подпись CLUSTER_LABELS_AI: проверено эмпирически (2026-07-26) — подпись
-//   4 из 7 кластеров вообще не пересекается словами с их собственной
-//   тензией/выводом (та же ловушка, что уже чинили для сущностей чуть выше) —
-//   сама тензия гарантированно пересекается сама с собой.
+// - Кластеры — короткий вопрос из CLUSTER_PRESET_QUESTIONS (курируемый
+//   список, не сырой обрывок тензии — см. комментарий у самого словаря
+//   выше по файлу, найдено пользователем на скриншоте 2026-07-28: обрывки
+//   тензии переносились на 2 строки в таблеточной кнопке и обрезались
+//   посреди слова/числа)
 function generatePresetSignals() {
   const hasEntities = Array.isArray(ENTITIES) && ENTITIES.length > 0;
   const hasClusters = SYNTHESIS_CACHE && Object.keys(SYNTHESIS_CACHE).some(k => !k.startsWith('_') && k !== 'meta');
@@ -4148,9 +4173,8 @@ function generatePresetSignals() {
   const topClusters = clusterEntries
     .sort((a, b) => (clusterSignalCounts[b[0]] || 0) - (clusterSignalCounts[a[0]] || 0))
     .slice(0, 3);
-  topClusters.forEach(([, cl]) => {
-    const firstClause = (cl.tension || '').split(' vs ')[0].trim();
-    if (firstClause) presets.push(firstClause.length > 70 ? firstClause.slice(0, 70) + '…' : firstClause);
+  topClusters.forEach(([key]) => {
+    if (CLUSTER_PRESET_QUESTIONS[key]) presets.push(CLUSTER_PRESET_QUESTIONS[key]);
   });
 
   return presets.length ? presets : PRESET_SIGNALS_LIST;

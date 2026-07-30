@@ -70,7 +70,8 @@
         "STR-2026-0706-001",
         "STR-2026-0713-001",
         "NAR-2026-0711-001",
-        "STR-2026-0720-001"
+        "STR-2026-0720-001",
+        "INF-2026-0723-002"
       ],
       "last_updated": "2026-07-20"
     },
@@ -1167,7 +1168,8 @@
         "notable": "Первая отраслевая (не продуктовая) координационная инициатива по квантовой готовности Bitcoin — открытый приём заявок на гранты, публичный призыв к со-финансированию другими игроками"
       },
       "signal_refs": [
-        "INF-2026-0721-001"
+        "INF-2026-0721-001",
+        "INF-2026-0723-002"
       ],
       "last_updated": "2026-07-21"
     },
@@ -1380,6 +1382,154 @@
         "INF-2026-0722-002"
       ],
       "last_updated": "2026-07-22"
+    },
+    {
+      "id": "blackrock",
+      "name": "BlackRock (BLK)",
+      "type": "fund",
+      "status": "active",
+      "summary": "Крупнейший в мире управляющий активами (NYSE: BLK) — эмитент IBIT (спот-BTC ETF), учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Глобальный управляющий активами; iShares Bitcoin Trust (IBIT) — крупнейший спот-BTC ETF по AUM",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026) — часть $15 млн совокупного пледжа на 3 года"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Оверсит десятки миллиардов долларов BTC-экспозиции через ETF/кастодиальные продукты"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "coinbase",
+      "name": "Coinbase (COIN)",
+      "type": "exchange",
+      "status": "active",
+      "summary": "Крупнейшая публичная криптобиржа США (NASDAQ: COIN) — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Регулируемая криптовалютная биржа и кастодиан",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Ранее (июнь 2026) собственный consultative council по quantum-risk уже оценивал уязвимый объём BTC в ~7М монет"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "anchorage_digital",
+      "name": "Anchorage Digital",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Федерально регулируемый криптокастодиан (OCC-chartered digital asset bank) — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Кастодиальная инфраструктура для институциональных цифровых активов",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Единственный федерально чартерованный криптобанк в США на момент участия в консорциуме"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "ark_invest",
+      "name": "ARK Invest",
+      "type": "fund",
+      "status": "active",
+      "summary": "Управляющий активами под руководством Кэти Вуд — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Активно управляемый инвестфонд, известен публичными BTC-тезисами Кэти Вуд",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Ранее (NAR-2026-0627-001) публично позиционировал BTC как страховку от суверенных валютных рисков"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "block_inc",
+      "name": "Block (XYZ)",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Платёжная компания Джека Дорси (NYSE: XYZ, бывш. Square) — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Платёжная и финтех-компания, включает Cash App и подразделение Bitcoin-разработки (Proto, tbDEX)",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Долгосрочная публичная приверженность Bitcoin-разработке под руководством Джека Дорси"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "blockstream_inc",
+      "name": "Blockstream",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Разработчик Liquid Network и Bitcoin-инфраструктуры — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Компания-разработчик, стоящая за Liquid Network (федеративный сайдчейн) и другой Bitcoin-инфраструктурой",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin",
+          "liquid_network"
+        ],
+        "notable": "Ранее (INF-2026-0722-002) запустила 0-conf API для видимости мемпула Liquid — отдельная сущность liquid_network охватывает сам протокол, эта — компанию-разработчика"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
+    },
+    {
+      "id": "fidelity_digital_assets",
+      "name": "Fidelity Digital Assets",
+      "type": "fund",
+      "status": "active",
+      "summary": "Подразделение цифровых активов Fidelity Investments — учредитель Bitcoin Security Consortium",
+      "profile": {
+        "what": "Институциональная BTC-кастодиальная и торговая инфраструктура Fidelity",
+        "metrics": [
+          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Наряду с BlackRock и Strategy — один из держателей десятков миллиардов долларов BTC-экспозиции, упомянутых в контексте создания консорциума"
+      },
+      "signal_refs": [
+        "INF-2026-0723-002"
+      ],
+      "last_updated": "2026-07-23"
     }
   ]
 }

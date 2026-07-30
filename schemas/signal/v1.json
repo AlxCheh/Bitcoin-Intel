@@ -49,6 +49,12 @@
       "minLength": 40,
       "description": "Структурный вывод — что изменилось для Bitcoin"
     },
+    "preset_question": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 60,
+      "description": "Опционально. Готовый короткий вопрос для AI-анализатора (кнопки 'ИЛИ ВЫБЕРИ ИЗ БАЗЫ'), написанный заново (не вырезан из tension/macro_implication) и ОБЯЗАТЕЛЬНО проверенный через localAnalyzeSignal() перед записью — см. CLAUDE.md, Шаг 8. НЕ покрывается Immutability Policy (AD-7) — в отличие от tension/macro_implication, это чисто UI-подсказка, не часть нарративного синтеза, можно редактировать/удалять позже, если найдётся проблема (падеж, пересечение слов с другим кластером/сущностью и т.п.)"
+    },
     "narrative_role": {
       "type": "string",
       "oneOf": [

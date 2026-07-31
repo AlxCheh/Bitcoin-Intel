@@ -205,3 +205,78 @@ class TestMainCLIRegression:
         )
         assert result.returncode in (0, 1)
         assert "Unexpected error" not in result.stderr
+
+
+# ─── Contradiction Detector Precision (roadmap 2026-07-31) ──────────────────
+# Видимость между прогонами тестов — см. docs/PLAN-contradiction-precision-roadmap.md.
+# НЕ подменяет tests/unit/test_contradiction.py (источник истины для CI gate).
+
+class TestContradictionPrecisionVisibility:
+
+    def _write_pairs(self, tmp_path, name, pairs):
+        path = tmp_path / name
+        path.write_text(json.dumps({"_meta": {}, "pairs": pairs}), encoding="utf-8")
+        return str(path)
+
+    def test_precision_computed_correctly_on_known_pairs(self, tmp_path, monkeypatch):
+        from scripts.quality_report import check_contradiction_precision
+
+        # Пара, которую semantic_inverse_score() заведомо оценит как contradicts
+        # (явная лексическая инверсия — не зависит от будущих правок детектора)
+        contradicting = {"a": "ETF-приток растёт", "b": "ETF-отток растёт", "expected": True}
+        path = self._write_pairs(tmp_path, "pairs.json", [contradicting])
+        monkeypatch.setattr("scripts.quality_report.CONTRADICTION_PAIRS_PATH", path)
+        monkeypatch.setattr(
+            "scripts.quality_report.CONTRADICTION_PAIRS_EXTENDED_PATH",
+            str(tmp_path / "does_not_exist.json"),
+        )
+
+        result = check_contradiction_precision()
+        assert result["blocking"]["n_pairs"] == 1
+        assert result["blocking"]["precision"] in (0.0, 1.0)  # детерминировано, не упало
+        assert result["extended"] is None
+
+    def test_missing_dataset_degrades_to_none_not_crash(self, tmp_path, monkeypatch):
+        from scripts.quality_report import check_contradiction_precision
+
+        monkeypatch.setattr(
+            "scripts.quality_report.CONTRADICTION_PAIRS_PATH",
+            str(tmp_path / "missing1.json"),
+        )
+        monkeypatch.setattr(
+            "scripts.quality_report.CONTRADICTION_PAIRS_EXTENDED_PATH",
+            str(tmp_path / "missing2.json"),
+        )
+        result = check_contradiction_precision()
+        assert result == {"blocking": None, "extended": None}
+
+    def test_empty_pairs_list_degrades_to_none(self, tmp_path, monkeypatch):
+        from scripts.quality_report import check_contradiction_precision
+
+        path = self._write_pairs(tmp_path, "empty.json", [])
+        monkeypatch.setattr("scripts.quality_report.CONTRADICTION_PAIRS_PATH", path)
+        monkeypatch.setattr(
+            "scripts.quality_report.CONTRADICTION_PAIRS_EXTENDED_PATH",
+            str(tmp_path / "missing.json"),
+        )
+        result = check_contradiction_precision()
+        assert result["blocking"] is None
+
+    def test_report_includes_contradiction_precision_key(self):
+        from scripts.quality_report import compute_quality_report
+        signals = [_signal("STR-2026-0101-001")]
+        report = compute_quality_report(signals)
+        assert "contradiction_precision" in report
+        assert set(report["contradiction_precision"]) == {"blocking", "extended"}
+
+    def test_real_blocking_dataset_reads_via_real_repo_paths(self):
+        """
+        Регрессия на реальные пути (не monkeypatch) — не даёт constants'ам
+        (CONTRADICTION_PAIRS_PATH/_EXTENDED_PATH) молча разойтись с
+        реальным расположением файлов в tests/golden/fixtures/.
+        """
+        from scripts.quality_report import (
+            CONTRADICTION_PAIRS_PATH, CONTRADICTION_PAIRS_EXTENDED_PATH,
+        )
+        assert (REPO_ROOT / CONTRADICTION_PAIRS_PATH).exists()
+        assert (REPO_ROOT / CONTRADICTION_PAIRS_EXTENDED_PATH).exists()

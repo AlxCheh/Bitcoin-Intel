@@ -35,6 +35,11 @@ logger = get_logger("quality_report")
 
 TENSION_MARKERS = ["vs", "несмотря на", "при условии", "вопреки", " — ", "—"]
 
+# ─── Contradiction Detector Precision (roadmap 2026-07-31) ──────────────────
+# Пути к golden-датасетам — см. check_contradiction_precision() ниже.
+CONTRADICTION_PAIRS_PATH          = "tests/golden/fixtures/contradiction_pairs.json"
+CONTRADICTION_PAIRS_EXTENDED_PATH = "tests/golden/fixtures/contradiction_pairs_extended.json"
+
 
 # ─── Вычисление метрик ────────────────────────────────────────────────────────
 
@@ -153,6 +158,7 @@ def compute_quality_report(signals: list[dict],
             "max":   100,
         },
         "calibration": check_calibration_readiness(),
+        "contradiction_precision": check_contradiction_precision(),
     }
 
 
@@ -180,6 +186,52 @@ def check_calibration_readiness() -> dict:
         "threshold":       MIN_SYNTHESES_FOR_CALIBRATION,
         "ready":           ready,
         "remaining":       max(0, MIN_SYNTHESES_FOR_CALIBRATION - count),
+    }
+
+
+# ─── Contradiction Detector Precision (roadmap 2026-07-31) ──────────────────
+# Видимость между прогонами тестов — НЕ подменяет tests/unit/test_contradiction.py
+# (единственный источник истины для CI gate на blocking-датасете). Оба числа
+# здесь чисто информационные, не блокируют CI сами по себе.
+#
+# Зачем два числа, не одно: blocking (73 пары) — тот же датасет, что enforced
+# тестом (>= 60%, ADR-012). extended (116 пар, добавлен 2026-07-31) — честно
+# ниже 60% ПО ДИЗАЙНУ (шире охват кластеров, не выборка "поудобнее") — см.
+# ADR-012 заметка 2026-07-31 и docs/PLAN-contradiction-precision-roadmap.md
+# для полной методологии и условий пересмотра. Показывать оба рядом —
+# намеренно: одно blocking-число без контекста расширенного легко читается
+# как "детектор в порядке", хотя честная картина на более сложных кластерах
+# заметно хуже.
+
+def _precision_on_pairs(path: str) -> dict | None:
+    """
+    Precision semantic_inverse_score() (порог 0.5) на паре {a, b, expected} из
+    указанного golden-датасета. None, если файл недоступен/пуст — не падает,
+    тот же принцип degrade gracefully, что и весь quality_report.py.
+    """
+    from scripts.contradiction_detector import semantic_inverse_score
+
+    data = safe_read_json(path, default=None)
+    pairs = (data or {}).get("pairs") if isinstance(data, dict) else None
+    if not pairs:
+        return None
+
+    correct = sum(
+        1 for p in pairs
+        if (semantic_inverse_score(p["a"], p["b"]) >= 0.5) == p["expected"]
+    )
+    return {
+        "n_pairs":   len(pairs),
+        "correct":   correct,
+        "precision": round(correct / len(pairs), 3),
+    }
+
+
+def check_contradiction_precision() -> dict:
+    """Возвращает {"blocking": {...}|None, "extended": {...}|None}."""
+    return {
+        "blocking": _precision_on_pairs(CONTRADICTION_PAIRS_PATH),
+        "extended": _precision_on_pairs(CONTRADICTION_PAIRS_EXTENDED_PATH),
     }
 
 
@@ -230,6 +282,21 @@ def _print_report(report: dict) -> None:
                 f"\n  📐 Calibration: {cal['synthesis_count']}/{cal['threshold']} "
                 f"синтезов ({cal['remaining']} до порога) — калибровка "
                 f"confidence отложена по ADR-011."
+            )
+
+    cp = report.get("contradiction_precision")
+    if cp:
+        b, e = cp.get("blocking"), cp.get("extended")
+        if b:
+            print(
+                f"\n  🔀 Contradiction precision (blocking, {b['n_pairs']} пар): "
+                f"{b['precision']:.1%}"
+            )
+        if e:
+            print(
+                f"  🔀 Contradiction precision (extended, {e['n_pairs']} пар): "
+                f"{e['precision']:.1%} — не enforced, трекинг прогресса "
+                f"(см. docs/PLAN-contradiction-precision-roadmap.md)"
             )
 
     print(f"{'─'*55}\n")

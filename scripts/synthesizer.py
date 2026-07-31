@@ -533,7 +533,12 @@ def handle_uncertainty(
     Три критических ситуации из UNCERTAINTY_RULES (settings.py):
       1. 50/50 pos/neg → direction = "contested", score penalty 0.7
       2. Два+ trigger → выбрать более свежий (most_recent)
-      3. Устаревший tension (победитель > 90 дней) → метка STALE
+      3. Устаревший tension (победитель) — по возрасту (> tension_staleness_days,
+         60) ИЛИ по числу новых сигналов с его даты (>= tension_staleness_signal_count,
+         8) → метка STALE. Второй критерий — velocity-aware фикс 2026-07-31
+         (ADR-019): день-порог один для всех кластеров непригоден для быстрых
+         кластеров (10+ сигналов/месяц), где 60-90 дней никогда не набегает
+         прежде чем накопятся десятки непоказанных новых сигналов.
 
     Возвращает dict с корректировками которые synthesize_cluster применяет.
     Пустой dict = неопределённости не обнаружено.
@@ -579,11 +584,18 @@ def handle_uncertainty(
             f"ignoring {adjustments['ignored_triggers']}"
         )
 
-    # ── 3. Устаревший tension ─────────────────────────────────────────────
-    staleness_days = UNCERTAINTY_RULES.get("tension_staleness_days", 90)
-    stale_label    = UNCERTAINTY_RULES.get(
+    # ── 3. Устаревший tension — по возрасту ИЛИ по числу новых сигналов ────
+    # (2026-07-31, ADR-019 — velocity-aware fix, см. комментарий у
+    # UNCERTAINTY_RULES в config/settings.py)
+    staleness_days   = UNCERTAINTY_RULES.get("tension_staleness_days", 60)
+    staleness_count  = UNCERTAINTY_RULES.get("tension_staleness_signal_count", 8)
+    stale_label_age  = UNCERTAINTY_RULES.get(
         "tension_stale_label",
-        "⚠ Нарратив устарел — tension не обновлялся более 90 дней"
+        "⚠ Нарратив устарел — tension не обновлялся более 60 дней"
+    )
+    stale_label_vel  = UNCERTAINTY_RULES.get(
+        "tension_stale_label_velocity",
+        "⚠ Нарратив устарел — уже {n} новых сигналов кластера с момента этого tension"
     )
 
     # Победитель tension = сигнал с MAX(contradicts)
@@ -597,14 +609,34 @@ def handle_uncertainty(
 
     if winner:
         try:
-            age = (_date.today() - _date.fromisoformat(winner.get("date", "1970-01-01"))).days
-            if age > staleness_days:
-                adjustments["tension_stale"]       = True
-                adjustments["tension_stale_label"] = stale_label
-                adjustments["tension_age_days"]    = age
+            winner_date  = winner.get("date", "1970-01-01")
+            age          = (_date.today() - _date.fromisoformat(winner_date)).days
+            newer_count  = sum(1 for s in signals if s.get("date", "") > winner_date)
+
+            stale_by_age   = age > staleness_days
+            stale_by_count = newer_count >= staleness_count
+
+            if stale_by_age or stale_by_count:
+                adjustments["tension_stale"]              = True
+                adjustments["tension_age_days"]           = age
+                adjustments["tension_newer_signal_count"] = newer_count
+
+                if stale_by_count:
+                    # Более информативный повод показывается первым — "N новых
+                    # сигналов" читателю понятнее и убедительнее, чем "N дней"
+                    # (особенно когда оба условия сработали одновременно).
+                    adjustments["tension_stale_reason"] = (
+                        "age_and_count" if stale_by_age else "signal_count"
+                    )
+                    adjustments["tension_stale_label"] = stale_label_vel.format(n=newer_count)
+                else:
+                    adjustments["tension_stale_reason"] = "age"
+                    adjustments["tension_stale_label"]  = stale_label_age
+
                 logger.warning(
-                    f"Uncertainty: tension winner {winner['id']} "
-                    f"is {age} days old → STALE label applied"
+                    f"Uncertainty: tension winner {winner['id']} is {age} days old "
+                    f"with {newer_count} newer signals in cluster → STALE "
+                    f"({adjustments['tension_stale_reason']})"
                 )
         except ValueError:
             pass

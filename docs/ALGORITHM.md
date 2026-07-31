@@ -81,7 +81,7 @@ else:                                          → "structural"
 
 **2. Несколько trigger.** Если в кластере больше одного `trigger` — выбирается самый свежий по дате, остальные попадают в `ignored_triggers`.
 
-**3. Устаревший tension.** Если у текущего anchor-победителя (по числу contradicts) дата старше `tension_staleness_days = 90` дней — добавляется `tension_stale: True` и `tension_stale_label` с предупреждающим текстом.
+**3. Устаревший tension.** Два независимых критерия (2026-07-31, ADR-019 — velocity-aware fix): (а) возраст текущего anchor-победителя (по числу contradicts) старше `tension_staleness_days = 60` дней, ИЛИ (б) с его даты в кластер добавлено `>= tension_staleness_signal_count = 8` новых сигналов. Любой из двух → `tension_stale: True`, `tension_stale_reason` (`age` / `signal_count` / `age_and_count`) и соответствующий `tension_stale_label`. До фикса порог был 90 дней и совпадал с `WINDOW_DAYS_DEFAULT` — флаг был структурно недостижим (см. таблицу ниже и ADR-019).
 
 Все три правила читаются из `UNCERTAINTY_RULES` в `config/settings.py`.
 
@@ -208,7 +208,8 @@ score.total = freshness + weight + role + contradiction
 | `WINDOW_DAYS_DEFAULT` | 90 дней | старше — не участвует в синтезе (Шаг 1) |
 | `STALE_THRESHOLD` | 30 дней | старше — `freshness=0`, и считается "stale" для confidence |
 | `ARCHIVE_THRESHOLD` | 180 дней | старше — кандидат на авто-архивацию (вне синтезатора) |
-| `tension_staleness_days` (UNCERTAINTY_RULES) | 90 дней | anchor старше — помечается STALE на Шаге 3.5 |
+| `tension_staleness_days` (UNCERTAINTY_RULES) | 60 дней | anchor старше — помечается STALE на Шаге 3.5 (ДОЛЖЕН быть < WINDOW_DAYS_DEFAULT — см. ADR-019) |
+| `tension_staleness_signal_count` (UNCERTAINTY_RULES) | 8 сигналов | anchor помечается STALE, если с его даты добавлено столько новых сигналов, даже если он ещё не "старый" по дням — ADR-019 |
 
 ---
 

@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from scripts.cache_diff_check import has_meaningful_diff, normalize
+from scripts.cache_diff_check import has_meaningful_diff, normalize, changed_clusters
 
 
 def test_identical_dicts_no_diff():
@@ -99,3 +99,60 @@ def test_normalize_does_not_mutate_input():
     data = {"a": {"generated_at": "t1", "tension": "X"}}
     normalize(data)
     assert "generated_at" in data["a"]  # original untouched
+
+
+# ─── changed_clusters() — ADR-011 заметка 2026-07-31 ─────────────────────────
+# Пофакторный вариант has_meaningful_diff: нужен не только факт "что-то в
+# кэше изменилось", но и КАКИЕ именно кластеры — чтобы честно считать
+# "кластеро-периоды" (единица наблюдения для будущей калибровки confidence),
+# не завышая счётчик на все N кластеров при каждом прогоне CI.
+
+def test_changed_clusters_empty_when_only_volatile_differs():
+    old = {"a": {"tension": "X", "generated_at": "t1"}}
+    new = {"a": {"tension": "X", "generated_at": "t2"}}
+    assert changed_clusters(old, new) == []
+
+
+def test_changed_clusters_reports_only_the_cluster_that_changed():
+    old = {"a": {"tension": "X"}, "b": {"tension": "Y"}}
+    new = {"a": {"tension": "X CHANGED"}, "b": {"tension": "Y"}}
+    assert changed_clusters(old, new) == ["a"]
+
+
+def test_changed_clusters_reports_multiple_changed_clusters_sorted():
+    old = {"a": {"tension": "X"}, "b": {"tension": "Y"}, "c": {"tension": "Z"}}
+    new = {"a": {"tension": "X2"}, "b": {"tension": "Y"}, "c": {"tension": "Z2"}}
+    assert changed_clusters(old, new) == ["a", "c"]
+
+
+def test_changed_clusters_counts_new_cluster_as_changed():
+    old = {"a": {"tension": "X"}}
+    new = {"a": {"tension": "X"}, "b": {"tension": "Y"}}
+    assert changed_clusters(old, new) == ["b"]
+
+
+def test_changed_clusters_counts_removed_cluster_as_changed():
+    old = {"a": {"tension": "X"}, "b": {"tension": "Y"}}
+    new = {"a": {"tension": "X"}}
+    assert changed_clusters(old, new) == ["b"]
+
+
+def test_changed_clusters_excludes_cross_cluster_entities_section():
+    """
+    _cross_cluster_entities — не кластер, агрегатная секция связей МЕЖДУ
+    кластерами. Реальный кейс из production-истории (2026-07-31): 37/132
+    коммитов synthesis_cache.json меняли только эту секцию — не должны
+    считаться как ресинтез какого-либо кластера.
+    """
+    old = {"a": {"tension": "X"}, "_cross_cluster_entities": {"strategy": ["a"]}}
+    new = {"a": {"tension": "X"}, "_cross_cluster_entities": {"strategy": ["a", "b"]}}
+    assert changed_clusters(old, new) == []
+
+
+def test_changed_clusters_empty_when_nothing_changed():
+    same = {"a": {"tension": "X"}}
+    assert changed_clusters(same, dict(same)) == []
+
+
+def test_changed_clusters_both_empty():
+    assert changed_clusters({}, {}) == []

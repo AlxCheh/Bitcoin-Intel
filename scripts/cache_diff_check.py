@@ -23,6 +23,13 @@ import json
 
 VOLATILE_KEYS = {"generated_at", "synthesis_id", "detected_at"}
 
+# _cross_cluster_entities — агрегатная секция (связи МЕЖДУ кластерами), не
+# кластер сам по себе. Меняется независимо от того, ресинтезировался ли
+# какой-либо конкретный кластер — не считается "кластеро-периодом" (ADR-011,
+# заметка 2026-07-31): иначе изменение только этой секции задвоило бы счётчик
+# calibration readiness без единого реального ресинтеза кластера.
+NON_CLUSTER_TOP_LEVEL_KEYS = {"_cross_cluster_entities"}
+
 
 def normalize(obj):
     """Рекурсивно убирает волатильные ключи из dict/list структуры."""
@@ -39,6 +46,33 @@ def normalize(obj):
 
 def has_meaningful_diff(old: dict, new: dict) -> bool:
     return normalize(old) != normalize(new)
+
+
+def changed_clusters(old: dict, new: dict) -> list:
+    """
+    Возвращает отсортированный список кластеров, чьё нормализованное (без
+    VOLATILE_KEYS) содержимое отличается между old и new — т.е. кластеров,
+    реально ресинтезированных с содержательным изменением за этот прогон.
+
+    Используется scripts/update_synthesis_history.py для инкрементального
+    подсчёта "кластеро-периодов" (ADR-011) — единица, которую CLAUDE.md/
+    ADR-011 определяют как минимальную статистическую наблюдаемую единицу
+    для будущей калибровки confidence. Один прогон synthesizer.py в CI
+    пересчитывает ВСЕ кластеры (обновляя volatile-поля у каждого), но
+    реально содержательно меняется обычно 0-1 кластер (см. распределение
+    в заметке 2026-07-31, ADR-011) — считать каждый прогон как N кластеро-
+    периодов (N = число кластеров в базе) сильно завысило бы счётчик.
+
+    Новый кластер (есть в new, нет в old) и удалённый кластер (наоборот)
+    оба считаются изменившимися — appearance/disappearance кластера тоже
+    содержательное событие.
+    """
+    keys = (set(old.keys()) | set(new.keys())) - NON_CLUSTER_TOP_LEVEL_KEYS
+    changed = [
+        k for k in keys
+        if normalize(old.get(k)) != normalize(new.get(k))
+    ]
+    return sorted(changed)
 
 
 def main() -> None:

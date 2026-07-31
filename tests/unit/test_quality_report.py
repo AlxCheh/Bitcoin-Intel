@@ -105,13 +105,21 @@ class TestComputeQualityReport:
 
 
 class TestCalibrationReadiness:
+    """
+    2026-07-31: до этой правки тесты патчили SYNTHESIS_STORE_PATH и считали
+    файлы в synthesis_store/ — тот самый механизм, который оказался
+    заброшен с 2026-06-29 в проде (см. ADR-011, заметка 2026-07-31).
+    Тесты теперь патчат SYNTHESIS_HISTORY_PATH (новый самоподдерживающийся
+    счётчик, data/synthesis_history_count.json), сохраняя тот же контракт
+    check_calibration_readiness() (synthesis_count/threshold/ready/remaining).
+    """
 
     def test_below_threshold_not_ready(self, tmp_path, monkeypatch):
-        store = tmp_path / "synthesis_store"
-        store.mkdir(exist_ok=True)
-        for i in range(5):
-            (store / f"synthesis_{i}.json").write_text("{}")
-        monkeypatch.setattr("scripts.quality_report.SYNTHESIS_STORE_PATH", str(store))
+        history_file = tmp_path / "synthesis_history_count.json"
+        history_file.write_text(json.dumps({"cluster_periods": 5}))
+        monkeypatch.setattr(
+            "scripts.quality_report.SYNTHESIS_HISTORY_PATH", str(history_file)
+        )
 
         result = check_calibration_readiness()
         assert result["synthesis_count"] == 5
@@ -119,20 +127,34 @@ class TestCalibrationReadiness:
         assert result["remaining"] == MIN_SYNTHESES_FOR_CALIBRATION - 5
 
     def test_at_or_above_threshold_ready(self, tmp_path, monkeypatch):
-        store = tmp_path / "synthesis_store"
-        store.mkdir(exist_ok=True)
-        for i in range(MIN_SYNTHESES_FOR_CALIBRATION):
-            (store / f"synthesis_{i}.json").write_text("{}")
-        monkeypatch.setattr("scripts.quality_report.SYNTHESIS_STORE_PATH", str(store))
+        history_file = tmp_path / "synthesis_history_count.json"
+        history_file.write_text(
+            json.dumps({"cluster_periods": MIN_SYNTHESES_FOR_CALIBRATION})
+        )
+        monkeypatch.setattr(
+            "scripts.quality_report.SYNTHESIS_HISTORY_PATH", str(history_file)
+        )
 
         result = check_calibration_readiness()
         assert result["ready"] is True
         assert result["remaining"] == 0
 
-    def test_missing_store_directory_counts_zero(self, tmp_path, monkeypatch):
+    def test_above_threshold_reports_real_backfilled_count(self, tmp_path, monkeypatch):
+        """Регрессия на реальный кейс находки: 191 >> 30, а не застрявшие 10."""
+        history_file = tmp_path / "synthesis_history_count.json"
+        history_file.write_text(json.dumps({"cluster_periods": 191}))
         monkeypatch.setattr(
-            "scripts.quality_report.SYNTHESIS_STORE_PATH",
-            str(tmp_path / "does_not_exist"),
+            "scripts.quality_report.SYNTHESIS_HISTORY_PATH", str(history_file)
+        )
+
+        result = check_calibration_readiness()
+        assert result["synthesis_count"] == 191
+        assert result["ready"] is True
+
+    def test_missing_history_file_counts_zero(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(
+            "scripts.quality_report.SYNTHESIS_HISTORY_PATH",
+            str(tmp_path / "does_not_exist.json"),
         )
         result = check_calibration_readiness()
         assert result["synthesis_count"] == 0

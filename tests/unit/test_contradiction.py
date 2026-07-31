@@ -278,3 +278,141 @@ def test_contradiction_threshold_sourced_from_settings():
     from scripts.contradiction_detector import PROPOSAL_THRESHOLD
     from config.settings import CONTRADICTION_PROPOSAL_THRESHOLD
     assert PROPOSAL_THRESHOLD == CONTRADICTION_PROPOSAL_THRESHOLD
+
+
+# ─── Shared-subject direction conflict (2026-07-31) ──────────────────────────
+# См. комментарий у SHARED_SUBJECTS в contradiction_detector.py: узкий,
+# независимый сигнал — общий курируемый "предмет" в обоих текстах +
+# противоположный directional verb рядом с ним. Найден и провалидирован при
+# разборе конкретного пропущенного противоречия (INF-2026-0618-001 vs
+# INF-2026-0722-001, см. чат по стратегии масштабирования 2026-07-31).
+
+class TestSharedSubjectConflict:
+
+    def test_real_missed_contradiction_now_detected(self):
+        """
+        Регрессия на реальный кейс, из-за которого этот сигнал появился:
+        INF-2026-0618-001 vs INF-2026-0722-001 (macro_implication дословно
+        из signals.json) — до этой правки semantic_inverse_score() возвращал
+        0.0 (полное отсутствие сигнала), хотя пара — прямое противоречие.
+        """
+        from scripts.contradiction_detector import semantic_inverse_score
+
+        a = (
+            "Крупнейшие майнеры превращаются в AI-инфраструктурные компании "
+            "с BTC-операциями как побочным бизнесом. Это снижает структурное "
+            "давление продаж BTC от майнеров — но также ослабляет связь между "
+            "хешрейтом и ценой."
+        )
+        b = (
+            "AI-диверсификация не устраняет структурное давление продаж BTC "
+            "от майнеров — она сама требует финансирования через продажу "
+            "BTC, то есть краткосрочно усиливает то самое давление, которое "
+            "должна была снять"
+        )
+        score = semantic_inverse_score(a, b)
+        assert score >= 0.5, (
+            f"Ожидался score >= 0.5 (contradicts) на реальной паре с общим "
+            f"предметом ('структурное давление продаж') и противоположными "
+            f"глаголами направления (снижает vs усиливает), получено {score}"
+        )
+
+    def test_no_conflict_when_only_one_text_has_subject(self):
+        from scripts.contradiction_detector import _shared_subject_conflict_score
+        a = "Хешрейт растёт до исторического максимума."
+        b = "ETF-приток остаётся стабильным третью неделю подряд."
+        score, subject = _shared_subject_conflict_score(a, b)
+        assert score == 0.0 and subject is None
+
+    def test_no_conflict_when_same_direction(self):
+        from scripts.contradiction_detector import _shared_subject_conflict_score
+        a = "Институциональный спрос растёт на фоне новых ETF-продуктов."
+        b = "Институциональный спрос увеличивается благодаря банковским платформам."
+        score, subject = _shared_subject_conflict_score(a, b)
+        assert score == 0.0 and subject is None
+
+    def test_conflict_detected_when_opposite_direction(self):
+        from scripts.contradiction_detector import _shared_subject_conflict_score
+        a = "Ликвидность растёт по мере притока капитала на рынок."
+        b = "Ликвидность снижается — крупные держатели выводят капитал."
+        score, subject = _shared_subject_conflict_score(a, b)
+        assert score == 1.0
+        assert subject == "ликвидность"
+
+    def test_negation_flips_direction(self):
+        """
+        'не устраняет давление' — глагол 'устраня' (DECREASE) с отрицанием
+        перед ним должен интерпретироваться как эффективный INCREASE.
+        """
+        from scripts.contradiction_detector import _shared_subject_conflict_score
+        a = "Новая мера не устраняет структурное давление продаж на рынке."
+        b = "Структурное давление продаж заметно снижается второй месяц подряд."
+        score, subject = _shared_subject_conflict_score(a, b)
+        assert score == 1.0, (
+            "'не устраняет' (эффективно increase) должно конфликтовать с "
+            "'снижается' (decrease) — отрицание не учтено"
+        )
+
+    def test_ambiguous_mixed_signals_in_same_span_no_conflict(self):
+        """Оба направления рядом с предметом в одном тексте — неоднозначно, не вывод."""
+        from scripts.contradiction_detector import _shared_subject_conflict_score
+        a = "Хешрейт то растёт, то падает без ясного тренда на этой неделе."
+        b = "Хешрейт устойчиво снижается третий месяц подряд."
+        score, subject = _shared_subject_conflict_score(a, b)
+        assert score == 0.0 and subject is None
+
+    def test_no_regression_on_original_73_golden_pairs(self):
+        """
+        Явная проверка нулевого регресса: добавка НЕ должна снижать precision
+        на исходном (blocking) Golden Dataset ни на одну пару.
+        """
+        from scripts.contradiction_detector import semantic_inverse_score
+
+        pairs_file = Path(__file__).parent.parent / "golden" / "fixtures" / "contradiction_pairs.json"
+        pairs = json.loads(pairs_file.read_text(encoding="utf-8"))["pairs"]
+        correct = sum(
+            1 for p in pairs
+            if (semantic_inverse_score(p["a"], p["b"]) >= 0.5) == p["expected"]
+        )
+        precision = correct / len(pairs)
+        assert precision >= 0.6, (
+            f"Добавка shared-subject-conflict регрессировала precision на "
+            f"исходных 73 парах ниже 60%: {precision:.1%} ({correct}/{len(pairs)})"
+        )
+
+
+# ─── Extended Golden Dataset (2026-07-31) — НЕ blocking ──────────────────────
+# tests/golden/fixtures/contradiction_pairs_extended.json (116 пар, 73
+# исходных + 43 новых из расширения на прежде непокрытые кластеры — см.
+# _meta._purpose в самом файле) — честно измеренная precision на нём ниже
+# 60% (текущий enforced-порог для 73-парного датасета выше). Продвигать
+# 116-парный датасет в качестве enforced gate — отдельное решение, ещё не
+# принятое. Этот тест ТОЛЬКО отслеживает прогресс (печатает число, мягкий
+# sanity-порог намного ниже реального 60%, чтобы ловить только катастрофическую
+# регрессию, не блокировать текущую работу).
+def test_precision_on_extended_golden_pairs_tracking_only():
+    """
+    Не blocking quality gate — трекинг. Порог 0.45 — не архитектурная цель,
+    просто защита от того, чтобы тест тихо не потерял смысл (см. тот же
+    принцип у tests/golden/test_tension_benchmarks.py).
+    """
+    from scripts.contradiction_detector import semantic_inverse_score
+
+    extended_path = (
+        Path(__file__).parent.parent / "golden" / "fixtures" / "contradiction_pairs_extended.json"
+    )
+    if not extended_path.exists():
+        pytest.skip("contradiction_pairs_extended.json не найден")
+
+    pairs = json.loads(extended_path.read_text(encoding="utf-8"))["pairs"]
+    correct = sum(
+        1 for p in pairs
+        if (semantic_inverse_score(p["a"], p["b"]) >= 0.5) == p["expected"]
+    )
+    precision = correct / len(pairs)
+    print(f"\nExtended Golden Dataset (116 пар, не blocking): precision {precision:.1%} ({correct}/{len(pairs)})")
+    assert precision >= 0.45, (
+        f"Precision на расширенном датасете упала ниже sanity-порога 45%: "
+        f"{precision:.1%} — похоже на настоящую регрессию, не на известный "
+        f"честный разрыв с исходными 73 (см. _meta._purpose в самом файле)"
+    )

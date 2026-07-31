@@ -140,6 +140,54 @@ NEGATIVE_TERMS: list[str] = [
     "ограничивает доступ",
 ]
 
+# ─── Shared-subject direction conflict (2026-07-31) ──────────────────────────
+# Дополняет polarity_score отдельным, узким сигналом: пары как
+# INF-2026-0618-001 vs INF-2026-0722-001 ("AI-пивот СНИЖАЕТ давление продаж"
+# vs "AI-пивот... УСИЛИВАЕТ то самое давление") делят один и тот же предмет
+# разговора почти дословно ("структурное давление продаж"), но с
+# противоположным глаголом направления — polarity_score их не видит: оба
+# текста содержат одни и те же NEGATIVE_TERMS ("давление продаж", "давление"),
+# поэтому net_a == net_b и расхождение равно нулю (см. разбор в чате,
+# 2026-07-31 — сессия по стратегии масштабирования).
+#
+# НЕ добавлено как правка к polarity_score/NEGATIVE_TERMS: эмпирически
+# проверено (не только предположение) — попытка учесть отрицание в общей
+# polarity-логике или добавить точечные негативные фразы РУШИТ другие пары
+# (протестировано на 116-парном расширенном датасете: -4.3 и -1.7 п.п.
+# соответственно, оба варианта отклонены). Причина — polarity веса (0.8)
+# используются во всех парах сразу; локальная правка одного случая задевает
+# несвязанные. Отдельная, узкая функция ниже — новый независимый сигнал,
+# который включается только при точном совпадении курируемого "предмета"
+# в ОБОИХ текстах, поэтому не пересчитывает существующий сигнал.
+#
+# Список специально маленький и курируемый (не общий словарь) — тот же
+# принцип, что INVERSE_PAIRS/POSITIVE_TERMS/NEGATIVE_TERMS: явный, объяснимый
+# список, не generic NLP. Расширять только на подтверждённых новых примерах,
+# не заранее.
+SHARED_SUBJECTS: list[str] = [
+    "структурное давление продаж", "давление продаж", "структурный спрос",
+    "институциональный спрос", "хешрейт", "ликвидность", "институционализация",
+    "накопление", "предложение",
+]
+INCREASE_VERBS: list[str] = [
+    "усилива", "увеличива", "растёт", "повыша", "возраста", "ускоря", "укрепля",
+]
+DECREASE_VERBS: list[str] = [
+    "снижа", "уменьша", "ослабля", "устраня", "сокраща", "падает", "замедля",
+]
+
+# Отрицание перед directional verb инвертирует его направление ("не
+# устраняет" эффективно означает "не снижает" → "усиливает"/"сохраняет").
+# Тот же список маркеров, что рассматривался для общей polarity-правки —
+# здесь безопасен именно потому, что применяется точечно, только внутри
+# уже найденного узкого окна вокруг курируемого SHARED_SUBJECTS-термина,
+# а не ко всему тексту целиком.
+_NEGATION_MARKERS: list[str] = [
+    "не ", "нет ", "отсутств", "перестал", "перестаёт", "прекрати", "без ",
+]
+_NEGATION_WINDOW = 12          # символов до directional verb
+_SUBJECT_CONTEXT_WINDOW = 110  # символов вокруг SHARED_SUBJECTS-термина
+
 # Веса компонент текстового (semantic_inverse_score) режима.
 # Откалиброваны на Golden Dataset (73 пары, tests/golden/fixtures/contradiction_pairs.json)
 # с целью максимизации accuracy при пороге классификации = CONTRADICTION_PROPOSAL_THRESHOLD.
@@ -147,6 +195,14 @@ NEGATIVE_TERMS: list[str] = [
 W_PAIR_TEXT     = 0.2
 W_POLARITY      = 0.8
 POLARITY_DIVNORM = 1.5   # нормирующий делитель для |net_a - net_b|
+
+# Вес shared-subject-conflict сигнала (2026-07-31, см. комментарий у
+# SHARED_SUBJECTS выше). Скомбинирован через max(), не сложением с
+# остальными компонентами — это НЕЗАВИСИМЫЙ сигнал ("нашли явный конфликт
+# направлений на общем предмете"), а не поправка к существующей формуле;
+# сложение задвоило бы вклад polarity/inverse_pair в парах, где оба сигнала
+# срабатывают одновременно.
+W_SHARED_SUBJECT = 0.9
 
 # Веса компонент полного (score_pair) режима — для реальных сигналов
 W_INVERSE  = 0.6
@@ -212,6 +268,62 @@ def _polarity_counts(text: str) -> tuple[int, int]:
     pos = sum(1 for term in POSITIVE_TERMS if term in t)
     neg = sum(1 for term in NEGATIVE_TERMS if term in t)
     return pos, neg
+
+
+def _preceded_by_negation(text: str, idx: int, window: int = _NEGATION_WINDOW) -> bool:
+    """Есть ли маркер отрицания в `window` символах непосредственно перед позицией idx."""
+    preceding = text[max(0, idx - window):idx]
+    return any(marker in preceding for marker in _NEGATION_MARKERS)
+
+
+def _direction_in_span(text: str, start: int, end: int) -> str | None:
+    """
+    Ищет INCREASE_VERBS/DECREASE_VERBS в диапазоне [start, end], учитывая
+    отрицание непосредственно перед каждым найденным глаголом (см.
+    _preceded_by_negation). Возвращает "inc"/"dec"/None (не найдено или
+    смешанные, неоднозначные сигналы в одном диапазоне).
+    """
+    signals: list[bool] = []  # True = "increase" (после учёта отрицания)
+    for verb in INCREASE_VERBS + DECREASE_VERBS:
+        idx = text.find(verb, max(0, start), end)
+        if idx == -1:
+            continue
+        is_increase = verb in INCREASE_VERBS
+        if _preceded_by_negation(text, idx):
+            is_increase = not is_increase
+        signals.append(is_increase)
+
+    if not signals:
+        return None
+    if all(signals):
+        return "inc"
+    if not any(signals):
+        return "dec"
+    return None  # смешанный сигнал в одном диапазоне — не делаем вывод
+
+
+def _shared_subject_conflict_score(macro_a: str, macro_b: str) -> tuple[float, str | None]:
+    """
+    Ищет курируемый SHARED_SUBJECTS-термин, присутствующий в ОБОИХ текстах,
+    и directional verb (снижает/усиливает и т.п.) рядом с ним в каждом —
+    если направления противоположны, это сильный, узкий сигнал реального
+    противоречия (см. комментарий у SHARED_SUBJECTS). Возвращает (score, term)
+    — term для объяснимости (что именно сработало), None если не сработало.
+    """
+    a, b = _normalize(macro_a), _normalize(macro_b)
+    for subject in SHARED_SUBJECTS:
+        if subject not in a or subject not in b:
+            continue
+        idx_a, idx_b = a.find(subject), b.find(subject)
+        dir_a = _direction_in_span(
+            a, idx_a - _SUBJECT_CONTEXT_WINDOW, idx_a + len(subject) + _SUBJECT_CONTEXT_WINDOW
+        )
+        dir_b = _direction_in_span(
+            b, idx_b - _SUBJECT_CONTEXT_WINDOW, idx_b + len(subject) + _SUBJECT_CONTEXT_WINDOW
+        )
+        if dir_a and dir_b and dir_a != dir_b:
+            return 1.0, subject
+    return 0.0, None
 
 
 def _polarity_score(macro_a: str, macro_b: str) -> float:
@@ -285,11 +397,22 @@ def _already_linked(sig_a: dict, sig_b: dict) -> bool:
 def _text_score(macro_a: str, macro_b: str) -> tuple[float, list[tuple[str, str]]]:
     """
     Чистый текстовый score без актёра/направления.
-    score = W_PAIR_TEXT × inverse_pair_score + W_POLARITY × polarity_score
+    score = max(
+        W_PAIR_TEXT × inverse_pair_score + W_POLARITY × polarity_score,
+        W_SHARED_SUBJECT × shared_subject_conflict_score,
+    )
+    Второй компонент (2026-07-31) — независимый сигнал, комбинируется через
+    max(), не сложением (см. комментарий у W_SHARED_SUBJECT). `hits`
+    по-прежнему отражает только INVERSE_PAIRS — shared-subject-конфликт
+    не участвует в объяснении через hits (объясняется отдельно, `subject`
+    во втором элементе _shared_subject_conflict_score, не в этой сигнатуре
+    — вызывающий код при необходимости может вызвать её напрямую).
     """
     pair_score, hits = _inverse_pair_score(macro_a, macro_b)
     pol_score         = _polarity_score(macro_a, macro_b)
-    total = W_PAIR_TEXT * pair_score + W_POLARITY * pol_score
+    subject_score, _  = _shared_subject_conflict_score(macro_a, macro_b)
+    base  = W_PAIR_TEXT * pair_score + W_POLARITY * pol_score
+    total = max(base, W_SHARED_SUBJECT * subject_score)
     return min(1.0, total), hits
 
 

@@ -144,6 +144,19 @@ jobs:
             echo "meaningful=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Update synthesis history counter (ADR-011)
+        # Независимо от diffcheck выше — считает РЕАЛЬНО изменившиеся кластеры
+        # (не просто "что-то в кэше отличается") и инкрементирует
+        # data/synthesis_history_count.json. Раньше calibration readiness
+        # (ADR-011) считалась файлами в synthesis_store/ — этот механизм не
+        # обновлялся с 2026-06-29, пока реальный пайплайн синтеза (этот же
+        # workflow) давно писал прямо в data/synthesis_cache.json. Счётчик был
+        # заморожен на "10/30" почти месяц, хотя порог был фактически пройден
+        # 2026-07-02 — см. ADR-011, заметка 2026-07-31, для полной истории и
+        # честного backfill. Идемпотентно: если ни один кластер содержательно
+        # не изменился, файл не перезаписывается (см. докстринг скрипта).
+        run: python3 scripts/update_synthesis_history.py /tmp/old_synthesis_cache.json data/synthesis_cache.json
+
       - name: Commit synthesis cache via PR (not direct push to main)
         if: steps.diffcheck.outputs.meaningful == 'true'
         # main защищён Branch Protection (IRP v1 M05, Вариант 3): прямой push
@@ -187,6 +200,10 @@ jobs:
           done
 
           git add data/synthesis_cache.json
+          # data/synthesis_history_count.json: no-op add если update_synthesis_history.py
+          # выше не тронул файл (0 реально изменившихся кластеров, см. его докстринг) —
+          # git add на неизменённый файл безопасен и ничего не коммитит.
+          git add data/synthesis_history_count.json
           BRANCH="bot/sync-synthesis-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update synthesis_cache.json"

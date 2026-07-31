@@ -203,6 +203,11 @@ SYNTHESIS_CACHE_PATH = "data/synthesis_cache.json"
 EVENTS_LOG_PATH      = "data/events.jsonl"
 RELATIONSHIPS_PATH   = "data/relationships.json"
 
+# Счётчик реальных "кластеро-периодов" (ADR-011) — см. заметку 2026-07-31
+# в docs/ADR-011-confidence-calibration-deferred.md. НЕ путать с
+# SYNTHESIS_STORE_PATH ниже (устаревший, не обновлялся с 2026-06-29).
+SYNTHESIS_HISTORY_PATH = "data/synthesis_history_count.json"
+
 # ─── Переходный период: миграция links.* → relationships.json ────────────────
 LEGACY_LINKS_ENABLED = False  # Фаза 0 завершена 2026-07-01: миграция выполнена (156 relationships), IRP v1 Wave 1 / B2
 
@@ -258,10 +263,16 @@ SYNTHESIS_STORE_PATH = "synthesis_store"
 
 # ─── Confidence Calibration Gate (ADR-011, C2 ARR v3) ────────────────────────
 # Калибровка confidence на статистически значимой выборке откладывается до
-# накопления этого числа исторических синтезов в synthesis_store/. До этого
-# порога calculate_confidence() остаётся объяснённой эвристикой, проверяемой
-# property-тестами (tests/unit/test_confidence_properties.py), а не
-# статистической моделью. См. ADR-011 для полного обоснования порога.
+# накопления этого числа исторических "кластеро-периодов" — см.
+# SYNTHESIS_HISTORY_PATH (data/synthesis_history_count.json), обновляется
+# scripts/update_synthesis_history.py на каждый прогон CI-синтеза (см.
+# .github/workflows/deploy.yml). До 2026-07-31 счётчик считал файлы в
+# synthesis_store/ — механизм не обновлялся с 2026-06-29, пока реальный
+# пайплайн синтеза давно переехал в data/synthesis_cache.json (заметка
+# 2026-07-31 в ADR-011 — полная история находки и честный backfill).
+# До достижения порога calculate_confidence() остаётся объяснённой
+# эвристикой, проверяемой property-тестами
+# (tests/unit/test_confidence_properties.py), а не статистической моделью.
 MIN_SYNTHESES_FOR_CALIBRATION = 30
 
 

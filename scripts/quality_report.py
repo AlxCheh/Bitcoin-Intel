@@ -21,12 +21,11 @@ import sys
 import json
 import argparse
 from datetime import date
-from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import (
     SIGNALS_PATH, ENCODING, ERROR_EXIT_CODES, WINDOW_DAYS_DEFAULT,
-    SYNTHESIS_STORE_PATH, MIN_SYNTHESES_FOR_CALIBRATION
+    SYNTHESIS_HISTORY_PATH, MIN_SYNTHESES_FOR_CALIBRATION
 )
 from infrastructure.file_lock import safe_read_json
 from infrastructure.logger import get_logger, measure_performance
@@ -161,12 +160,20 @@ def compute_quality_report(signals: list[dict],
 
 def check_calibration_readiness() -> dict:
     """
-    Считает файлы в synthesis_store/ как прокси числа исторических синтезов
-    и сравнивает с MIN_SYNTHESES_FOR_CALIBRATION (ADR-011). Не блокирует
+    Читает data/synthesis_history_count.json — самоподдерживающийся счётчик
+    реальных "кластеро-периодов", обновляемый scripts/update_synthesis_history.py
+    на каждый прогон CI-синтеза (см. .github/workflows/deploy.yml) — и
+    сравнивает с MIN_SYNTHESES_FOR_CALIBRATION (ADR-011). Не блокирует
     CI — это управленческая рекомендация, не ошибка качества данных.
+
+    До 2026-07-31 здесь считались файлы в synthesis_store/ — механизм не
+    обновлялся с 2026-06-29 (заморожен на 10), пока реальный пайплайн синтеза
+    уже давно писал в data/synthesis_cache.json. См. ADR-011, заметка
+    2026-07-31, для полной истории находки и честного backfill счётчика
+    из git-истории на момент фикса.
     """
-    store = Path(SYNTHESIS_STORE_PATH)
-    count = len(list(store.glob("*.json"))) if store.exists() else 0
+    history = safe_read_json(SYNTHESIS_HISTORY_PATH, default={})
+    count = (history or {}).get("cluster_periods", 0)
     ready = count >= MIN_SYNTHESES_FOR_CALIBRATION
     return {
         "synthesis_count": count,

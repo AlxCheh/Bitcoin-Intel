@@ -510,3 +510,143 @@ def test_detect_phase_structural_when_no_complications_or_triggers():
     from scripts.synthesizer import _detect_phase
     signals = _roles("background", "background")
     assert _detect_phase(signals) == "structural"
+
+
+# ─── Velocity-aware tension staleness (2026-07-31, ADR-019) ──────────────────
+# КОНТЕКСТ: tension_staleness_days=90 был СТРУКТУРНО НЕДОСТИЖИМ — signals,
+# переданные в handle_uncertainty(), уже отфильтрованы synthesize_cluster()
+# по WINDOW_DAYS_DEFAULT=90 ДО вызова (Шаг 1), поэтому возраст победителя
+# внутри неё математически не мог превысить 90. Фикс: (1) tension_staleness_days
+# снижен до 60 (строго меньше WINDOW_DAYS_DEFAULT — теперь реально достижим),
+# (2) добавлен независимый velocity-aware критерий tension_staleness_signal_count
+# — устарел, если накопилось >= N новых сигналов с даты победителя, ДАЖЕ если
+# по дням он ещё "молодой". Быстрые кластеры (10+ сигналов/месяц) иначе никогда
+# не набирают 60+ дней прежде чем накопятся десятки непоказанных сигналов.
+
+def _dated_signal(sid: str, days_ago: int, tension: str = "X vs Y", role: str = "complication") -> dict:
+    from datetime import date, timedelta
+    return {
+        "id": sid,
+        "date": (date.today() - timedelta(days=days_ago)).isoformat(),
+        "tension": tension,
+        "dir": "neg",
+        "narrative_role": role,
+    }
+
+
+class TestTensionStalenessVelocityAware:
+
+    def test_tension_staleness_days_below_synthesis_window(self):
+        """
+        Структурный инвариант, предотвращающий рецидив найденного бага:
+        tension_staleness_days ДОЛЖЕН быть строго меньше WINDOW_DAYS_DEFAULT,
+        иначе флаг снова становится недостижимым (active_signals в
+        synthesize_cluster() отфильтрован по WINDOW_DAYS_DEFAULT раньше, чем
+        handle_uncertainty() успевает проверить возраст).
+        """
+        from config.settings import UNCERTAINTY_RULES, WINDOW_DAYS_DEFAULT
+        assert UNCERTAINTY_RULES["tension_staleness_days"] < WINDOW_DAYS_DEFAULT, (
+            f"tension_staleness_days ({UNCERTAINTY_RULES['tension_staleness_days']}) "
+            f">= WINDOW_DAYS_DEFAULT ({WINDOW_DAYS_DEFAULT}) — флаг STALE снова "
+            f"недостижим, active_signals никогда не содержит сигнал старше окна"
+        )
+
+    def test_stale_by_age_when_old_and_no_newer_signals(self):
+        """Единственный сигнал в кластере, старше tension_staleness_days → stale по возрасту."""
+        from scripts.synthesizer import handle_uncertainty
+        signals = [_dated_signal("A", days_ago=70, role="trigger")]
+        adj = handle_uncertainty(signals, "structural", [], {})
+        assert adj.get("tension_stale") is True
+        assert adj.get("tension_stale_reason") == "age"
+        assert adj.get("tension_newer_signal_count") == 0
+
+    def test_stale_by_signal_count_even_when_young(self):
+        """
+        Реальный кейс находки: winner молодой (10 дней, далеко от 60-дневного
+        порога), но за это время в кластер добавлено 8+ новых сигналов —
+        должен считаться устаревшим именно по velocity, не по возрасту.
+        """
+        from scripts.synthesizer import handle_uncertainty
+        winner = _dated_signal("WINNER", days_ago=10, role="trigger")
+        newer = [_dated_signal(f"NEW{i}", days_ago=10 - i - 1) for i in range(8)]
+        signals = [winner] + newer
+        adj = handle_uncertainty(signals, "tension", [], {})
+        assert adj.get("tension_stale") is True
+        assert adj.get("tension_stale_reason") == "signal_count"
+        assert adj.get("tension_newer_signal_count") == 8
+        assert "8" in adj.get("tension_stale_label", "")
+
+    def test_not_stale_when_young_and_few_newer_signals(self):
+        """Молодой winner, мало новых сигналов — ни один критерий не сработал."""
+        from scripts.synthesizer import handle_uncertainty
+        winner = _dated_signal("WINNER", days_ago=10, role="trigger")
+        newer = [_dated_signal("NEW1", days_ago=5)]
+        adj = handle_uncertainty([winner] + newer, "tension", [], {})
+        assert "tension_stale" not in adj
+
+    def test_both_criteria_triggered_reports_combined_reason(self):
+        from scripts.synthesizer import handle_uncertainty
+        winner = _dated_signal("WINNER", days_ago=65, role="trigger")
+        newer = [_dated_signal(f"NEW{i}", days_ago=65 - i - 1) for i in range(9)]
+        adj = handle_uncertainty([winner] + newer, "tension", [], {})
+        assert adj.get("tension_stale") is True
+        assert adj.get("tension_stale_reason") == "age_and_count"
+
+    def test_signal_count_only_counts_signals_strictly_newer_than_winner(self):
+        """Сигналы СТАРШЕ или той же даты, что winner, не считаются 'новыми'."""
+        from scripts.synthesizer import handle_uncertainty
+        winner = _dated_signal("WINNER", days_ago=10, role="trigger")
+        older_or_same = [_dated_signal(f"OLD{i}", days_ago=10 + i) for i in range(8)]
+        adj = handle_uncertainty([winner] + older_or_same, "tension", [], {})
+        assert adj.get("tension_newer_signal_count", 0) == 0
+        assert "tension_stale" not in adj
+
+
+def test_velocity_aware_staleness_on_real_clusters_matches_empirical_finding(monkeypatch):
+    """
+    Регрессия на реальных данных (см. разбор масштабирования, 2026-07-31):
+    четыре самых быстрых кластера (много новых сигналов с даты winner'а)
+    должны теперь помечаться STALE через новый signal_count-критерий, семь
+    более медленных — нет. Использует реальные signals.json/relationships.json,
+    не синтетику — честная проверка на проде, не только на придуманных кейсах.
+
+    monkeypatch RELATIONSHIPS_PATH на абсолютный путь обязателен: conftest.py
+    (isolated_environment, autouse) делает monkeypatch.chdir(tmp_path) для
+    КАЖДОГО теста — иначе _load_contradicts_map() резолвит относительный
+    RELATIONSHIPS_PATH внутри пустой песочницы и молча возвращает {} (тот же
+    паттерн уже используется чуть выше в этом файле, строка ~146).
+    """
+    import json
+    from collections import defaultdict
+    import scripts.synthesizer as _syn
+    from scripts.synthesizer import handle_uncertainty
+
+    repo_root = Path(__file__).parent.parent.parent
+    monkeypatch.setattr(_syn, "RELATIONSHIPS_PATH", str(repo_root / "data" / "relationships.json"))
+
+    data = json.loads((repo_root / "signals.json").read_text(encoding="utf-8"))
+    signals = data["signals"]
+    cmap = _syn._load_contradicts_map()
+
+    by_cluster = defaultdict(list)
+    for s in signals:
+        by_cluster[s["cluster"]].append(s)
+
+    expected_stale = {
+        "btc_treasury_competition", "etf_institutional_flow",
+        "strategy_model_stress", "mining_ai_diversification",
+    }
+
+    for cluster, group in by_cluster.items():
+        adj = handle_uncertainty(group, "tension", [], cmap)
+        is_stale = adj.get("tension_stale", False)
+        if cluster in expected_stale:
+            assert is_stale, (
+                f"{cluster} ожидался STALE (быстрый кластер, много новых "
+                f"сигналов с даты winner'а) — не сработало: {adj}"
+            )
+        else:
+            assert not is_stale, (
+                f"{cluster} НЕ ожидался STALE (медленный кластер) — "
+                f"velocity-критерий сработал ложно: {adj}"
+            )

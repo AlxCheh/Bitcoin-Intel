@@ -353,12 +353,36 @@ SCHEMA_BACKWARD_COMPAT: dict = {
 }
 
 # ─── Uncertainty Handling Rules (P3 §18) ─────────────────────────────────────
+# tension_staleness_days ИСПРАВЛЕН с 90 → 60 (2026-07-31, ADR-019): при 90 флаг
+# был структурно недостижим — active_signals в synthesize_cluster() уже
+# отфильтрован по WINDOW_DAYS_DEFAULT=90 ДО вызова handle_uncertainty(),
+# поэтому возраст победителя внутри неё математически не мог превысить 90.
+# ИНВАРИАНТ (проверяется tests/unit/test_uncertainty_indicator.py::
+# test_tension_staleness_days_below_synthesis_window): tension_staleness_days
+# ДОЛЖЕН быть строго меньше WINDOW_DAYS_DEFAULT, иначе тот же баг повторится
+# при любом будущем изменении одной из констант без другой.
+#
+# tension_staleness_signal_count (новое) — независимый, velocity-aware
+# критерий: победитель считается устаревшим, если с его даты в кластер
+# добавлено >= N новых сигналов, ДАЖЕ если по дням он моложе
+# tension_staleness_days. Найдено на реальных данных (2026-07-31, разбор
+# масштабирования): в двух самых быстрых кластерах (btc_treasury_competition,
+# etf_institutional_flow) tension был "жив" по дням (30-42 дня), но за это
+# время накопилось 12-14 новых сигналов без единого обновления заголовка —
+# фиксированный день-порог для быстрого кластера практически бесполезен,
+# т.к. кластер успевает архивировать/переросинтезировать раньше, чем
+# набежит 60-90 дней. N=8 — эмпирически: на 11 реальных кластерах чётко
+# разделяет 4 быстрых (8-14 новых сигналов) от 7 медленных (1-3) — не
+# теоретическая оценка, реальный разрыв в распределении. Полная методология
+# и honest caveat про произвольность конкретного N → ADR-019.
 UNCERTAINTY_RULES: dict = {
     "pos_neg_balance_threshold": 0.6,   # pos/(pos+neg) < 0.6 → contested
     "contested_strength_penalty": 0.7,  # score × 0.7
     "multiple_triggers_resolution": "most_recent",
-    "tension_staleness_days": 90,
-    "tension_stale_label": "⚠ Нарратив устарел — tension не обновлялся более 90 дней",
+    "tension_staleness_days": 60,
+    "tension_staleness_signal_count": 8,
+    "tension_stale_label": "⚠ Нарратив устарел — tension не обновлялся более 60 дней",
+    "tension_stale_label_velocity": "⚠ Нарратив устарел — уже {n} новых сигналов кластера с момента этого tension",
 }
 
 # ─── Idempotency Matrix (P2 §15) ─────────────────────────────────────────────

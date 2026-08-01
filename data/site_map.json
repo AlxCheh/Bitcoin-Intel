@@ -1265,6 +1265,22 @@
       "dynamic": true
     },
     {
+      "id": "e107",
+      "title": "Чего делать нельзя",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "checklist",
+        "чеклист",
+        "ошибки"
+      ],
+      "dynamic": true
+    },
+    {
       "id": "e075",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",

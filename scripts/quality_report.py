@@ -197,7 +197,7 @@ def check_calibration_readiness() -> dict:
 # Зачем два числа, не одно: blocking (73 пары) — тот же датасет, что enforced
 # тестом (>= 60%, ADR-012). extended (116 пар, добавлен 2026-07-31) — честно
 # ниже 60% ПО ДИЗАЙНУ (шире охват кластеров, не выборка "поудобнее") — см.
-# ADR-012 заметка 2026-07-31 и docs/PLAN-contradiction-precision-roadmap.md
+# ADR-012 заметка 2026-07-31 и docs/PLAN-open-initiatives.md (Часть 2)
 # для полной методологии и условий пересмотра. Показывать оба рядом —
 # намеренно: одно blocking-число без контекста расширенного легко читается
 # как "детектор в порядке", хотя честная картина на более сложных кластерах
@@ -296,7 +296,7 @@ def _print_report(report: dict) -> None:
             print(
                 f"  🔀 Contradiction precision (extended, {e['n_pairs']} пар): "
                 f"{e['precision']:.1%} — не enforced, трекинг прогресса "
-                f"(см. docs/PLAN-contradiction-precision-roadmap.md)"
+                f"(см. docs/PLAN-open-initiatives.md, Часть 2)"
             )
 
     print(f"{'─'*55}\n")

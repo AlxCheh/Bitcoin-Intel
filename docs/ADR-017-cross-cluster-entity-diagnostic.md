@@ -3,7 +3,7 @@
 **Статус:** Принято
 **Дата:** 2026-07-22
 **Авторы:** Bitcoin Intel (аналитик + владелец домена)
-**Контекст ревью:** находка 3 из `docs/PLAN-synthesizer-entity-aware.md` (эксперимент на `btc_treasury_competition`, 2026-07-20) — реализуется после Фаз A/B/C и находки 1, по тому же плану.
+**Контекст ревью:** находка 3 из `archive/PLAN-synthesizer-entity-aware.md` (эксперимент на `btc_treasury_competition`, 2026-07-20) — реализуется после Фаз A/B/C и находки 1, по тому же плану.
 
 ## Контекст
 
@@ -59,7 +59,7 @@
 
 ## Связанные документы
 
-- `docs/PLAN-synthesizer-entity-aware.md` — находка 3, исходный план
+- `archive/PLAN-synthesizer-entity-aware.md` — находка 3, исходный план
 - `docs/ADR-011-confidence-calibration-deferred.md` — тот же принцип «не действовать на N=1»
 - `docs/NIES.md` §17 — контракт независимости кластеров, не нарушается (агрегация строго снаружи `synthesize_cluster()`)
 

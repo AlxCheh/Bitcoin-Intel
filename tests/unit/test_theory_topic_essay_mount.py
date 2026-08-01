@@ -130,3 +130,114 @@ console.log(JSON.stringify(results));
         missing = [tid for tid, has_mount in results.items() if not has_mount]
         assert not missing, f"Топики без -essays точки монтирования: {missing}"
         assert "theory-passphrase" in results, "theory-passphrase должен существовать в THEORY_TOPICS.json"
+
+
+# ─── Порядок вызова renderTheoryTopics()/renderTheoryEssays() (2026-08-01) ──
+# Отдельная, вторая находка на тот же баг: даже с точкой монтирования (фикс
+# выше) эссе для дата-driven топика не появляется, если renderTheoryEssays()
+# вызывается РАНЬШЕ renderTheoryTopics() — мостик <div id="...-essays">
+# создаёт именно renderTheoryTopics(), до её вызова элемента ещё не
+# существует, и renderTheoryEssays() тихо делает if (!el) return. Найдено
+# пользователем на реальном скриншоте: PR с фиксом точки монтирования
+# смержен, панель всё равно 'такая же скупая, как была' — porядок вызова
+# в triggerTabData() был именно обратным (renderTheoryEssays() первой).
+
+class TestTheoryRenderCallOrder:
+
+    def test_trigger_tab_data_calls_topics_before_essays_for_theory(self):
+        """
+        Статическая проверка исходника — то же место, что уже дважды
+        подводило (renderTheoryEssays() до renderTheoryTopics() в
+        triggerTabData()). Ищет буквальную позицию вызовов в строке
+        'if (id === \\'theory\\') { ... }'.
+        """
+        src = APP_MAIN_JS.read_text(encoding="utf-8")
+        marker = "if (id === 'theory')"
+        start = src.find(marker)
+        assert start != -1, "Ветка theory в triggerTabData() не найдена"
+        end = src.find("\n", start)
+        line = src[start:end]
+
+        topics_pos = line.find("renderTheoryTopics()")
+        essays_pos = line.find("renderTheoryEssays()")
+        assert topics_pos != -1 and essays_pos != -1
+        assert topics_pos < essays_pos, (
+            "renderTheoryTopics() должна вызываться ПЕРВОЙ — она создаёт "
+            "точку монтирования <div id='...-essays'>, которую ищет "
+            "renderTheoryEssays(). Обратный порядок молча ничего не "
+            "рендерит, без единой ошибки (см. коммит 2026-08-01)."
+        )
+
+    def test_wrong_order_produces_empty_mount_right_order_does_not(self):
+        """
+        Не просто порядок в исходнике, а реальное поведение на реальных
+        данных: неверный порядок даёт 0 символов в точке монтирования,
+        верный — реальный контент. Доказывает, ЧТО именно проверяет
+        предыдущий тест, не только форму записи.
+        """
+        src = APP_MAIN_JS.read_text(encoding="utf-8")
+        funcs = "\n\n".join([
+            _extract_function(src, "sanitize"),
+            _extract_function(src, "sanitizeStrong"),
+            _extract_function(src, "sourceFooterHtml"),
+            _extract_function(src, "renderAccItem"),
+            _extract_function(src, "renderTheoryTopic"),
+            _extract_function(src, "renderTheoryTopics"),
+            _extract_function(src, "renderTheoryEssays"),
+        ])
+
+        import json
+        import subprocess
+        topics_data = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
+        essays_data = json.loads((REPO_ROOT / "THEORY_ESSAYS.json").read_text(encoding="utf-8"))["items"]
+
+        def _run(order_topics_first: bool) -> int:
+            calls = (
+                "renderTheoryTopics(); renderTheoryEssays();"
+                if order_topics_first else
+                "renderTheoryEssays(); renderTheoryTopics();"
+            )
+            # renderTheoryTopics() создаёт панели через container.innerHTML =
+            # ..., а не через отдельные getElementById-вставки — минимальный
+            # mock должен сам регистрировать вложенные id после присвоения.
+            # Мини-DOM только на то, что здесь реально нужно: container с
+            # innerHTML, который при записи регистрирует id вложенных div'ов
+            # как отдельные "элементы" — этого достаточно, чтобы честно
+            # проверить порядок вызовов, не поднимая jsdom ради одного теста
+            # (см. test_show_tab_resilience.py про этот же принцип).
+            js = f"""
+{funcs}
+const THEORY_TOPICS = {json.dumps(topics_data)};
+const THEORY_ESSAYS = {json.dumps(essays_data)};
+
+const registry = {{}};
+function makeMount(id) {{ return {{ innerHTML: '' }}; }}
+const containerEl = {{ set innerHTML(html) {{
+  this._html = html;
+  const re = /id="([\\w-]+)"/g;
+  let m;
+  while ((m = re.exec(html))) {{ if (!registry[m[1]]) registry[m[1]] = makeMount(m[1]); }}
+}}, get innerHTML() {{ return this._html || ''; }} }};
+registry['theory-topics-container'] = containerEl;
+
+const document = {{
+  getElementById: function(id) {{ return registry[id] || null; }}
+}};
+{calls}
+const mount = document.getElementById('theory-passphrase-essays');
+console.log(JSON.stringify({{ len: mount ? mount.innerHTML.length : -1 }}));
+"""
+            result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+            assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+            return json.loads(result.stdout)["len"]
+
+        wrong_order_len = _run(order_topics_first=False)
+        right_order_len = _run(order_topics_first=True)
+
+        assert wrong_order_len == 0, (
+            f"Ожидался пустой mount при неверном порядке (эссе раньше топиков), "
+            f"получено {wrong_order_len} символов — тест сам мог сломаться"
+        )
+        assert right_order_len > 0, (
+            "При верном порядке (топики раньше эссе) mount обязан заполниться реальным контентом"
+        )

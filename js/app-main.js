@@ -2845,7 +2845,7 @@ function triggerTabData(id) {
   }
   if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderTopAddresses(); }
   if (id === 'lightning') renderTheoryTopics();
-  if (id === 'theory') { renderTheoryEssays(); renderTheoryTopics(); }
+  if (id === 'theory') { renderTheoryTopics(); renderTheoryEssays(); }
   if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }

@@ -2859,7 +2859,24 @@ function showTab(id, btn, keepCluster) {
     updateCrumb(id);
   }
 
-  triggerTabData(id);
+  // 2026-08-01: try/catch — до этой правки исключение внутри triggerTabData()
+  // (например, гонка restoreLastActiveTab() vs ещё не пришедшие async-данные,
+  // см. комментарий там же) оставляло DOM и currentTabId РАССИНХРОНИЗИРОВАННЫМИ:
+  // .active класс и currentTabId выше УЖЕ обновлены на id, но если catch в
+  // restoreLastActiveTab() ловил исключение снаружи и откатывал currentTabId
+  // на 'home' БЕЗ отката видимого DOM (чтобы не задвоить init Chart.js) —
+  // вкладка оставалась визуально активной и пустой НАВСЕГДА: последующий
+  // triggerTabData(currentTabId) целился в 'home', не в реально показанную
+  // сломанную вкладку. Теперь currentTabId/DOM выше в этой функции остаются
+  // консистентны с id независимо от того, упал ли рендер данных — именно
+  // поэтому более поздний triggerTabData(currentTabId) (после loadSignals())
+  // корректно доперерисует ИМЕННО эту вкладку. Общая защита для ЛЮБОГО
+  // вызова showTab(), не только restoreLastActiveTab().
+  try {
+    triggerTabData(id);
+  } catch (e) {
+    console.warn('showTab(' + id + '): triggerTabData упал, вкладка переключена, но контент может быть неполным до повторной перерисовки:', e);
+  }
 
   // Запоминаем активную вкладку — при перезагрузке страницы восстановится
   // именно она, а не дефолтный ОБЗОР (localStorage, не sessionStorage —
@@ -2889,7 +2906,24 @@ function showTab(id, btn, keepCluster) {
     try {
       showTab(saved, null);
     } catch (e) {
+      // 2026-08-01: раньше здесь откатывался только currentTabId, не видимый
+      // DOM — если showTab() успела навесить .active на сохранённую вкладку
+      // до броска исключения (шаги ДО triggerTabData, который теперь сам
+      // защищён try/catch внутри showTab() — см. комментарий там), вкладка
+      // оставалась визуально активной и пустой навсегда, а currentTabId
+      // указывал на 'home' — рассинхрон, из-за которого более поздний
+      // triggerTabData(currentTabId) чинил не ту вкладку. Явный сброс
+      // .active классов здесь (не полный showTab('home') — не задвоить
+      // init Chart.js) гарантирует, что видимый DOM и currentTabId снова
+      // согласованы, каким бы шагом внутри showTab() ни бросило исключение.
       console.warn('restoreLastActiveTab: showTab(' + saved + ') упал, откатываюсь на ОБЗОР:', e);
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const homeSection = document.getElementById('tab-home');
+      if (homeSection) homeSection.classList.add('active');
+      document.querySelectorAll('.cbar-btn').forEach(b => b.classList.remove('active'));
+      const homeCbar = document.getElementById('cbar-live');
+      if (homeCbar) homeCbar.classList.add('active');
+      activeCluster = 'live';
       renderSubnav('live', 'home');
       currentTabId = 'home';
     }

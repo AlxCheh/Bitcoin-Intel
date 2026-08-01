@@ -699,7 +699,7 @@ function renderAccItem(item) {
     const s = item.source;
     html += sourceFooterHtml(
       'ИСТОЧНИК (' + sanitize(item.icon) + '): ' + sanitize(s.author) + ' · «' + sanitize(s.title) + '» · ' + sanitize(s.date)
-      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:none">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
+      + (s.url ? ' · <a href="' + sanitize(s.url) + '" target="_blank" style="color:var(--btc);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px">' + sanitize(s.url.replace(/^https?:\/\//, '').slice(0, 40)) + '</a>' : '')
     );
   }
   return html;

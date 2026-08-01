@@ -2,7 +2,7 @@
 tests/unit/test_compare_contradiction_precision.py
 Bitcoin Intel — тесты scripts/compare_contradiction_precision.py (методология
 "до/после на фиксированном срезе", формализована 2026-07-31 — см.
-docs/PLAN-contradiction-precision-roadmap.md).
+docs/PLAN-open-initiatives.md (Часть 2)).
 """
 import json
 import types

@@ -208,7 +208,7 @@ class TestMainCLIRegression:
 
 
 # ─── Contradiction Detector Precision (roadmap 2026-07-31) ──────────────────
-# Видимость между прогонами тестов — см. docs/PLAN-contradiction-precision-roadmap.md.
+# Видимость между прогонами тестов — см. docs/PLAN-open-initiatives.md (Часть 2).
 # НЕ подменяет tests/unit/test_contradiction.py (источник истины для CI gate).
 
 class TestContradictionPrecisionVisibility:

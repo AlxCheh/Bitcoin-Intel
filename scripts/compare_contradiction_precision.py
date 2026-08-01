@@ -2,7 +2,7 @@
 scripts/compare_contradiction_precision.py
 Bitcoin Intel — сравнение precision semantic_inverse_score() «до/после» на
 фиксированном срезе Golden Dataset (методология из сессии по contradiction
-detector, 2026-07-31 — см. docs/PLAN-contradiction-precision-roadmap.md).
+detector, 2026-07-31 — см. docs/PLAN-open-initiatives.md, Часть 2).
 
 ПРОБЛЕМА, КОТОРУЮ РЕШАЕТ: при прототипировании правок detector'а precision
 на extended-датасете не всегда падает или растёт из-за самой правки — он

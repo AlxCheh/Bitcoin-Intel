@@ -727,6 +727,20 @@ function renderTheoryTopic(topic) {
       + '<p style="margin:0;font-size:12px;color:var(--txt);line-height:1.6">' + sanitize(topic.conclusion) + '</p>'
       + '</div>';
   }
+  // 2026-08-01: точка монтирования для THEORY_ESSAYS.json — найдено
+  // пользователем на реальном скриншоте ("блок такой же скупой, как
+  // раньше"): renderTheoryEssays() ищет document.getElementById(target_panel
+  // + '-essays'), но ЭТА функция (для ЛЮБОГО дата-driven топика из
+  // THEORY_TOPICS.json) никогда такой div не генерировала — только
+  // статичные, написанные вручную панели в index.html (theory-money) имели
+  // его расставленным руками. Эссе с target_panel на дата-driven топик
+  // (theory-passphrase, мой же 21ideas-2026-dice-seed) технически не могло
+  // никуда смонтироваться — renderTheoryEssays() тихо делает if (!el) return,
+  // без единой ошибки в консоли, поэтому баг не проявлялся ничем кроме
+  // "эссе просто не появилось". Добавлено здесь, а не точечно в JSON
+  // конкретной панели — теперь работает для ЛЮБОГО топика из
+  // THEORY_TOPICS.json, не только для того, где сегодня нашли пропуск.
+  html += '<div id="' + sanitize(topic.id) + '-essays"></div>';
   if (topic.source_footer) {
     html += sourceFooterHtml(topic.source_footer);
   }

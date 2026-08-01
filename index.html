@@ -1428,7 +1428,7 @@ header {
 
 /* ── ТОЧЕЧНЫЕ СВЯЗИ МЕЖДУ ПУНКТАМИ (Вариант C) ── */
 .crosslink {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 12px; padding: 8px 10px;
   background: var(--bg3); border: 1px solid var(--line); border-left: 2px solid var(--btc);
   cursor: pointer; transition: border-color 0.15s;
@@ -1439,7 +1439,12 @@ header {
 .crosslink-target {
   font-family: var(--mono); font-size: 10px; color: var(--btc);
   border: 1px solid rgba(247,147,26,0.3); padding: 1px 6px;
-  white-space: nowrap; margin-left: auto; flex-shrink: 0;
+  /* 2026-08-01: было white-space:nowrap + flex-shrink:0 — рассчитано на
+     короткие метки вроде "DCA · 01" (см. theory-money). Полное название
+     панели ("Сид на костях: как создать ключ...") утекало за пределы
+     экрана вместо переноса — найдено пользователем на реальном
+     скриншоте. Разрешаем перенос и сжатие вместо жёсткого overflow. */
+  white-space: normal; margin-left: auto; flex-shrink: 1; max-width: 100%;
 }
 
 /* ══════════════════════════════════

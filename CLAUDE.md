@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.33 · **Обновлено:** 2026-07-31
+> **Версия:** v8.34 · **Обновлено:** 2026-08-01
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -671,7 +671,7 @@ narrative_role   → приоритет при выборе anchor-сигнал�
 |---|------|--------|-----------|
 | 2 | `ENTITIES.json` ↔ `REVENUE_ENGINES.json` | ✅ Реализовано (v8.17) | Referential integrity — `entity_id`/`entity_name` как внешний ключ, проверяется `validate_integrity.py` |
 | 1 | `signals.json` ↔ `REVENUE_ENGINES.json` | 🔄 2/5-6 реальных случаев (2026-07-31) — порог для вопроса об автоматизации не достигнут, см. чеклист Шага 8 | Сигнал о компании подтверждает/меняет `trend`/`risk_factors` существующего движка |
-| 3 | `signals.json` ↔ `THEORY_ESSAYS.json`/`THEORY_TOPICS.json` | Заблокировано объёмом — `THEORY_ESSAYS.json` всего 1 запись (2026-07-31) | Эссе формулирует тезис → сигнал подтверждает/опровергает/уточняет со временем |
+| 3 | `signals.json` ↔ `THEORY_ESSAYS.json`/`THEORY_TOPICS.json` | 🔄 Первая рабочая связь — `signal_refs` в схеме (2026-07-31), 2/5-6 записей | Эссе формулирует тезис → сигнал подтверждает/опровергает/уточняет со временем |
 | 4 | `signals.json` ↔ `TREASURY_HOLDERS.json`/`data/holders.js` | Не начато | Частично пересекается с уже работающим механизмом FACTS |
 | 5 | `signals.json` ↔ `data/top_addresses.json`/`data/bip110_signaling.json` | Не начато | Метрика подтверждает нарративное утверждение — не двусторонний тест |
 | 6 | `BITCOIN_FUNCTIONS.json` ↔ signals | Отклонено пока | Всего 5 записей — недостаточно материала для автоматизации |

@@ -59,6 +59,11 @@
       "label": "Lightning: платежи и расчёты",
       "theme": "infrastructure",
       "description": "Компромисс скорость/доверие в around-Bitcoin расчётных системах — Lightning, некастодиальные кошельки, 0-conf"
+    },
+    "wallet_security_incidents": {
+      "label": "Провалы безопасности self-custody",
+      "theme": "infrastructure",
+      "description": "Криптографические/реализационные провалы в инструментах self-custody (аппаратные кошельки, генерация ключей) — отдельно от quantum_security (там угроза будущая и протокольная, здесь — сегодняшняя и в реализации конкретного вендора)"
     }
   },
   "themes": {

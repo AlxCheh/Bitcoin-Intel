@@ -1646,6 +1646,27 @@
         "INF-2026-0724-001"
       ],
       "last_updated": "2026-07-24"
+    },
+    {
+      "id": "coinkite",
+      "name": "Coinkite (Coldcard)",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Производитель аппаратных кошельков Coldcard — крупный независимый self-custody вендор",
+      "profile": {
+        "what": "Аппаратные кошельки для холодного хранения BTC (Coldcard Mk3/Mk4/Mk5/Q), также TAPSIGNER/OPENDIME/SATSCARD",
+        "metrics": [
+          "30 июля 2026: RNG-баг в прошивке, ~1082,59 BTC похищено, баг существовал 5 лет с марта 2021"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Один из самых доверенных в индустрии аппаратных кошельков — инцидент показал, что открытый код и годы аудита не исключают критический RNG-баг"
+      },
+      "signal_refs": [
+        "INF-2026-0730-001"
+      ],
+      "last_updated": "2026-07-30"
     }
   ]
 }

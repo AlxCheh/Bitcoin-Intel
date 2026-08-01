@@ -1139,6 +1139,132 @@
       "dynamic": true
     },
     {
+      "id": "e099",
+      "title": "Сид на костях: как создать ключ, не доверяя генератору",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "essay",
+      "keywords": [
+        "dice",
+        "seed",
+        "entropy",
+        "coldcard",
+        "энтропия",
+        "кости"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e100",
+      "title": "Главный урок: что нельзя проверить — уязвимость по умолчанию",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "trng",
+        "rng",
+        "верификация"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e101",
+      "title": "Сколько бросков нужно и как они превращаются в слова",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "bip39",
+        "sha256",
+        "энтропия"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e102",
+      "title": "Процедура: калибровка, офлайн-окружение, сами броски",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "tails",
+        "калибровка"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e103",
+      "title": "Критическая ловушка режима «Dice»",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "iancoleman",
+        "base10"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e104",
+      "title": "Перекрёстная проверка тремя независимыми способами",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "seedsigner",
+        "rolls.py"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e105",
+      "title": "Перенос в устройство и финальная сверка",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "xfp",
+        "адрес"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e106",
+      "title": "Варианты, мультисиг и кому это вообще нужно",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "text",
+      "keywords": [
+        "multisig",
+        "мультисиг"
+      ],
+      "dynamic": true
+    },
+    {
       "id": "e075",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",

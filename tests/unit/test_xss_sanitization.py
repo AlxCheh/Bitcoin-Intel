@@ -431,7 +431,13 @@ SANITIZE_RATCHET_BASELINE = {
     "first.date": 3,
     "h.date": 1,
     "item.source": 1,
-    "item.target": 2,
+    # item.target было 2 (2026-08-01): два отдельных инлайн-вызова
+    # document.getElementById(item.target) объединены в один
+    # uncollapseAndScrollTo(item.target) — та же защищённая функция, что
+    # добавлена для находки "клик по crosslink не работает, ничего не
+    # происходит" (getElementById на null тихо бросал исключение без
+    # обработки). Не удаление проверки — консолидация двух мест в одно.
+    "item.target": 1,
     "item.title": 1,
     "last.date": 2,
     "p.country": 1,

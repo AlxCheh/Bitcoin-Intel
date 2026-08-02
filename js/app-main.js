@@ -685,9 +685,19 @@ function renderAccItem(item) {
     // target_panel в этом случае — точный текст .panel-title цели (как
     // ищет siteMapGoTo), не id. Без target_tab — прежнее поведение
     // (та же вкладка), не тронуто — обратная совместимость сохранена.
+    //
+    // 2026-08-01: раньше здесь был прямой инлайн-вызов
+    // document.getElementById(id).scrollIntoView(...) — если элемент по
+    // какой-то причине не найден в момент клика, .scrollIntoView() на
+    // null бросает исключение, которое НИЧЕМ не проявляется внешне (нет
+    // обработчика ошибок на инлайн onclick) — ровно поведение "жму,
+    // ничего не происходит", о котором сообщил пользователь, без единой
+    // строки в консоли для диагностики. Обёрнуто в crosslinkGo() с явной
+    // проверкой и console.warn — тот же результат при успехе, но теперь
+    // видно в консоли, если элемент действительно не найден.
     const onclickAttr = cl.target_tab
       ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
-      : 'document.getElementById(\'' + sanitize(cl.target_panel) + '\').scrollIntoView({behavior:\'smooth\'})';
+      : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
     html += '<div class="crosslink" onclick="' + onclickAttr + '">'
       + '<span class="crosslink-arrow">↳</span>'
       + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
@@ -2982,8 +2992,7 @@ function renderTOC(containerId, items) {
     const num = String(i + 1).padStart(2, '0');
     const isLast = i === items.length - 1;
     const borderStyle = isLast ? '' : 'border-bottom:1px solid var(--line);';
-    return '<div onclick="document.getElementById(\'' + item.target + '\').classList.remove(\'collapsed\');'
-      + 'document.getElementById(\'' + item.target + '\').scrollIntoView({behavior:\'smooth\'})" '
+    return '<div onclick="uncollapseAndScrollTo(\'' + item.target + '\')" '
       + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;' + borderStyle + 'cursor:pointer;transition:background 0.12s" '
       + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
       + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
@@ -3040,6 +3049,36 @@ renderTOC('holders-toc', [
 loadSignals();
 
 // ── ACCORDION ──
+// 2026-08-01: вынесено из инлайн-onclick в renderAccItem() — точечная
+// ссылка внутри той же вкладки (без target_tab, см. комментарий там же).
+// Раньше document.getElementById(id).scrollIntoView(...) вызывался прямо
+// в onclick-атрибуте — если элемент не найден в момент клика (по любой
+// причине), .scrollIntoView() на null бросает исключение без единого
+// внешнего проявления (нет обработчика ошибок на инлайн onclick) —
+// нажатие выглядит так, будто вообще ничего не произошло, без единой
+// строки в консоли для диагностики.
+function crosslinkGo(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) {
+    console.warn('crosslinkGo: элемент с id="' + targetId + '" не найден в DOM на момент клика — переход невозможен');
+    return;
+  }
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Тот же принцип для точки монтирования, которая может быть свёрнута
+// (.collapsed) — раскрыть и проскроллить одной защищённой функцией
+// вместо двух отдельных инлайн-вызовов getElementById без проверки.
+function uncollapseAndScrollTo(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) {
+    console.warn('uncollapseAndScrollTo: элемент с id="' + targetId + '" не найден в DOM на момент клика');
+    return;
+  }
+  el.classList.remove('collapsed');
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
 function toggleAcc(head) {
   const body = head.nextElementSibling;
   const arrow = head.querySelector('.acc-arrow');
@@ -4145,7 +4184,7 @@ function renderHolders() {
   cats.forEach(c => {
     const isCompanies = c.key === 'companies';
     const labelCell = isCompanies
-      ? '<td style="cursor:pointer;color:var(--btc);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px" onclick="document.getElementById(\'treasury-panel\').scrollIntoView({behavior:\'smooth\',block:\'start\'})" title="Смотреть детализацию по компаниям">' + c.label + '</td>'
+      ? '<td style="cursor:pointer;color:var(--btc);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px" onclick="crosslinkGo(\'treasury-panel\')" title="Смотреть детализацию по компаниям">' + c.label + '</td>'
       : '<td>' + c.label + '</td>';
     tbl += '<tr>' + labelCell;
     snapsDesc.forEach(s => {

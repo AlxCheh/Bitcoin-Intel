@@ -60,6 +60,7 @@ class TestCrosslinkGoDefensive:
 
     def test_crosslink_go_missing_element_warns_does_not_throw(self, helpers_source):
         js = helpers_source + """
+global.alert = function() {};
 const document = { getElementById: function() { return null; } };
 let warned = null;
 console.warn = function(msg) { warned = msg; };
@@ -76,6 +77,7 @@ console.log(JSON.stringify({ threw: threw, warned: warned !== null }));
 
     def test_crosslink_go_found_element_scrolls(self, helpers_source):
         js = helpers_source + """
+global.alert = function() {};
 let scrolled = false;
 const document = { getElementById: function() {
   return { scrollIntoView: function() { scrolled = true; } };

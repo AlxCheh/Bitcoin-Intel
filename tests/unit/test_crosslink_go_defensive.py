@@ -78,7 +78,6 @@ console.log(JSON.stringify({ threw: threw, warned: warned !== null }));
         js = helpers_source + """
 global.alert = function() {};
 global.window = { scrollY: 0 };
-global.setTimeout = function(fn) { fn(); };
 let scrolled = false;
 const document = {
   getElementById: function() {

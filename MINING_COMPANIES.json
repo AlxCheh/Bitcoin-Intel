@@ -131,10 +131,12 @@
       "name": "MARA Holdings (MARA)",
       "ticker": "MARA",
       "exchange": "Nasdaq",
-      "btc_treasury_policy": "unknown",
-      "ai_hpc_diversification": "unknown",
-      "notable": "Не зафиксировано напрямую в обработанных сигналах на момент создания файла — известна как крупный держатель BTC через ENTITIES.json/facts.json, но операционная политика майнинг-резерва отдельно не проверялась.",
-      "signal_refs": [],
+      "btc_treasury_policy": "mixed",
+      "ai_hpc_diversification": "major",
+      "notable": "26 июля 2026 (INF-2026-0726-001): CEO Фред Тил от первого лица подтвердил обе стороны сразу - продано ~20 000 BTC (mixed, не чистое 'sell': компания сохраняет 36 303 BTC) на погашение долга с дисконтом + финансирование AI-пивота (major, не full_pivot: майнинг продолжится минимум 2 года параллельно со стройкой AI-мощностей через партнёрство со Starwood Digital Ventures, ~4 ГВт). Явно отверг статус 'digital asset treasury company' - BTC-резерв как инструмент cash-менеджмента.",
+      "signal_refs": [
+        "INF-2026-0726-001"
+      ],
       "last_updated": "2026-07-26"
     },
     {

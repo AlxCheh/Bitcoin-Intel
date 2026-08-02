@@ -3073,16 +3073,21 @@ function crosslinkGo(targetId) {
     console.warn('crosslinkGo: элемент с id="' + targetId + '" не найден в DOM на момент клика — переход невозможен');
     return;
   }
-  const rect = el.getBoundingClientRect();
-  const dupCount = document.querySelectorAll('[id="' + targetId + '"]').length;
-  const beforeY = window.scrollY;
-  alert('ДИАГНОСТИКА 2:\nразмер элемента: ' + Math.round(rect.width) + '×' + Math.round(rect.height)
-    + '\nдубликатов id: ' + dupCount
-    + '\nscrollY до: ' + Math.round(beforeY));
+  // 2026-08-02, раунд 3: try/catch вокруг ВСЕЙ диагностики — раунд 2
+  // (getBoundingClientRect/querySelectorAll/scrollY в отдельных
+  // строках до alert) мог упасть до того, как alert успевал показаться,
+  // и пользователь не видел вообще ничего — тот же класс "тихого" сбоя,
+  // который эта диагностика должна была устранить, а не повторить.
+  try {
+    const rect = el.getBoundingClientRect();
+    const dupCount = document.querySelectorAll('[id="' + targetId + '"]').length;
+    alert('ДИАГНОСТИКА v3:\nразмер: ' + Math.round(rect.width) + '×' + Math.round(rect.height)
+      + '\nдубликатов id: ' + dupCount
+      + '\nscrollY: ' + Math.round(window.scrollY));
+  } catch (e) {
+    alert('ДИАГНОСТИКА v3 упала на подготовке: ' + e.message);
+  }
   el.scrollIntoView({ behavior: 'smooth' });
-  setTimeout(function() {
-    alert('ДИАГНОСТИКА 2 (через 600мс):\nscrollY после: ' + Math.round(window.scrollY));
-  }, 600);
 }
 
 // Тот же принцип для точки монтирования, которая может быть свёрнута

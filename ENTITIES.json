@@ -1671,9 +1671,12 @@
         "INF-2026-0730-001",
         "STR-2026-0731-001"
       ],
-      "last_updated": "2026-08-01",
+      "last_updated": "2026-08-02",
       "theory_refs": [
         "theory-dice-seed"
+      ],
+      "function_refs": [
+        "multisig-2of3"
       ]
     },
     {

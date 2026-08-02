@@ -878,6 +878,27 @@ function renderFunctionCard(fn) {
   if (fn.deep_dive_highlight) {
     html += '<div class="callout-mono" style="margin-top:12px">' + sanitize(fn.deep_dive_highlight) + '</div>';
   }
+  // 2026-08-02: crosslinks — исходящие связи функции с другими блоками
+  // сайта (сущности ECOSYSTEM, панели Теории). Тот же визуальный класс
+  // .crosslink, что уже используется в renderAccItem() для панелей
+  // Теории — не изобретён новый стиль. Два типа onclick в зависимости
+  // от типа цели: сущность — showEntityPopup(id) (попап работает
+  // независимо от текущей вкладки, переключать вкладку не нужно);
+  // панель на любой вкладке — siteMapGoTo(tab, точный текст .acc-label/
+  // .panel-title цели), тот же механизм, что уже используют THEORY-
+  // эссе с target_tab.
+  if (fn.crosslinks && fn.crosslinks.length) {
+    html += fn.crosslinks.map(function(cl) {
+      const onclickAttr = cl.type === 'entity'
+        ? 'showEntityPopup(\'' + sanitize(cl.entity_id) + '\')'
+        : 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')';
+      return '<div class="crosslink" onclick="' + onclickAttr + '">'
+        + '<span class="crosslink-arrow">↳</span>'
+        + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
+        + '<span class="crosslink-target">' + sanitize(cl.label) + '</span>'
+        + '</div>';
+    }).join('');
+  }
   if (fn.tools && fn.tools.length) {
     html += '<div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.05em">КАК ИСПОЛЬЗОВАТЬ</div>';
     html += fn.tools.map(renderToolBlock).join('');
@@ -1201,6 +1222,24 @@ function showEntityPopup(id) {
   const refs = e.signal_refs || [];
   document.getElementById('ep-refs').innerHTML = refs.length
     ? refs.map(r => '<span class="ep-ref">' + sanitize(r) + '</span>').join('')
+    : '';
+
+  // 2026-08-02: function_refs — входящие связи с BITCOIN_FUNCTIONS.json
+  // (напр. сущность coinkite <- функция Multisig 2-of-3). Бейдж кликабелен
+  // (в отличие от ep-refs выше, которые остаются просто текстом) —
+  // закрывает попап и переходит к панели функции через уже существующий
+  // siteMapGoTo(). Ищем название функции по id в уже загруженном
+  // BITCOIN_FUNCTIONS, а не храним дублирующий текст в ENTITIES.json.
+  const functionRefs = e.function_refs || [];
+  document.getElementById('ep-function-refs').innerHTML = functionRefs.length
+    ? '<div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em">СВЯЗАННЫЕ ФУНКЦИИ</div>'
+      + '<div class="ep-refs" style="margin-top:4px">'
+      + functionRefs.map(function(fid) {
+          const fn = (BITCOIN_FUNCTIONS || []).find(function(x) { return x.id === fid; });
+          const label = fn ? fn.name : fid;
+          return '<span class="ep-ref" style="cursor:pointer" onclick="goToPanelFromPopup(\'tech\',\'' + sanitize(label) + '\')">' + sanitize(label) + '</span>';
+        }).join('')
+      + '</div>'
     : '';
 
   document.getElementById('entity-popup').classList.add('visible');
@@ -3101,6 +3140,14 @@ loadSignals();
 // theory-dice-seed-mount в правильной секции #tab-theory, см. другой
 // коммит того же дня — не в этой функции; здесь просто убрана
 // диагностика, сама функция не менялась содержательно.)
+// 2026-08-02: закрыть попап сущности и перейти к панели на другой вкладке
+// (напр. клик по бейджу 'СВЯЗАННЫЕ ФУНКЦИИ' внутри попапа) — обёртка над
+// уже существующим siteMapGoTo(), не новая логика поиска панели.
+function goToPanelFromPopup(tabId, panelTitle) {
+  closeEntityPopup();
+  siteMapGoTo(tabId, panelTitle);
+}
+
 function crosslinkGo(targetId) {
   const el = document.getElementById(targetId);
   if (!el) {

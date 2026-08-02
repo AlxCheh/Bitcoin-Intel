@@ -72,3 +72,19 @@ def test_theory_topics_crosslink_target_labels_stay_short():
                 if len(cl["target_label"]) > MAX_TARGET_LABEL_LENGTH:
                     offenders.append((topic["id"], item.get("icon"), cl["target_label"]))
     assert not offenders, f"target_label длиннее {MAX_TARGET_LABEL_LENGTH} символов: {offenders}"
+
+
+def test_bitcoin_functions_crosslinks_labels_stay_short():
+    """
+    Тот же контентный уровень защиты — для BITCOIN_FUNCTIONS.json (поле
+    crosslinks, добавлено 2026-08-02, использует тот же .crosslink-target
+    визуальный класс, что и THEORY_ESSAYS/THEORY_TOPICS).
+    """
+    import json
+    functions = json.loads((REPO_ROOT / "BITCOIN_FUNCTIONS.json").read_text(encoding="utf-8"))["functions"]
+    offenders = []
+    for fn in functions:
+        for cl in fn.get("crosslinks", []):
+            if len(cl.get("label", "")) > MAX_TARGET_LABEL_LENGTH:
+                offenders.append((fn["id"], cl["label"]))
+    assert not offenders, f"label длиннее {MAX_TARGET_LABEL_LENGTH} символов: {offenders}"

@@ -3062,13 +3062,27 @@ loadSignals();
 // историю в git log — исходная находка и временная alert()-диагностика
 // для тестирования с телефона без консоли, убрана здесь после
 // подтверждения: элемент находится корректно, дело было не в этом).
+// 2026-08-02: ВТОРОЙ раунд временной диагностики (после первого — элемент
+// находится, но пользователь по-прежнему не видит скролл). Проверяем:
+// (а) реальные размеры элемента (не 0×0 — невидимый дубликат?),
+// (б) есть ли дубликаты id на странице (getElementById вернул бы только
+// первый), (в) реально ли меняется scrollY после вызова.
 function crosslinkGo(targetId) {
   const el = document.getElementById(targetId);
   if (!el) {
     console.warn('crosslinkGo: элемент с id="' + targetId + '" не найден в DOM на момент клика — переход невозможен');
     return;
   }
+  const rect = el.getBoundingClientRect();
+  const dupCount = document.querySelectorAll('[id="' + targetId + '"]').length;
+  const beforeY = window.scrollY;
+  alert('ДИАГНОСТИКА 2:\nразмер элемента: ' + Math.round(rect.width) + '×' + Math.round(rect.height)
+    + '\nдубликатов id: ' + dupCount
+    + '\nscrollY до: ' + Math.round(beforeY));
   el.scrollIntoView({ behavior: 'smooth' });
+  setTimeout(function() {
+    alert('ДИАГНОСТИКА 2 (через 600мс):\nscrollY после: ' + Math.round(window.scrollY));
+  }, 600);
 }
 
 // Тот же принцип для точки монтирования, которая может быть свёрнута

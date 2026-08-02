@@ -76,10 +76,19 @@ console.log(JSON.stringify({ threw: threw, warned: warned !== null }));
 
     def test_crosslink_go_found_element_scrolls(self, helpers_source):
         js = helpers_source + """
+global.alert = function() {};
+global.window = { scrollY: 0 };
+global.setTimeout = function(fn) { fn(); };
 let scrolled = false;
-const document = { getElementById: function() {
-  return { scrollIntoView: function() { scrolled = true; } };
-} };
+const document = {
+  getElementById: function() {
+    return {
+      scrollIntoView: function() { scrolled = true; },
+      getBoundingClientRect: function() { return { width: 100, height: 50 }; }
+    };
+  },
+  querySelectorAll: function() { return { length: 1 }; }
+};
 crosslinkGo('exists');
 console.log(JSON.stringify({ scrolled: scrolled }));
 """

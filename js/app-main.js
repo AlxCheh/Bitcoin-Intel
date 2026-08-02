@@ -3067,25 +3067,19 @@ loadSignals();
 // (а) реальные размеры элемента (не 0×0 — невидимый дубликат?),
 // (б) есть ли дубликаты id на странице (getElementById вернул бы только
 // первый), (в) реально ли меняется scrollY после вызова.
+// 2026-08-01: crosslinkGo()/uncollapseAndScrollTo() — защищённая обёртка
+// вместо инлайн document.getElementById(id).scrollIntoView(...) — null-
+// проверка + console.warn вместо тихого исключения на несуществующем
+// элементе. (Три раунда временной alert()-диагностики 2026-08-02 нашли
+// реальную причину конкретно для theory-dice-seed — отсутствие мостика
+// theory-dice-seed-mount в правильной секции #tab-theory, см. другой
+// коммит того же дня — не в этой функции; здесь просто убрана
+// диагностика, сама функция не менялась содержательно.)
 function crosslinkGo(targetId) {
   const el = document.getElementById(targetId);
   if (!el) {
     console.warn('crosslinkGo: элемент с id="' + targetId + '" не найден в DOM на момент клика — переход невозможен');
     return;
-  }
-  // 2026-08-02, раунд 3: try/catch вокруг ВСЕЙ диагностики — раунд 2
-  // (getBoundingClientRect/querySelectorAll/scrollY в отдельных
-  // строках до alert) мог упасть до того, как alert успевал показаться,
-  // и пользователь не видел вообще ничего — тот же класс "тихого" сбоя,
-  // который эта диагностика должна была устранить, а не повторить.
-  try {
-    const rect = el.getBoundingClientRect();
-    const dupCount = document.querySelectorAll('[id="' + targetId + '"]').length;
-    alert('ДИАГНОСТИКА v3:\nразмер: ' + Math.round(rect.width) + '×' + Math.round(rect.height)
-      + '\nдубликатов id: ' + dupCount
-      + '\nscrollY: ' + Math.round(window.scrollY));
-  } catch (e) {
-    alert('ДИАГНОСТИКА v3 упала на подготовке: ' + e.message);
   }
   el.scrollIntoView({ behavior: 'smooth' });
 }

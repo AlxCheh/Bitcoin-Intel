@@ -874,6 +874,20 @@ header {
 .ep-metric:last-child { border-bottom:none; }
 .ep-notable { font-size:11px; color:var(--amber); background:rgba(200,168,75,0.06); border-left:2px solid var(--amber); padding:6px 8px; margin-bottom:10px; line-height:1.4; }
 .ep-ref { font-family:var(--mono); font-size:10px; color:var(--dim); background:var(--bg3); border:1px solid var(--line); padding:2px 6px; border-radius:2px; }
+/* 2026-08-02: бейдж 'СВЯЗАННЫЕ ФУНКЦИИ' в попапе - Вариант 5, тот же
+   split label+CTA, что и .crosslink в аккордеонах. В отличие от .ep-ref
+   выше (просто текст, signal_refs не кликабельны) - этот кликабелен. */
+.ep-fn-badge {
+  display: inline-flex; align-items: stretch; border-radius: 3px; overflow: hidden; cursor: pointer;
+}
+.ep-fn-badge-label {
+  background: var(--bg3); border: 1px solid var(--line); border-right: none;
+  padding: 5px 10px; font-family: var(--mono); font-size: 10px; color: var(--dim);
+}
+.ep-fn-badge-cta {
+  background: var(--btc); color: var(--bg); padding: 5px 10px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+}
 .ep-overlay { position:fixed; inset:0; z-index:999; background:rgba(6,8,11,0.6); display:none; }
 .ep-overlay.visible { display:block; }
 
@@ -1426,25 +1440,27 @@ header {
 }
 .acc-body p strong { color: var(--txt); font-weight: 600; }
 
-/* ── ТОЧЕЧНЫЕ СВЯЗИ МЕЖДУ ПУНКТАМИ (Вариант C) ── */
+/* ── ТОЧЕЧНЫЕ СВЯЗИ МЕЖДУ ПУНКТАМИ (Вариант 5 — разделённая строка / CTA,
+   выбран пользователем 2026-08-02 из пяти превью-вариантов) ── */
 .crosslink {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin-top: 12px; padding: 8px 10px;
-  background: var(--bg3); border: 1px solid var(--line); border-left: 2px solid var(--btc);
-  cursor: pointer; transition: border-color 0.15s;
+  display: flex; align-items: stretch; gap: 0;
+  margin-top: 12px; border: 1px solid var(--line); border-radius: 3px;
+  overflow: hidden; cursor: pointer; transition: border-color 0.15s;
 }
 .crosslink:hover { border-color: var(--btc); }
-.crosslink-arrow { color: var(--btc); font-size: 12px; flex-shrink: 0; }
-.crosslink-text { font-size: 11px; color: var(--dim); line-height: 1.4; }
-.crosslink-target {
-  font-family: var(--mono); font-size: 10px; color: var(--btc);
-  border: 1px solid rgba(247,147,26,0.3); padding: 1px 6px;
-  /* 2026-08-01: было white-space:nowrap + flex-shrink:0 — рассчитано на
-     короткие метки вроде "DCA · 01" (см. theory-money). Полное название
-     панели ("Сид на костях: как создать ключ...") утекало за пределы
-     экрана вместо переноса — найдено пользователем на реальном
-     скриншоте. Разрешаем перенос и сжатие вместо жёсткого overflow. */
-  white-space: normal; margin-left: auto; flex-shrink: 1; max-width: 100%;
+.crosslink-text-col {
+  flex: 1; padding: 10px 12px; background: var(--bg3);
+  font-size: 11px; color: var(--dim); line-height: 1.5;
+}
+.crosslink-cta {
+  flex-shrink: 0; background: var(--btc); color: var(--bg);
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .02em;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 16px; text-align: center;
+  /* тот же урок 2026-08-01 (длинная метка не должна утекать за экран) —
+     здесь метка короче по конвенции ("DCA · 01" style), но на случай
+     будущей длинной оставляем перенос, не nowrap */
+  white-space: normal;
 }
 
 /* ══════════════════════════════════
@@ -4205,7 +4221,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=b2e77bd77b"></script>
+<script src="js/app-main.js?v=8b7c5ee70a"></script>
 
 <div class="ep-overlay" id="ep-overlay" onclick="closeEntityPopup()"></div>
 <div class="entity-popup" id="entity-popup">

@@ -699,9 +699,8 @@ function renderAccItem(item) {
       ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
       : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
     html += '<div class="crosslink" onclick="' + onclickAttr + '">'
-      + '<span class="crosslink-arrow">↳</span>'
-      + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
-      + '<span class="crosslink-target">' + sanitize(cl.target_label) + '</span>'
+      + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
+      + '<div class="crosslink-cta">' + sanitize(cl.target_label) + ' →</div>'
       + '</div>';
   }
   html += '</div></div>';
@@ -893,9 +892,8 @@ function renderFunctionCard(fn) {
         ? 'showEntityPopup(\'' + sanitize(cl.entity_id) + '\')'
         : 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')';
       return '<div class="crosslink" onclick="' + onclickAttr + '">'
-        + '<span class="crosslink-arrow">↳</span>'
-        + '<span class="crosslink-text">' + sanitize(cl.text) + '</span>'
-        + '<span class="crosslink-target">' + sanitize(cl.label) + '</span>'
+        + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
+        + '<div class="crosslink-cta">' + sanitize(cl.label) + ' →</div>'
         + '</div>';
     }).join('');
   }
@@ -1233,11 +1231,14 @@ function showEntityPopup(id) {
   const functionRefs = e.function_refs || [];
   document.getElementById('ep-function-refs').innerHTML = functionRefs.length
     ? '<div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em">СВЯЗАННЫЕ ФУНКЦИИ</div>'
-      + '<div class="ep-refs" style="margin-top:4px">'
+      + '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px">'
       + functionRefs.map(function(fid) {
           const fn = (BITCOIN_FUNCTIONS || []).find(function(x) { return x.id === fid; });
           const label = fn ? fn.name : fid;
-          return '<span class="ep-ref" style="cursor:pointer" onclick="goToPanelFromPopup(\'tech\',\'' + sanitize(label) + '\')">' + sanitize(label) + '</span>';
+          return '<div class="ep-fn-badge" onclick="goToPanelFromPopup(\'tech\',\'' + sanitize(label) + '\')">'
+            + '<span class="ep-fn-badge-label">ФУНКЦИЯ</span>'
+            + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
+            + '</div>';
         }).join('')
       + '</div>'
     : '';

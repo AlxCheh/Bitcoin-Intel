@@ -852,6 +852,32 @@ function renderFunctionCard(fn) {
   if (fn.explanation) {
     html += '<p style="margin-top:10px;font-weight:600;color:var(--txt)">' + sanitize(fn.explanation) + '</p>';
   }
+  // 2026-08-02: deep_dive — необязательный более глубокий технический
+  // разбор (напр. "почему функция называется именно так"), отдельный от
+  // краткого explanation — прогрессивное раскрытие детализации, не
+  // замена. Элементы массива — либо строка (обычный абзац), либо объект
+  // { code: [...строки...] } — блок кода, тот же визуальный класс .code,
+  // что уже используется в статичной разметке (напр. пример PoW-цикла).
+  if (fn.deep_dive_title || (fn.deep_dive && fn.deep_dive.length)) {
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)">';
+    if (fn.deep_dive_title) {
+      html += '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--btc);letter-spacing:.03em">🔬 ' + sanitize(fn.deep_dive_title) + '</div>';
+    }
+    if (fn.deep_dive && fn.deep_dive.length) {
+      html += fn.deep_dive.map(function(block) {
+        if (block && typeof block === 'object' && block.code) {
+          return '<div class="code" style="margin-top:10px">'
+            + block.code.map(function(line){ return '<div>' + sanitize(line) + '</div>'; }).join('')
+            + '</div>';
+        }
+        return '<p style="margin-top:8px">' + sanitize(block) + '</p>';
+      }).join('');
+    }
+    html += '</div>';
+  }
+  if (fn.deep_dive_highlight) {
+    html += '<div class="callout-mono" style="margin-top:12px">' + sanitize(fn.deep_dive_highlight) + '</div>';
+  }
   if (fn.tools && fn.tools.length) {
     html += '<div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.05em">КАК ИСПОЛЬЗОВАТЬ</div>';
     html += fn.tools.map(renderToolBlock).join('');

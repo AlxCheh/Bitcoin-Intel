@@ -677,6 +677,21 @@ function renderAccItem(item) {
     html += '<div class="callout-mono">'
       + sanitize(item.highlight) + '</div>';
   }
+  // 2026-08-02: item.crosslinks (массив) — добавлено рядом с уже
+  // существующим item.crosslink (единственное число, обратная
+  // совместимость не нарушена) — пункту иногда нужна более чем одна
+  // связь (напр. пункт 06 theory-dice-seed уже был связан с
+  // theory-passphrase, понадобилась вторая связь с PSBT). Общая функция
+  // рендера одного crosslink переиспользуется для обоих случаев.
+  function renderOneCrosslink(cl) {
+    const onclickAttr = cl.target_tab
+      ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
+      : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
+    return '<div class="crosslink" onclick="' + onclickAttr + '">'
+      + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
+      + '<div class="crosslink-cta">' + sanitize(cl.target_label) + ' →</div>'
+      + '</div>';
+  }
   if (item.crosslink) {
     const cl = item.crosslink;
     // target_tab — опционально (добавлено 2026-07-20): межвкладочная
@@ -695,13 +710,10 @@ function renderAccItem(item) {
     // строки в консоли для диагностики. Обёрнуто в crosslinkGo() с явной
     // проверкой и console.warn — тот же результат при успехе, но теперь
     // видно в консоли, если элемент действительно не найден.
-    const onclickAttr = cl.target_tab
-      ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
-      : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
-    html += '<div class="crosslink" onclick="' + onclickAttr + '">'
-      + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
-      + '<div class="crosslink-cta">' + sanitize(cl.target_label) + ' →</div>'
-      + '</div>';
+    html += renderOneCrosslink(cl);
+  }
+  if (item.crosslinks && item.crosslinks.length) {
+    html += item.crosslinks.map(renderOneCrosslink).join('');
   }
   html += '</div></div>';
   if (item.source) {

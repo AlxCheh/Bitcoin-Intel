@@ -123,7 +123,18 @@ const document = {{ getElementById: id => registry[id] }};
 showEntityPopup('{entity["id"]}');
 console.log(JSON.stringify({{ html: registry['ep-function-refs'].innerHTML }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        # 2026-08-02: тот же ARG_MAX-риск, что в test_theory_topic_essay_mount.py -
+        # BITCOIN_FUNCTIONS.json растёт (новые crosslinks), полный дамп через
+        # node -e рано или поздно упирается в системный лимит длины аргумента.
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
+            tmp.write(js)
+            tmp_path = tmp.name
+        try:
+            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
+        finally:
+            os.unlink(tmp_path)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         return json.loads(result.stdout)["html"]
 

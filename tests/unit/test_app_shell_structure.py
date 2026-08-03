@@ -24,6 +24,8 @@ import re
 from pathlib import Path
 from html.parser import HTMLParser
 
+import pytest
+
 REPO_ROOT = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
 APP_EARLY_JS = REPO_ROOT / "js" / "app-early.js"
@@ -45,7 +47,30 @@ class TestAppShellCSS:
         normalized = re.sub(r"\s+", "", rule)
         assert "display:flex" in normalized
         assert "flex-direction:column" in normalized
-        assert "min-height:100dvh" in normalized
+        assert "height:100dvh" in normalized
+
+    def test_app_shell_uses_height_not_min_height_for_dvh(self):
+        """
+        Регрессия на реальный, подтверждённый через headless-браузер баг
+        (2026-08-03) - min-height задаёт только МИНИМУМ, не потолок.
+        Контент .app-scroll (все вкладки) естественно выше 100dvh -
+        .app-shell с min-height честно рос под этот контент вместо того,
+        чтобы остаться ровно 100dvh и заставить .app-scroll включить свой
+        внутренний overflow-y:auto. Результат: .clusterbar рендерилась
+        корректно (не display:none, не нулевой высоты), но на 200+px ниже
+        видимой области - пользователь описал это как "меню отсутствует".
+        Playwright-тест (реальный Chromium) подтвердил: с height (не
+        min-height) .app-shell === window.innerHeight ровно, .clusterbar
+        остаётся в видимой области при любой прокрутке .app-scroll.
+        """
+        rule = _css_rule_body(".app-shell")
+        normalized = re.sub(r"\s+", "", rule)
+        assert "min-height:100dvh" not in normalized, (
+            "min-height:100dvh вернулась в .app-shell вместо height:100dvh - "
+            "контейнер снова сможет расти выше видимой области под давлением "
+            "контента .app-scroll, .clusterbar снова окажется ниже экрана "
+            "(см. находку 2026-08-03, подтверждено реальным Playwright-рендером)"
+        )
 
     def test_app_scroll_is_the_scrolling_flex_child(self):
         rule = _css_rule_body(".app-scroll")
@@ -202,3 +227,98 @@ def test_no_leftover_visual_viewport_js():
         "window.visualViewport вернулся в активный код (не в комментарии) - "
         "см. историю четырёх неудачных JS-реактивных попыток 2026-08-03"
     )
+
+
+# ─── Реальный рендер через Playwright (2026-08-03) ──────────────────────
+# Найдено: в этой среде разработки установлен настоящий Chromium
+# (/opt/pw-browsers/) через playwright, вопреки более раннему допущению
+# в других тестах "headless-браузера в проекте намеренно нет". Именно
+# реальный рендер (не статический анализ CSS) поймал реальный баг -
+# min-height:100dvh на .app-shell позволяла контейнеру расти ВЫШЕ
+# видимой области под давлением контента .app-scroll, .clusterbar
+# оказывалась на 200+px ниже экрана при видимом (не display:none)
+# состоянии - статический CSS-анализ такое не ловит в принципе, только
+# реальные computed-размеры после реального рендера.
+#
+# Тест опционален (пропускается, если playwright/chromium недоступны -
+# напр. в CI, где playwright не в requirements.txt) - для CI остаётся
+# статическая проверка выше (test_app_shell_uses_height_not_min_height_for_dvh),
+# этот тест - дополнительная, более сильная гарантия для локальной разработки.
+try:
+    from playwright.sync_api import sync_playwright
+    import glob
+    _chromium_paths = glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome")
+    PLAYWRIGHT_AVAILABLE = bool(_chromium_paths)
+    _CHROMIUM_PATH = _chromium_paths[0] if _chromium_paths else None
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    _CHROMIUM_PATH = None
+
+
+@pytest.mark.skipif(not PLAYWRIGHT_AVAILABLE, reason="Playwright/Chromium недоступны в этой среде")
+class TestAppShellRealRender:
+
+    def test_clusterbar_stays_within_viewport_after_real_render(self, tmp_path):
+        """
+        Реальный рендер (не статический анализ) - .app-shell не должна
+        визуально превышать высоту viewport, .clusterbar обязана
+        оставаться внутри видимой области. Локальный HTTP-сервер вместо
+        file:// - относительные fetch() к JSON-файлам сайта требуют
+        HTTP-контекста, не файлового.
+        """
+        import http.server
+        import socketserver
+        import threading
+
+        handler = http.server.SimpleHTTPRequestHandler
+        original_cwd = str(REPO_ROOT)
+
+        class Handler(handler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=original_cwd, **kwargs)
+            def log_message(self, *args):
+                pass  # без лишнего вывода в лог теста
+
+        # порт 0 - ОС сама выбирает свободный эфемерный порт, не завязываемся
+        # на конкретный номер (устойчиво к повторным запускам без ожидания
+        # освобождения сокета от предыдущего прогона)
+        httpd = socketserver.TCPServer(("", 0), Handler)
+        port = httpd.server_address[1]
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(executable_path=_CHROMIUM_PATH)
+                page = browser.new_page(viewport={"width": 390, "height": 844})
+                page.goto(f"http://localhost:{port}/index.html", wait_until="load", timeout=15000)
+                page.wait_for_timeout(1000)
+
+                shell_height = page.evaluate(
+                    "() => document.querySelector('.app-shell').getBoundingClientRect().height"
+                )
+                bar_rect = page.evaluate(
+                    "() => document.querySelector('.clusterbar').getBoundingClientRect()"
+                )
+                viewport_height = page.evaluate("() => window.innerHeight")
+
+                browser.close()
+        finally:
+            httpd.shutdown()
+
+        # 4px допуск - известный, пред-существующий отступ под декоративную
+        # градиентную полосу сверху страницы (position:fixed;top:0, высота
+        # 4px) + такой же по высоте spacer-div ПЕРЕД .app-shell в обычном
+        # потоке - сдвигает всю страницу на эти 4px вниз, не связано с
+        # данным структурным фиксом, было так и до него.
+        KNOWN_TOP_SPACER_PX = 4
+        assert shell_height <= viewport_height + KNOWN_TOP_SPACER_PX, (
+            f".app-shell высотой {shell_height}px превышает viewport {viewport_height}px "
+            f"(с учётом известного отступа {KNOWN_TOP_SPACER_PX}px) - "
+            f"min-height вместо height могла вернуться (см. находку 2026-08-03)"
+        )
+        assert bar_rect["bottom"] <= viewport_height + KNOWN_TOP_SPACER_PX, (
+            f".clusterbar (bottom={bar_rect['bottom']}) выходит за пределы видимой области "
+            f"({viewport_height}px + известный отступ {KNOWN_TOP_SPACER_PX}px) - "
+            f"меню невидимо без скролла всей страницы"
+        )
+        assert bar_rect["top"] >= 0

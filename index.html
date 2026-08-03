@@ -378,8 +378,18 @@ header {
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  /* 2026-08-03: найдено через реальный рендер в headless-браузере (не
+     догадкой) - было min-height, которое задаёт только МИНИМУМ, не
+     потолок. Контент .app-scroll (все вкладки) естественно выше 100dvh -
+     .app-shell честно рос под этот контент, вместо того чтобы остаться
+     ровно 100dvh и заставить .app-scroll включить свой внутренний
+     overflow-y:auto. .clusterbar при этом рендерился корректно (не
+     display:none, не нулевой высоты) - просто на 200+px ниже видимой
+     области, что пользователь и описал как "меню отсутствует". height
+     (не min-height) - жёсткий потолок, обязательное условие для
+     правильной работы flex:1;overflow-y:auto на дочернем .app-scroll. */
+  height: 100vh;
+  height: 100dvh;
 }
 .app-scroll {
   flex: 1 1 auto;

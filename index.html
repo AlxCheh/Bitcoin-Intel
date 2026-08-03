@@ -358,27 +358,41 @@ header {
   border-bottom-color: var(--btc);
 }
 
+/* 2026-08-03: структурный фикс "меню уезжает под панель браузера /
+   дёргается". Четыре JS/CSS-надстройки поверх position:fixed (GPU-слой,
+   body{100dvh}, три варианта JS-оверрайда через visualViewport) не дали
+   полного результата - JS-реактивные подходы физически не успевают за
+   покадровой, непрерывной нативной анимацией показа/скрытия панели
+   браузера (resize-событие приходит уже post-factum, JS всегда на шаг
+   позади реальной анимации, независимо от направления скролла).
+
+   Решение - переложить синхронизацию ПОЛНОСТЬЮ на браузер, без JS
+   посередине: .app-shell - flex-колонка высотой ровно 100dvh (нативно
+   отслеживает реально видимую область в том же рендер-пайплайне, что и
+   сама анимация панели браузера, без какой-либо JS-задержки).
+   .app-scroll - единственный СКРОЛЛЯЩИЙСЯ потомок (flex:1, весь контент
+   сайта теперь внутри него). .clusterbar - ВТОРОЙ, последний flex-потомок
+   .app-shell, СЕСТРА .app-scroll, не position:fixed и не position:sticky -
+   обычный элемент потока, который естественным образом всегда занимает
+   нижнюю часть 100dvh-колонки, независимо от прокрутки .app-scroll. */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.app-scroll {
+  flex: 1 1 auto;
+  min-height: 0; /* критично для flex - без этого дочерний overflow:auto не сработает */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .clusterbar {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 100;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-evenly;
   background: var(--bg3);
   border-top: 1px solid var(--line2);
-  /* 2026-08-03: за один день накопилось четыре попытки фикса
-     "мелькания"/"уезжания" панели (GPU-слой translateZ(0), body{100dvh},
-     JS-оверрайд через visualViewport, CSS transition сглаживающий этот
-     оверрайд) - ни одна не решила проблему до конца, а пользователь
-     прямо указал: "раньше всё было идеально". Это меняет диагноз: не
-     "браузер не умеет корректно позиционировать fixed", а "что-то из
-     добавленного за сессию сломало то, что раньше работало само по
-     себе". Все накопленные CSS/JS-надстройки убраны полностью -
-     .clusterbar снова в точности в том виде, в котором была ДО первой
-     попытки фикса. Если проблема сохранится и на этой версии - причина
-     не в самой .clusterbar, и искать нужно в другом месте (напр. в
-     JS/CSS, добавленном сегодня для других элементов интерфейса, не
-     связанных с этой панелью напрямую). */
 }
 .cbar-btn {
   flex: 0 0 auto;
@@ -1992,6 +2006,9 @@ header {
 <div style="height:4px;background:linear-gradient(90deg,#C8922A 0%,#F7C95A 40%,#C8922A 70%,#A0701A 100%);width:100%;position:fixed;top:0;left:0;z-index:9999;"></div>
 <div style="height:4px;flex-shrink:0;"></div>
 
+<div class="app-shell">
+<div class="app-scroll">
+
 <!-- ══ HEADER + NAV ══ -->
 <header>
   <div class="logo">
@@ -2008,43 +2025,6 @@ header {
   </div>
 </header>
 
-<!-- ══ КАРТА САЙТА (оверлей) ══ -->
-<div class="sitemap-overlay" id="sitemap-overlay">
-  <div class="sitemap-panel">
-    <div class="sitemap-head">
-      <input type="text" class="sitemap-search" id="sitemap-search" placeholder="Поиск по всему сайту… (например «халвинг»)" oninput="filterSiteMap(this.value)" autocomplete="off">
-      <button class="sitemap-close" onclick="closeSiteMap()">✕</button>
-    </div>
-    <div class="sitemap-clusters">
-      <button class="sm-cluster-btn" data-cluster="live" onclick="jumpToSiteMapCluster('live')">LIVE</button>
-      <button class="sm-cluster-btn" data-cluster="knowledge" onclick="jumpToSiteMapCluster('knowledge')">ECOSYSTEM</button>
-      <button class="sm-cluster-btn" data-cluster="macro" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
-      <button class="sm-cluster-btn" data-cluster="analysis" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
-    </div>
-    <div class="sitemap-tabs" id="sitemap-tabs"></div>
-    <div class="sitemap-legend">
-      <span><span class="sm-dot live"></span>живое</span>
-      <span><span class="sm-dot facts"></span>из сигналов</span>
-      <span><span class="sm-dot static"></span>статика</span>
-      <span><span class="sm-dot signals"></span>нарратив</span>
-      <span><span class="sm-dot none"></span>без данных</span>
-      <span><span class="sm-dot tool"></span>инструмент</span>
-    </div>
-    <div class="sitemap-body" id="sitemap-body"></div>
-  </div>
-</div>
-
-<!-- ══ ДЕТАЛИ ДОХОДНОГО ДВИЖКА ══ -->
-<div class="re-detail-overlay" id="re-detail-overlay">
-  <div class="re-detail-panel">
-    <div class="re-detail-head">
-      <span class="re-detail-head-title" id="re-detail-title">—</span>
-      <button class="re-detail-close" onclick="closeEngineDetail()">✕</button>
-    </div>
-    <div class="re-detail-body" id="re-detail-body"></div>
-  </div>
-</div>
-
 <!-- ══ NAV ══ -->
 <div class="nav-crumb">
   <span>
@@ -2054,13 +2034,6 @@ header {
   <span class="crumb-dots" id="crumb-dots"></span>
 </div>
 <nav class="subnav" id="subnav"></nav>
-
-<div class="clusterbar">
-  <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
-  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ECOSYSTEM</button>
-  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">FUNDAMENTAL</button>
-  <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
-</div>
 
 <!-- ══════════════════════════════════════
      HOME
@@ -2559,7 +2532,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-early.js?v=a504b59ee1"></script>
+<script src="js/app-early.js?v=5124321959"></script>
 
 <section class="section" id="tab-theory">
   <div class="page">
@@ -4249,7 +4222,55 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=14eae36579"></script>
+<script src="js/app-main.js?v=8e343e6765"></script>
+
+</div><!-- /.app-scroll -->
+
+<div class="clusterbar">
+  <button class="cbar-btn active" id="cbar-live" onclick="selectCluster('live')">LIVE</button>
+  <button class="cbar-btn" id="cbar-knowledge" onclick="selectCluster('knowledge')">ECOSYSTEM</button>
+  <button class="cbar-btn" id="cbar-macro" onclick="selectCluster('macro')">FUNDAMENTAL</button>
+  <button class="cbar-btn" id="cbar-analysis" onclick="selectCluster('analysis')">ANALYSIS</button>
+</div>
+
+</div><!-- /.app-shell -->
+
+<!-- ══ КАРТА САЙТА (оверлей) ══ -->
+<div class="sitemap-overlay" id="sitemap-overlay">
+  <div class="sitemap-panel">
+    <div class="sitemap-head">
+      <input type="text" class="sitemap-search" id="sitemap-search" placeholder="Поиск по всему сайту… (например «халвинг»)" oninput="filterSiteMap(this.value)" autocomplete="off">
+      <button class="sitemap-close" onclick="closeSiteMap()">✕</button>
+    </div>
+    <div class="sitemap-clusters">
+      <button class="sm-cluster-btn" data-cluster="live" onclick="jumpToSiteMapCluster('live')">LIVE</button>
+      <button class="sm-cluster-btn" data-cluster="knowledge" onclick="jumpToSiteMapCluster('knowledge')">ECOSYSTEM</button>
+      <button class="sm-cluster-btn" data-cluster="macro" onclick="jumpToSiteMapCluster('macro')">FUNDAMENTAL</button>
+      <button class="sm-cluster-btn" data-cluster="analysis" onclick="jumpToSiteMapCluster('analysis')">ANALYSIS</button>
+    </div>
+    <div class="sitemap-tabs" id="sitemap-tabs"></div>
+    <div class="sitemap-legend">
+      <span><span class="sm-dot live"></span>живое</span>
+      <span><span class="sm-dot facts"></span>из сигналов</span>
+      <span><span class="sm-dot static"></span>статика</span>
+      <span><span class="sm-dot signals"></span>нарратив</span>
+      <span><span class="sm-dot none"></span>без данных</span>
+      <span><span class="sm-dot tool"></span>инструмент</span>
+    </div>
+    <div class="sitemap-body" id="sitemap-body"></div>
+  </div>
+</div>
+
+<!-- ══ ДЕТАЛИ ДОХОДНОГО ДВИЖКА ══ -->
+<div class="re-detail-overlay" id="re-detail-overlay">
+  <div class="re-detail-panel">
+    <div class="re-detail-head">
+      <span class="re-detail-head-title" id="re-detail-title">—</span>
+      <button class="re-detail-close" onclick="closeEngineDetail()">✕</button>
+    </div>
+    <div class="re-detail-body" id="re-detail-body"></div>
+  </div>
+</div>
 
 <div class="ep-overlay" id="ep-overlay" onclick="closeEntityPopup()"></div>
 <div class="entity-popup" id="entity-popup">

@@ -41,54 +41,30 @@ function scheduleInstStickyTopUpdate() {
     updateInstStickyTop();
   });
 }
-window.addEventListener('scroll', scheduleInstStickyTopUpdate, { passive: true });
+// 2026-08-03: структурный фикс .clusterbar (вынос в .app-shell/.app-scroll,
+// см. index.html) сделал СКРОЛЛЯЩИМСЯ элементом .app-scroll, не window/body
+// как раньше - слушатель на window больше не отражает реальный скролл
+// пользователя (или отражает лишь частично, в зависимости от браузера).
+// Вешаем тот же обработчик на .app-scroll явно, а не на window.
+var appScrollEl = document.querySelector('.app-scroll');
+if (appScrollEl) {
+  appScrollEl.addEventListener('scroll', scheduleInstStickyTopUpdate, { passive: true });
+} else {
+  window.addEventListener('scroll', scheduleInstStickyTopUpdate, { passive: true });
+}
 updateInstStickyTop();
 
 // ── Instrument sticky headers: handled via CSS ──
 
-// 2026-08-03 (третий заход): второй заход (top - bottom-офсет через
-// window.innerHeight - visualViewport.height) исправил "уезжание под
-// панель", но пользователь сообщил о НОВОМ симптоме - просвет с
-// содержимым страницы МЕЖДУ меню и панелью браузера, то есть офсет
-// временами ПЕРЕОЦЕНИВАЛСЯ (толкал панель выше, чем нужно), а не
-// только недооценивался. Вероятная причина: window.innerHeight ведёт
-// себя непоследовательно между мобильными браузерами/версиями - на
-// части из них обновляется синхронно с visualViewport при показе/
-// скрытии панели браузера, на части - остаётся статичным (значение
-// "большого" viewport всегда) - в зависимости от того, КАКОЙ из двух
-// случаев на конкретном устройстве, разница (innerHeight -
-// visualViewport.height) может быть то верной, то нет, отсюда дёрганье
-// в обе стороны скролла и то заниженный, то завышенный офсет.
-//
-// Убираем window.innerHeight из формулы полностью - вместо офсета
-// "снизу", посчитанного как разница двух потенциально рассинхронизированных
-// величин, позиционируем панель через top, вычисленный НАПРЯМУЮ из
-// собственных свойств visualViewport (height, offsetTop) и реальной
-// высоты самой панели - ни одна из этих величин не зависит от того, как
-// конкретный браузер трактует innerHeight.
-var clusterbarVVScheduled = false;
-function updateClusterbarBottomOffset() {
-  if (!window.visualViewport) return;
-  var clusterbar = document.querySelector('.clusterbar');
-  if (!clusterbar) return;
-  var vv = window.visualViewport;
-  var barHeight = clusterbar.offsetHeight;
-  var top = vv.height + vv.offsetTop - barHeight;
-  clusterbar.style.top = Math.round(top) + 'px';
-  clusterbar.style.bottom = 'auto';
-}
-function scheduleClusterbarUpdate() {
-  if (clusterbarVVScheduled) return;
-  clusterbarVVScheduled = true;
-  requestAnimationFrame(function() {
-    clusterbarVVScheduled = false;
-    updateClusterbarBottomOffset();
-  });
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', scheduleClusterbarUpdate, { passive: true });
-  updateClusterbarBottomOffset();
-}
+// 2026-08-03: три JS-реактивных попытки синхронизировать .clusterbar с
+// показом/скрытием панели мобильного браузера через window.visualViewport
+// (GPU-слой + bottom-офсет, затем top-офсет без window.innerHeight) не
+// дали полного результата - JS в принципе не успевает за покадровой
+// нативной анимацией панели браузера (resize-событие приходит уже
+// post-factum). Заменено структурным решением - .clusterbar теперь
+// обычный flex-потомок .app-shell (min-height:100dvh), не
+// position:fixed/sticky, синхронизация полностью на стороне браузера,
+// без JS. См. CSS .app-shell/.app-scroll/.clusterbar в index.html.
 
 function toggleInstrument(id) {
   var body = document.getElementById(id + '-body');

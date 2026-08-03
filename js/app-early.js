@@ -46,6 +46,51 @@ updateInstStickyTop();
 
 // ── Instrument sticky headers: handled via CSS ──
 
+// 2026-08-03: полный откат (PR #716) подтвердил - "уезжает под панель
+// браузера + серая полоска" воспроизводится и на чистом CSS без каких-либо
+// надстроек. Значит JS-оверрайд через visualViewport (первая попытка,
+// PR #714) был ПРАВИЛЬНЫМ направлением - пользователь прямо подтверждал
+// "теперь остаётся на месте" именно после него. Ошибка была в
+// преждевременном полном откате из-за оставшегося дёрганья, а не в самой
+// идее использовать visualViewport.
+//
+// Возвращаем ту же логику расчёта офсета (проверена - решает "уезжание
+// под панель"), но с двумя уточнениями по сравнению с первой попыткой:
+// 1. Убран конкурирующий CSS transition (был добавлен отдельным PR #715) -
+//    гипотеза: transition боролся с частыми повторными JS-обновлениями
+//    во время САМОЙ анимации показа/скрытия панели браузера (каждое новое
+//    resize-событие перезапускало transition от уже промежуточной,
+//    недоехавшей позиции) - это могло создавать эффект "погони за целью"
+//    вместо точного, синхронного попадания в реальную позицию панели.
+// 2. Слушаем только 'resize' на visualViewport, не 'scroll' - resize
+//    семантически корректное событие именно для изменения РАЗМЕРА
+//    видимой области (что и происходит при показе/скрытии панели
+//    браузера); 'scroll' на visualViewport означает панорамирование
+//    видимой области относительно layout viewport (напр. при pinch-zoom),
+//    не связано напрямую с этим конкретным симптомом - лишний слушатель
+//    добавлял лишние, близко расположенные по времени срабатывания без
+//    дополнительной пользы для этой конкретной задачи.
+var clusterbarVVScheduled = false;
+function updateClusterbarBottomOffset() {
+  if (!window.visualViewport) return;
+  var clusterbar = document.querySelector('.clusterbar');
+  if (!clusterbar) return;
+  var offsetBottom = window.innerHeight - (window.visualViewport.height + window.visualViewport.offsetTop);
+  clusterbar.style.bottom = Math.max(0, Math.round(offsetBottom)) + 'px';
+}
+function scheduleClusterbarUpdate() {
+  if (clusterbarVVScheduled) return;
+  clusterbarVVScheduled = true;
+  requestAnimationFrame(function() {
+    clusterbarVVScheduled = false;
+    updateClusterbarBottomOffset();
+  });
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', scheduleClusterbarUpdate, { passive: true });
+  updateClusterbarBottomOffset();
+}
+
 // 2026-08-03: JS-оверрайд через visualViewport (updateClusterbarBottomOffset())
 // был добавлен как фикс "меню уезжает под панель браузера", но пользователь
 // сообщил, что дёрганье и серая полоска-артефакт ПРОДОЛЖИЛИСЬ после этого

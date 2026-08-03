@@ -2667,10 +2667,24 @@ function setSigFilter(c) {
   renderSignals();
 }
 
+// 2026-08-03: структурный фикс .clusterbar сделал скроллящимся элементом
+// .app-scroll, не window - window.scrollTo(0,0) в трёх местах кода
+// (сброс скролла при переходе на новую вкладку/панель) больше не
+// действует на реальную прокрутку. Общий хелпер вместо трёх копий одной
+// и той же проверки.
+function scrollAppToTop() {
+  var appScroll = document.querySelector('.app-scroll');
+  if (appScroll) {
+    appScroll.scrollTo(0, 0);
+  } else {
+    window.scrollTo(0, 0);
+  }
+}
+
 function goToDigest(clusterKey) {
   sigFilter = clusterKey || 'all';
   showTab('market', null);
-  window.scrollTo(0, 0);
+  scrollAppToTop();
 }
 
 // 2026-07-28 (по запросу пользователя): «Главные нарративы» на ОБЗОРЕ
@@ -3459,7 +3473,7 @@ function openPool(key) {
     + '<p style="margin-top:10px"><strong>Особенности.</strong> ' + p.notes + '</p></div>'
     + '</div>';
   showTab('pools', null);
-  window.scrollTo(0, 0);
+  scrollAppToTop();
 }
 
 function closePool() {
@@ -3468,7 +3482,7 @@ function closePool() {
   if (wrap) wrap.innerHTML = '';
   if (summary) summary.style.display = '';
   renderPoolSummary();
-  window.scrollTo(0, 0);
+  scrollAppToTop();
 }
 
 function statCell(label, val) {

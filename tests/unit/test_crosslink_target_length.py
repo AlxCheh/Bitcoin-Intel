@@ -47,14 +47,17 @@ def test_css_crosslink_cta_does_not_force_nowrap():
 
 
 def test_theory_essays_crosslink_target_labels_stay_short():
-    """Контентный уровень защиты — для THEORY_ESSAYS.json."""
+    """
+    Контентный уровень защиты — для THEORY_ESSAYS.json. Проверяет
+    crosslinks (массив, единственный формат с 2026-08-02 — старое
+    единственное число item.crosslink убрано полностью).
+    """
     import json
     data = json.loads(THEORY_ESSAYS_JSON.read_text(encoding="utf-8"))
     offenders = []
     for item in data["items"]:
-        cl = item.get("crosslink")
-        if cl and "target_label" in cl:
-            if len(cl["target_label"]) > MAX_TARGET_LABEL_LENGTH:
+        for cl in item.get("crosslinks", []):
+            if len(cl.get("target_label", "")) > MAX_TARGET_LABEL_LENGTH:
                 offenders.append((item["id"], cl["target_label"]))
     assert not offenders, (
         f"target_label длиннее {MAX_TARGET_LABEL_LENGTH} символов (короткий тег "
@@ -63,17 +66,39 @@ def test_theory_essays_crosslink_target_labels_stay_short():
 
 
 def test_theory_topics_crosslink_target_labels_stay_short():
-    """Тот же контентный уровень защиты — для THEORY_TOPICS.json (items внутри топиков тоже могут нести crosslink)."""
+    """
+    Тот же контентный уровень защиты — для THEORY_TOPICS.json. Проверяет
+    crosslinks (массив, единственный формат с 2026-08-02).
+    """
     import json
     data = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))
     offenders = []
     for topic in data["topics"]:
         for item in topic.get("items", []):
-            cl = item.get("crosslink")
-            if cl and "target_label" in cl:
-                if len(cl["target_label"]) > MAX_TARGET_LABEL_LENGTH:
+            for cl in item.get("crosslinks", []):
+                if len(cl.get("target_label", "")) > MAX_TARGET_LABEL_LENGTH:
                     offenders.append((topic["id"], item.get("icon"), cl["target_label"]))
     assert not offenders, f"target_label длиннее {MAX_TARGET_LABEL_LENGTH} символов: {offenders}"
+
+
+def test_no_singular_crosslink_field_remains():
+    """
+    2026-08-02: единый формат — только crosslinks (массив). Регрессия на
+    случайный возврат старого item.crosslink (единственное число) в любом
+    из двух файлов — по запросу пользователя старый формат убран
+    полностью, не должен появиться снова незамеченным.
+    """
+    import json
+    theory_essays = json.loads(THEORY_ESSAYS_JSON.read_text(encoding="utf-8"))
+    theory_topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))
+
+    offenders = [item["id"] for item in theory_essays["items"] if "crosslink" in item]
+    for topic in theory_topics["topics"]:
+        for item in topic.get("items", []):
+            if "crosslink" in item:
+                offenders.append(f"{topic['id']}/{item.get('icon')}")
+
+    assert not offenders, f"Найден старый формат item.crosslink (единственное число): {offenders}"
 
 
 def test_bitcoin_functions_crosslinks_labels_stay_short():

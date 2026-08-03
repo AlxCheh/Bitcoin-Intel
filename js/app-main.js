@@ -677,12 +677,12 @@ function renderAccItem(item) {
     html += '<div class="callout-mono">'
       + sanitize(item.highlight) + '</div>';
   }
-  // 2026-08-02: item.crosslinks (массив) — добавлено рядом с уже
-  // существующим item.crosslink (единственное число, обратная
-  // совместимость не нарушена) — пункту иногда нужна более чем одна
-  // связь (напр. пункт 06 theory-dice-seed уже был связан с
-  // theory-passphrase, понадобилась вторая связь с PSBT). Общая функция
-  // рендера одного crosslink переиспользуется для обоих случаев.
+  // 2026-08-02: единый формат — item.crosslinks (массив). Раньше был
+  // ещё item.crosslink (единственное число) для обратной совместимости,
+  // по запросу пользователя все записи в THEORY_TOPICS.json/
+  // THEORY_ESSAYS.json переведены на массив, старый формат убран
+  // полностью — не остаётся двух параллельных путей поддержки одного
+  // и того же.
   function renderOneCrosslink(cl) {
     const onclickAttr = cl.target_tab
       ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
@@ -691,26 +691,6 @@ function renderAccItem(item) {
       + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
       + '<div class="crosslink-cta">' + sanitize(cl.target_label) + ' →</div>'
       + '</div>';
-  }
-  if (item.crosslink) {
-    const cl = item.crosslink;
-    // target_tab — опционально (добавлено 2026-07-20): межвкладочная
-    // ссылка через уже существующий siteMapGoTo(tab, title) вместо
-    // getElementById+scrollIntoView, который не переключает вкладки.
-    // target_panel в этом случае — точный текст .panel-title цели (как
-    // ищет siteMapGoTo), не id. Без target_tab — прежнее поведение
-    // (та же вкладка), не тронуто — обратная совместимость сохранена.
-    //
-    // 2026-08-01: раньше здесь был прямой инлайн-вызов
-    // document.getElementById(id).scrollIntoView(...) — если элемент по
-    // какой-то причине не найден в момент клика, .scrollIntoView() на
-    // null бросает исключение, которое НИЧЕМ не проявляется внешне (нет
-    // обработчика ошибок на инлайн onclick) — ровно поведение "жму,
-    // ничего не происходит", о котором сообщил пользователь, без единой
-    // строки в консоли для диагностики. Обёрнуто в crosslinkGo() с явной
-    // проверкой и console.warn — тот же результат при успехе, но теперь
-    // видно в консоли, если элемент действительно не найден.
-    html += renderOneCrosslink(cl);
   }
   if (item.crosslinks && item.crosslinks.length) {
     html += item.crosslinks.map(renderOneCrosslink).join('');

@@ -46,53 +46,21 @@ updateInstStickyTop();
 
 // ── Instrument sticky headers: handled via CSS ──
 
-// 2026-08-03: два предыдущих фикса (GPU-слой translateZ(0), затем
-// scroll-throttling updateInstStickyTop()) не решили основную жалобу -
-// .clusterbar (position:fixed;bottom:0) визуально "уезжает под панель
-// мобильного браузера" при скролле вниз. Причина, которую я упустил
-// раньше: position:fixed позиционируется относительно viewport'а
-// (точнее, initial containing block), НЕ относительно body - поэтому
-// правка body{min-height:100dvh} из предыдущего PR физически не могла
-// повлиять на реальную позицию .clusterbar вообще, независимо от того,
-// правильна ли была сама идея про dvh.
-//
-// Настоящая проблема глубже: на части мобильных браузеров с динамически
-// скрывающейся/появляющейся собственной панелью (адресная строка,
-// системная навигация) position:fixed вычисляется относительно LAYOUT
-// viewport (как будто панели браузера всегда убраны), а не VISUAL
-// viewport (то, что реально видно в моменте) - разница между ними и есть
-// та полоса, под которую "уезжает" нижнее меню сайта, когда панель
-// браузера показана.
-//
-// window.visualViewport - API, специально созданный именно для этого
-// класса проблем (тот же механизм обычно используют для панели ввода
-// поверх появляющейся экранной клавиатуры). Разница между
-// window.innerHeight (layout viewport) и visualViewport.height +
-// offsetTop (реально видимая область) - это и есть высота полосы,
-// занятой собственным UI браузера в данный момент. Явно выставляем эту
-// разницу как bottom-отступ .clusterbar, вместо того чтобы полагаться на
-// то, как конкретный браузер сам трактует "bottom:0" для fixed-элементов.
-var clusterbarVVScheduled = false;
-function updateClusterbarBottomOffset() {
-  if (!window.visualViewport) return;
-  var clusterbar = document.querySelector('.clusterbar');
-  if (!clusterbar) return;
-  var offsetBottom = window.innerHeight - (window.visualViewport.height + window.visualViewport.offsetTop);
-  clusterbar.style.bottom = Math.max(0, Math.round(offsetBottom)) + 'px';
-}
-function scheduleClusterbarUpdate() {
-  if (clusterbarVVScheduled) return;
-  clusterbarVVScheduled = true;
-  requestAnimationFrame(function() {
-    clusterbarVVScheduled = false;
-    updateClusterbarBottomOffset();
-  });
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', scheduleClusterbarUpdate, { passive: true });
-  window.visualViewport.addEventListener('scroll', scheduleClusterbarUpdate, { passive: true });
-  updateClusterbarBottomOffset();
-}
+// 2026-08-03: JS-оверрайд через visualViewport (updateClusterbarBottomOffset())
+// был добавлен как фикс "меню уезжает под панель браузера", но пользователь
+// сообщил, что дёрганье и серая полоска-артефакт ПРОДОЛЖИЛИСЬ после этого
+// фикса, и явно указал: "раньше всё было идеально" - то есть простой CSS
+// (position:fixed;bottom:0) без какого-либо JS-вмешательства работал
+// корректно САМ ПО СЕБЕ. Наиболее вероятное объяснение: современные
+// мобильные браузеры уже корректно позиционируют position:fixed
+// относительно РЕАЛЬНО видимой области нативно, без необходимости в
+// ручном JS-пересчёте - а мой JS-оверрайд (принудительная запись
+// style.bottom на каждый resize/scroll visualViewport) активно
+// конфликтовал с этим уже правильным нативным поведением браузера,
+// создавая рассинхронизацию (два независимых механизма одновременно
+// пытаются управлять одним и тем же bottom) - отсюда и "дёрганье", и
+// серая полоска. Убран полностью - .clusterbar снова управляется только
+// CSS (position:fixed;bottom:0), без активного JS поверх него.
 
 function toggleInstrument(id) {
   var body = document.getElementById(id + '-body');

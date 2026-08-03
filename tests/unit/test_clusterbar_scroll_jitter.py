@@ -50,3 +50,20 @@ def test_clusterbar_has_gpu_layer_promotion():
         "рискует мелькать/дёргаться при активном скролле на мобильных "
         "WebKit/Blink браузерах (см. находку 2026-08-03)"
     )
+
+
+def test_clusterbar_has_smooth_bottom_transition():
+    """
+    2026-08-03 (второй раунд): после фикса через visualViewport JS-обновление
+    bottom происходит покадрово во время анимации показа/скрытия панели
+    браузера, создавая резкие скачки ("дёргается" + серая полоска-артефакт,
+    по описанию пользователя). transition сглаживает эти обновления в
+    плавную анимацию.
+    """
+    rule_body = _clusterbar_rule_body()
+    normalized = re.sub(r"\s+", "", rule_body)
+    assert "transition:bottom" in normalized, (
+        "transition на bottom отсутствует в .clusterbar - JS-обновления позиции "
+        "(updateClusterbarBottomOffset()) будут скакать резко, а не плавно, "
+        "во время анимации показа/скрытия панели браузера (см. находку 2026-08-03, раунд 2)"
+    )

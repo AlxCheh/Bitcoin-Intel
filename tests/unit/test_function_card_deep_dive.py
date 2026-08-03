@@ -95,13 +95,35 @@ console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
         op_return = next((f for f in functions if f["id"] == "op-return-blockchain-notary"), None)
         assert op_return is not None, "op-return-blockchain-notary не найден в BITCOIN_FUNCTIONS.json"
 
+        # 2026-08-02: renderFunctionCard() теперь читает глобальный SIGNALS
+        # для рендера signal_refs как кликабельных .crosslink (найдено
+        # пользователем - "не вижу рабочих связей", signal_refs раньше
+        # были только данными без реального перехода). Без объявления
+        # SIGNALS здесь - ReferenceError, не тихий сбой (SIGNALS - не
+        # объявленная переменная, `SIGNALS || []` в этом случае не спасает).
+        signals_data = json.loads((REPO_ROOT / "signals.json").read_text(encoding="utf-8"))["signals"]
+
         js = render_source + f"""
+const SIGNALS = {json.dumps(signals_data)};
 const fn = {json.dumps(op_return)};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
+            tmp.write(js)
+            tmp_path = tmp.name
+        try:
+            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
+        finally:
+            os.unlink(tmp_path)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert 'class="code"' in html
         assert "callout-mono" in html
         assert "Элиз" not in html, "Отсылка на неподтверждённую историю не должна попасть в контент"
+        # signal_refs должны рендериться как реально кликабельные .crosslink,
+        # не просто упоминание id текстом внутри deep_dive
+        assert "pendingScrollSignal='NAR-2026-0711-001'" in html
+        assert "pendingScrollSignal='NAR-2026-0717-003'" in html
+        assert "showTab('market',null)" in html

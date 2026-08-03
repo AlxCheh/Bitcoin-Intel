@@ -889,6 +889,25 @@ function renderFunctionCard(fn) {
         + '</div>';
     }).join('');
   }
+  // 2026-08-02: signal_refs — раньше только данные (для теста
+  // референциальной целостности) + голое упоминание id текстом внутри
+  // deep_dive, БЕЗ реального перехода — найдено пользователем ("не вижу
+  // рабочих связей"). Переиспользует уже существующий pendingScrollSignal
+  // + showTab('market') паттерн (см. renderSignalRefList() выше в файле,
+  // тот же приём для confirms/contradicts внутри карточки нарратива) —
+  // не новая логика поиска сигнала, только новая обёртка в тот же визуал
+  // .crosslink, что и остальные связи функции. Текст бейджа — короткий
+  // текст сигнала из уже загруженного SIGNALS, не голый id.
+  if (fn.signal_refs && fn.signal_refs.length) {
+    html += fn.signal_refs.map(function(sid) {
+      const sig = (SIGNALS || []).find(function(s) { return s.id === sid; });
+      const label = sig ? sanitize(sig.signal).slice(0, 60) + (sig.signal.length > 60 ? '…' : '') : sid;
+      return '<div class="crosslink" onclick="pendingScrollSignal=\'' + sanitize(sid) + '\';showTab(\'market\',null)">'
+        + '<div class="crosslink-text-col">' + label + '</div>'
+        + '<div class="crosslink-cta">' + sanitize(sid) + ' →</div>'
+        + '</div>';
+    }).join('');
+  }
   if (fn.tools && fn.tools.length) {
     html += '<div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.05em">КАК ИСПОЛЬЗОВАТЬ</div>';
     html += fn.tools.map(renderToolBlock).join('');

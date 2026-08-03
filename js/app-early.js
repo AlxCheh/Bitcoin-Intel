@@ -19,7 +19,29 @@ function updateInstStickyTop() {
   }
   document.documentElement.style.setProperty('--inst-sticky-top', Math.round(top) + 'px');
 }
-window.addEventListener('scroll', updateInstStickyTop, { passive: true });
+// 2026-08-03: найдено пользователем - нижняя панель (.clusterbar,
+// position:fixed) визуально мелькала/дёргалась во время активного
+// скролла. Два CSS-фикса (GPU-слой, dvh) не помогли - пользователь
+// проверил на других сайтах в том же браузере, там нормально, значит
+// причина не в браузере, а в JS конкретно этого сайта.
+// updateInstStickyTop() висела на 'scroll' БЕЗ троттлинга - три вызова
+// getBoundingClientRect() (каждый форсирует синхронный layout) плюс
+// запись CSS-переменной на <html>, используемой для position:sticky
+// таблицы - и всё это на КАЖДОЕ сырое событие scroll, которых при
+// быстрой прокрутке может быть кратно больше, чем кадров экрана.
+// Классический паттерн scroll-jank. Оборачиваем в requestAnimationFrame -
+// стандартный приём, схлопывающий любое число событий между кадрами
+// в один вызов работы за кадр, не за событие.
+var instStickyTopScheduled = false;
+function scheduleInstStickyTopUpdate() {
+  if (instStickyTopScheduled) return;
+  instStickyTopScheduled = true;
+  requestAnimationFrame(function() {
+    instStickyTopScheduled = false;
+    updateInstStickyTop();
+  });
+}
+window.addEventListener('scroll', scheduleInstStickyTopUpdate, { passive: true });
 updateInstStickyTop();
 
 // ── Instrument sticky headers: handled via CSS ──

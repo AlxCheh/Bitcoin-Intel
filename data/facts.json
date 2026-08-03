@@ -58,10 +58,10 @@
       "signal_id": "STR-2026-0727-001"
     },
     "strive.btc_holdings": {
-      "value": 19921,
+      "value": 20000,
       "unit": "BTC",
-      "as_of": "2026-07-20",
-      "signal_id": "STR-2026-0725-002"
+      "as_of": "2026-07-24",
+      "signal_id": "STR-2026-0727-002"
     },
     "top100_public_companies.btc_holdings": {
       "value": 1264867,

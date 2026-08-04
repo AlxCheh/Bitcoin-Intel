@@ -33,21 +33,51 @@ APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 
 
 def _css_rule_body(selector: str) -> str:
+    """
+    Возвращает тело CSS-правила БЕЗ комментариев - объясняющие комментарии
+    в этом файле нередко упоминают убранные/отклонённые значения по имени
+    как часть истории находки (напр. "убран min-height:100dvh, теперь
+    100svh") - без вырезания комментариев проверки "X не должен
+    встречаться" ложно срабатывают на собственном же объясняющем тексте.
+    """
     html = INDEX_HTML.read_text(encoding="utf-8")
     pattern = re.escape(selector) + r"\s*\{([^}]*)\}"
     m = re.search(pattern, html)
     assert m, f"{selector} CSS-правило не найдено"
-    return m.group(1)
+    return re.sub(r"/\*.*?\*/", "", m.group(1), flags=re.DOTALL)
 
 
 class TestAppShellCSS:
 
-    def test_app_shell_is_flex_column_with_dvh(self):
+    def test_app_shell_is_flex_column_with_svh(self):
+        """
+        2026-08-03 (второй раунд структурного фикса): переключено с dvh на
+        svh - dvh не пересчитывался плавно синхронно с анимацией панели
+        браузера на части устройств (широко задокументированная проблема,
+        не специфичная для этого проекта - см. комментарий в CSS), меню
+        периодически "залипало" до явного взаимодействия. svh - статичное
+        значение (худший случай, панель браузера всегда считается
+        показанной) - не пытается динамически догонять анимацию, поэтому
+        нечему рассинхронизироваться.
+        """
         rule = _css_rule_body(".app-shell")
         normalized = re.sub(r"\s+", "", rule)
         assert "display:flex" in normalized
         assert "flex-direction:column" in normalized
-        assert "height:100dvh" in normalized
+        assert "height:100svh" in normalized
+
+    def test_app_shell_does_not_use_dvh(self):
+        """
+        Регрессия - dvh не должен вернуться без явного, осознанного
+        решения (см. находку про залипание/рассинхронизацию выше).
+        """
+        rule = _css_rule_body(".app-shell")
+        normalized = re.sub(r"\s+", "", rule)
+        assert "100dvh" not in normalized, (
+            "100dvh вернулась в .app-shell - если это осознанное решение "
+            "попробовать снова (напр. после исправления браузерами известного "
+            "бага пересчёта), обнови этот тест явно вместе с изменением"
+        )
 
     def test_app_shell_uses_height_not_min_height_for_dvh(self):
         """
@@ -65,8 +95,8 @@ class TestAppShellCSS:
         """
         rule = _css_rule_body(".app-shell")
         normalized = re.sub(r"\s+", "", rule)
-        assert "min-height:100dvh" not in normalized, (
-            "min-height:100dvh вернулась в .app-shell вместо height:100dvh - "
+        assert "min-height:100dvh" not in normalized and "min-height:100svh" not in normalized, (
+            "min-height вместо height вернулась в .app-shell - "
             "контейнер снова сможет расти выше видимой области под давлением "
             "контента .app-scroll, .clusterbar снова окажется ниже экрана "
             "(см. находку 2026-08-03, подтверждено реальным Playwright-рендером)"

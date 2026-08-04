@@ -20,7 +20,10 @@ position:fixed и не position:sticky). Синхронизация с реал�
 тот же рендер-пайплайн, что и анимация панели браузера), без JS
 посередине вообще.
 """
+import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 from html.parser import HTMLParser
 
@@ -352,3 +355,81 @@ class TestAppShellRealRender:
             f"меню невидимо без скролла всей страницы"
         )
         assert bar_rect["top"] >= 0
+
+
+# ─── Одноразовая коррекция начальной высоты (2026-08-03, продолжение) ───
+class TestInitialHeightCorrection:
+    """
+    Пользователь описал точный, воспроизводимый симптом: меню
+    "полускрыто" именно на СВЕЖЕЙ загрузке страницы, до первого реального
+    скролл-взаимодействия - доскроллить .app-scroll один раз "вытягивает"
+    меню в полный размер, дальше стабильно до следующей перезагрузки.
+    Не про постоянное отставание JS от анимации (структурно решено ранее)
+    - про то, что браузер, судя по всему, не сразу фиксирует точное
+    значение svh при первом рендере, только после первого реального
+    скролл-жеста. Решение - ОДНОРАЗОВАЯ (once:true) коррекция на первое
+    scroll-событие внутри .app-scroll, не покадровая/непрерывная слежка.
+    """
+
+    def test_correction_function_exists_and_sets_app_shell_height(self):
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        assert "function correctInitialAppShellHeight()" in src
+        assert "appShell.style.height = window.innerHeight + 'px'" in src
+
+    def test_listener_uses_once_true_not_continuous_tracking(self):
+        """
+        Регрессия на класс ошибки четырёх предыдущих провалившихся
+        попыток - НЕ должно быть непрерывного отслеживания (once:true
+        обязателен, иначе это снова "покадровая погоня").
+        """
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        m = re.search(
+            r"addEventListener\('scroll',\s*correctInitialAppShellHeight,\s*\{([^}]*)\}\)",
+            src
+        )
+        assert m, "Регистрация слушателя correctInitialAppShellHeight не найдена"
+        options = m.group(1)
+        assert "once:true" in re.sub(r"\s+", "", options), (
+            "once:true отсутствует - без него это снова непрерывное отслеживание "
+            "каждого scroll-события, тот же класс проблемы, что уже провалился "
+            "четыре раза (см. историю 2026-08-03)"
+        )
+
+    def test_listener_attached_to_app_scroll_not_window(self):
+        """
+        Слушатель должен быть на .app-scroll (реальный скроллящийся
+        элемент после структурного фикса), не на window - иначе может
+        вообще не сработать.
+        """
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        assert "scrollElForInitFix = document.querySelector('.app-scroll')" in src
+        assert "scrollElForInitFix.addEventListener('scroll', correctInitialAppShellHeight" in src
+
+    @pytest.mark.skipif(not shutil.which("node"), reason="Node.js не найден в PATH")
+    def test_correction_logic_sets_correct_pixel_height(self):
+        """Проверка самой логики через минимальный DOM-мок - не полагаемся только на текстовые grep-проверки."""
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        start = src.index("function correctInitialAppShellHeight()")
+        brace_open = src.index("{", start)
+        depth, i = 0, brace_open
+        while i < len(src):
+            if src[i] == "{":
+                depth += 1
+            elif src[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        fn_source = src[start:i + 1]
+
+        js = f"""
+const appShellEl = {{ style: {{ height: '' }} }};
+const document = {{ querySelector: (sel) => sel === '.app-shell' ? appShellEl : null }};
+window = {{ innerHeight: 812 }};
+{fn_source}
+correctInitialAppShellHeight();
+console.log(JSON.stringify({{ height: appShellEl.style.height }}));
+"""
+        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        assert json.loads(result.stdout)["height"] == "812px"

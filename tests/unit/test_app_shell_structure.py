@@ -362,19 +362,39 @@ class TestInitialHeightCorrection:
     """
     Пользователь описал точный, воспроизводимый симптом: меню
     "полускрыто" именно на СВЕЖЕЙ загрузке страницы, до первого реального
-    скролл-взаимодействия - доскроллить .app-scroll один раз "вытягивает"
-    меню в полный размер, дальше стабильно до следующей перезагрузки.
-    Не про постоянное отставание JS от анимации (структурно решено ранее)
-    - про то, что браузер, судя по всему, не сразу фиксирует точное
-    значение svh при первом рендере, только после первого реального
-    скролл-жеста. Решение - ОДНОРАЗОВАЯ (once:true) коррекция на первое
-    scroll-событие внутри .app-scroll, не покадровая/непрерывная слежка.
+    скролл-взаимодействия. Первая версия фикса (once:true на первый
+    scroll) сняла необходимость доскролливать именно до конца - хватало
+    любого свайпа - но не решила саму суть жалобы: между загрузкой и
+    первым взаимодействием пользователь всё равно видел сломанное
+    состояние. Финальная версия - тройная защита: немедленный
+    синхронный вызов + двойной requestAnimationFrame + прежний
+    once-слушатель как последняя страховка - корректирует высоту ДО
+    первой видимой отрисовки, без участия пользователя вообще.
     """
 
     def test_correction_function_exists_and_sets_app_shell_height(self):
         src = APP_EARLY_JS.read_text(encoding="utf-8")
         assert "function correctInitialAppShellHeight()" in src
         assert "appShell.style.height = window.innerHeight + 'px'" in src
+
+    def test_correction_called_immediately_not_only_on_interaction(self):
+        """
+        Регрессия на находку "фикс снимает симптом, но не саму жалобу" -
+        функция обязана вызываться СРАЗУ (синхронно), не только через
+        слушатель события, ожидающий действия пользователя.
+        """
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        assert re.search(r"^correctInitialAppShellHeight\(\);\s*$", src, re.MULTILINE), (
+            "Немедленный синхронный вызов correctInitialAppShellHeight() отсутствует - "
+            "без него коррекция сработает только по взаимодействию пользователя, "
+            "оставляя видимое сломанное состояние на загрузке (см. находку 2026-08-03)"
+        )
+
+    def test_double_raf_present(self):
+        """Двойной requestAnimationFrame - страховка на случай, если немедленный синхронный вызов застаёт неустоявшееся значение."""
+        src = APP_EARLY_JS.read_text(encoding="utf-8")
+        normalized = re.sub(r"\s+", "", src)
+        assert "requestAnimationFrame(function(){requestAnimationFrame(correctInitialAppShellHeight);})" in normalized
 
     def test_listener_uses_once_true_not_continuous_tracking(self):
         """

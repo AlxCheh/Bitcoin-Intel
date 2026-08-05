@@ -659,7 +659,10 @@
         "INF-2026-0623-002",
         "NAR-2026-0717-003"
       ],
-      "last_updated": "2026-07-17"
+      "last_updated": "2026-08-03",
+      "function_refs": [
+        "op-return-blockchain-notary"
+      ]
     },
     {
       "id": "rgb_protocol",
@@ -1020,7 +1023,10 @@
       "signal_refs": [
         "INF-2026-0716-001"
       ],
-      "last_updated": "2026-07-16"
+      "last_updated": "2026-08-03",
+      "theory_refs": [
+        "lightning-routing"
+      ]
     },
     {
       "id": "turnkey",
@@ -1111,7 +1117,10 @@
       "signal_refs": [
         "NAR-2026-0717-002"
       ],
-      "last_updated": "2026-07-17"
+      "last_updated": "2026-08-03",
+      "theory_refs": [
+        "theory-governance"
+      ]
     },
     {
       "id": "dog_mode",
@@ -1134,7 +1143,10 @@
       "signal_refs": [
         "NAR-2026-0717-003"
       ],
-      "last_updated": "2026-07-17"
+      "last_updated": "2026-08-03",
+      "theory_refs": [
+        "theory-governance"
+      ]
     },
     {
       "id": "satsuma",
@@ -1706,7 +1718,10 @@
       "signal_refs": [
         "STR-2026-0731-001"
       ],
-      "last_updated": "2026-07-31"
+      "last_updated": "2026-08-03",
+      "function_refs": [
+        "multisig-2of3"
+      ]
     },
     {
       "id": "poolin",

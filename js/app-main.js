@@ -684,12 +684,22 @@ function renderAccItem(item) {
   // полностью — не остаётся двух параллельных путей поддержки одного
   // и того же.
   function renderOneCrosslink(cl) {
-    const onclickAttr = cl.target_tab
-      ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
-      : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
+    // 2026-08-03: добавлен третий вариант onclick - type:'entity' (тот
+    // же паттерн, что уже используется в renderFunctionCard() для
+    // BITCOIN_FUNCTIONS.crosslinks) - раньше пункты теории могли
+    // ссылаться только на другие панели (same-tab/cross-tab), не на
+    // сущности напрямую. Найдено при систематическом аудите связей
+    // ENTITIES↔THEORY - несколько честных кандидатов (dog_mode, foundry
+    // → theory-governance) требуют именно entity-типа crosslink.
+    const onclickAttr = cl.type === 'entity'
+      ? 'showEntityPopup(\'' + sanitize(cl.entity_id) + '\')'
+      : cl.target_tab
+        ? 'siteMapGoTo(\'' + sanitize(cl.target_tab) + '\',\'' + sanitize(cl.target_panel) + '\')'
+        : 'crosslinkGo(\'' + sanitize(cl.target_panel) + '\')';
+    const label = cl.type === 'entity' ? cl.label : cl.target_label;
     return '<div class="crosslink" onclick="' + onclickAttr + '">'
       + '<div class="crosslink-text-col">' + sanitize(cl.text) + '</div>'
-      + '<div class="crosslink-cta">' + sanitize(cl.target_label) + ' →</div>'
+      + '<div class="crosslink-cta">' + sanitize(label) + ' →</div>'
       + '</div>';
   }
   if (item.crosslinks && item.crosslinks.length) {
@@ -1248,6 +1258,27 @@ function showEntityPopup(id) {
           const label = fn ? fn.name : fid;
           return '<div class="ep-fn-badge" onclick="goToPanelFromPopup(\'tech\',\'' + sanitize(label) + '\')">'
             + '<span class="ep-fn-badge-label">ФУНКЦИЯ</span>'
+            + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
+            + '</div>';
+        }).join('')
+      + '</div>'
+    : '';
+
+  // 2026-08-03: theory_refs — то же самое для THEORY_TOPICS.json, что
+  // function_refs уже делает для BITCOIN_FUNCTIONS.json (см. блок выше).
+  // Найдено при систематическом аудите связей - поле theory_refs
+  // существовало в данных (coinkite) с 2026-08-02, но НИ РАЗУ не имело
+  // визуального представления в попапе - только данные, без навигации.
+  // Ищем panel_title топика по id в уже загруженном THEORY_TOPICS.
+  const theoryRefs = e.theory_refs || [];
+  document.getElementById('ep-theory-refs').innerHTML = theoryRefs.length
+    ? '<div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em">СВЯЗАННЫЕ ПАНЕЛИ ТЕОРИИ</div>'
+      + '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px">'
+      + theoryRefs.map(function(tid) {
+          const topic = (THEORY_TOPICS || []).find(function(x) { return x.id === tid; });
+          const label = topic ? topic.panel_title : tid;
+          return '<div class="ep-fn-badge" onclick="goToPanelFromPopup(\'theory\',\'' + sanitize(label) + '\')">'
+            + '<span class="ep-fn-badge-label">ТЕОРИЯ</span>'
             + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
             + '</div>';
         }).join('')

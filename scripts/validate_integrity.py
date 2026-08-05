@@ -142,6 +142,29 @@ def validate() -> bool:
                 )
             if not orphan_entity_ids and not name_mismatches:
                 print(f"✓ REVENUE_ENGINES.json ↔ ENTITIES.json: {len(engines)} движков, все entity_id/entity_name согласованы")
+
+            # 2026-08-03: signal_refs внутри REVENUE_ENGINES.json никогда не
+            # проверялись на referential integrity - тот же класс риска, что
+            # уже закрыт для ENTITIES.json/MINING_COMPANIES.json выше, найден
+            # при аудите LLM Wiki Пары 1 (сессия 2026-08-03) как побочная
+            # находка при добавлении реальных, ранее пропущенных signal_refs.
+            engine_signal_refs = []
+            for eng in engines:
+                for ref in eng.get("signal_refs", []) or []:
+                    engine_signal_refs.append((eng.get("id", "?"), ref))
+            if signal_ids and engine_signal_refs:
+                orphan_signal_refs = [
+                    (eid, ref) for eid, ref in engine_signal_refs
+                    if ref not in signal_ids
+                ]
+                if orphan_signal_refs:
+                    errors.append(
+                        "REVENUE_ENGINES.json: orphan signal_refs (ссылка на "
+                        "несуществующий signal id): "
+                        + ", ".join(f"{e}→{r}" for e, r in orphan_signal_refs)
+                    )
+                else:
+                    print(f"✓ REVENUE_ENGINES.json.signal_refs: {len(engine_signal_refs)} ссылок, все валидны")
         except Exception as e:
             errors.append(f"REVENUE_ENGINES.json: {e}")
 

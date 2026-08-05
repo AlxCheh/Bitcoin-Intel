@@ -105,6 +105,7 @@ class TestEntityPopupFunctionRefs:
 {popup_source}
 const ENTITIES = [{json.dumps(entity)}];
 const BITCOIN_FUNCTIONS = {json.dumps(functions)};
+const THEORY_TOPICS = [];
 const TYPE_META = {{}};
 
 function makeEl() {{
@@ -117,7 +118,7 @@ function makeEl() {{
   }};
 }}
 const registry = {{}};
-['ep-name','ep-type','ep-summary','ep-metrics','ep-notable','ep-refs','ep-function-refs','entity-popup','ep-overlay'].forEach(id => registry[id] = makeEl());
+['ep-name','ep-type','ep-summary','ep-metrics','ep-notable','ep-refs','ep-function-refs','ep-theory-refs','entity-popup','ep-overlay'].forEach(id => registry[id] = makeEl());
 const document = {{ getElementById: id => registry[id] }};
 
 showEntityPopup('{entity["id"]}');

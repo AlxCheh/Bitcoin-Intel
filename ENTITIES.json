@@ -884,7 +884,10 @@
       "signal_refs": [
         "INF-2026-0709-001"
       ],
-      "last_updated": "2026-07-09"
+      "last_updated": "2026-08-03",
+      "function_refs": [
+        "multisig-2of3"
+      ]
     },
     {
       "id": "cryl",

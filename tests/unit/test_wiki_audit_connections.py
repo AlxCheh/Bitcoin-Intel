@@ -200,12 +200,21 @@ def test_all_five_audit_connections_referentially_intact():
 
 def test_coinkite_multisig_link_not_disturbed_by_audit():
     """
-    Регрессия - добавление Tangem к multisig-2of3.crosslinks не должно
-    было затронуть уже существующую связь с Coinkite (найдена и
-    реализована в более ранней сессии).
+    Регрессия - добавление Tangem, затем BitGo к multisig-2of3.crosslinks
+    не должно было затронуть уже существующие связи (Coinkite - более
+    ранняя сессия, Tangem - первый проход аудита 2026-08-03, BitGo -
+    второй проход, расширивший скан за пределы типа l2/protocol/
+    infrastructure).
     """
     functions = json.loads((REPO_ROOT / "BITCOIN_FUNCTIONS.json").read_text(encoding="utf-8"))["functions"]
     multisig = next(f for f in functions if f["id"] == "multisig-2of3")
     entity_ids = {cl.get("entity_id") for cl in multisig.get("crosslinks", []) if cl.get("type") == "entity"}
     assert "coinkite" in entity_ids
     assert "tangem" in entity_ids
+    assert "bitgo" in entity_ids
+
+
+def test_bitgo_second_pass_connection_referentially_intact():
+    """BitGo <-> Multisig 2-of-3 (второй проход аудита, type=exchange - за пределами исходного фильтра l2/protocol/infrastructure)."""
+    entities = {e["id"]: e for e in json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]}
+    assert "multisig-2of3" in entities["bitgo"]["function_refs"]

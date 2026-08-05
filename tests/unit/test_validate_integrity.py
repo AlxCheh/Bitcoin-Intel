@@ -43,8 +43,8 @@ def _entity(id_: str, signal_refs: list[str]) -> dict:
     return {"id": id_, "name": id_, "type": "l2", "signal_refs": signal_refs}
 
 
-def _engine(id_: str, entity_id: str, entity_name: str) -> dict:
-    return {"id": id_, "entity_id": entity_id, "entity_name": entity_name}
+def _engine(id_: str, entity_id: str, entity_name: str, signal_refs: list[str] | None = None) -> dict:
+    return {"id": id_, "entity_id": entity_id, "entity_name": entity_name, "signal_refs": signal_refs or []}
 
 
 def _write_revenue_engines(engines: list[dict]) -> None:
@@ -193,9 +193,46 @@ class TestRevenueEnginesEntityIntegrity:
         # REVENUE_ENGINES.json намеренно не создаём
 
         ok = validate()
+
+
+class TestRevenueEnginesSignalRefsIntegrity:
+    """
+    2026-08-03: signal_refs внутри REVENUE_ENGINES.json никогда не
+    проверялись на referential integrity - тот же класс риска, что уже
+    закрыт для ENTITIES.json.signal_refs (см. класс выше), найден при
+    аудите LLM Wiki Пары 1 как побочная находка при добавлении реальных,
+    ранее пропущенных signal_refs (strategy_strc, canaan_mining_production).
+    """
+
+    def test_valid_engine_signal_refs_pass(self, capsys):
+        _write_signals([_signal("SIG-1")])
+        _write_entities([_entity("e1", [])])
+        _write_revenue_engines([_engine("eng1", "e1", "e1", signal_refs=["SIG-1"])])
+
+        ok = validate()
         captured = capsys.readouterr()
         assert ok
-        assert "REVENUE_ENGINES.json" not in captured.out
+        assert "REVENUE_ENGINES.json.signal_refs" in captured.out
+        assert "все валидны" in captured.out
+
+    def test_orphan_engine_signal_ref_fails_validation(self, capsys):
+        _write_signals([_signal("SIG-1")])
+        _write_entities([_entity("e1", [])])
+        _write_revenue_engines([_engine("eng1", "e1", "e1", signal_refs=["SIG-1", "GHOST-9999"])])
+
+        ok = validate()
+        captured = capsys.readouterr()
+        assert not ok
+        assert "orphan signal_refs" in captured.out
+        assert "eng1→GHOST-9999" in captured.out
+
+    def test_engine_with_no_signal_refs_does_not_break_check(self, capsys):
+        _write_signals([_signal("SIG-1")])
+        _write_entities([_entity("e1", [])])
+        _write_revenue_engines([_engine("eng1", "e1", "e1")])  # signal_refs пустой по умолчанию
+
+        ok = validate()
+        assert ok
 
 
 def _miner(id_: str, entity_id: str, name: str, signal_refs: list[str] | None = None) -> dict:

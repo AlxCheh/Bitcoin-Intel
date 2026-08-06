@@ -12,42 +12,26 @@ renderFunctionCard() (BITCOIN_FUNCTIONS.json), добавлено 2026-08-02.
 """
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
 def render_source() -> str:
     src = APP_MAIN_JS.read_text(encoding="utf-8")
     return "\n\n".join([
-        _extract_function(src, "sanitize"),
-        _extract_function(src, "sanitizeStrong"),
-        _extract_function(src, "renderToolBlock"),
-        _extract_function(src, "renderFunctionCard"),
+        extract_js_function(src, "sanitize"),
+        extract_js_function(src, "sanitizeStrong"),
+        extract_js_function(src, "renderToolBlock"),
+        extract_js_function(src, "renderFunctionCard"),
     ])
 
 
@@ -61,7 +45,7 @@ class TestFunctionCardDeepDive:
 const fn = {json.dumps({"id": "x", "icon": "⚙", "name": "Тест", "hook": "H", "story": ["S"], "explanation": "E"})};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert "Тест" in html and "🔬" not in html
@@ -78,7 +62,7 @@ console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 const fn = {json.dumps(fn)};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
 
@@ -108,15 +92,7 @@ const SIGNALS = {json.dumps(signals_data)};
 const fn = {json.dumps(op_return)};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        import tempfile
-        import os
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
-            tmp.write(js)
-            tmp_path = tmp.name
-        try:
-            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
-        finally:
-            os.unlink(tmp_path)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert 'class="code"' in html

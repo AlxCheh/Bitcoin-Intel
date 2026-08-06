@@ -17,32 +17,16 @@ Bitcoin Intel — систематический аудит связей Пар 
 import json
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
@@ -55,11 +39,11 @@ class TestTheoryItemEntityCrosslink:
 
     def test_render_acc_item_supports_entity_type_crosslink(self, app_src):
         render_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "sanitizeStrong"),
-            _extract_function(app_src, "renderToolBlock"),
-            _extract_function(app_src, "renderAccItem"),
-            _extract_function(app_src, "sourceFooterHtml"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "sanitizeStrong"),
+            extract_js_function(app_src, "renderToolBlock"),
+            extract_js_function(app_src, "renderAccItem"),
+            extract_js_function(app_src, "sourceFooterHtml"),
         ])
         item = {
             "icon": "01", "label": "Тест",
@@ -69,7 +53,7 @@ class TestTheoryItemEntityCrosslink:
 const item = {json.dumps(item)};
 console.log(JSON.stringify({{ html: renderAccItem(item) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert "showEntityPopup('test_entity')" in html
@@ -77,11 +61,11 @@ console.log(JSON.stringify({{ html: renderAccItem(item) }}));
     def test_theory_crosslink_still_uses_site_map_go_to(self, app_src):
         """Обратная совместимость - существующий type:'theory'/без type не сломан новым веткой type:'entity'."""
         render_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "sanitizeStrong"),
-            _extract_function(app_src, "renderToolBlock"),
-            _extract_function(app_src, "renderAccItem"),
-            _extract_function(app_src, "sourceFooterHtml"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "sanitizeStrong"),
+            extract_js_function(app_src, "renderToolBlock"),
+            extract_js_function(app_src, "renderAccItem"),
+            extract_js_function(app_src, "sourceFooterHtml"),
         ])
         item = {
             "icon": "01", "label": "Тест",
@@ -91,7 +75,7 @@ console.log(JSON.stringify({{ html: renderAccItem(item) }}));
 const item = {json.dumps(item)};
 console.log(JSON.stringify({{ html: renderAccItem(item) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert "siteMapGoTo('tech','Панель Х')" in html
@@ -102,8 +86,8 @@ class TestEntityPopupTheoryRefs:
 
     def _run_popup(self, app_src: str, entity: dict, topics: list) -> str:
         popup_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "showEntityPopup"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "showEntityPopup"),
         ])
         js = f"""
 {popup_source}
@@ -128,18 +112,7 @@ const document = {{ getElementById: id => registry[id] }};
 showEntityPopup('{entity["id"]}');
 console.log(JSON.stringify({{ html: registry['ep-theory-refs'].innerHTML }}));
 """
-        # 2026-08-03: THEORY_TOPICS.json продолжает расти (новая панель
-        # theory-quantum) - тот же ARG_MAX-риск, что уже чинился раньше
-        # сегодня в других тестах. Временный файл вместо инлайн-аргумента.
-        import tempfile
-        import os
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
-            tmp.write(js)
-            tmp_path = tmp.name
-        try:
-            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
-        finally:
-            os.unlink(tmp_path)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         return json.loads(result.stdout)["html"]
 

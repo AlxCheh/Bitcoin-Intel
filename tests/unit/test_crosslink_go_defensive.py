@@ -18,40 +18,24 @@ Bitcoin Intel — тест на crosslinkGo()/uncollapseAndScrollTo() (2026-08-0
 """
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
 def helpers_source() -> str:
     src = APP_MAIN_JS.read_text(encoding="utf-8")
     return "\n\n".join([
-        _extract_function(src, "crosslinkGo"),
-        _extract_function(src, "uncollapseAndScrollTo"),
+        extract_js_function(src, "crosslinkGo"),
+        extract_js_function(src, "uncollapseAndScrollTo"),
     ])
 
 
@@ -67,7 +51,7 @@ let threw = false;
 try { crosslinkGo('does-not-exist'); } catch (e) { threw = true; }
 console.log(JSON.stringify({ threw: threw, warned: warned !== null }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         out = json.loads(result.stdout)
@@ -83,7 +67,7 @@ const document = { getElementById: function() {
 crosslinkGo('exists');
 console.log(JSON.stringify({ scrolled: scrolled }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         assert json.loads(result.stdout)["scrolled"] is True
@@ -97,7 +81,7 @@ let threw = false;
 try { uncollapseAndScrollTo('does-not-exist'); } catch (e) { threw = true; }
 console.log(JSON.stringify({ threw: threw, warned: warned !== null }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         out = json.loads(result.stdout)
@@ -116,7 +100,7 @@ const document = { getElementById: function() {
 uncollapseAndScrollTo('exists');
 console.log(JSON.stringify({ removedClass: removedClass, scrolled: scrolled }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         out = json.loads(result.stdout)

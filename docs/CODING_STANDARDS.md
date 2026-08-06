@@ -87,6 +87,24 @@ if not is_valid_transition(current, target):
 Не использовать `hash()` для выбора между вариантами без фиксированного seed — это нарушение
 архитектурного контракта (см. историю Blocker IRB-B1 в [`ARR_STATUS_REPORT.md`](../archive/ARR_STATUS_REPORT.md)).
 
+## Windows-окружение
+
+`PYTHONUTF8=1` обязателен при запуске любого скрипта из `scripts/` (и тестов, которые их
+транзитивно импортируют) в PowerShell/cmd на Windows. Без него консоль по умолчанию открывается
+в codepage (напр. cp1251), и `print()` юникод-символов (`✓`, эмодзи в выводе `check_new_tension.py`
+и т.п.) падает с `UnicodeEncodeError`. Обнаружено 2026-08-06 при первом прогоне
+`scripts/check_new_tension.py` на Windows-машине без WSL.
+
+```
+set PYTHONUTF8=1 && python scripts/check_new_tension.py "..."      REM cmd, разово
+$env:PYTHONUTF8=1; python scripts/check_new_tension.py "..."       # PowerShell, разово
+setx PYTHONUTF8 1                                                   # постоянно для пользователя (новые сессии)
+```
+
+Отдельная, уже решённая на уровне кода проблема — `infrastructure/file_lock.py` жёстко
+импортировал Unix-only `fcntl`; с 2026-08-06 есть `msvcrt`-fallback для Windows, это не требует
+`PYTHONUTF8`.
+
 ## Логирование
 
 Через `infrastructure/logger.py`, не через `print()`. Уровни:

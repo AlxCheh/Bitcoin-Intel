@@ -8,7 +8,7 @@
     "none": "методология/описание, живых данных нет",
     "tool": "интерактивный инструмент, не витрина данных"
   },
-  "generated_at": "2026-07-12",
+  "generated_at": "2026-08-03",
   "entries": [
     {
       "id": "e001",
@@ -1277,6 +1277,28 @@
         "checklist",
         "чеклист",
         "ошибки"
+      ],
+      "dynamic": true
+    },
+    {
+      "id": "e108",
+      "title": "Квантовая угроза: подготовка началась",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "essay",
+      "keywords": [
+        "квантовая угроза",
+        "quantum",
+        "BIP-360",
+        "BIP-361",
+        "Шор",
+        "Гровер",
+        "BitGo",
+        "Q-Day",
+        "post-quantum"
       ],
       "dynamic": true
     },

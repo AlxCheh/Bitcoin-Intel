@@ -128,7 +128,18 @@ const document = {{ getElementById: id => registry[id] }};
 showEntityPopup('{entity["id"]}');
 console.log(JSON.stringify({{ html: registry['ep-theory-refs'].innerHTML }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        # 2026-08-03: THEORY_TOPICS.json продолжает расти (новая панель
+        # theory-quantum) - тот же ARG_MAX-риск, что уже чинился раньше
+        # сегодня в других тестах. Временный файл вместо инлайн-аргумента.
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
+            tmp.write(js)
+            tmp_path = tmp.name
+        try:
+            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
+        finally:
+            os.unlink(tmp_path)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         return json.loads(result.stdout)["html"]
 
@@ -218,3 +229,16 @@ def test_bitgo_second_pass_connection_referentially_intact():
     """BitGo <-> Multisig 2-of-3 (второй проход аудита, type=exchange - за пределами исходного фильтра l2/protocol/infrastructure)."""
     entities = {e["id"]: e for e in json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]}
     assert "multisig-2of3" in entities["bitgo"]["function_refs"]
+
+
+def test_bitgo_theory_quantum_link_referentially_intact():
+    """
+    BitGo <-> theory-quantum (2026-08-03, продолжение аудита - контентный
+    пробел из docs/BACKLOG.md закрыт написанием панели, не просто связью).
+    """
+    entities = json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]
+    bitgo = next(e for e in entities if e["id"] == "bitgo")
+    assert "theory-quantum" in bitgo.get("theory_refs", [])
+
+    topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
+    assert any(t["id"] == "theory-quantum" for t in topics), "theory-quantum топик не найден в THEORY_TOPICS.json"

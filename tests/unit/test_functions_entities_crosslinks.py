@@ -13,32 +13,16 @@ ENTITIES.json и THEORY_TOPICS.json (2026-08-02, по запросу польз�
 """
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
@@ -51,10 +35,10 @@ class TestFunctionCardCrosslinks:
 
     def test_entity_type_crosslink_calls_show_entity_popup(self, app_src):
         render_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "sanitizeStrong"),
-            _extract_function(app_src, "renderToolBlock"),
-            _extract_function(app_src, "renderFunctionCard"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "sanitizeStrong"),
+            extract_js_function(app_src, "renderToolBlock"),
+            extract_js_function(app_src, "renderFunctionCard"),
         ])
         import json
         fn = {
@@ -65,17 +49,17 @@ class TestFunctionCardCrosslinks:
 const fn = {json.dumps(fn)};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert "showEntityPopup('coinkite')" in html
 
     def test_theory_type_crosslink_calls_site_map_go_to(self, app_src):
         render_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "sanitizeStrong"),
-            _extract_function(app_src, "renderToolBlock"),
-            _extract_function(app_src, "renderFunctionCard"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "sanitizeStrong"),
+            extract_js_function(app_src, "renderToolBlock"),
+            extract_js_function(app_src, "renderFunctionCard"),
         ])
         import json
         fn = {
@@ -86,7 +70,7 @@ console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 const fn = {json.dumps(fn)};
 console.log(JSON.stringify({{ html: renderFunctionCard(fn) }}));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert "siteMapGoTo('theory','Панель X')" in html
@@ -98,8 +82,8 @@ class TestEntityPopupFunctionRefs:
     def _run_popup(self, app_src: str, entity: dict, functions: list) -> str:
         import json
         popup_source = "\n\n".join([
-            _extract_function(app_src, "sanitize"),
-            _extract_function(app_src, "showEntityPopup"),
+            extract_js_function(app_src, "sanitize"),
+            extract_js_function(app_src, "showEntityPopup"),
         ])
         js = f"""
 {popup_source}
@@ -124,18 +108,7 @@ const document = {{ getElementById: id => registry[id] }};
 showEntityPopup('{entity["id"]}');
 console.log(JSON.stringify({{ html: registry['ep-function-refs'].innerHTML }}));
 """
-        # 2026-08-02: тот же ARG_MAX-риск, что в test_theory_topic_essay_mount.py -
-        # BITCOIN_FUNCTIONS.json растёт (новые crosslinks), полный дамп через
-        # node -e рано или поздно упирается в системный лимит длины аргумента.
-        import tempfile
-        import os
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
-            tmp.write(js)
-            tmp_path = tmp.name
-        try:
-            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
-        finally:
-            os.unlink(tmp_path)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         return json.loads(result.stdout)["html"]
 

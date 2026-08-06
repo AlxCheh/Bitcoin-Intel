@@ -17,39 +17,22 @@ loadSignals()). Если рендер данных внутри triggerTabData()
 Извлекает реальный исходник из js/app-main.js (паттерн test_uncertainty_indicator.py).
 """
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    assert brace_open != -1
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
 def show_tab_source() -> str:
     src = APP_MAIN_JS.read_text(encoding="utf-8")
-    return _extract_function(src, "showTab")
+    return extract_js_function(src, "showTab")
 
 
 # Минимальный мок DOM — только то, что реально использует showTab():
@@ -130,7 +113,7 @@ console.log(JSON.stringify({
   localStorageSaved: localStorage._store['bi_active_tab']
 }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         out = json.loads(result.stdout)
@@ -158,7 +141,7 @@ console.log(JSON.stringify({
   themeTabActive: document.getElementById('tab-theory').classList.contains('active')
 }));
 """
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         import json
         out = json.loads(result.stdout)

@@ -15,10 +15,10 @@ confidence занижен из-за contested pos/neg баланса или ус
 import json
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
@@ -30,35 +30,11 @@ APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(html: str, signature: str) -> str:
-    """
-    Извлекает полное тело function {signature}(...) {...} по балансу
-    фигурных скобок — устойчиво к любому уровню отступа закрывающей скобки
-    (в отличие от regex с фиксированным отступом, который однажды уже
-    обрезал synthesizeNarrativeAdvanced на первой вложенной '}' с
-    совпадающим отступом).
-    """
-    start_marker = f"function {signature}"
-    start = html.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in index.html"
-    brace_open = html.find("{", start)
-    assert brace_open != -1, f"No opening brace found for '{signature}'"
-    depth = 0
-    i = brace_open
-    while i < len(html):
-        if html[i] == "{":
-            depth += 1
-        elif html[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return html[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces while extracting '{signature}'")
 
 
 def _run(js_source: str, call: str):
     script = js_source + f"\nconsole.log(JSON.stringify({call}));"
-    result = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+    result = run_node_js(script)
     assert result.returncode == 0, f"Node failed:\n{result.stderr}"
     return json.loads(result.stdout)
 
@@ -66,13 +42,13 @@ def _run(js_source: str, call: str):
 @pytest.fixture(scope="module")
 def phase_label_source() -> str:
     html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
-    return _extract_function(html, "formatPhaseLabel")
+    return extract_js_function(html, "formatPhaseLabel")
 
 
 @pytest.fixture(scope="module")
 def uncertainty_warnings_source() -> str:
     html = APP_EARLY_JS.read_text(encoding="utf-8") + chr(10) + APP_MAIN_JS.read_text(encoding="utf-8")
-    return _extract_function(html, "buildUncertaintyWarnings")
+    return extract_js_function(html, "buildUncertaintyWarnings")
 
 
 @pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
@@ -174,7 +150,7 @@ class TestJSFallbackRationale:
             f"const FRESHNESS_FRESH_DAYS = {fresh};\n"
             f"const FRESHNESS_RECENT_DAYS = {recent};\n"
         )
-        return globals_src + _extract_function(html, "synthesizeNarrativeAdvanced")
+        return globals_src + extract_js_function(html, "synthesizeNarrativeAdvanced")
 
     def test_rationale_present_and_mentions_anchor_id(self, synth_source):
         signals = [{
@@ -188,7 +164,7 @@ class TestJSFallbackRationale:
             + f"\nconst r = synthesizeNarrativeAdvanced('c', {payload});"
             + "\nconsole.log(JSON.stringify({rationale: r.rationale}));"
         )
-        result = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        result = run_node_js(script)
         assert result.returncode == 0, result.stderr
         parsed = json.loads(result.stdout)
         assert "TEST-001" in parsed["rationale"]

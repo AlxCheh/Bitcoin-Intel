@@ -16,11 +16,11 @@ FAIL). `formatSynthesisFreshness()` в index.html закрывает это: п�
 import json
 import re
 import shutil
-import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
@@ -32,26 +32,6 @@ APP_MAIN_JS  = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(html: str, signature: str) -> str:
-    """
-    Извлекает тело функции по балансу фигурных скобок — устойчиво к
-    любому отступу закрывающей скобки (см. test_uncertainty_indicator.py).
-    """
-    start = html.find(f"function {signature}")
-    assert start != -1, f"Function '{signature}' not found in index.html"
-    brace_open = html.find("{", start)
-    assert brace_open != -1, f"No opening brace found for '{signature}'"
-    depth = 0
-    i = brace_open
-    while i < len(html):
-        if html[i] == "{":
-            depth += 1
-        elif html[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return html[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces while extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
@@ -60,7 +40,7 @@ def freshness_source() -> str:
     recent_match = re.search(r"let FRESHNESS_RECENT_DAYS\s*=\s*(\d+);", html)
     assert recent_match, "FRESHNESS_RECENT_DAYS not found in index.html"
     globals_src = f"const FRESHNESS_RECENT_DAYS = {recent_match.group(1)};\n"
-    return globals_src + _extract_function(html, "formatSynthesisFreshness")
+    return globals_src + extract_js_function(html, "formatSynthesisFreshness")
 
 
 def _run(js_source: str, synthesis_json: str) -> dict:
@@ -68,7 +48,7 @@ def _run(js_source: str, synthesis_json: str) -> dict:
         js_source
         + f"\nconsole.log(JSON.stringify(formatSynthesisFreshness({synthesis_json})));"
     )
-    result = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+    result = run_node_js(script)
     assert result.returncode == 0, f"Node failed:\n{result.stderr}"
     return json.loads(result.stdout)
 

@@ -14,11 +14,11 @@ highlightEntities() живут как inline JS внутри index.html, а не
 """
 import re
 import json
-import subprocess
 import shutil
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
@@ -37,38 +37,11 @@ def _read_js_source() -> str:
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(html: str, signature: str) -> str:
-    """
-    Извлекает тело функции `function <signature> {...}` из index.html по
-    балансу фигурных скобок (устойчиво к любому уровню отступа закрывающей
-    скобки — regex с фиксированным отступом однажды уже обрезал
-    synthesizeNarrativeAdvanced на первой вложенной '}' с совпадающим
-    отступом, см. tests/unit/test_uncertainty_indicator.py).
-    """
-    base_name = signature.split("(")[0].strip()
-    start = html.find(f"function {base_name}")
-    assert start != -1, f"Function '{signature}' not found in index.html — was it renamed or removed?"
-    brace_open = html.find("{", start)
-    assert brace_open != -1, f"No opening brace found for '{signature}'"
-    depth = 0
-    i = brace_open
-    while i < len(html):
-        if html[i] == "{":
-            depth += 1
-        elif html[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return html[start:i + 1]
-        i += 1
-    raise AssertionError(f"Unbalanced braces while extracting '{signature}'")
 
 
 def _run_js(js_code: str) -> dict:
     """Запускает JS-сниппет через node и возвращает распарсенный JSON из stdout."""
-    result = subprocess.run(
-        ["node", "-e", js_code],
-        capture_output=True, text=True, timeout=10,
-    )
+    result = run_node_js(js_code)
     assert result.returncode == 0, f"Node execution failed:\n{result.stderr}"
     return json.loads(result.stdout)
 
@@ -77,8 +50,8 @@ def _run_js(js_code: str) -> dict:
 def sanitize_and_highlight_source() -> str:
     """Реальный исходник sanitize() + highlightEntities() из index.html."""
     html = _read_js_source()
-    sanitize_fn   = _extract_function(html, "sanitize(str)")
-    highlight_fn  = _extract_function(html, "highlightEntities(text)")
+    sanitize_fn   = extract_js_function(html, "sanitize(str)")
+    highlight_fn  = extract_js_function(html, "highlightEntities(text)")
     return sanitize_fn + "\n\n" + highlight_fn
 
 
@@ -168,8 +141,8 @@ console.log(JSON.stringify({ out }));
 def sanitize_strong_source() -> str:
     """Реальный исходник sanitize() + sanitizeStrong() из index.html."""
     html = _read_js_source()
-    sanitize_fn = _extract_function(html, "sanitize(str)")
-    strong_fn   = _extract_function(html, "sanitizeStrong(str)")
+    sanitize_fn = extract_js_function(html, "sanitize(str)")
+    strong_fn   = extract_js_function(html, "sanitizeStrong(str)")
     return sanitize_fn + "\n\n" + strong_fn
 
 

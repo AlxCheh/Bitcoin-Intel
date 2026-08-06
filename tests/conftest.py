@@ -118,3 +118,68 @@ def populated_signals_json(tmp_path, sample_signal):
         encoding="utf-8"
     )
     return signals_path
+
+
+# ─── Общий JS-харнесс (2026-08-03) ───────────────────────────────────────
+# До этой консолидации _extract_function (извлечение тела функции из
+# app-main.js/app-early.js по балансу фигурных скобок, не regex — regex
+# однажды уже обрезал synthesizeNarrativeAdvanced на первой вложенной
+# '}' с совпадающим отступом, см. историю test_uncertainty_indicator.py)
+# была независимо скопирована в 12 файлов tests/unit/*.py с косметическими
+# отличиями (имена параметров, тексты ошибок) при идентичной логике.
+# Отдельно, subprocess.run(["node", "-e", js], ...) - передача JS одним
+# аргументом командной строки - несколько раз за 2026-08-03 упиралась в
+# системный лимит ARG_MAX по мере роста THEORY_TOPICS.json/signals.json,
+# каждый раз чинилась точечно в том файле, где всплыла. Обе проблемы -
+# один и тот же класс (дублирование вместо общего места) - закрываются
+# здесь один раз, а не при каждом следующем росте данных.
+#
+# Это ОБЫЧНЫЕ функции, не pytest-фикстуры - существующие тесты уже
+# вызывают _extract_function() многократно с разными аргументами внутри
+# своих собственных fixture/helper-методов (напр. `render_source`,
+# `_run_popup`) - минимальная замена: одна строка импорта вместо
+# копии определения, остальная структура каждого теста не тронута.
+
+def extract_js_function(src: str, signature: str) -> str:
+    """
+    Извлекает тело `function <signature> {...}` из исходника JS по балансу
+    фигурных скобок. signature может включать сигнатуру аргументов
+    (`"foo(a, b)"`) - для поиска используется имя до первой `(`.
+    """
+    base_name = signature.split("(")[0].strip()
+    start = src.find(f"function {base_name}")
+    assert start != -1, f"Function '{signature}' not found in source — renamed or removed?"
+    brace_open = src.find("{", start)
+    assert brace_open != -1, f"No opening brace found for '{signature}'"
+    depth = 0
+    i = brace_open
+    while i < len(src):
+        if src[i] == "{":
+            depth += 1
+        elif src[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return src[start:i + 1] + "\n"
+        i += 1
+    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
+
+
+def run_node_js(js_code: str, timeout: int = 10):
+    """
+    Запускает JS через node БЕЗОПАСНО — временный файл вместо `node -e`
+    (инлайн-аргумент командной строки). `node -e` несколько раз упиралась
+    в ARG_MAX по мере роста встраиваемых JSON-данных (THEORY_TOPICS.json,
+    BITCOIN_FUNCTIONS.json) — временный файл не имеет этого ограничения
+    независимо от размера кода, поэтому не требует повторного лечения при
+    дальнейшем росте данных.
+    """
+    import subprocess
+    import tempfile
+    import os
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
+        tmp.write(js_code)
+        tmp_path = tmp.name
+    try:
+        return subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=timeout)
+    finally:
+        os.unlink(tmp_path)

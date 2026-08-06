@@ -22,42 +22,27 @@ renderTheoryTopic() для дата-driven топиков такой div ник�
 import re
 import shutil
 from pathlib import Path
+from tests.conftest import extract_js_function, run_node_js
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(src: str, signature: str) -> str:
-    start_marker = f"function {signature}"
-    start = src.find(start_marker)
-    assert start != -1, f"Function '{signature}' not found in app-main.js"
-    brace_open = src.find("{", start)
-    assert brace_open != -1
-    depth = 0
-    i = brace_open
-    while i < len(src):
-        if src[i] == "{":
-            depth += 1
-        elif src[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return src[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces extracting '{signature}'")
 
 
 @pytest.fixture(scope="module")
 def render_topic_source() -> str:
     src = APP_MAIN_JS.read_text(encoding="utf-8")
     funcs = [
-        _extract_function(src, "sanitize"),
-        _extract_function(src, "sanitizeStrong"),
-        _extract_function(src, "sourceFooterHtml"),
-        _extract_function(src, "renderAccItem"),
-        _extract_function(src, "renderTheoryTopic"),
+        extract_js_function(src, "sanitize"),
+        extract_js_function(src, "sanitizeStrong"),
+        extract_js_function(src, "sourceFooterHtml"),
+        extract_js_function(src, "renderAccItem"),
+        extract_js_function(src, "renderTheoryTopic"),
     ]
     return "\n\n".join(funcs)
 
@@ -72,7 +57,7 @@ const topic = { id: 'theory-example', panel_title: 'Пример', panel_tag: 'X
 console.log(JSON.stringify({ html: renderTheoryTopic(topic) }));
 """
         import subprocess, json
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
         assert 'id="theory-example-essays"' in html
@@ -89,7 +74,7 @@ const topic = {
 console.log(JSON.stringify({ html: renderTheoryTopic(topic) }));
 """
         import subprocess, json
-        result = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=10)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         html = json.loads(result.stdout)["html"]
 
@@ -123,18 +108,7 @@ for (const t of topics) {{
 }}
 console.log(JSON.stringify(results));
 """
-        # 2026-08-02: тот же ARG_MAX-риск, что и в TestTheoryRenderCallOrder
-        # ниже — файл THEORY_TOPICS.json растёт, полный дамп через node -e
-        # рано или поздно упирается в системный лимит длины аргумента.
-        import tempfile
-        import os
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
-            tmp.write(js)
-            tmp_path = tmp.name
-        try:
-            result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
-        finally:
-            os.unlink(tmp_path)
+        result = run_node_js(js)
         assert result.returncode == 0, f"Node failed:\n{result.stderr}"
         results = json.loads(result.stdout)
 
@@ -188,13 +162,13 @@ class TestTheoryRenderCallOrder:
         """
         src = APP_MAIN_JS.read_text(encoding="utf-8")
         funcs = "\n\n".join([
-            _extract_function(src, "sanitize"),
-            _extract_function(src, "sanitizeStrong"),
-            _extract_function(src, "sourceFooterHtml"),
-            _extract_function(src, "renderAccItem"),
-            _extract_function(src, "renderTheoryTopic"),
-            _extract_function(src, "renderTheoryTopics"),
-            _extract_function(src, "renderTheoryEssays"),
+            extract_js_function(src, "sanitize"),
+            extract_js_function(src, "sanitizeStrong"),
+            extract_js_function(src, "sourceFooterHtml"),
+            extract_js_function(src, "renderAccItem"),
+            extract_js_function(src, "renderTheoryTopic"),
+            extract_js_function(src, "renderTheoryTopics"),
+            extract_js_function(src, "renderTheoryEssays"),
         ])
 
         import json
@@ -238,20 +212,7 @@ const document = {{
 const mount = document.getElementById('theory-passphrase-essays');
 console.log(JSON.stringify({{ len: mount ? mount.innerHTML.length : -1 }}));
 """
-            # 2026-08-02: THEORY_TOPICS.json выросло за сессию (новые
-            # crosslinks) - передача всего js одним аргументом command-line
-            # (node -e "...") упёрлась в системный лимит ARG_MAX ("Argument
-            # list too long"). Пишем во временный файл и запускаем node на
-            # нём - устойчиво к дальнейшему росту файла, тот же результат.
-            import tempfile
-            import os
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False, encoding="utf-8") as tmp:
-                tmp.write(js)
-                tmp_path = tmp.name
-            try:
-                result = subprocess.run(["node", tmp_path], capture_output=True, text=True, timeout=10)
-            finally:
-                os.unlink(tmp_path)
+            result = run_node_js(js)
             assert result.returncode == 0, f"Node failed:\n{result.stderr}"
             return json.loads(result.stdout)["len"]
 

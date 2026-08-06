@@ -18,10 +18,10 @@ Bitcoin Intel — тесты чистых JS-хелперов из index.html (J
 """
 import json
 import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 # 2026-07-25: JS вынесен из index.html в js/app-early.js + js/app-main.js
@@ -35,29 +35,10 @@ APP_MAIN_JS = REPO_ROOT / "js" / "app-main.js"
 NODE_AVAILABLE = shutil.which("node") is not None
 
 
-def _extract_function(html: str, name: str) -> str:
-    """Извлекает `function <name>(...) {...}` по балансу фигурных скобок."""
-    start = html.find(f"function {name}")
-    assert start != -1, f"Function '{name}' not found in js/app-*.js — renamed or removed?"
-    brace_open = html.find("{", start)
-    depth = 0
-    i = brace_open
-    while i < len(html):
-        if html[i] == "{":
-            depth += 1
-        elif html[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return html[start:i + 1]
-        i += 1
-    raise AssertionError(f"Unbalanced braces while extracting '{name}'")
 
 
 def _run_js(js_code: str) -> dict:
-    result = subprocess.run(
-        ["node", "-e", js_code],
-        capture_output=True, text=True, timeout=10,
-    )
+    result = run_node_js(js_code)
     assert result.returncode == 0, f"Node execution failed:\n{result.stderr}"
     return json.loads(result.stdout)
 
@@ -73,7 +54,7 @@ def html_source() -> str:
 
 @pytest.fixture(scope="module")
 def calc_total_mined_fn(html_source):
-    return _extract_function(html_source, "calcTotalMined")
+    return extract_js_function(html_source, "calcTotalMined")
 
 
 @pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
@@ -149,7 +130,7 @@ console.log(JSON.stringify({ v: calcTotalMined(903000) }));
 
 @pytest.fixture(scope="module")
 def calc_cycle_phase_fn(html_source):
-    return _extract_function(html_source, "calcCyclePhase")
+    return extract_js_function(html_source, "calcCyclePhase")
 
 
 @pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
@@ -212,7 +193,7 @@ console.log(JSON.stringify({
 
 @pytest.fixture(scope="module")
 def ru_plural_fn(html_source):
-    return _extract_function(html_source, "ruPlural")
+    return extract_js_function(html_source, "ruPlural")
 
 
 @pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")

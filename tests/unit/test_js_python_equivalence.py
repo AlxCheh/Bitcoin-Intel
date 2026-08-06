@@ -55,11 +55,11 @@ test_known_gap_js_lacks_window_filtering ниже. Закрытие этого g
 import json
 import re
 import shutil
-import subprocess
 from collections import defaultdict
 from pathlib import Path
 
 import pytest
+from tests.conftest import extract_js_function, run_node_js
 
 REPO_ROOT  = Path(__file__).parent.parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
@@ -76,27 +76,6 @@ NODE_AVAILABLE = shutil.which("node") is not None
 KNOWN_GAP_CLUSTERS = {"test_stale"}
 
 
-def _extract_function(html: str, name: str) -> str:
-    """
-    Извлекает тело функции по балансу фигурных скобок — устойчиво к
-    любому отступу закрывающей скобки (см. test_uncertainty_indicator.py,
-    где фиксированный-отступ regex однажды уже обрезал эту же функцию).
-    """
-    start = html.find(f"function {name}")
-    assert start != -1, f"Function '{name}' not found in index.html — was it renamed?"
-    brace_open = html.find("{", start)
-    assert brace_open != -1, f"No opening brace found for '{name}'"
-    depth = 0
-    i = brace_open
-    while i < len(html):
-        if html[i] == "{":
-            depth += 1
-        elif html[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return html[start:i + 1] + "\n"
-        i += 1
-    raise AssertionError(f"Unbalanced braces while extracting '{name}'")
 
 
 @pytest.fixture(scope="module")
@@ -118,7 +97,7 @@ def js_synthesize_source() -> str:
         f"const FRESHNESS_FRESH_DAYS = {fresh_match.group(1)};\n"
         f"const FRESHNESS_RECENT_DAYS = {recent_match.group(1)};\n"
     )
-    return globals_src + _extract_function(html, "synthesizeNarrativeAdvanced")
+    return globals_src + extract_js_function(html, "synthesizeNarrativeAdvanced")
 
 
 @pytest.fixture(scope="module")
@@ -143,10 +122,7 @@ def _run_js_synthesis(js_source: str, cluster_key: str, signals: list) -> dict:
         + "\nconst result = synthesizeNarrativeAdvanced(input.key, {signals: input.signals});"
         + "\nprocess.stdout.write(JSON.stringify(result));"
     )
-    result = subprocess.run(
-        ["node", "-e", script],
-        capture_output=True, text=True, timeout=10,
-    )
+    result = run_node_js(script)
     assert result.returncode == 0, f"Node execution failed:\n{result.stderr}"
     return json.loads(result.stdout)
 

@@ -7,19 +7,30 @@ Bitcoin Intel — атомарная запись файлов с блокиро
 Без блокировки — race condition → повреждённый JSON.
 
 Решение:
-  1. fcntl-based advisory lock (Unix-only, см. примечание)
+  1. Advisory lock — fcntl (Unix) / msvcrt (Windows), см. ниже
   2. Атомарная запись через temp file → os.replace()
 
-Примечание: работает только на Unix (Linux/macOS).
-На Windows использовать msvcrt.locking или запускать скрипты последовательно.
+Кросс-платформенность (2026-08-06): изначально только fcntl (Unix-only) —
+на Windows любой скрипт, импортирующий этот модуль (напрямую или
+транзитивно, напр. scripts/quality_report.py → tests/golden/
+test_tension_benchmarks.py → scripts/check_new_tension.py), падал с
+ModuleNotFoundError на ровном месте, блокируя Шаг 5/6/7 алгоритма
+CLAUDE.md на Windows-окружениях без WSL. msvcrt.locking блокирует байт
+0 lock-файла тем же блокирующим семантикой (без LOCK_NB), что и
+fcntl.flock(LOCK_EX) — не таймаут, ждёт до освобождения.
 """
 
 import os
+import sys
 import json
-import fcntl
 import tempfile
 from contextlib import contextmanager
 from typing import Any
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -50,11 +61,23 @@ def file_lock(path: str, timeout: float = 10.0):
     lock_path = path + ".lock"
     lock_fd = open(lock_path, "w")
     try:
-        # LOCK_EX — эксклюзивная блокировка, блокирует до освобождения
-        fcntl.flock(lock_fd, fcntl.LOCK_EX)
+        if sys.platform == "win32":
+            # msvcrt блокирует диапазон байт файла, не файл целиком —
+            # пишем 1 байт-заглушку, чтобы было что блокировать
+            lock_fd.write("L")
+            lock_fd.flush()
+            lock_fd.seek(0)
+            msvcrt.locking(lock_fd.fileno(), msvcrt.LK_LOCK, 1)
+        else:
+            # LOCK_EX — эксклюзивная блокировка, блокирует до освобождения
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)
         yield
     finally:
-        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        if sys.platform == "win32":
+            lock_fd.seek(0)
+            msvcrt.locking(lock_fd.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
         lock_fd.close()
         # Убираем .lock файл после снятия блокировки
         try:

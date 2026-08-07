@@ -1201,7 +1201,10 @@
         "INF-2026-0721-001",
         "INF-2026-0723-002"
       ],
-      "last_updated": "2026-07-21"
+      "last_updated": "2026-08-06",
+      "theory_refs": [
+        "theory-quantum"
+      ]
     },
     {
       "id": "coinshares",
@@ -1459,7 +1462,10 @@
       "signal_refs": [
         "INF-2026-0723-002"
       ],
-      "last_updated": "2026-07-23"
+      "last_updated": "2026-08-06",
+      "theory_refs": [
+        "theory-quantum"
+      ]
     },
     {
       "id": "anchorage_digital",
@@ -1697,12 +1703,13 @@
         "INF-2026-0730-001",
         "STR-2026-0731-001"
       ],
-      "last_updated": "2026-08-02",
+      "last_updated": "2026-08-06",
       "theory_refs": [
         "theory-dice-seed"
       ],
       "function_refs": [
-        "multisig-2of3"
+        "multisig-2of3",
+        "psbt-partially-signed-bitcoin-transaction"
       ]
     },
     {
@@ -1724,9 +1731,10 @@
       "signal_refs": [
         "STR-2026-0731-001"
       ],
-      "last_updated": "2026-08-03",
+      "last_updated": "2026-08-06",
       "function_refs": [
-        "multisig-2of3"
+        "multisig-2of3",
+        "psbt-partially-signed-bitcoin-transaction"
       ]
     },
     {

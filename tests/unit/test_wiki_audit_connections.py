@@ -215,3 +215,33 @@ def test_bitgo_theory_quantum_link_referentially_intact():
 
     topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
     assert any(t["id"] == "theory-quantum" for t in topics), "theory-quantum топик не найден в THEORY_TOPICS.json"
+
+
+def test_keyword_curation_second_round_connections_referentially_intact():
+    """
+    2026-08-06: ретроактивное курирование audit_keywords для BITCOIN_FUNCTIONS/
+    THEORY_TOPICS вскрыло 3 новые честные связи, не найденные при ручном
+    аудите 2026-08-03/06 (Galaxy Digital и Coinbase уже упоминались в тексте
+    theory-quantum по имени, но не были связаны на уровне данных; Coinkite/
+    Tangem как аппаратные производители, поддерживающие PSBT).
+    """
+    entities = {e["id"]: e for e in json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]}
+    functions = {f["id"]: f for f in json.loads((REPO_ROOT / "BITCOIN_FUNCTIONS.json").read_text(encoding="utf-8"))["functions"]}
+    topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
+
+    # Galaxy Digital, Coinbase <-> theory-quantum
+    assert "theory-quantum" in entities["galaxy_digital"]["theory_refs"]
+    assert "theory-quantum" in entities["coinbase"]["theory_refs"]
+    quantum_topic = next(t for t in topics if t["id"] == "theory-quantum")
+    industry_item = next(i for i in quantum_topic["items"] if i["label"] == "От одной компании к отрасли")
+    linked = {cl.get("entity_id") for cl in industry_item.get("crosslinks", [])}
+    assert "galaxy_digital" in linked
+    assert "coinbase" in linked
+
+    # Coinkite, Tangem <-> PSBT
+    assert "psbt-partially-signed-bitcoin-transaction" in entities["coinkite"]["function_refs"]
+    assert "psbt-partially-signed-bitcoin-transaction" in entities["tangem"]["function_refs"]
+    psbt_fn = functions["psbt-partially-signed-bitcoin-transaction"]
+    psbt_linked = {cl.get("entity_id") for cl in psbt_fn.get("crosslinks", [])}
+    assert "coinkite" in psbt_linked
+    assert "tangem" in psbt_linked

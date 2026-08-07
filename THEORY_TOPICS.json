@@ -123,7 +123,15 @@
           "paragraphs": [
             "Model T вводит парольную фразу прямо на устройстве, не на компьютере — Trusted Display защищает даже при заражённой малварью машине: символы никогда не проходят через потенциально скомпрометированный ввод компьютера."
           ],
-          "highlight": "Ввод на устройстве → малварь на компьютере не видит саму фразу"
+          "highlight": "Ввод на устройстве → малварь на компьютере не видит саму фразу",
+          "crosslinks": [
+            {
+              "type": "entity",
+              "entity_id": "trezor",
+              "text": "Первый аппаратный кошелёк в истории (2014) — Model T, названный здесь, снят с продажи в январе 2026, актуальная линейка — Safe 3/5/7",
+              "label": "TREZOR"
+            }
+          ]
         }
       ],
       "source_footer": "ИСТОЧНИК: SatoshiLabs · Trezor Blog · 12 июля 2019 · <a href=\"https://blog.trezor.io/is-your-passphrase-strong-enough-d687f44c63af\" target=\"_blank\" style=\"color:var(--btc);text-decoration:none\">blog.trezor.io</a>"

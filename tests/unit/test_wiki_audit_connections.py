@@ -245,3 +245,31 @@ def test_keyword_curation_second_round_connections_referentially_intact():
     psbt_linked = {cl.get("entity_id") for cl in psbt_fn.get("crosslinks", [])}
     assert "coinkite" in psbt_linked
     assert "tangem" in psbt_linked
+
+
+def test_trezor_entity_and_connections_referentially_intact():
+    """
+    2026-08-06: сущность Trezor создана по инициативе пользователя
+    (исторический факт основания 29 июля 2014) - закрывает пробел,
+    найденный при курировании audit_keywords (theory-passphrase уже
+    ссылалась на "Model T" по имени, но сущности не существовало).
+    Не из сигнала - signal_refs пустой намеренно, честно.
+    """
+    entities = {e["id"]: e for e in json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]}
+    assert "trezor" in entities
+    trezor = entities["trezor"]
+    assert trezor["signal_refs"] == []  # не из сигнала, честно пусто, не забыто
+    assert "theory-passphrase" in trezor["theory_refs"]
+    assert "psbt-partially-signed-bitcoin-transaction" in trezor["function_refs"]
+
+    topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
+    passphrase_topic = next(t for t in topics if t["id"] == "theory-passphrase")
+    trezor_item = next(i for i in passphrase_topic["items"] if i["label"] == "Trezor Trusted Display")
+    assert any(cl.get("entity_id") == "trezor" for cl in trezor_item.get("crosslinks", []))
+
+    functions = json.loads((REPO_ROOT / "BITCOIN_FUNCTIONS.json").read_text(encoding="utf-8"))["functions"]
+    psbt_fn = next(f for f in functions if f["id"] == "psbt-partially-signed-bitcoin-transaction")
+    linked = {cl.get("entity_id") for cl in psbt_fn.get("crosslinks", [])}
+    assert "trezor" in linked
+    assert "coinkite" in linked  # старые связи не задеты
+    assert "tangem" in linked

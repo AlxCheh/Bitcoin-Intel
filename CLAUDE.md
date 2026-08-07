@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.42 · **Обновлено:** 2026-08-06
+> **Версия:** v8.43 · **Обновлено:** 2026-08-06
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -662,7 +662,7 @@ narrative_role   → приоритет при выборе anchor-сигнал�
 
 ---
 
-## LLM Wiki — связывание не только сигналов (план, v8.42)
+## LLM Wiki — связывание не только сигналов (план, v8.43)
 
 > **Открытые пункты (Пары 1, 3, 4, 5)** → [docs/PLAN-open-initiatives.md](docs/PLAN-open-initiatives.md) Часть 1 — читать перед тем, как продолжать эту работу в новой сессии. **Полная история решений и отклонённых пар (7)** → [archive/PLAN-llm-wiki-cross-linking.md](archive/PLAN-llm-wiki-cross-linking.md) (закрыто, см. архив).
 
@@ -680,8 +680,8 @@ narrative_role   → приоритет при выборе anchor-сигнал�
 | 4 | `signals.json` ↔ `TREASURY_HOLDERS.json`/`data/holders.js` | Не начато | Частично пересекается с уже работающим механизмом FACTS |
 | 5 | `signals.json` ↔ `data/top_addresses.json`/`data/bip110_signaling.json` | Не начато | Метрика подтверждает нарративное утверждение — не двусторонний тест |
 | 6 | `BITCOIN_FUNCTIONS.json` ↔ `signals.json` | ✅ Реализовано (v8.30), 2 функции | `signal_refs` на функции + плечо в `deep_dive`, статус переоценён — было «отклонено, мало материала» при 5 записях, теперь 6 функций и реальная связь |
-| 8 | `ENTITIES.json` ↔ `THEORY_TOPICS.json` | ✅ Реализовано (v8.42), 7 сущностей | `theory_refs` на сущности + двусторонний кликабельный `crosslink` (type:'entity') на пункте топика |
-| 9 | `ENTITIES.json` ↔ `BITCOIN_FUNCTIONS.json` | ✅ Реализовано (v8.30/v8.42), 4 сущности (5 связей — Coinkite и Tangem по 2) | `function_refs` на сущности + двусторонний кликабельный `crosslink` (type:'entity') на функции |
+| 8 | `ENTITIES.json` ↔ `THEORY_TOPICS.json` | ✅ Реализовано (v8.43), 8 сущностей | `theory_refs` на сущности + двусторонний кликабельный `crosslink` (type:'entity') на пункте топика |
+| 9 | `ENTITIES.json` ↔ `BITCOIN_FUNCTIONS.json` | ✅ Реализовано (v8.30/v8.43), 5 сущностей (6 связей — Coinkite и Tangem по 2) | `function_refs` на сущности + двусторонний кликабельный `crosslink` (type:'entity') на функции |
 | 7 | Методология (`ontology.json`/`BDKS.md`/`BAMS.md`/`NIES.md`) ↔ контент | Отклонено | Другой тип связи (обоснование классификации, не нарративное подтверждение) |
 
 **Пара 2 (реализовано):** `scripts/validate_integrity.py` проверяет каждую запись `REVENUE_ENGINES.json` — `entity_id` должен существовать в `ENTITIES.json`, `entity_name` должен точно совпадать с каноническим `ENTITIES.json.name` (это производная копия, не независимое поле — single source of truth). При внедрении найден и исправлен один реальный дрейф (`strive_sata.entity_name`).

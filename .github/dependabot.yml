@@ -10,11 +10,18 @@
 #     actions/upload-pages-artifact@v3, actions/deploy-pages@v4.
 #   - npm/yarn/etc НЕ настроены — в репозитории нет package.json.
 #
-# target-branch: develop, не main — по модели M04 (feature -> develop -> main,
-# DEPLOYMENT.md). PR от Dependabot проходит тот же Branch Protection
-# ("Validate and Test" required status check), что и любой другой PR, и
-# требует отдельного promotion PR develop -> main как всё остальное — не
-# исключение для секьюрити-патчей.
+# target-branch: main, не develop (изменено 2026-08-09). Изначально (2026-07-01)
+# был настроен develop — по модели M04 (feature -> develop -> main,
+# DEPLOYMENT.md), с отдельным promotion PR develop -> main. На практике с
+# 2026-07-04 (последний promotion PR, #116) вся реальная работа идёт прямо
+# в main — develop отстала на 600+ коммитов и promotion больше не
+# происходит. Dependabot молча копил PR в мёртвую ветку, откуда они никогда
+# не попадали в прод. Конфиг приведён в соответствие с фактической практикой
+# (trunk-based на main), а не с документом, который перестал отражать
+# реальность. Судьба самой ветки develop и обновление DEPLOYMENT.md —
+# отдельное решение, не в рамках этой правки. PR от Dependabot по-прежнему
+# проходит тот же Branch Protection ("Validate and Test" required status
+# check), что и main для любого другого PR.
 #
 # Обновления версий (Dependabot version updates) — это НЕ замена
 # pip-audit в deploy.yml (сканирование известных CVE в текущих
@@ -26,7 +33,7 @@ version: 2
 updates:
   - package-ecosystem: "pip"
     directory: "/"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -39,7 +46,7 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"

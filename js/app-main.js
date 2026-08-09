@@ -3705,7 +3705,11 @@ async function fetchFacts() {
 function fmtFactValue(value, format) {
   if (format === 'k') return Math.round(value / 1000) + 'K';
   if (format === 'usd_b') return '$' + (value / 1e9).toFixed(1).replace('.', ',') + ' млрд';
-  // 2026-08-09: toLocaleString('ru-RU') даёт запятую как разделитель
+  // 2026-08-09: usd_b рассчитан на масштаб в миллиардах - для BITA AUM
+  // ($59,24М) деление на 1e9 дало бы вводящее в заблуждение "$0,1 млрд".
+  // usd_m - тот же паттерн, для масштаба в миллионах.
+  if (format === 'usd_m') return '$' + (value / 1e6).toFixed(1).replace('.', ',') + 'М';
+  // toLocaleString('ru-RU') даёт запятую как разделитель
   // (1,05) - несовпадение с конвенцией точки, уже принятой на сайте для
   // десятичных чисел (0.83x, 0.65% и т.д. по всему сайту). Формат 'dec'
   // - period-decimal без хвостовых нулей (1.05, 3.5, не 3.50) - добавлен

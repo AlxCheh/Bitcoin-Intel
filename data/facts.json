@@ -104,6 +104,12 @@
       "unit": "BTC",
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
+    },
+    "twenty_one_capital.mnav": {
+      "value": 0.73,
+      "unit": "x",
+      "as_of": "2026-07-22",
+      "signal_id": "STR-2026-0809-002"
     }
   }
 }

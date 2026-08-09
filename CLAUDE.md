@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.44 · **Обновлено:** 2026-08-09
+> **Версия:** v8.45 · **Обновлено:** 2026-08-09
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -611,6 +611,8 @@ BDKS и NIES декларируют принцип Single Source of Truth — «
 ### Текущий охват
 
 Сущности с fact-трекингом (`entity_id.btc_holdings`; `strategy` дополнительно даёт `usd_reserve`): `strategy`, `metaplanet`, `twenty_one_capital`, `mara_holdings`, `bstr`, `strive`, `oranjebtc`, `el_salvador`, `spacex`. Плюс агрегатные категории без отдельной сущности в ENTITIES.json: `top100_public_companies`, `etf_exchanges`.
+
+С 2026-08-09 у `strategy` и `metaplanet` дополнительно отслеживаются `mnav` и `btc_yield_ytd` (панель mNAV — механика BTC-казначейств, вкладка MACROCONTEXT) — не входят в предложение выше по формату (там фиксированный якорь для теста-стража), но входят в `data/facts.json` наравне с остальными.
 
 Этот список синхронизирован тестом `tests/unit/test_facts.py::test_claude_md_facts_coverage_matches_data` с `data/facts.json` — при добавлении нового ключа тест упадёт, если забыть дописать сюда сущность. Числа-счётчики намеренно не фиксируются в прозе — список сам себе счётчик, его длину видно, не считая отдельно.
 

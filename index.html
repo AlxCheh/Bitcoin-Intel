@@ -1390,6 +1390,7 @@ header {
 .instrument-badge { font-family: var(--mono); font-size: 9px; padding: 4px 9px; background: var(--bg3); }
 .instrument-badge.dim { border: 1px solid var(--line); color: var(--dim); }
 .instrument-badge.red { border: 1px solid var(--red); color: var(--red); }
+.instrument-badge.grn { border: 1px solid var(--grn); color: var(--grn); }
 
 /* ── СВОРАЧИВАЕМЫЕ ПАНЕЛИ (eco-panel, revenue-engines-panel, treasury-panel) ── */
 .panel-head.collapsible { cursor: pointer; user-select: none; }
@@ -2551,9 +2552,62 @@ header {
       </div>
     </div>
 
+    <!-- BITA -->
+    <div class="instrument-card" id="instrument-bita">
+      <div class="instrument-head" id="bita-head" onclick="toggleInstrument('bita')">
+        <div class="instrument-ticker-row">
+          <span class="instrument-ticker">BITA</span>
+          <div class="instrument-ticker-meta">
+            <span class="instrument-tag">COVERED CALL ETF · NASDAQ</span>
+            <span id="bita-arrow" class="instrument-arrow">▼</span>
+          </div>
+        </div>
+        <div class="instrument-stat-strip">
+          <div><div class="instrument-stat-strip-label">АКТИВЫ</div><div class="instrument-stat-strip-val" style="color:var(--btc)" data-fact-key="bita_fund.aum" data-fact-format="usd_m">$59,2М</div></div>
+          <div><div class="instrument-stat-strip-label">ТАРГЕТ ДОХОДНОСТИ</div><div class="instrument-stat-strip-val" style="color:var(--grn)">15–25%</div></div>
+          <div><div class="instrument-stat-strip-label">КОМИССИЯ</div><div class="instrument-stat-strip-val" style="color:var(--txt)">0.65%</div></div>
+        </div>
+      </div>
+      <div id="bita-body" class="instrument-body">
+
+        <div class="instrument-text">
+          BITA — фонд BlackRock, продающий колл-опционы на часть портфеля ради регулярного денежного потока поверх BTC-экспозиции. Не альтернатива холду BTC, а его модификация: часть потенциального роста обменивается на премии здесь и сейчас. Запущен 16 июня 2026 — третий шаг BlackRock после IBIT (доступ к BTC через брокерский счёт) и IBIT options (деривативы/хеджирование).
+        </div>
+
+        <div class="instrument-label">КАК РАБОТАЕТ</div>
+        <div class="instrument-flow accent-btc">
+          <div class="instrument-flow-text">
+            65–75% портфеля (IBIT + spot BTC) держится напрямую → на оставшиеся <span style="color:var(--txt)">25–35% продаются колл-опционы</span> → премии распределяются держателям ежемесячно как доход. Волатильность BTC, обычно фактор риска, здесь напрямую конвертируется в размер премии.
+          </div>
+        </div>
+
+        <div class="instrument-label">КЛЮЧЕВОЕ ПРОТИВОРЕЧИЕ</div>
+        <div class="instrument-callout accent-red">
+          <div class="instrument-callout-text">
+            Продавая колл-опционы, BlackRock заранее ограничивает апсайд — прямое противоречие биткоин-максимализму («держи и не продавай потенциал роста»). По собственным материалам iShares для инвесторов, стратегия превосходит простой холд BTC в 3 из 4 рыночных сценариев (падение, стагнация, умеренный рост) — но заведомо проигрывает в четвёртом, при резком росте цены BTC.
+          </div>
+        </div>
+
+        <div class="instrument-label">ЧЕМ ЭТО НЕ ЯВЛЯЕТСЯ</div>
+        <div class="instrument-flow accent-txt">
+          <div class="instrument-flow-text">
+            Не то же самое, что impermanent loss в DeFi-пулах ликвидности — там потеря возникает из арбитража между ценой в пуле и внешним рынком при движении актива в любую сторону. Здесь риск односторонний и заранее ограничен сверху: максимум — упущенная выгода сверх страйка опциона, не потеря капитала.
+          </div>
+        </div>
+
+        <div class="instrument-label">ТЕКУЩЕЕ СОСТОЯНИЕ</div>
+        <div class="instrument-badges">
+          <span class="instrument-badge dim">Запуск: 16 июня 2026, ~$10,5М при старте</span>
+          <span class="instrument-badge grn">Активы: <span data-fact-key="bita_fund.aum" data-fact-format="usd_m">$59,2М</span> — почти впятеро за 1,5 месяца</span>
+          <span class="instrument-badge dim">Реальная доходность последней выплаты: 12,40%</span>
+        </div>
+
+      </div>
+    </div>
+
     <div style="margin:0 16px 12px;padding:14px;background:var(--bg2);border:1px solid var(--line2);border-style:dashed;text-align:center">
       <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em">СЛЕДУЮЩИЕ ИНСТРУМЕНТЫ</div>
-      <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);margin-top:6px">MSBT · BITA · DRIP ETF · EZBC</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--dim2);margin-top:6px">MSBT · DRIP ETF · EZBC</div>
     </div>
 
   </div>
@@ -4283,7 +4337,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=cae756bb60"></script>
+<script src="js/app-main.js?v=2653cb583e"></script>
 
 </div><!-- /.app-scroll -->
 

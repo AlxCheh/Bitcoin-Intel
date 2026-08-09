@@ -287,6 +287,18 @@ console.log(JSON.stringify({ usd: fmtFactValue(2400000000, 'usd_b') }));
         result = _run_js(js)
         assert result["usd"] == "$2,4 млрд"
 
+    def test_usd_m_format_for_million_scale_values(self, fn):
+        """
+        2026-08-09: usd_b рассчитан на масштаб в миллиардах - для BITA
+        AUM ($59,24М) деление на 1e9 дало бы вводящее в заблуждение
+        "$0,1 млрд". usd_m - тот же паттерн, для масштаба в миллионах.
+        """
+        js = fn + """
+console.log(JSON.stringify({ usd: fmtFactValue(59240000, 'usd_m') }));
+"""
+        result = _run_js(js)
+        assert result["usd"] == "$59,2М"
+
     def test_default_format_unchanged_for_integers(self, fn):
         """Дефолтная ветка (toLocaleString) по-прежнему используется для целых чисел (BTC-резервы и т.п.) - не заменена глобально форматом 'dec'."""
         js = fn + """

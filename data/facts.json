@@ -3,6 +3,12 @@
   "_source": "signals.json (facts[] по каждому сигналу)",
   "generated_at": "2026-08-09",
   "facts": {
+    "bita_fund.aum": {
+      "value": 59240000,
+      "unit": "usd",
+      "as_of": "2026-08-04",
+      "signal_id": "STR-2026-0806-001"
+    },
     "bstr.btc_holdings": {
       "value": 30021,
       "unit": "BTC",

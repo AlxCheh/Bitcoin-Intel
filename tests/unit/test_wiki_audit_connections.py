@@ -273,3 +273,25 @@ def test_trezor_entity_and_connections_referentially_intact():
     assert "trezor" in linked
     assert "coinkite" in linked  # старые связи не задеты
     assert "tangem" in linked
+
+
+def test_bita_instrument_card_exists_and_wired_to_facts():
+    """
+    2026-08-09: карточка инструмента BITA (вкладка Инструменты,
+    ECOSYSTEM) - по образцу STRC (статичный контент + FACTS для AUM),
+    не MSTR (live-fetch избыточен для ETF, где NAV публикует сам фонд).
+    """
+    html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'id="instrument-bita"' in html
+    assert 'data-fact-key="bita_fund.aum"' in html
+    assert 'data-fact-format="usd_m"' in html
+    # плейсхолдер-упоминание убрано из "СЛЕДУЮЩИЕ ИНСТРУМЕНТЫ" - карточка построена, не план на будущее
+    assert "MSBT · BITA · DRIP ETF" not in html
+    assert "MSBT · DRIP ETF · EZBC" in html
+
+
+def test_bita_fund_aum_fact_referentially_intact():
+    entities_signal = json.loads((REPO_ROOT / "signals.json").read_text(encoding="utf-8"))
+    sig = next(s for s in entities_signal["signals"] if s["id"] == "STR-2026-0806-001")
+    fact_keys = {f["key"] for f in sig.get("facts", [])}
+    assert "bita_fund.aum" in fact_keys

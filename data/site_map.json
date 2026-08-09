@@ -486,6 +486,23 @@
       ]
     },
     {
+      "id": "e110",
+      "title": "BITA",
+      "cluster": "knowledge",
+      "cluster_label": "ECOSYSTEM",
+      "tab": "instruments",
+      "tab_label": "ИНСТРУМЕНТЫ",
+      "source": "facts",
+      "kind": "deep-dive",
+      "keywords": [
+        "bita",
+        "covered call",
+        "доходность",
+        "blackrock",
+        "опционы"
+      ]
+    },
+    {
       "id": "e032",
       "title": "Что такое Lightning Network",
       "cluster": "knowledge",

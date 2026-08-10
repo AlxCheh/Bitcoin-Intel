@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.47 · **Обновлено:** 2026-08-09
+> **Версия:** v8.48 · **Обновлено:** 2026-08-09
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -610,7 +610,7 @@ BDKS и NIES декларируют принцип Single Source of Truth — «
 
 ### Текущий охват
 
-Сущности с fact-трекингом (`entity_id.btc_holdings`; `strategy` дополнительно даёт `usd_reserve`): `strategy`, `metaplanet`, `twenty_one_capital`, `mara_holdings`, `bstr`, `strive`, `oranjebtc`, `el_salvador`, `spacex`. Плюс агрегатные категории без отдельной сущности в ENTITIES.json: `top100_public_companies`, `etf_exchanges`, `bita_fund`.
+Сущности с fact-трекингом (`entity_id.btc_holdings`; `strategy` дополнительно даёт `usd_reserve`): `strategy`, `metaplanet`, `twenty_one_capital`, `mara_holdings`, `bstr`, `strive`, `oranjebtc`, `el_salvador`, `spacex`, `tether`. Плюс агрегатные категории без отдельной сущности в ENTITIES.json: `top100_public_companies`, `etf_exchanges`, `bita_fund`.
 
 С 2026-08-09 у `strategy` и `metaplanet` дополнительно отслеживаются `mnav` и `btc_yield_ytd` (панель mNAV — механика BTC-казначейств, вкладка MACROCONTEXT), у `twenty_one_capital` — `mnav` — не входят в предложение выше по формату (там фиксированный якорь для теста-стража), но входят в `data/facts.json` наравне с остальными.
 

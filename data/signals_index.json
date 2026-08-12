@@ -4,6 +4,15 @@
   "_purpose": "Панорамное чтение корпуса целиком без риска исчерпать контекст; для точечной работы по конкретному сигналу использовать grep по signals.json",
   "signals": [
     {
+      "id": "STR-2026-0812-001",
+      "date": "2026-08-12",
+      "cluster": "etf_institutional_flow",
+      "dir": "pos",
+      "narrative_role": "complication",
+      "signal": "Goldman Sachs выкупает NEOS Investments за $2,25 млрд — получает лидирующий Bitcoin-доходный ETF BTCI с $1+ млрд активов",
+      "tension": "Goldman покупает готового лидера BTC-доходных ETF NEOS за $2,25 млрд вместо запуска своей поданной в SEC заявки — покупка чужого масштаба побеждает органическое наращивание, которым идёт конкурент BlackRock"
+    },
+    {
       "id": "STR-2026-0809-001",
       "date": "2026-08-09",
       "cluster": "strategy_model_stress",

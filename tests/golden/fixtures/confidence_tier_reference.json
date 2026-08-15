@@ -8,13 +8,17 @@
     "not_a_snapshot": "expected_tier каждого кейса ВЫВЕДЕН из текста критериев Р9 (поле derivation), а не скопирован из вывода кода. При расхождении кода с derivation неправ КОД. Обратный порядок (заморозить текущий вывод и назвать эталоном) отклонён явно — ADR-021, альтернатива 4.",
     "update_rule": "Изменение формулы, ломающее любой кейс, НЕ принимается автоматически: по BAMS Р13 понижение соответствия эталонным выводам — основание отклонить изменение, независимо от того, насколько разумным оно выглядит в отрыве от данных. Если изменение всё же верно, а эталон устарел — обновить derivation, утвердить вручную, записать в CHANGELOG.",
     "diversity_requirement": "BDKS R-06: набор обязан содержать разные исходы. Проверка на кейсах только одного уровня недействительна — enforced тестом test_reference_set_covers_all_three_tiers.",
-    "open_question": "Правило all_stale → low НЕ является буквальным критерием Р9: устаревание в тексте раздела не названо вовсе. Код трактует его как «данных структурно недостаточно» (критерий Низкой). Трактовка защитима (устаревшее доказательство не описывает текущее состояние), но это интерпретация. Вынесено владельцу домена: дописать устаревание в BAMS Р9 явным критерием или признать интерпретацией кода. См. кейсы с p9_criterion = 'interpretation_staleness'."
+    "open_question": "РАЗРЕШЁН ЧАСТИЧНО (BAMS v1.4, 2026-08-15). Было: «правило all_stale → low не является буквальным критерием Р9». Оказалось точнее: свежесть УЖЕ была в методологии — Раздел 3, четвёртый критерий качества сигнала — но Р9 на неё не ссылался. BAMS v1.4 связь дописала: устаревание названо компонентом уверенности и уточнено в критерии «Низкой». ОСТАЁТСЯ расхождение, зарегистрированное как docs/NIES.md AD-10: Р3 требует различать скорость устаревания по категориям («рыночные сигналы устаревают быстро, инфраструктурные — медленно»), а код применяет единый STALE_THRESHOLD=30 ко всем. На реальных данных видно на кейсе real-layer2-programmability — кластер целиком инфраструктурный (theme: infrastructure, возраст 40-67 дней), то есть по методологии медленно устаревающий, но получает «Низкую» по порогу, рассчитанному как будто на рыночные сигналы. Числа для категорийных порогов назначить нечем — калибровка без данных отклонена ADR-011. ВАЖНО про локализацию дефекта: сама classify_confidence_tier() исправна — при переданных входах её ответы верны. AD-10 находится ВЫШЕ по потоку, в вычислении all_stale (scripts/synthesizer.py), поэтому кейсы здесь не помечены xfail: это обвиняло бы не тот компонент. Целевое поведение после закрытия долга закреплено отдельным кейсом target-infrastructure-not-stale-under-category-threshold."
   },
   "cases": [
     {
       "id": "real-btc-treasury-competition",
       "origin": "production cluster btc_treasury_competition (2026-08-15)",
-      "inputs": { "direct_evidence_count": 22, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 22,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Р9, «Высокая»: ≥2 независимых прямых доказательства и ни одного неразрешённого противоречия. 22 прямых сигнала (weight onchain/primary), спора в ключевом факте у anchor нет. Исторический прецедент по BAMS v1.3 — усиливающий, необязательный фактор, его отсутствие уровень не понижает."
@@ -22,7 +26,11 @@
     {
       "id": "real-strategy-model-stress",
       "origin": "production cluster strategy_model_stress (2026-08-15)",
-      "inputs": { "direct_evidence_count": 16, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 16,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 16 прямых доказательств, спора у anchor нет."
@@ -30,7 +38,11 @@
     {
       "id": "real-etf-institutional-flow",
       "origin": "production cluster etf_institutional_flow (2026-08-15)",
-      "inputs": { "direct_evidence_count": 15, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 15,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 15 прямых доказательств, спора у anchor нет."
@@ -38,7 +50,11 @@
     {
       "id": "real-lightning-payments",
       "origin": "production cluster lightning_payments (2026-08-15)",
-      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 6,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
@@ -46,7 +62,11 @@
     {
       "id": "real-mining-ai-diversification",
       "origin": "production cluster mining_ai_diversification (2026-08-15)",
-      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 6,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
@@ -54,7 +74,11 @@
     {
       "id": "real-supply-scarcity",
       "origin": "production cluster supply_scarcity (2026-08-15)",
-      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 6,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
@@ -62,7 +86,11 @@
     {
       "id": "real-mining-operations",
       "origin": "production cluster mining_operations (2026-08-15)",
-      "inputs": { "direct_evidence_count": 4, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 4,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 4 прямых доказательства, спора у anchor нет."
@@ -70,7 +98,11 @@
     {
       "id": "real-bitcoin-governance-debate",
       "origin": "production cluster bitcoin_governance_debate (2026-08-15)",
-      "inputs": { "direct_evidence_count": 4, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 4,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 4 прямых доказательства, спора у anchor нет."
@@ -78,7 +110,11 @@
     {
       "id": "real-quantum-security",
       "origin": "production cluster quantum_security (2026-08-15)",
-      "inputs": { "direct_evidence_count": 3, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 3,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Тот же критерий Высокой: 3 прямых доказательства (порог ≥2 пройден), спора у anchor нет."
@@ -86,7 +122,11 @@
     {
       "id": "real-wallet-security-incidents",
       "origin": "production cluster wallet_security_incidents (2026-08-15)",
-      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": true, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 1,
+        "anchor_has_disputed_facts": true,
+        "all_stale": false
+      },
       "expected_tier": "low",
       "p9_criterion": "low_unresolved_conflict_in_key_fact",
       "derivation": "Р9, «Низкая»: есть неразрешённое противоречие в ключевом факте. У anchor-сигнала (INF-2026-0730-001) заполнен disputed_facts — конфликт ФАКТОВ по BAMS Р7 тип 1, зафиксированный структурно. Спор в ключевом факте перекрывает наличие прямого доказательства."
@@ -94,7 +134,11 @@
     {
       "id": "real-btc-payment-adoption",
       "origin": "production cluster btc_payment_adoption (2026-08-15)",
-      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 1,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "medium",
       "p9_criterion": "medium_direct_but_insufficient_independent",
       "derivation": "Р9, «Средняя»: есть прямое доказательство, но независимых подтверждений недостаточно. Ровно 1 прямой сигнал — порог ≥2 для Высокой не пройден, но и «только косвенные доказательства» (критерий Низкой) не выполнено."
@@ -102,23 +146,35 @@
     {
       "id": "real-layer2-programmability",
       "origin": "production cluster layer2_programmability (2026-08-15)",
-      "inputs": { "direct_evidence_count": 3, "anchor_has_disputed_facts": false, "all_stale": true },
+      "inputs": {
+        "direct_evidence_count": 3,
+        "anchor_has_disputed_facts": false,
+        "all_stale": true
+      },
       "expected_tier": "low",
-      "p9_criterion": "interpretation_staleness",
-      "derivation": "ВНИМАНИЕ — не буквальный критерий Р9. По буквальному чтению это «Высокая»: 3 прямых доказательства, противоречий нет. Код даёт «Низкую», трактуя устаревание (все сигналы старше STALE_THRESHOLD) как «данных структурно недостаточно». Устаревание в тексте Р9 не названо вовсе. Трактовка защитима — устаревшее доказательство не описывает текущее состояние системы — но это решение кода, а не буква методологии. См. _meta.open_question."
+      "p9_criterion": "low_stale_evidence_uniform_threshold_caveat",
+      "derivation": "Р9 (v1.4), «Низкая»: данных структурно недостаточно — включая случай, когда все доказательства устарели по мерке своей категории (Р3, ось временной свежести). При переданных входах (all_stale=True) уровень «Низкая» — единственно верный, и функция его даёт. ОГОВОРКА (AD-10) — она НЕ про эту функцию, а про её ВХОД: сам факт all_stale=True для этого кластера получен единым порогом STALE_THRESHOLD=30 (scripts/synthesizer.py, вычисление all_stale), а кластер целиком инфраструктурный (theme: infrastructure, возраст 40-67 дней) — по Р3 такие сигналы устаревают медленно. Под категорийным порогом вход был бы all_stale=False, и правильным уровнем стала бы «Высокая» (см. кейс target-infrastructure-not-stale-under-category-threshold). Поэтому кейс НЕ помечен xfail: тестируемая функция исправна, дефект выше по потоку."
     },
     {
       "id": "real-leverage-deleveraging-cycle",
       "origin": "production cluster leverage_deleveraging_cycle (2026-08-15)",
-      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": false, "all_stale": true },
+      "inputs": {
+        "direct_evidence_count": 1,
+        "anchor_has_disputed_facts": false,
+        "all_stale": true
+      },
       "expected_tier": "low",
-      "p9_criterion": "interpretation_staleness",
-      "derivation": "Двойное основание. По букве Р9 без учёта устаревания это «Средняя» (1 прямое доказательство, независимых подтверждений недостаточно). Код понижает до «Низкой» по тому же правилу устаревания, что и layer2_programmability. Тот же открытый вопрос — см. _meta.open_question."
+      "p9_criterion": "low_stale_evidence_uniform_threshold_caveat",
+      "derivation": "Двойное основание. Без учёта свежести профиль дал бы «Среднюю» (1 прямое доказательство, независимых подтверждений недостаточно). Устаревание всех сигналов понижает до «Низкой» — Р9 (v1.4) через ось свежести Р3. ОГОВОРКА (AD-10) слабее, чем у layer2: категории macro/narrative относятся к БЫСТРО устаревающим по Р3, а возраст 31 и 40 дней превышает порог с запасом — под категорийным порогом вход, скорее всего, остался бы all_stale=True, и уровень не изменился бы. Единый порог здесь даёт верный ответ по совпадению, а не по обоснованию."
     },
     {
       "id": "boundary-zero-direct-evidence",
       "origin": "boundary (в production не встречается)",
-      "inputs": { "direct_evidence_count": 0, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 0,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "low",
       "p9_criterion": "low_only_indirect_evidence",
       "derivation": "Р9, «Низкая»: только косвенные доказательства. Ноль сигналов с weight onchain/primary означает, что весь кластер держится на market/media — по BAMS Раздел 3 это косвенное доказательство. Граничный кейс: в production сейчас нет ни одного кластера без прямых доказательств, но правило должно работать и для него."
@@ -126,7 +182,11 @@
     {
       "id": "boundary-exactly-two-direct",
       "origin": "boundary (нижняя граница Высокой)",
-      "inputs": { "direct_evidence_count": 2, "anchor_has_disputed_facts": false, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 2,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
       "expected_tier": "high",
       "p9_criterion": "high_two_or_more_direct_no_contradiction",
       "derivation": "Р9 говорит «≥2 независимых прямых доказательства» — ровно 2 порог проходят. Кейс фиксирует именно границу: сдвиг порога на >2 сломает его и потребует явного пересмотра, а не пройдёт незамеченным."
@@ -134,7 +194,11 @@
     {
       "id": "boundary-one-direct-with-disputed-fact",
       "origin": "boundary (приоритет спора над «Средней»)",
-      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": true, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 1,
+        "anchor_has_disputed_facts": true,
+        "all_stale": false
+      },
       "expected_tier": "low",
       "p9_criterion": "low_unresolved_conflict_in_key_fact",
       "derivation": "Без спора этот профиль дал бы «Среднюю» (см. real-btc-payment-adoption). Наличие неразрешённого противоречия в ключевом факте понижает до «Низкой» — критерий Низкой в Р9 перечисляет спор в ключевом факте как самостоятельное, достаточное основание, не требующее одновременного отсутствия прямых доказательств."
@@ -142,10 +206,26 @@
     {
       "id": "boundary-many-direct-with-disputed-fact",
       "origin": "boundary (спор перекрывает объём доказательств)",
-      "inputs": { "direct_evidence_count": 20, "anchor_has_disputed_facts": true, "all_stale": false },
+      "inputs": {
+        "direct_evidence_count": 20,
+        "anchor_has_disputed_facts": true,
+        "all_stale": false
+      },
       "expected_tier": "low",
       "p9_criterion": "low_unresolved_conflict_in_key_fact",
       "derivation": "Р9 не даёт способа скомпенсировать неразрешённое противоречие в ключевом факте количеством прямых доказательств: критерий Высокой требует «ни одного неразрешённого противоречия» как обязательное условие, а не как одно из слагаемых. 20 прямых сигналов уровень не поднимают."
+    },
+    {
+      "id": "target-infrastructure-not-stale-under-category-threshold",
+      "origin": "target (целевое поведение после закрытия AD-10)",
+      "inputs": {
+        "direct_evidence_count": 3,
+        "anchor_has_disputed_facts": false,
+        "all_stale": false
+      },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же профиль доказательств, что у real-layer2-programmability (3 прямых, споров нет), но с входом all_stale=False — каким он стал бы под категорийным порогом Р3, где инфраструктурные сигналы возрастом 40-67 дней устаревшими не считаются. Кейс проходит УЖЕ СЕЙЧАС: функция исправна, менять её при закрытии AD-10 не потребуется. Он фиксирует, что именно изменится после исправления порога — уровень кластера поднимется до «Высокой» — чтобы это было решением, принятым заранее и осознанно, а не сюрпризом в момент правки."
     }
   ]
 }

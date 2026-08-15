@@ -204,7 +204,7 @@ jobs:
           # выше не тронул файл (0 реально изменившихся кластеров, см. его докстринг) —
           # git add на неизменённый файл безопасен и ничего не коммитит.
           git add data/synthesis_history_count.json
-          BRANCH="bot/sync-synthesis-${{ github.run_id }}"
+          BRANCH="bot/sync-synthesis-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update synthesis_cache.json"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"

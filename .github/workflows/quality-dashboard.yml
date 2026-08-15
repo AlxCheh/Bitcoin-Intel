@@ -62,7 +62,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/QUALITY_DASHBOARD.md
-          BRANCH="bot/update-dashboard-${{ github.run_id }}"
+          BRANCH="bot/update-dashboard-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update QUALITY_DASHBOARD.md"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"

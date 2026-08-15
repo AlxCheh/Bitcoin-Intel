@@ -65,7 +65,7 @@ jobs:
             gh pr close "$old_pr" --delete-branch || true
           done
 
-          BRANCH="bot/sync-volume-${{ github.run_id }}"
+          BRANCH="bot/sync-volume-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update daily BTC volume data"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"

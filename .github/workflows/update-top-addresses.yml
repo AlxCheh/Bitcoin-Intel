@@ -70,7 +70,7 @@ jobs:
             gh pr close "$old_pr" --delete-branch || true
           done
 
-          BRANCH="bot/sync-top-addresses-${{ github.run_id }}"
+          BRANCH="bot/sync-top-addresses-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update top addresses data (Blockchair)"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"

@@ -1,0 +1,151 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-08-15",
+    "rule": "BAMS Раздел 9 («Шкала уверенности»)",
+    "implements": "classify_confidence_tier() — config/settings.py",
+    "description": "Эталонный набор для регрессии правила Р9 в духе BAMS Р13. Первое правило методологии, реализованное кодом ПОЛНОСТЬЮ (без человеческого шага внутри), поэтому единственное, к которому регрессия применима — см. docs/ADR-021-ad3-methodology-regression-scope.md, Находка 3.",
+    "not_a_snapshot": "expected_tier каждого кейса ВЫВЕДЕН из текста критериев Р9 (поле derivation), а не скопирован из вывода кода. При расхождении кода с derivation неправ КОД. Обратный порядок (заморозить текущий вывод и назвать эталоном) отклонён явно — ADR-021, альтернатива 4.",
+    "update_rule": "Изменение формулы, ломающее любой кейс, НЕ принимается автоматически: по BAMS Р13 понижение соответствия эталонным выводам — основание отклонить изменение, независимо от того, насколько разумным оно выглядит в отрыве от данных. Если изменение всё же верно, а эталон устарел — обновить derivation, утвердить вручную, записать в CHANGELOG.",
+    "diversity_requirement": "BDKS R-06: набор обязан содержать разные исходы. Проверка на кейсах только одного уровня недействительна — enforced тестом test_reference_set_covers_all_three_tiers.",
+    "open_question": "Правило all_stale → low НЕ является буквальным критерием Р9: устаревание в тексте раздела не названо вовсе. Код трактует его как «данных структурно недостаточно» (критерий Низкой). Трактовка защитима (устаревшее доказательство не описывает текущее состояние), но это интерпретация. Вынесено владельцу домена: дописать устаревание в BAMS Р9 явным критерием или признать интерпретацией кода. См. кейсы с p9_criterion = 'interpretation_staleness'."
+  },
+  "cases": [
+    {
+      "id": "real-btc-treasury-competition",
+      "origin": "production cluster btc_treasury_competition (2026-08-15)",
+      "inputs": { "direct_evidence_count": 22, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Р9, «Высокая»: ≥2 независимых прямых доказательства и ни одного неразрешённого противоречия. 22 прямых сигнала (weight onchain/primary), спора в ключевом факте у anchor нет. Исторический прецедент по BAMS v1.3 — усиливающий, необязательный фактор, его отсутствие уровень не понижает."
+    },
+    {
+      "id": "real-strategy-model-stress",
+      "origin": "production cluster strategy_model_stress (2026-08-15)",
+      "inputs": { "direct_evidence_count": 16, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 16 прямых доказательств, спора у anchor нет."
+    },
+    {
+      "id": "real-etf-institutional-flow",
+      "origin": "production cluster etf_institutional_flow (2026-08-15)",
+      "inputs": { "direct_evidence_count": 15, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 15 прямых доказательств, спора у anchor нет."
+    },
+    {
+      "id": "real-lightning-payments",
+      "origin": "production cluster lightning_payments (2026-08-15)",
+      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
+    },
+    {
+      "id": "real-mining-ai-diversification",
+      "origin": "production cluster mining_ai_diversification (2026-08-15)",
+      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
+    },
+    {
+      "id": "real-supply-scarcity",
+      "origin": "production cluster supply_scarcity (2026-08-15)",
+      "inputs": { "direct_evidence_count": 6, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 6 прямых доказательств, спора у anchor нет."
+    },
+    {
+      "id": "real-mining-operations",
+      "origin": "production cluster mining_operations (2026-08-15)",
+      "inputs": { "direct_evidence_count": 4, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 4 прямых доказательства, спора у anchor нет."
+    },
+    {
+      "id": "real-bitcoin-governance-debate",
+      "origin": "production cluster bitcoin_governance_debate (2026-08-15)",
+      "inputs": { "direct_evidence_count": 4, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 4 прямых доказательства, спора у anchor нет."
+    },
+    {
+      "id": "real-quantum-security",
+      "origin": "production cluster quantum_security (2026-08-15)",
+      "inputs": { "direct_evidence_count": 3, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Тот же критерий Высокой: 3 прямых доказательства (порог ≥2 пройден), спора у anchor нет."
+    },
+    {
+      "id": "real-wallet-security-incidents",
+      "origin": "production cluster wallet_security_incidents (2026-08-15)",
+      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": true, "all_stale": false },
+      "expected_tier": "low",
+      "p9_criterion": "low_unresolved_conflict_in_key_fact",
+      "derivation": "Р9, «Низкая»: есть неразрешённое противоречие в ключевом факте. У anchor-сигнала (INF-2026-0730-001) заполнен disputed_facts — конфликт ФАКТОВ по BAMS Р7 тип 1, зафиксированный структурно. Спор в ключевом факте перекрывает наличие прямого доказательства."
+    },
+    {
+      "id": "real-btc-payment-adoption",
+      "origin": "production cluster btc_payment_adoption (2026-08-15)",
+      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "medium",
+      "p9_criterion": "medium_direct_but_insufficient_independent",
+      "derivation": "Р9, «Средняя»: есть прямое доказательство, но независимых подтверждений недостаточно. Ровно 1 прямой сигнал — порог ≥2 для Высокой не пройден, но и «только косвенные доказательства» (критерий Низкой) не выполнено."
+    },
+    {
+      "id": "real-layer2-programmability",
+      "origin": "production cluster layer2_programmability (2026-08-15)",
+      "inputs": { "direct_evidence_count": 3, "anchor_has_disputed_facts": false, "all_stale": true },
+      "expected_tier": "low",
+      "p9_criterion": "interpretation_staleness",
+      "derivation": "ВНИМАНИЕ — не буквальный критерий Р9. По буквальному чтению это «Высокая»: 3 прямых доказательства, противоречий нет. Код даёт «Низкую», трактуя устаревание (все сигналы старше STALE_THRESHOLD) как «данных структурно недостаточно». Устаревание в тексте Р9 не названо вовсе. Трактовка защитима — устаревшее доказательство не описывает текущее состояние системы — но это решение кода, а не буква методологии. См. _meta.open_question."
+    },
+    {
+      "id": "real-leverage-deleveraging-cycle",
+      "origin": "production cluster leverage_deleveraging_cycle (2026-08-15)",
+      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": false, "all_stale": true },
+      "expected_tier": "low",
+      "p9_criterion": "interpretation_staleness",
+      "derivation": "Двойное основание. По букве Р9 без учёта устаревания это «Средняя» (1 прямое доказательство, независимых подтверждений недостаточно). Код понижает до «Низкой» по тому же правилу устаревания, что и layer2_programmability. Тот же открытый вопрос — см. _meta.open_question."
+    },
+    {
+      "id": "boundary-zero-direct-evidence",
+      "origin": "boundary (в production не встречается)",
+      "inputs": { "direct_evidence_count": 0, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "low",
+      "p9_criterion": "low_only_indirect_evidence",
+      "derivation": "Р9, «Низкая»: только косвенные доказательства. Ноль сигналов с weight onchain/primary означает, что весь кластер держится на market/media — по BAMS Раздел 3 это косвенное доказательство. Граничный кейс: в production сейчас нет ни одного кластера без прямых доказательств, но правило должно работать и для него."
+    },
+    {
+      "id": "boundary-exactly-two-direct",
+      "origin": "boundary (нижняя граница Высокой)",
+      "inputs": { "direct_evidence_count": 2, "anchor_has_disputed_facts": false, "all_stale": false },
+      "expected_tier": "high",
+      "p9_criterion": "high_two_or_more_direct_no_contradiction",
+      "derivation": "Р9 говорит «≥2 независимых прямых доказательства» — ровно 2 порог проходят. Кейс фиксирует именно границу: сдвиг порога на >2 сломает его и потребует явного пересмотра, а не пройдёт незамеченным."
+    },
+    {
+      "id": "boundary-one-direct-with-disputed-fact",
+      "origin": "boundary (приоритет спора над «Средней»)",
+      "inputs": { "direct_evidence_count": 1, "anchor_has_disputed_facts": true, "all_stale": false },
+      "expected_tier": "low",
+      "p9_criterion": "low_unresolved_conflict_in_key_fact",
+      "derivation": "Без спора этот профиль дал бы «Среднюю» (см. real-btc-payment-adoption). Наличие неразрешённого противоречия в ключевом факте понижает до «Низкой» — критерий Низкой в Р9 перечисляет спор в ключевом факте как самостоятельное, достаточное основание, не требующее одновременного отсутствия прямых доказательств."
+    },
+    {
+      "id": "boundary-many-direct-with-disputed-fact",
+      "origin": "boundary (спор перекрывает объём доказательств)",
+      "inputs": { "direct_evidence_count": 20, "anchor_has_disputed_facts": true, "all_stale": false },
+      "expected_tier": "low",
+      "p9_criterion": "low_unresolved_conflict_in_key_fact",
+      "derivation": "Р9 не даёт способа скомпенсировать неразрешённое противоречие в ключевом факте количеством прямых доказательств: критерий Высокой требует «ни одного неразрешённого противоречия» как обязательное условие, а не как одно из слагаемых. 20 прямых сигналов уровень не поднимают."
+    }
+  ]
+}

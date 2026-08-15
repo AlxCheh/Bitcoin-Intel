@@ -28,7 +28,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #   PATCH — bugfix без изменения логики (ревью не требуется)
 # Хранится в каждой записи synthesis_store/*.json и synthesis_cache.json
 # как поле algorithm_version.
-ALGORITHM_VERSION = "2.1.1"
+# 2.1.1 → 2.2.0 (2026-08-15, MINOR): два новых выходных поля карточки —
+# confidence_tier (AD-1, трёхуровневая шкала BAMS Р9) и alternative_scenario
+# (+ source_id; AD-4, BAMS Р8). Выбор tension/anchor/causal chain НЕ менялся,
+# поэтому MINOR, не MAJOR. Бамп покрывает и confidence_tier тоже: при его
+# добавлении версия не была поднята — упущение, исправляется здесь явно,
+# а не задним числом молча.
+ALGORITHM_VERSION = "2.2.0"
 
 from config.settings import (
     assert_deterministic_env,
@@ -141,6 +147,10 @@ class SynthesisResult:
     entity_count:        int   = 0
     anchor_entity_share: float = 1.0
     is_minority_anchor:  bool  = False
+    # AD-4/BAMS Р8 (2026-08-15): пустые при confidence_tier == "high" (сценарий
+    # не требуется) и когда ни у одного сигнала кластера поля нет.
+    alternative_scenario:           str = ""
+    alternative_scenario_source_id: str = ""
 
 
 # ─── Вспомогательные ──────────────────────────────────────────────────────────
@@ -452,6 +462,58 @@ def _select_tension_source(signals: list[dict], contradicts_map: dict) -> Option
         ).toordinal()),
     ))
     return candidates[0]
+
+
+def _select_alternative_scenario(
+    anchor: Optional[dict],
+    ranked_signals: list[dict],
+    confidence_tier: str,
+) -> tuple[str, str]:
+    """
+    Отбирает альтернативный сценарий для карточки кластера (BAMS Р8, AD-4).
+
+    BAMS Р8 требует полноценный альтернативный сценарий, когда уверенность
+    вывода НИЖЕ ВЫСОКОЙ. До закрытия AD-1 формальной границы «не высокая»
+    не существовало — именно поэтому ADR-015 закрыла AD-4 только частично
+    (поле на уровне сигнала есть, отбор в карточке отложен). Граница
+    появилась как `confidence_tier` (config/settings.py) — эта функция
+    использует её, а не изобретает временный порог (та же ошибка, что
+    ADR-011 уже отклонила для confidence в целом).
+
+    Синтезатор ВЫБИРАЕТ, не генерирует (RQ-18, NIES S11) — текст сценария
+    целиком берётся из сигнала, ни одно слово здесь не сочиняется.
+
+    Приоритет кандидатов:
+      1. anchor-сигнал (tension_source или anchor_trigger) — сценарий тогда
+         гарантированно относится к тому же сигналу, что дал tension карточки
+      2. остальные сигналы в порядке ранга — первый, у кого поле непусто
+
+    Fallback на п.2 нужен реально, не теоретически: на корпусе 2026-08-15
+    из 4 кластеров с tier != high у трёх сценарий несёт сам anchor, а у
+    layer2_programmability — только другой сигнал кластера. Строгий
+    «только anchor» потерял бы этот кластер целиком.
+
+    Возвращает (текст_сценария, id_сигнала_донора) — id нужен для
+    прослеживаемости (NIES Traceability: каждый элемент карточки
+    разрешается до сигнала). Оба пустые, если tier == "high" (BAMS Р8
+    не требует сценария при высокой уверенности) или ни у одного
+    сигнала поля нет.
+    """
+    if confidence_tier == "high":
+        return "", ""
+
+    candidates = []
+    if anchor is not None:
+        candidates.append(anchor)
+    anchor_id = (anchor or {}).get("id")
+    candidates.extend(s for s in ranked_signals if s.get("id") != anchor_id)
+
+    for signal in candidates:
+        scenario = (signal.get("alternative_scenario") or "").strip()
+        if scenario:
+            return scenario, signal.get("id", "")
+
+    return "", ""
 
 
 def _capitalize(text: str) -> str:
@@ -822,6 +884,13 @@ def synthesize_cluster(
         anchor_has_disputed_facts=bool(anchor_obj.get("disputed_facts")),
         all_stale=all_stale,
     )
+    # AD-4 (ADR-015, отложенная часть): показывать альтернативный сценарий,
+    # когда уверенность ниже высокой — граница появилась вместе с AD-1.
+    alternative_scenario, alternative_scenario_source_id = _select_alternative_scenario(
+        anchor=anchor_obj,
+        ranked_signals=ranked_signals,
+        confidence_tier=confidence_tier,
+    )
 
     # Суммарный score
     cluster_score = SignalScore()
@@ -891,6 +960,8 @@ def synthesize_cluster(
         entity_count=entity_count,
         anchor_entity_share=anchor_entity_share,
         is_minority_anchor=is_minority_anchor,
+        alternative_scenario=alternative_scenario,
+        alternative_scenario_source_id=alternative_scenario_source_id,
     )
 
 
@@ -933,6 +1004,8 @@ def _save_synthesis(cluster_key: str, result: SynthesisResult,
         "strength":         result.strength,
         "confidence":       round(result.confidence, 3),
         "confidence_tier":  result.confidence_tier,
+        "alternative_scenario":           result.alternative_scenario,
+        "alternative_scenario_source_id": result.alternative_scenario_source_id,
         "phase":            result.phase,
         "score":            result.score.total,
         "signal_count":     result.signal_count,
@@ -1015,6 +1088,8 @@ def main() -> None:
                 "strength":         result.strength,
                 "confidence":       round(result.confidence, 3),
         "confidence_tier":  result.confidence_tier,
+        "alternative_scenario":           result.alternative_scenario,
+        "alternative_scenario_source_id": result.alternative_scenario_source_id,
                 "phase":            result.phase,
                 "score":            result.score.total,
                 "signal_count":     result.signal_count,

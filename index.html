@@ -2012,6 +2012,27 @@ header {
   cursor: help;
 }
 
+/* AD-4 / BAMS Р8: альтернативный сценарий — показывается только когда
+   confidence_tier != 'high'. Приглушённый намеренно: это оговорка к
+   основному нарративу, не конкурент tension за внимание читателя. */
+.dash-narrative-alt-scenario {
+  border-left: 2px solid var(--dim2);
+  padding-left: 8px;
+  margin: 6px 0 4px;
+}
+.dash-narrative-alt-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin-bottom: 3px;
+}
+.dash-narrative-alt-text {
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.5;
+}
+
 .dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
 .dash-sum-bar { display: flex; height: 6px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
@@ -4337,7 +4358,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=2653cb583e"></script>
+<script src="js/app-main.js?v=15a5b10ed0"></script>
 
 </div><!-- /.app-scroll -->
 

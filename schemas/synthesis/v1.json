@@ -37,6 +37,14 @@
       "enum": ["high", "medium", "low"],
       "description": "Дискретная трёхуровневая шкала по критериям BAMS Р9 (docs/NIES.md AD-1, docs/ADR-020-ad1-blocker-decomposition.md) — дополняет confidence выше, не заменяет. Введено 2026-08-15; не входит в required — записи synthesis_store, созданные до этой даты, поля не содержат и не бэкфиллятся (тот же принцип, что algorithm_version, см. ADR-013)."
     },
+    "alternative_scenario": {
+      "type": "string",
+      "description": "Альтернативный сценарий развития (BAMS Р8, docs/NIES.md AD-4, docs/ADR-015-alternative-scenario-partial-closure.md). Отбирается синтезатором из поля alternative_scenario сигналов кластера — НЕ генерируется (RQ-18, NIES S11). Пустая строка, когда confidence_tier == 'high' (BAMS Р8 требует сценарий только при уверенности ниже высокой) или ни у одного сигнала кластера поля нет. Введено 2026-08-15, не в required — по тому же принципу, что confidence_tier/algorithm_version."
+    },
+    "alternative_scenario_source_id": {
+      "type": "string",
+      "description": "id сигнала-донора для alternative_scenario — прослеживаемость карточки до исходного сигнала (NIES, принцип Traceability). Пустая строка, когда alternative_scenario пуст."
+    },
     "phase": {
       "type": "string",
       "description": "Фаза нарратива кластера (active/resolution/... — значения определяются synthesizer.py, не зафиксированы отдельным enum здесь, т.к. набор фаз развивается)"

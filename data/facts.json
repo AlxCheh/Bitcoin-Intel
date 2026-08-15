@@ -1,8 +1,14 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-08-09",
+  "generated_at": "2026-08-10",
   "facts": {
+    "bita_fund.aum": {
+      "value": 59240000,
+      "unit": "usd",
+      "as_of": "2026-08-04",
+      "signal_id": "STR-2026-0806-001"
+    },
     "bstr.btc_holdings": {
       "value": 30021,
       "unit": "BTC",
@@ -33,6 +39,18 @@
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
     },
+    "metaplanet.btc_yield_ytd": {
+      "value": 2.45,
+      "unit": "%",
+      "as_of": "2026-08-09",
+      "signal_id": "STR-2026-0809-001"
+    },
+    "metaplanet.mnav": {
+      "value": 1.03,
+      "unit": "x",
+      "as_of": "2026-08-09",
+      "signal_id": "STR-2026-0809-001"
+    },
     "oranjebtc.btc_holdings": {
       "value": 3904,
       "unit": "BTC",
@@ -51,6 +69,18 @@
       "as_of": "2026-07-31",
       "signal_id": "STR-2026-0731-002"
     },
+    "strategy.btc_yield_ytd": {
+      "value": 3.5,
+      "unit": "%",
+      "as_of": "2026-08-07",
+      "signal_id": "STR-2026-0809-001"
+    },
+    "strategy.mnav": {
+      "value": 1.05,
+      "unit": "x",
+      "as_of": "2026-08-09",
+      "signal_id": "STR-2026-0809-001"
+    },
     "strategy.usd_reserve": {
       "value": 4000000000,
       "unit": "USD",
@@ -63,6 +93,12 @@
       "as_of": "2026-07-24",
       "signal_id": "STR-2026-0727-002"
     },
+    "tether.btc_holdings": {
+      "value": 98933,
+      "unit": "BTC",
+      "as_of": "2026-06-30",
+      "signal_id": "STR-2026-0731-003"
+    },
     "top100_public_companies.btc_holdings": {
       "value": 1264867,
       "unit": "BTC",
@@ -74,6 +110,12 @@
       "unit": "BTC",
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
+    },
+    "twenty_one_capital.mnav": {
+      "value": 0.73,
+      "unit": "x",
+      "as_of": "2026-07-22",
+      "signal_id": "STR-2026-0809-002"
     }
   }
 }

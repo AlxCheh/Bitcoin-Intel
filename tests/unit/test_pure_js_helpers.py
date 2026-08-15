@@ -226,3 +226,83 @@ console.log(JSON.stringify(Object.fromEntries(ns.map(n => [n, f(n)]))));
             "121": "сигнал", "122": "сигнала",
         }
         assert r == expected, {k: (r[k], expected[k]) for k in expected if r[k] != expected[k]}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# fmtFactValue(value, format) — форматирование значений FACTS для DOM
+# ═══════════════════════════════════════════════════════════════════════
+
+@pytest.fixture(scope="module")
+def fmt_fact_value_fn(html_source):
+    return extract_js_function(html_source, "fmtFactValue")
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+class TestFmtFactValue:
+    """
+    2026-08-09: новый формат 'dec' добавлен для ячеек mNAV/BTC Yield
+    (панель theory-mnav) — toLocaleString('ru-RU') по умолчанию даёт
+    запятую как разделитель (1,05), несовпадение с конвенцией точки,
+    уже принятой на сайте для десятичных чисел (0.83x и т.д. по всему
+    сайту). Найдено и исправлено ДО деплоя, не постфактум.
+    """
+
+    @pytest.fixture
+    def fn(self, fmt_fact_value_fn):
+        return fmt_fact_value_fn
+
+    def test_dec_format_uses_period_not_comma(self, fn):
+        js = fn + """
+console.log(JSON.stringify({
+  mnav: fmtFactValue(1.05, 'dec'),
+  yield_no_trailing_zero: fmtFactValue(3.5, 'dec'),
+  yield_two_decimals: fmtFactValue(2.45, 'dec'),
+}));
+"""
+        result = _run_js(js)
+        assert result["mnav"] == "1.05"
+        assert "," not in result["mnav"]
+        assert result["yield_no_trailing_zero"] == "3.5"  # не "3.50"
+        assert result["yield_two_decimals"] == "2.45"
+
+    def test_dec_format_strips_trailing_zero_for_whole_numbers(self, fn):
+        js = fn + """
+console.log(JSON.stringify({ whole: fmtFactValue(1.0, 'dec') }));
+"""
+        result = _run_js(js)
+        assert result["whole"] == "1"  # не "1.00"
+
+    def test_k_format_still_works(self, fn):
+        """Регрессия — новый формат не должен был сломать существующие."""
+        js = fn + """
+console.log(JSON.stringify({ k: fmtFactValue(842138, 'k') }));
+"""
+        result = _run_js(js)
+        assert result["k"] == "842K"
+
+    def test_usd_b_format_still_works(self, fn):
+        js = fn + """
+console.log(JSON.stringify({ usd: fmtFactValue(2400000000, 'usd_b') }));
+"""
+        result = _run_js(js)
+        assert result["usd"] == "$2,4 млрд"
+
+    def test_usd_m_format_for_million_scale_values(self, fn):
+        """
+        2026-08-09: usd_b рассчитан на масштаб в миллиардах - для BITA
+        AUM ($59,24М) деление на 1e9 дало бы вводящее в заблуждение
+        "$0,1 млрд". usd_m - тот же паттерн, для масштаба в миллионах.
+        """
+        js = fn + """
+console.log(JSON.stringify({ usd: fmtFactValue(59240000, 'usd_m') }));
+"""
+        result = _run_js(js)
+        assert result["usd"] == "$59,2М"
+
+    def test_default_format_unchanged_for_integers(self, fn):
+        """Дефолтная ветка (toLocaleString) по-прежнему используется для целых чисел (BTC-резервы и т.п.) - не заменена глобально форматом 'dec'."""
+        js = fn + """
+console.log(JSON.stringify({ default: fmtFactValue(842138, undefined) }));
+"""
+        result = _run_js(js)
+        assert "842" in result["default"]

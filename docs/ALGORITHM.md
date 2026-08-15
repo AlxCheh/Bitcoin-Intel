@@ -226,6 +226,7 @@ class SynthesisResult:
     takeaway:          str      # ключевая мысль, не дублирует tension/narrative
     strength:          str      # strong | moderate | weak
     confidence:        float    # [0.1, 1.0]
+    confidence_tier:   str      # high | medium | low — дискретная шкала BAMS Р9 (AD-1)
     phase:             str      # active | tension | resolution | structural
     score:             SignalScore
     anchor_signal_id:  str      # ID сигнала-источника tension
@@ -237,7 +238,13 @@ class SynthesisResult:
     signals_used:      list = []
     signals_ignored:   list = []   # дубликаты, выброшенные на Шаге 0
     generated_at:      str
+    alternative_scenario:           str = ""   # BAMS Р8 (AD-4) — пусто при tier == "high"
+    alternative_scenario_source_id: str = ""   # id сигнала-донора сценария
 ```
+
+**`confidence_tier` vs `confidence`** — две разные величины, не дубликаты. `confidence` (непрерывная эвристика, `calculate_confidence`) используется для внутреннего ранжирования и rationale; `confidence_tier` (`classify_confidence_tier`) — дискретная шкала по операциональным критериям BAMS Р9, вычисляется независимо от непрерывного значения, не пороговой нарезкой из него (обоснование — `docs/ADR-020-ad1-blocker-decomposition.md`).
+
+**`alternative_scenario`** отбирается `_select_alternative_scenario()` только при `confidence_tier != "high"` (BAMS Р8 требует сценарий лишь когда уверенность ниже высокой). Приоритет: anchor-сигнал → остальные по рангу, первый с непустым полем. Синтезатор **выбирает, не генерирует** (RQ-18) — текст целиком из сигнала, `alternative_scenario_source_id` фиксирует, из какого именно.
 
 Имён `core_tension`, `market_structure`, `btc_implication` в коде **не существует** — если встретишь их в старой документации, это устаревшие названия из ранней архитектурной версии (до реализации).
 

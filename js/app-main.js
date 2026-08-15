@@ -2563,6 +2563,22 @@ function renderDashboard() {
       + (s.entity_count ? ' (' + s.entity_count + ' сущностей всего)' : '');
   }
 
+  // AD-4 / BAMS Р8: альтернативный сценарий показывается, когда уверенность
+  // синтеза ниже высокой. Отбор делает Python (scripts/synthesizer.py,
+  // _select_alternative_scenario) — здесь только отрисовка уже отобранного
+  // текста; JS не повторяет логику отбора и не решает, показывать ли (пустое
+  // поле = не показывать), тот же принцип, что для uncertainty выше.
+  // Вынесено в чистую функцию для тестируемости (tests/unit/test_alt_scenario_indicator.py).
+  function buildAltScenarioHtml(synthesis) {
+    const s = synthesis || {};
+    const text = (s.alternative_scenario || '').trim();
+    if (!text) return '';
+    return '<div class="dash-narrative-alt-scenario">'
+      +   '<div class="dash-narrative-alt-label">⚠ ЕСЛИ ИНТЕРПРЕТАЦИЯ НЕВЕРНА</div>'
+      +   '<div class="dash-narrative-alt-text">' + sanitize(text) + '</div>'
+      + '</div>';
+  }
+
   // Разворот карточки нарратива: список сигналов signals_used/signals_ignored,
   // каждый id кликабелен — переход во вкладку Дайджест + скролл к карточке
   // сигнала (переиспользует существующий pendingScrollSignal-паттерн, см.
@@ -2636,6 +2652,7 @@ function renderDashboard() {
       + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
+      + buildAltScenarioHtml(synthesis)
       + '<div class="dash-sum-counts" style="margin:5px 0">'
       +   '<span class="dsc-pos">🟢 ' + (cl.pos||0) + '</span>'
       +   '<span class="dsc-neg">🔴 ' + (cl.neg||0) + '</span>'

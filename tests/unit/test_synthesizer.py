@@ -117,7 +117,7 @@ def test_synthesis_result_default_algorithm_version_matches_constant():
     from scripts.synthesizer import ALGORITHM_VERSION, SynthesisResult, SignalScore
     result = SynthesisResult(
         cluster="test", tension="X vs Y", narrative="n", takeaway="t",
-        strength="weak", confidence=0.5, phase="active",
+        strength="weak", confidence=0.5, confidence_tier="medium", phase="active",
         score=SignalScore(), anchor_signal_id="X-1", signal_count=1,
     )
     assert result.algorithm_version == ALGORITHM_VERSION

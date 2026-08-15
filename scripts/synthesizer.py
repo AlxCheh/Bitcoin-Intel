@@ -35,6 +35,8 @@ from config.settings import (
     assert_required_files_exist,
     calculate_max_possible_score,
     calculate_confidence,
+    classify_confidence_tier,
+    DIRECT_EVIDENCE_WEIGHTS,
     get_strength,
     FRESHNESS_SCORE, WEIGHT_SCORE, ROLE_SCORE, CONTRADICTION_BONUS,
     SCORE_HOT, WINDOW_DAYS_DEFAULT, STALE_THRESHOLD, ARCHIVE_THRESHOLD,
@@ -119,6 +121,7 @@ class SynthesisResult:
     takeaway:          str
     strength:          str
     confidence:        float
+    confidence_tier:   str
     phase:             str
     score:             SignalScore
     anchor_signal_id:  str
@@ -786,6 +789,11 @@ def synthesize_cluster(
         )
 
     # ШАГ 11: Confidence
+    # anchor_obj вынесен сюда (было в ШАГ 12) — нужен уже здесь для
+    # classify_confidence_tier(); ШАГ 12 переиспользует те же переменные.
+    anchor_id  = (tension_source or anchor_trigger).get("id", "?")
+    anchor_obj = tension_source or anchor_trigger
+
     all_scores   = [sc for _, sc in ranked]
     total_score  = sum(sc.total for sc in all_scores)
     # Находка 2026-07-21: было has_contradicts=any(...) — бинарный флаг не
@@ -806,6 +814,14 @@ def synthesize_cluster(
         all_stale=all_stale,
         has_tension=bool(tension_source),
     )
+    direct_evidence_count = sum(
+        1 for s in active_signals if s.get("weight") in DIRECT_EVIDENCE_WEIGHTS
+    )
+    confidence_tier = classify_confidence_tier(
+        direct_evidence_count=direct_evidence_count,
+        anchor_has_disputed_facts=bool(anchor_obj.get("disputed_facts")),
+        all_stale=all_stale,
+    )
 
     # Суммарный score
     cluster_score = SignalScore()
@@ -822,8 +838,8 @@ def synthesize_cluster(
         )
 
     # ШАГ 12: Rationale
-    anchor_id  = (tension_source or anchor_trigger).get("id", "?")
-    anchor_obj = tension_source or anchor_trigger
+    # anchor_id/anchor_obj уже вычислены в ШАГ 11 (нужны раньше для
+    # classify_confidence_tier) — переиспользуются здесь без изменений.
 
     # Фаза B: диагностика периферийности anchor — только измерение, не влияет
     # ни на что выше (tension/anchor уже выбраны на Шаге 6, не переопределяются)
@@ -841,7 +857,7 @@ def synthesize_cluster(
         f"weight: {anchor_obj.get('weight','?')}); "
         f"partA from {anchor_trigger.get('id','?')}; "
         f"phase: {phase}; bridge: '{bridge}'; "
-        f"confidence: {confidence:.2f}; "
+        f"confidence: {confidence:.2f}; confidence_tier: {confidence_tier}; "
         f"signals_used: {len(signals_used)}; "
         f"ignored_duplicates: {ignored_ids}"
     )
@@ -849,7 +865,8 @@ def synthesize_cluster(
     logger.info(
         f"Synthesized '{cluster_key}': {get_strength(cluster_score.total)} | "
         f"phase={phase} | score={cluster_score.total} | "
-        f"confidence={confidence:.2f} | signals={len(active_signals)}",
+        f"confidence={confidence:.2f} | tier={confidence_tier} | "
+        f"signals={len(active_signals)}",
         extra={"cluster": cluster_key}
     )
 
@@ -860,6 +877,7 @@ def synthesize_cluster(
         takeaway=takeaway,
         strength=get_strength(cluster_score.total),
         confidence=confidence,
+        confidence_tier=confidence_tier,
         phase=phase,
         score=cluster_score,
         anchor_signal_id=anchor_id,
@@ -914,6 +932,7 @@ def _save_synthesis(cluster_key: str, result: SynthesisResult,
         "takeaway":         result.takeaway,
         "strength":         result.strength,
         "confidence":       round(result.confidence, 3),
+        "confidence_tier":  result.confidence_tier,
         "phase":            result.phase,
         "score":            result.score.total,
         "signal_count":     result.signal_count,
@@ -995,6 +1014,7 @@ def main() -> None:
                 "takeaway":         result.takeaway,
                 "strength":         result.strength,
                 "confidence":       round(result.confidence, 3),
+        "confidence_tier":  result.confidence_tier,
                 "phase":            result.phase,
                 "score":            result.score.total,
                 "signal_count":     result.signal_count,

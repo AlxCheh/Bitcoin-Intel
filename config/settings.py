@@ -109,6 +109,87 @@ def calculate_confidence(score_total: int, n_signals: int,
 
     return max(0.1, min(1.0, raw))
 
+# ─── Трёхуровневая шкала уверенности (BAMS Р9) ───────────────────────────────
+# docs/NIES.md AD-1, docs/ADR-020-ad1-blocker-decomposition.md.
+#
+# НЕ калибровка/замена calculate_confidence() выше — отдельная, дополнительная
+# классификация. calculate_confidence() остаётся эвристикой для ранжирования
+# и внутреннего rationale; classify_confidence_tier() — дискретная шкала,
+# которую буквально требует BAMS Р9 и которой не было ни в каком виде
+# (сам разрыв — предмет AD-1).
+#
+# weight ∈ {onchain, primary} — "прямое доказательство" по BAMS Р9. market/media
+# — косвенное. Единственный runtime-источник этого деления (наравне с
+# WEIGHT_SCORE ниже) — не дублировать по значению в другом месте (ADR-014).
+DIRECT_EVIDENCE_WEIGHTS = frozenset({"onchain", "primary"})
+
+
+def classify_confidence_tier(direct_evidence_count: int,
+                              anchor_has_disputed_facts: bool,
+                              all_stale: bool) -> str:
+    """
+    Дискретная уверенность по критериям BAMS Р9 ("Шкала уверенности") —
+    high/medium/low. Критерии оценивают состояние доказательств кластера
+    на момент синтеза, не предсказывают будущее (см. ADR-020).
+
+    Параметры — уже агрегированные на уровне кластера, вычисляются вызывающей
+    стороной (scripts/synthesizer.py, ШАГ 11):
+        direct_evidence_count     — число активных сигналов кластера с
+                                     weight ∈ DIRECT_EVIDENCE_WEIGHTS
+        anchor_has_disputed_facts — есть ли непустой disputed_facts[] у
+                                     anchor-сигнала (tension_source или
+                                     anchor_trigger) — НЕ у любого сигнала
+                                     кластера. Критерий Р9 — "противоречие
+                                     в КЛЮЧЕВОМ факте", ключевой факт — тот,
+                                     на котором держится вывод ЭТОГО кластера,
+                                     не любой факт в его доказательной базе.
+                                     Проверено эмпирически на реальном корпусе
+                                     (2026-08-15): агрегация "любой сигнал
+                                     кластера" систематически наказывает
+                                     крупные, лучше всего обеспеченные
+                                     кластеры — 1 спорный факт из 22-28
+                                     сигналов топил весь кластер до low,
+                                     тогда как однoсигнальные кластеры без
+                                     единого спора получали high. Тот же
+                                     класс инверсии, что уже пойман для
+                                     links.contradicts в ADR-020.
+        all_stale                 — все активные сигналы кластера старше
+                                     STALE_THRESHOLD (та же величина, что
+                                     already использует calculate_confidence)
+
+    Критерий "исторический прецедент" (BAMS Р9) сюда сознательно не входит:
+    BAMS v1.3 переформулировала его как опциональный бонус, не обязательное
+    условие для high (см. ADR-020, разрешение открытого вопроса) — при
+    текущем отсутствии Golden Dataset-матчинга (AD-3) он просто никогда не
+    участвует, это не пробел данной функции.
+
+    "Данных структурно недостаточно" (BAMS Р9, критерий low) отдельно не
+    моделируется — покрывается direct_evidence_count == 0 и all_stale;
+    вводить отдельный порог по числу сигналов без калибровки было бы той же
+    "фиктивной точностью", которую ADR-011 уже отклонила для другой части
+    формулы.
+
+    >>> classify_confidence_tier(2, False, False)
+    'high'
+    >>> classify_confidence_tier(1, False, False)
+    'medium'
+    >>> classify_confidence_tier(0, False, False)
+    'low'
+    >>> classify_confidence_tier(5, True, False)
+    'low'
+    >>> classify_confidence_tier(5, False, True)
+    'low'
+    """
+    if anchor_has_disputed_facts:
+        return "low"
+    if direct_evidence_count == 0:
+        return "low"
+    if all_stale:
+        return "low"
+    if direct_evidence_count >= 2:
+        return "high"
+    return "medium"
+
 # ─── Score: веса по полям ────────────────────────────────────────────────────
 FRESHNESS_SCORE = {
     "fresh":   3,   # age <= 7 дней

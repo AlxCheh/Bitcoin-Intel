@@ -32,6 +32,11 @@
       "enum": ["structural", "strong", "moderate", "weak"]
     },
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "confidence_tier": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Дискретная трёхуровневая шкала по критериям BAMS Р9 (docs/NIES.md AD-1, docs/ADR-020-ad1-blocker-decomposition.md) — дополняет confidence выше, не заменяет. Введено 2026-08-15; не входит в required — записи synthesis_store, созданные до этой даты, поля не содержат и не бэкфиллятся (тот же принцип, что algorithm_version, см. ADR-013)."
+    },
     "phase": {
       "type": "string",
       "description": "Фаза нарратива кластера (active/resolution/... — значения определяются synthesizer.py, не зафиксированы отдельным enum здесь, т.к. набор фаз развивается)"

@@ -1,13 +1,14 @@
 name: Update Top Addresses Data
 
-# ⚠️ ПЕРВЫЙ ЗАПУСК ЭТОГО WORKFLOW — ПРОВЕРОЧНЫЙ. scripts/fetch_top_addresses.py
-# написан по задокументированному, но лично не проверенному синтаксису
-# Blockchair API (интерактивная сессия не имела сетевого доступа к
-# blockchair.com — см. шапку скрипта и обсуждение 2026-07-25). Если первый
-# прогон здесь упадёт на шаге "Fetch top addresses data" — это ожидаемо
-# и означает, что реальный формат ответа API отличается от предполагаемого;
-# исправить build_top_addresses_payload() по сообщению об ошибке, не
-# отключать эту проверку.
+# ИСТОЧНИК: blockchain.info/balance — см. шапку scripts/fetch_top_addresses.py
+# для полной истории. Первая версия (25 июля) обращалась к Blockchair API и
+# написана была по документированному, но лично не проверенному синтаксису —
+# первый реальный прогон здесь провалился на 22 дня подряд (HTTP 430, IP
+# заблокирован без ключа), никто не заметил, потому что красный шедулер не
+# блокирует PR. 16 августа источник заменён на blockchain.info, проверенный
+# фактически. Урок для будущей смены источника: проверить хотя бы один
+# workflow_dispatch-прогон вручную и посмотреть результат, не полагаться на
+# то, что зелёный CI шага "Fetch top addresses data" сам себя подтвердит.
 
 on:
   schedule:
@@ -72,10 +73,10 @@ jobs:
 
           BRANCH="bot/sync-top-addresses-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
-          git commit -m "chore: update top addresses data (Blockchair)"
+          git commit -m "chore: update top addresses data (blockchain.info)"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
           gh pr create --base main --head "$BRANCH" \
             --title "chore: sync top addresses data ($(date -u +%Y-%m-%d))" \
-            --body "Автообновление data/top_addresses.json (scripts/fetch_top_addresses.py). ⚠️ Если это первый успешный прогон — стоит вручную сверить структуру ответа Blockchair с предположениями в скрипте перед мержем. Auto-merge после зелёного validate."
+            --body "Автообновление data/top_addresses.json (scripts/fetch_top_addresses.py, blockchain.info/balance). Auto-merge после зелёного validate."
           gh pr merge "$BRANCH" --auto --squash --delete-branch \
             || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

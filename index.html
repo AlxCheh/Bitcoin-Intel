@@ -550,7 +550,7 @@ header {
 .eco-badge.closed  { color: var(--red); border-color: rgba(194,96,96,0.3); }
 .eco-badge.pending { color: var(--amber); border-color: rgba(200,168,75,0.3); }
 
-/* Топ-100 богатейших адресов (data/top_addresses.json, Blockchair) —
+/* Крупнейшие известные адреса (data/top_addresses.json, blockchain.info) —
    те же .eco-badge/.eco-compact-row паттерны, что "Экосистема Bitcoin",
    плюс цвет категории слева (биржа/потеряно-конфисковано/неизвестно),
    чтобы не вводить новый визуальный язык (иконки-квадраты из превью)
@@ -3679,14 +3679,14 @@ header {
       </div>
     </div>
 
-    <!-- Топ-100 богатейших адресов (data/top_addresses.json, Blockchair) —
+    <!-- Крупнейшие известные адреса (data/top_addresses.json, blockchain.info) —
          добавлено 2026-07-25 по обсуждению в чате. ⚠️ Источник ещё не
          верифицирован реальным прогоном (см. scripts/fetch_top_addresses.py
          шапку) — на момент коммита data/top_addresses.json содержит черновик
          на реальных цифрах bitinfocharts, не live Blockchair-данные. -->
     <div class="panel collapsed" style="margin-top:12px;scroll-margin-top:64px" id="top-addr-panel">
       <div class="panel-head collapsible" data-collapse-target="top-addr-panel">
-        <span class="panel-title">Топ-100 богатейших адресов</span>
+        <span class="panel-title">Крупнейшие известные адреса</span>
         <span class="panel-head-right"><span class="panel-tag" id="ta-count">—</span><span class="panel-collapse-arrow">▾</span></span>
       </div>
       <div class="ta-meta" id="ta-meta">—</div>

@@ -3213,7 +3213,18 @@ function ruPlural(n, one, few, many) {
 function renderTOC(containerId, items) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  const n = items.length;
+
+  // 2026-08-16: items может быть либо плоским массивом записей
+  // ({target,title,subtitle}, как раньше — macrocontext-toc/lightning-toc),
+  // либо массивом групп ({group, items:[...]}, как теперь theory-toc).
+  // Приводим плоский случай к одной безымянной группе — дальше один и тот
+  // же путь рендера, не два параллельных куска кода.
+  const groups = (items.length && items[0].group !== undefined)
+    ? items
+    : [{ group: null, items: items }];
+
+  const n = groups.reduce(function(sum, g) { return sum + g.items.length; }, 0);
+  let counter = 0;
 
   let html = '<div style="margin-top:12px;border:1px solid var(--btc);background:var(--bg2)">';
   html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--btc);background:var(--bg3)">'
@@ -3222,21 +3233,23 @@ function renderTOC(containerId, items) {
     + '<span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--btc);border:1px solid rgba(247,147,26,0.4);padding:2px 7px;border-radius:2px">' + n + '</span>'
     + '</div>';
 
-  html += items.map(function(item, i) {
-    const num = String(i + 1).padStart(2, '0');
-    const isLast = i === items.length - 1;
-    const borderStyle = isLast ? '' : 'border-bottom:1px solid var(--line);';
-    return '<div onclick="uncollapseAndScrollTo(\'' + item.target + '\')" '
-      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;' + borderStyle + 'cursor:pointer;transition:background 0.12s" '
-      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
-      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
-      + '<div style="flex:1">'
-      + '<div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:15px;color:var(--ivory);margin-bottom:3px">' + sanitize(item.title) + '</div>'
-      + '<div style="font-size:10px;color:var(--dim)">' + sanitize(item.subtitle) + '</div>'
-      + '</div>'
-      + '<span style="color:var(--dim);font-size:14px">›</span>'
-      + '</div>';
+  html += '<div style="padding:12px 14px">';
+  html += groups.map(function(g) {
+    let groupHtml = g.group ? '<div class="toc-group-label">' + sanitize(g.group) + '</div>' : '';
+    groupHtml += '<div class="toc-card-grid">';
+    groupHtml += g.items.map(function(item) {
+      counter++;
+      const num = String(counter).padStart(2, '0');
+      return '<div class="toc-card" onclick="uncollapseAndScrollTo(\'' + item.target + '\')">'
+        + '<span class="toc-card-num">' + num + '</span>'
+        + '<div class="toc-card-title">' + sanitize(item.title) + '</div>'
+        + '<div class="toc-card-subtitle">' + sanitize(item.subtitle) + '</div>'
+        + '</div>';
+    }).join('');
+    groupHtml += '</div>';
+    return groupHtml;
   }).join('');
+  html += '</div>';
 
   html += '</div>';
   el.innerHTML = html;

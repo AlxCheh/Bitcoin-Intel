@@ -54,6 +54,46 @@ if (appScrollEl) {
 }
 updateInstStickyTop();
 
+// ── Плавающая кнопка «↑ К содержанию» (2026-08-16) ──────────────────────
+// Показывается только на вкладках с оглавлением (theory/macrocontext/
+// lightning — те же три, что renderTOC() в app-main.js) после скролла
+// ниже порога. currentTabId — глобал, объявленный в app-main.js
+// (загружается ПОСЛЕ этого файла); на момент реального вызова этой
+// функции (пользователь уже скроллит/переключает вкладки) app-main.js
+// уже успел выполниться.
+var TOC_FAB_TABS = ['theory', 'macrocontext', 'lightning'];
+var TOC_FAB_SCROLL_THRESHOLD = 400;
+
+function updateTocFabVisibility() {
+  var fab = document.getElementById('toc-fab');
+  var scrollEl = document.querySelector('.app-scroll');
+  if (!fab || !scrollEl) return;
+  var shouldShow = TOC_FAB_TABS.indexOf(currentTabId) !== -1 && scrollEl.scrollTop > TOC_FAB_SCROLL_THRESHOLD;
+  fab.style.display = shouldShow ? 'flex' : 'none';
+}
+
+function scrollToActiveToc() {
+  var toc = document.getElementById(currentTabId + '-toc');
+  if (toc) toc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Тот же rAF-throttling паттерн, что у scheduleInstStickyTopUpdate выше —
+// см. комментарий там же про scroll-jank от необёрнутых 'scroll'-событий.
+var tocFabScheduled = false;
+function scheduleTocFabUpdate() {
+  if (tocFabScheduled) return;
+  tocFabScheduled = true;
+  requestAnimationFrame(function() {
+    tocFabScheduled = false;
+    updateTocFabVisibility();
+  });
+}
+if (appScrollEl) {
+  appScrollEl.addEventListener('scroll', scheduleTocFabUpdate, { passive: true });
+} else {
+  window.addEventListener('scroll', scheduleTocFabUpdate, { passive: true });
+}
+
 // ── Instrument sticky headers: handled via CSS ──
 
 // 2026-08-03: три JS-реактивных попытки синхронизировать .clusterbar с

@@ -52,6 +52,17 @@ def test_many_scroll_events_between_frames_trigger_only_one_heavy_call():
     в ОДИН вызов тяжёлой функции, не в N вызовов.
     """
     src = APP_EARLY_JS.read_text(encoding="utf-8")
+    # 2026-08-16: файл теперь содержит ВТОРОЙ независимый scroll-throttling
+    # блок (кнопка «к содержанию», scheduleTocFabUpdate) после sticky-top.
+    # Этот тест целится ИМЕННО в sticky-top в изоляции — мок window
+    # (addEventListener перезаписывает единственную переменную scrollHandler,
+    # не собирает массив) исторически предполагал ровно один 'scroll'-
+    # слушатель в файле. Обрезаем срез до появления второго блока — тот же
+    # принцип, что extract_js_function для отдельных функций, здесь для
+    # непрерывного участка модульного кода.
+    sticky_top_boundary = src.find("// ── Плавающая кнопка")
+    assert sticky_top_boundary != -1, "Граница блока «Плавающая кнопка» не найдена — переименована?"
+    src = src[:sticky_top_boundary]
 
     js = """
 let callCount = 0;

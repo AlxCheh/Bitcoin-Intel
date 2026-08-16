@@ -81,6 +81,11 @@ const TAB_TO_CLUSTER = { home: 'live', theory: 'macro' };
 let renderSubnavCalls = [];
 function renderSubnav(key, activeId) { renderSubnavCalls.push([key, activeId]); }
 function updateCrumb(id) {}
+// 2026-08-16: showTab() теперь вызывает updateTocFabVisibility() (кнопка
+// «к содержанию», js/app-early.js) сразу после установки currentTabId —
+// заглушка здесь, реальная логика этой функции покрыта отдельно
+// tests/unit/test_toc_fab.py, не предмет этого теста.
+function updateTocFabVisibility() {}
 const localStorage = { _store: {}, setItem: function(k, v) { this._store[k] = v; } };
 """
 

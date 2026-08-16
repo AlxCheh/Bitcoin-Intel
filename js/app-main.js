@@ -671,7 +671,21 @@ function renderAccItem(item) {
   html += '</div>';
   html += '<div class="acc-body' + (item.open ? ' open' : '') + '">';
   if (item.paragraphs && item.paragraphs.length) {
-    html += item.paragraphs.map(function(p){ return '<p>' + sanitizeStrong(p) + '</p>'; }).join('');
+    // 2026-08-16: элемент paragraphs может быть либо строкой (обычный
+    // абзац, как раньше), либо { list: [...] } — маркированный список.
+    // Добавлено для Saylor Series (секция "Рим" эпизода 1 — реальный
+    // список в исходном тексте пользователя, не искусственно навязанная
+    // структура). sanitizeStrong() применяется к каждому пункту списка
+    // тем же путём, что и к обычным абзацам — не отдельная лазейка мимо
+    // экранирования.
+    html += item.paragraphs.map(function(p){
+      if (p && typeof p === 'object' && p.list) {
+        return '<ul style="margin:8px 0 8px 18px;padding:0;display:flex;flex-direction:column;gap:6px">'
+          + p.list.map(function(li){ return '<li style="font-size:12px;color:var(--dim);line-height:1.6">' + sanitizeStrong(li) + '</li>'; }).join('')
+          + '</ul>';
+      }
+      return '<p>' + sanitizeStrong(p) + '</p>';
+    }).join('');
   }
   if (item.highlight) {
     html += '<div class="callout-mono">'

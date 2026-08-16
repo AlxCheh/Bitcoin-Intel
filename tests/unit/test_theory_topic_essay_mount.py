@@ -101,6 +101,11 @@ console.log(JSON.stringify({ html: renderTheoryTopic(topic) }));
 
         js = render_topic_source + f"""
 const topics = {json.dumps(topics_data)};
+// 2026-08-16: THEORY_TOPICS обязан существовать как глобал — renderTheoryTopic()
+// использует его для related_episodes (поиск panel_title связанного эпизода
+// Saylor Series по id). В реальном приложении объявлен на уровне модуля
+// (let THEORY_TOPICS = [];), здесь — синтетический харнесс, нужно явно.
+const THEORY_TOPICS = topics;
 const results = {{}};
 for (const t of topics) {{
   const html = renderTheoryTopic(t);

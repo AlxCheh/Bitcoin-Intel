@@ -776,7 +776,7 @@ function renderTheoryTopic(topic) {
           const related = (THEORY_TOPICS || []).find(function(x) { return x.id === rid; });
           const label = related ? related.panel_title : rid;
           const num = related && related.episode_number ? ' ' + String(related.episode_number).padStart(2, '0') : '';
-          return '<div class="ep-fn-badge" onclick="document.getElementById(\'' + sanitize(rid) + '\').scrollIntoView({behavior:\'smooth\'})">'
+          return '<div class="ep-fn-badge" onclick="goToSaylorEpisode(\'' + sanitize(rid) + '\')">'
             + '<span class="ep-fn-badge-label">ЭПИЗОД' + num + '</span>'
             + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
             + '</div>';
@@ -842,15 +842,25 @@ function renderTheoryTopics() {
 // ── SAYLOR SERIES — мини-раздел внутри ТЕОРИИ ───────────────────────────
 // Эпизоды — топики THEORY_TOPICS.json с target_group: 'saylor-series',
 // пропущенные generic-сканером renderTheoryTopics() (см. правку там же).
-// Индекс-карточки + полные панели эпизодов рендерятся сюда, в единственную
-// статичную точку монтирования theory-saylor-series-mount — без раздувания
-// theory-toc на 17 строк. Панель эпизода — тот же renderTheoryTopic(), что
-// у theory-dice-seed/theory-quantum, без дублирования кода.
+// 2026-08-16: раньше renderSaylorSeriesSection() рендерила индекс + ВСЕ
+// полные панели эпизодов разом (episodes.map(renderTheoryTopic).join(''))
+// — при 17 эпизодах это очень длинная страница. Теперь — index→detail:
+// по умолчанию показывается только сетка карточек (showSaylorSeriesIndex),
+// клик по карточке рендерит РОВНО один эпизод (showSaylorEpisode), кнопка
+// "назад" возвращает к сетке. Панель эпизода — тот же renderTheoryTopic(),
+// что у theory-dice-seed/theory-quantum, без дублирования кода.
 function renderSaylorSeriesSection() {
   const el = document.getElementById('theory-saylor-series-mount');
   if (!el) return;
   const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
   if (!episodes.length) return;
+  showSaylorSeriesIndex();
+}
+
+function showSaylorSeriesIndex() {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
 
   let html = '<div class="panel" style="margin-top:12px">';
   html += '<div class="panel-head"><span class="panel-title">Saylor Series</span>'
@@ -860,22 +870,45 @@ function renderSaylorSeriesSection() {
     + 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах, энергии и цивилизации. Разбор по одному эпизоду за раз.'
     + '</div></div>';
 
+  html += '<div style="padding:12px 14px"><div class="toc-card-grid">';
   html += episodes.map(function(ep) {
     const num = String(ep.episode_number || '').padStart(2, '0');
-    return '<div onclick="document.getElementById(\'' + sanitize(ep.id) + '\').scrollIntoView({behavior:\'smooth\'})" '
-      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" '
-      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
-      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
-      + '<div style="flex:1"><div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;color:var(--ivory)">'
-      + sanitize(ep.panel_title) + '</div></div>'
-      + '<span style="color:var(--dim);font-size:14px">›</span>'
+    return '<div class="toc-card" onclick="showSaylorEpisode(\'' + sanitize(ep.id) + '\')">'
+      + '<span class="toc-card-num">' + num + '</span>'
+      + '<div class="toc-card-title">' + sanitize(ep.panel_title) + '</div>'
       + '</div>';
   }).join('');
+  html += '</div></div>';
 
   html += '</div>';
-  html += episodes.map(renderTheoryTopic).join('');
-
   el.innerHTML = html;
+}
+
+function showSaylorEpisode(id) {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episode = THEORY_TOPICS.find(function(t) { return t.id === id && t.target_group === 'saylor-series'; });
+  if (!episode) return;
+
+  let html = '<div style="margin-top:12px">';
+  html += '<div onclick="showSaylorSeriesIndex()" '
+    + 'style="cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--btc);padding:8px 0;display:flex;align-items:center;gap:6px">'
+    + '<span>←</span><span>Ко всем эпизодам Saylor Series</span>'
+    + '</div>';
+  html += renderTheoryTopic(episode);
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// related_episodes-бейджи (см. renderTheoryTopic()) вызывают ЭТУ функцию,
+// не голый scrollIntoView — целевой эпизод может быть сейчас не в DOM
+// (показан индекс или другой эпизод), его сперва нужно отрендерить.
+function goToSaylorEpisode(id) {
+  if (!document.getElementById(id)) {
+    showSaylorEpisode(id);
+  }
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({ behavior: 'smooth' });
 }
 
 // ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
@@ -3213,7 +3246,18 @@ function ruPlural(n, one, few, many) {
 function renderTOC(containerId, items) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  const n = items.length;
+
+  // 2026-08-16: items может быть либо плоским массивом записей
+  // ({target,title,subtitle}, как раньше — macrocontext-toc/lightning-toc),
+  // либо массивом групп ({group, items:[...]}, как теперь theory-toc).
+  // Приводим плоский случай к одной безымянной группе — дальше один и тот
+  // же путь рендера, не два параллельных куска кода.
+  const groups = (items.length && items[0].group !== undefined)
+    ? items
+    : [{ group: null, items: items }];
+
+  const n = groups.reduce(function(sum, g) { return sum + g.items.length; }, 0);
+  let counter = 0;
 
   let html = '<div style="margin-top:12px;border:1px solid var(--btc);background:var(--bg2)">';
   html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--btc);background:var(--bg3)">'
@@ -3222,36 +3266,44 @@ function renderTOC(containerId, items) {
     + '<span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--btc);border:1px solid rgba(247,147,26,0.4);padding:2px 7px;border-radius:2px">' + n + '</span>'
     + '</div>';
 
-  html += items.map(function(item, i) {
-    const num = String(i + 1).padStart(2, '0');
-    const isLast = i === items.length - 1;
-    const borderStyle = isLast ? '' : 'border-bottom:1px solid var(--line);';
-    return '<div onclick="uncollapseAndScrollTo(\'' + item.target + '\')" '
-      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;' + borderStyle + 'cursor:pointer;transition:background 0.12s" '
-      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
-      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
-      + '<div style="flex:1">'
-      + '<div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:15px;color:var(--ivory);margin-bottom:3px">' + sanitize(item.title) + '</div>'
-      + '<div style="font-size:10px;color:var(--dim)">' + sanitize(item.subtitle) + '</div>'
-      + '</div>'
-      + '<span style="color:var(--dim);font-size:14px">›</span>'
-      + '</div>';
+  html += '<div style="padding:12px 14px">';
+  html += groups.map(function(g) {
+    let groupHtml = g.group ? '<div class="toc-group-label">' + sanitize(g.group) + '</div>' : '';
+    groupHtml += '<div class="toc-card-grid">';
+    groupHtml += g.items.map(function(item) {
+      counter++;
+      const num = String(counter).padStart(2, '0');
+      return '<div class="toc-card" onclick="uncollapseAndScrollTo(\'' + item.target + '\')">'
+        + '<span class="toc-card-num">' + num + '</span>'
+        + '<div class="toc-card-title">' + sanitize(item.title) + '</div>'
+        + '<div class="toc-card-subtitle">' + sanitize(item.subtitle) + '</div>'
+        + '</div>';
+    }).join('');
+    groupHtml += '</div>';
+    return groupHtml;
   }).join('');
+  html += '</div>';
 
   html += '</div>';
   el.innerHTML = html;
 }
 
 renderTOC('theory-toc', [
-  { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
-  { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
-  { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
-  { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
-  { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
-  { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' },
-  { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
-  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' },
-  { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
+  { group: 'ОСНОВЫ', items: [
+    { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
+    { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
+    { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
+    { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
+    { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' }
+  ]},
+  { group: 'БЕЗОПАСНОСТЬ', items: [
+    { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
+    { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
+    { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' }
+  ]},
+  { group: 'МЕДИА', items: [
+    { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
+  ]}
 ]);
 
 renderTOC('macrocontext-toc', [

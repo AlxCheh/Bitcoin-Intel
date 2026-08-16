@@ -54,6 +54,15 @@ def test_all_theory_tab_topics_have_explicit_mounts():
     — намеренное исключение, их место реально в macrocontext), обязан
     иметь свою явную точку монтирования внутри #tab-theory или
     #tab-lightning.
+
+    Третья категория (2026-08-16, Saylor Series): топики с полем
+    target_group рендерятся НЕ generic-сканером renderTheoryTopics() (он их
+    явно пропускает — см. js/app-main.js), а отдельной функцией
+    (renderSaylorSeriesSection() и потенциально другие в будущем) в общую
+    точку монтирования группы, не в свою собственную {id}-mount. У них нет
+    и не должно быть {id}-mount — это не пропуск, а архитектурное решение;
+    сама точка монтирования группы (theory-saylor-series-mount и т.п.)
+    проверяется отдельным тестом (tests/unit/test_saylor_series_section.py).
     """
     import json
     topics = json.loads((REPO_ROOT / "THEORY_TOPICS.json").read_text(encoding="utf-8"))["topics"]
@@ -73,6 +82,8 @@ def test_all_theory_tab_topics_have_explicit_mounts():
     for topic in topics:
         tid = topic["id"]
         if tid in INTENTIONAL_MACROCONTEXT_FALLBACK:
+            continue
+        if topic.get("target_group"):
             continue
         mount_marker = f'id="{tid}-mount"'
         if mount_marker not in theory_html and mount_marker not in lightning_html:

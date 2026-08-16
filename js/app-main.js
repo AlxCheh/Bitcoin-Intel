@@ -671,7 +671,21 @@ function renderAccItem(item) {
   html += '</div>';
   html += '<div class="acc-body' + (item.open ? ' open' : '') + '">';
   if (item.paragraphs && item.paragraphs.length) {
-    html += item.paragraphs.map(function(p){ return '<p>' + sanitizeStrong(p) + '</p>'; }).join('');
+    // 2026-08-16: элемент paragraphs может быть либо строкой (обычный
+    // абзац, как раньше), либо { list: [...] } — маркированный список.
+    // Добавлено для Saylor Series (секция "Рим" эпизода 1 — реальный
+    // список в исходном тексте пользователя, не искусственно навязанная
+    // структура). sanitizeStrong() применяется к каждому пункту списка
+    // тем же путём, что и к обычным абзацам — не отдельная лазейка мимо
+    // экранирования.
+    html += item.paragraphs.map(function(p){
+      if (p && typeof p === 'object' && p.list) {
+        return '<ul style="margin:8px 0 8px 18px;padding:0;display:flex;flex-direction:column;gap:6px">'
+          + p.list.map(function(li){ return '<li style="font-size:12px;color:var(--dim);line-height:1.6">' + sanitizeStrong(li) + '</li>'; }).join('')
+          + '</ul>';
+      }
+      return '<p>' + sanitizeStrong(p) + '</p>';
+    }).join('');
   }
   if (item.highlight) {
     html += '<div class="callout-mono">'
@@ -767,6 +781,12 @@ function renderTheoryTopics() {
     // контейнера), triggerTabData() может вызвать эту функцию дважды за
     // сессию. Если панель с этим id уже в DOM — пропускаем полностью.
     if (document.getElementById(topic.id)) return;
+    // 2026-08-16: топики с target_group рендерятся отдельным конвейером
+    // (renderSaylorSeriesSection() и аналогичные в будущем) — не через
+    // generic-сканер. Без этого пропуска они падают в общий контейнер
+    // theory-topics-container, который физически лежит на вкладке
+    // MACROCONTEXT, не ТЕОРИЯ (см. design doc 2026-08-16).
+    if (topic.target_group) return;
     // Точечный якорь: если в разметке уже стоит элемент с id="{id}-mount"
     // на конкретном месте (нужен позиционный контроль внутри своей
     // вкладки — например, среди других статичных панелей ТЕОРИИ), тема
@@ -785,6 +805,45 @@ function renderTheoryTopics() {
   // rest.length === 0 на повторном вызове — не трогаем innerHTML вовсе,
   // иначе затрём уже отрисованный контейнер пустой строкой.
   if (el && rest.length) el.innerHTML = rest.map(renderTheoryTopic).join('');
+}
+
+// ── SAYLOR SERIES — мини-раздел внутри ТЕОРИИ ───────────────────────────
+// Эпизоды — топики THEORY_TOPICS.json с target_group: 'saylor-series',
+// пропущенные generic-сканером renderTheoryTopics() (см. правку там же).
+// Индекс-карточки + полные панели эпизодов рендерятся сюда, в единственную
+// статичную точку монтирования theory-saylor-series-mount — без раздувания
+// theory-toc на 17 строк. Панель эпизода — тот же renderTheoryTopic(), что
+// у theory-dice-seed/theory-quantum, без дублирования кода.
+function renderSaylorSeriesSection() {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
+  if (!episodes.length) return;
+
+  let html = '<div class="panel" style="margin-top:12px">';
+  html += '<div class="panel-head"><span class="panel-title">Saylor Series</span>'
+    + '<span class="panel-tag">BREEDLOVE × SAYLOR</span></div>';
+  html += '<div style="padding:12px 14px;border-bottom:1px solid var(--line)">'
+    + '<div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">'
+    + 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах, энергии и цивилизации. Разбор по одному эпизоду за раз.'
+    + '</div></div>';
+
+  html += episodes.map(function(ep) {
+    const num = String(ep.episode_number || '').padStart(2, '0');
+    return '<div onclick="document.getElementById(\'' + sanitize(ep.id) + '\').scrollIntoView({behavior:\'smooth\'})" '
+      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" '
+      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
+      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
+      + '<div style="flex:1"><div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;color:var(--ivory)">'
+      + sanitize(ep.panel_title) + '</div></div>'
+      + '<span style="color:var(--dim);font-size:14px">›</span>'
+      + '</div>';
+  }).join('');
+
+  html += '</div>';
+  html += episodes.map(renderTheoryTopic).join('');
+
+  el.innerHTML = html;
 }
 
 // ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
@@ -2998,7 +3057,7 @@ function triggerTabData(id) {
   }
   if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderTopAddresses(); }
   if (id === 'lightning') renderTheoryTopics();
-  if (id === 'theory') { renderTheoryTopics(); renderTheoryEssays(); }
+  if (id === 'theory') { renderTheoryTopics(); renderSaylorSeriesSection(); renderTheoryEssays(); }
   if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }
@@ -3159,7 +3218,8 @@ renderTOC('theory-toc', [
   { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
   { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' },
   { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
-  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' }
+  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' },
+  { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
 ]);
 
 renderTOC('macrocontext-toc', [

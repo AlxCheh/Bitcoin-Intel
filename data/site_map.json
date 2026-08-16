@@ -1320,6 +1320,25 @@
       "dynamic": true
     },
     {
+      "id": "e111",
+      "title": "Saylor Series",
+      "cluster": "macro",
+      "cluster_label": "FUNDAMENTAL",
+      "tab": "theory",
+      "tab_label": "ТЕОРИЯ",
+      "source": "static",
+      "kind": "essay",
+      "keywords": [
+        "saylor series",
+        "michael saylor",
+        "robert breedlove",
+        "what is money",
+        "деньги как протокол",
+        "рим",
+        "энергия"
+      ]
+    },
+    {
       "id": "e075",
       "title": "mNAV — механика BTC-казначейств",
       "cluster": "macro",

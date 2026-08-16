@@ -758,19 +758,30 @@ function renderTheoryTopic(topic) {
   // второго эпизода — та же дисциплина "честный тест на факте, не наперёд",
   // что у context_chain сигналов. Заголовок связанного эпизода ищется по id
   // в THEORY_TOPICS — тот же паттерн, что theory_refs на карточке сущности
-  // (js/app-main.js, ~строка 1278). Если id ещё не существует (ссылка на
-  // ещё не написанный эпизод) — сырой id как fallback, не крах рендера.
+  // (js/app-main.js, showEntityPopup()). Если id ещё не существует (ссылка
+  // на ещё не написанный эпизод) — сырой id как fallback, не крах рендера.
+  //
+  // Стиль — .ep-fn-badge/-label/-cta (та же плашка "СВЯЗАННЫЕ ПАНЕЛИ
+  // ТЕОРИИ"/"СВЯЗАННЫЕ ФУНКЦИИ" из попапа сущности), не .crosslink —
+  // первая версия использовала .crosslink-arrow/-text/-target, у которых
+  // нет ни единого правила CSS в текущей вёрстке (эти классы остались
+  // только в паре старых статичных панелей до редизайна "Вариант 5"
+  // 2026-08-02, сам .crosslink рассчитан на .crosslink-text-col/-cta).
+  // Найдено пользователем визуально ("оформлено криво").
   if (topic.related_episodes && topic.related_episodes.length) {
     html += '<div style="padding:10px 14px;border-top:1px solid var(--line)">'
-      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em;margin-bottom:6px">СВЯЗАННЫЕ ЭПИЗОДЫ</div>'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em;margin-bottom:8px">СВЯЗАННЫЕ ЭПИЗОДЫ</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
       + topic.related_episodes.map(function(rid) {
           const related = (THEORY_TOPICS || []).find(function(x) { return x.id === rid; });
           const label = related ? related.panel_title : rid;
-          return '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(rid) + '\').scrollIntoView({behavior:\'smooth\'})">'
-            + '<span class="crosslink-arrow">↳</span>'
-            + '<span class="crosslink-text">' + sanitize(label) + '</span>'
+          const num = related && related.episode_number ? ' ' + String(related.episode_number).padStart(2, '0') : '';
+          return '<div class="ep-fn-badge" onclick="document.getElementById(\'' + sanitize(rid) + '\').scrollIntoView({behavior:\'smooth\'})">'
+            + '<span class="ep-fn-badge-label">ЭПИЗОД' + num + '</span>'
+            + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
             + '</div>';
         }).join('')
+      + '</div>'
       + '</div>';
   }
   // 2026-08-01: точка монтирования для THEORY_ESSAYS.json — найдено

@@ -84,42 +84,102 @@ def render_saylor_source() -> str:
         extract_js_function(src, "renderAccItem"),
         extract_js_function(src, "renderTheoryTopic"),
         extract_js_function(src, "renderSaylorSeriesSection"),
+        extract_js_function(src, "showSaylorSeriesIndex"),
+        extract_js_function(src, "showSaylorEpisode"),
+        extract_js_function(src, "goToSaylorEpisode"),
     ]
     return "\n\n".join(funcs)
 
 
-@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
-def test_render_saylor_series_section_builds_index_and_episode_panels(render_saylor_source):
-    js = render_saylor_source + """
+_TWO_EPISODES_JS = """
 const THEORY_TOPICS = [
   {
     id: 'saylor-series-01', target_group: 'saylor-series', episode_number: 1,
-    panel_title: 'Эпизод про огонь', panel_tag: 'SAYLOR SERIES · 01',
-    intro: 'Интро', items: [{ icon: '01', label: 'Огонь', paragraphs: ['текст'] }]
+    panel_title: 'Огонь, праща и Рим', panel_tag: 'SAYLOR SERIES · 01',
+    items: [{ icon: '01', label: 'Огонь', paragraphs: ['текст огня'] }]
   },
-  { id: 'theory-example', panel_title: 'Не эпизод', panel_tag: 'X' }
+  {
+    id: 'saylor-series-02', target_group: 'saylor-series', episode_number: 2,
+    panel_title: 'Империи, сталь и антибиотики', panel_tag: 'SAYLOR SERIES · 02',
+    related_episodes: ['saylor-series-01'],
+    items: [{ icon: '01', label: 'Империя', paragraphs: ['текст империи'] }]
+  }
 ];
-
 const registry = {};
 function makeMount(id) { return { innerHTML: '' }; }
 registry['theory-saylor-series-mount'] = makeMount('theory-saylor-series-mount');
 const document = { getElementById: function(id) { return registry[id] || null; } };
+"""
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+def test_render_saylor_series_section_shows_index_only_not_full_episodes(render_saylor_source):
+    js = render_saylor_source + _TWO_EPISODES_JS + """
 renderSaylorSeriesSection();
 const html = registry['theory-saylor-series-mount'].innerHTML;
 console.log(JSON.stringify({
-  hasIndexCard: html.includes('Эпизод про огонь'),
-  hasEpisodePanel: html.includes('id=\\"saylor-series-01\\"'),
-  hasEpisodeBody: html.includes('Огонь') && html.includes('текст'),
-  excludesNonEpisode: !html.includes('Не эпизод')
+  hasIndexTitles: html.includes('Огонь, праща и Рим') && html.includes('Империи, сталь и антибиотики'),
+  hasFullEpisodeBody: html.includes('текст огня') || html.includes('текст империи')
 }));
 """
     result = run_node_js(js)
     assert result.returncode == 0, f"Node failed:\n{result.stderr}"
     out = json.loads(result.stdout)
-    assert out["hasIndexCard"] is True
-    assert out["hasEpisodePanel"] is True
-    assert out["hasEpisodeBody"] is True
-    assert out["excludesNonEpisode"] is True
+    assert out["hasIndexTitles"] is True
+    assert out["hasFullEpisodeBody"] is False, (
+        "После renderSaylorSeriesSection() в DOM не должно быть полного тела "
+        "ни одного эпизода — только карточки индекса, до клика"
+    )
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+def test_show_saylor_episode_renders_exactly_one_episode_with_back_link(render_saylor_source):
+    js = render_saylor_source + _TWO_EPISODES_JS + """
+showSaylorEpisode('saylor-series-01');
+const html = registry['theory-saylor-series-mount'].innerHTML;
+console.log(JSON.stringify({
+  hasEpisode1Body: html.includes('текст огня'),
+  hasEpisode2Body: html.includes('текст империи'),
+  hasBackLink: html.includes('showSaylorSeriesIndex()')
+}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json.loads(result.stdout)
+    assert out["hasEpisode1Body"] is True
+    assert out["hasEpisode2Body"] is False, "Только показанный эпизод должен быть в DOM, не оба сразу"
+    assert out["hasBackLink"] is True
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+def test_show_saylor_series_index_returns_from_episode_view(render_saylor_source):
+    js = render_saylor_source + _TWO_EPISODES_JS + """
+showSaylorEpisode('saylor-series-01');
+showSaylorSeriesIndex();
+const html = registry['theory-saylor-series-mount'].innerHTML;
+console.log(JSON.stringify({
+  hasIndexTitles: html.includes('Огонь, праща и Рим') && html.includes('Империи, сталь и антибиотики'),
+  hasFullEpisodeBody: html.includes('текст огня')
+}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json.loads(result.stdout)
+    assert out["hasIndexTitles"] is True
+    assert out["hasFullEpisodeBody"] is False, "Возврат к индексу не должен оставлять старую панель эпизода в DOM"
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+def test_go_to_saylor_episode_renders_target_if_not_already_shown(render_saylor_source):
+    js = render_saylor_source + _TWO_EPISODES_JS + """
+goToSaylorEpisode('saylor-series-01');
+const html = registry['theory-saylor-series-mount'].innerHTML;
+console.log(JSON.stringify({ hasEpisode1Body: html.includes('текст огня') }));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json.loads(result.stdout)
+    assert out["hasEpisode1Body"] is True
 
 
 @pytest.fixture(scope="module")
@@ -161,7 +221,7 @@ console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[1]) }));
         html = json.loads(result.stdout)["html"]
         assert "СВЯЗАННЫЕ ЭПИЗОДЫ" in html
         assert "Огонь, праща и Рим" in html, "Заголовок связанного эпизода должен подтягиваться по id из THEORY_TOPICS, не показывать голый id"
-        assert "onclick=\"document.getElementById('saylor-series-01').scrollIntoView" in html
+        assert "onclick=\"goToSaylorEpisode('saylor-series-01')\"" in html
 
     def test_related_episode_uses_established_badge_pattern(self, render_topic_source):
         """

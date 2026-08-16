@@ -776,7 +776,7 @@ function renderTheoryTopic(topic) {
           const related = (THEORY_TOPICS || []).find(function(x) { return x.id === rid; });
           const label = related ? related.panel_title : rid;
           const num = related && related.episode_number ? ' ' + String(related.episode_number).padStart(2, '0') : '';
-          return '<div class="ep-fn-badge" onclick="document.getElementById(\'' + sanitize(rid) + '\').scrollIntoView({behavior:\'smooth\'})">'
+          return '<div class="ep-fn-badge" onclick="goToSaylorEpisode(\'' + sanitize(rid) + '\')">'
             + '<span class="ep-fn-badge-label">ЭПИЗОД' + num + '</span>'
             + '<span class="ep-fn-badge-cta">' + sanitize(label) + ' →</span>'
             + '</div>';
@@ -842,15 +842,25 @@ function renderTheoryTopics() {
 // ── SAYLOR SERIES — мини-раздел внутри ТЕОРИИ ───────────────────────────
 // Эпизоды — топики THEORY_TOPICS.json с target_group: 'saylor-series',
 // пропущенные generic-сканером renderTheoryTopics() (см. правку там же).
-// Индекс-карточки + полные панели эпизодов рендерятся сюда, в единственную
-// статичную точку монтирования theory-saylor-series-mount — без раздувания
-// theory-toc на 17 строк. Панель эпизода — тот же renderTheoryTopic(), что
-// у theory-dice-seed/theory-quantum, без дублирования кода.
+// 2026-08-16: раньше renderSaylorSeriesSection() рендерила индекс + ВСЕ
+// полные панели эпизодов разом (episodes.map(renderTheoryTopic).join(''))
+// — при 17 эпизодах это очень длинная страница. Теперь — index→detail:
+// по умолчанию показывается только сетка карточек (showSaylorSeriesIndex),
+// клик по карточке рендерит РОВНО один эпизод (showSaylorEpisode), кнопка
+// "назад" возвращает к сетке. Панель эпизода — тот же renderTheoryTopic(),
+// что у theory-dice-seed/theory-quantum, без дублирования кода.
 function renderSaylorSeriesSection() {
   const el = document.getElementById('theory-saylor-series-mount');
   if (!el) return;
   const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
   if (!episodes.length) return;
+  showSaylorSeriesIndex();
+}
+
+function showSaylorSeriesIndex() {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
 
   let html = '<div class="panel" style="margin-top:12px">';
   html += '<div class="panel-head"><span class="panel-title">Saylor Series</span>'
@@ -860,22 +870,45 @@ function renderSaylorSeriesSection() {
     + 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах, энергии и цивилизации. Разбор по одному эпизоду за раз.'
     + '</div></div>';
 
+  html += '<div style="padding:12px 14px"><div class="toc-card-grid">';
   html += episodes.map(function(ep) {
     const num = String(ep.episode_number || '').padStart(2, '0');
-    return '<div onclick="document.getElementById(\'' + sanitize(ep.id) + '\').scrollIntoView({behavior:\'smooth\'})" '
-      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" '
-      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
-      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
-      + '<div style="flex:1"><div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;color:var(--ivory)">'
-      + sanitize(ep.panel_title) + '</div></div>'
-      + '<span style="color:var(--dim);font-size:14px">›</span>'
+    return '<div class="toc-card" onclick="showSaylorEpisode(\'' + sanitize(ep.id) + '\')">'
+      + '<span class="toc-card-num">' + num + '</span>'
+      + '<div class="toc-card-title">' + sanitize(ep.panel_title) + '</div>'
       + '</div>';
   }).join('');
+  html += '</div></div>';
 
   html += '</div>';
-  html += episodes.map(renderTheoryTopic).join('');
-
   el.innerHTML = html;
+}
+
+function showSaylorEpisode(id) {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episode = THEORY_TOPICS.find(function(t) { return t.id === id && t.target_group === 'saylor-series'; });
+  if (!episode) return;
+
+  let html = '<div style="margin-top:12px">';
+  html += '<div onclick="showSaylorSeriesIndex()" '
+    + 'style="cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--btc);padding:8px 0;display:flex;align-items:center;gap:6px">'
+    + '<span>←</span><span>Ко всем эпизодам Saylor Series</span>'
+    + '</div>';
+  html += renderTheoryTopic(episode);
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// related_episodes-бейджи (см. renderTheoryTopic()) вызывают ЭТУ функцию,
+// не голый scrollIntoView — целевой эпизод может быть сейчас не в DOM
+// (показан индекс или другой эпизод), его сперва нужно отрендерить.
+function goToSaylorEpisode(id) {
+  if (!document.getElementById(id)) {
+    showSaylorEpisode(id);
+  }
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({ behavior: 'smooth' });
 }
 
 // ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих

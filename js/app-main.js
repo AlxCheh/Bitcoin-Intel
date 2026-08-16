@@ -3157,7 +3157,9 @@ renderTOC('theory-toc', [
   { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
   { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
   { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
-  { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' }
+  { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' },
+  { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
+  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' }
 ]);
 
 renderTOC('macrocontext-toc', [

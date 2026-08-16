@@ -253,6 +253,8 @@ Add this object as the last element of `topics` (keep valid JSON — comma after
     }
 ```
 
+> **Found during execution:** a pre-existing test, `tests/unit/test_theory_dice_seed_mount_location.py::test_all_theory_tab_topics_have_explicit_mounts`, asserts every `THEORY_TOPICS.json` topic has either an explicit `{id}-mount` or is in an `INTENTIONAL_MACROCONTEXT_FALLBACK` set — it didn't know about the new `target_group` category (topics deliberately handled by a dedicated renderer, no `{id}-mount` of their own). Fixed by adding a `topic.get("target_group")` skip to that test, with a docstring note explaining the third category. File: `tests/unit/test_theory_dice_seed_mount_location.py`.
+
 - [ ] **Step 8: Validate JSON**
 
 Run: `python -c "import json; json.load(open('THEORY_TOPICS.json', encoding='utf-8'))" && echo OK`

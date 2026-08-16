@@ -4,6 +4,11 @@ Bitcoin Intel — regression: topics with target_group must NOT be picked up
 by the generic renderTheoryTopics() scanner (they'd otherwise fall into
 theory-topics-container, which physically lives on the MACROCONTEXT tab —
 see docs/superpowers/specs/2026-08-16-saylor-series-theory-section-design.md).
+
+Also covers related_episodes rendering (added 2026-08-16 with episode 2 —
+deliberately deferred in the original design until a real second episode
+existed to link to, per the "honest test only" discipline used elsewhere
+in this project).
 """
 import json
 import shutil
@@ -115,3 +120,80 @@ console.log(JSON.stringify({
     assert out["hasEpisodePanel"] is True
     assert out["hasEpisodeBody"] is True
     assert out["excludesNonEpisode"] is True
+
+
+@pytest.fixture(scope="module")
+def render_topic_source() -> str:
+    src = APP_MAIN_JS.read_text(encoding="utf-8")
+    funcs = [
+        extract_js_function(src, "sanitize"),
+        extract_js_function(src, "sanitizeStrong"),
+        extract_js_function(src, "sourceFooterHtml"),
+        extract_js_function(src, "renderAccItem"),
+        extract_js_function(src, "renderTheoryTopic"),
+    ]
+    return "\n\n".join(funcs)
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+class TestRelatedEpisodes:
+
+    def test_topic_without_related_episodes_has_no_block(self, render_topic_source):
+        js = render_topic_source + """
+const THEORY_TOPICS = [{ id: 'saylor-series-01', panel_title: 'Эпизод 1', panel_tag: 'X' }];
+console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[0]) }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        html = json.loads(result.stdout)["html"]
+        assert "СВЯЗАННЫЕ ЭПИЗОДЫ" not in html
+
+    def test_related_episode_renders_clickable_link_with_looked_up_title(self, render_topic_source):
+        js = render_topic_source + """
+const THEORY_TOPICS = [
+  { id: 'saylor-series-01', panel_title: 'Огонь, праща и Рим', panel_tag: 'X' },
+  { id: 'saylor-series-02', panel_title: 'Империи, сталь и антибиотики', panel_tag: 'Y', related_episodes: ['saylor-series-01'] }
+];
+console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[1]) }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        html = json.loads(result.stdout)["html"]
+        assert "СВЯЗАННЫЕ ЭПИЗОДЫ" in html
+        assert "Огонь, праща и Рим" in html, "Заголовок связанного эпизода должен подтягиваться по id из THEORY_TOPICS, не показывать голый id"
+        assert "onclick=\"document.getElementById('saylor-series-01').scrollIntoView" in html
+
+    def test_related_episode_falls_back_to_raw_id_if_not_found(self, render_topic_source):
+        """Не должно падать, если ссылка на ещё не существующий эпизод — просто некрасивый fallback, не краш."""
+        js = render_topic_source + """
+const THEORY_TOPICS = [
+  { id: 'saylor-series-02', panel_title: 'Y', panel_tag: 'Y', related_episodes: ['saylor-series-03'] }
+];
+console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[0]) }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        html = json.loads(result.stdout)["html"]
+        assert "saylor-series-03" in html
+
+    def test_related_episodes_block_positioned_before_essays_mount(self, render_topic_source):
+        js = render_topic_source + """
+const THEORY_TOPICS = [
+  { id: 'saylor-series-01', panel_title: 'X', panel_tag: 'X' },
+  {
+    id: 'saylor-series-02', panel_title: 'Y', panel_tag: 'Y',
+    items: [{ icon: '01', label: 'Пункт', paragraphs: ['текст'] }],
+    related_episodes: ['saylor-series-01'],
+    source_footer: 'ИСТОЧНИК: тест'
+  }
+];
+console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[1]) }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        html = json.loads(result.stdout)["html"]
+        items_pos = html.find("Пункт")
+        related_pos = html.find("СВЯЗАННЫЕ ЭПИЗОДЫ")
+        mount_pos = html.find('id="saylor-series-02-essays"')
+        footer_pos = html.find("ИСТОЧНИК: тест")
+        assert items_pos < related_pos < mount_pos < footer_pos

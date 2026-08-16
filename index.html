@@ -975,6 +975,25 @@ header {
   letter-spacing: 0.08em; margin: 0 0 8px;
 }
 
+/* 2026-08-16: плавающая кнопка «к содержанию» — появляется после
+   небольшого скролла на вкладках с оглавлением (ТЕОРИЯ/MACROCONTEXT/
+   LIGHTNING), возвращает к соответствующему {tab}-toc. Логика показа —
+   js/app-early.js (тот же rAF-throttling паттерн, что у
+   scheduleInstStickyTopUpdate). position:fixed — вне .app-shell/.app-scroll,
+   тот же уровень, что .sitemap-overlay/.ep-overlay ниже по файлу. */
+.toc-fab {
+  position: fixed; right: 16px;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: none; align-items: center; gap: 6px;
+  background: var(--btc); color: var(--bg);
+  border: none; border-radius: 20px;
+  padding: 10px 16px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
 .ep-fn-badge {
   display: inline-flex; align-items: stretch; border-radius: 3px; overflow: hidden; cursor: pointer;
 }
@@ -2663,7 +2682,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-early.js?v=0da3de87af"></script>
+<script src="js/app-early.js?v=1be783ea92"></script>
 
 <section class="section" id="tab-theory">
   <div class="page">
@@ -4389,7 +4408,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=b9cf40b8f7"></script>
+<script src="js/app-main.js?v=db31e0fac4"></script>
 
 </div><!-- /.app-scroll -->
 
@@ -4401,6 +4420,10 @@ header {
 </div>
 
 </div><!-- /.app-shell -->
+
+<button id="toc-fab" class="toc-fab" onclick="scrollToActiveToc()">
+  <span>↑</span><span>К содержанию</span>
+</button>
 
 <!-- ══ КАРТА САЙТА (оверлей) ══ -->
 <div class="sitemap-overlay" id="sitemap-overlay">

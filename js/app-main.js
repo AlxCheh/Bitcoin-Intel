@@ -3134,6 +3134,11 @@ function showTab(id, btn, keepCluster) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   currentTabId = id;
+  // 2026-08-16: переключение вкладки не сбрасывает scrollTop .app-scroll
+  // само по себе — кнопка «к содержанию» (js/app-early.js) должна
+  // пересчитаться сразу по currentTabId, не ждать следующего scroll-события
+  // (иначе может остаться видимой на вкладке без оглавления).
+  updateTocFabVisibility();
 
   // синхронизировать кластер, если перешли на вкладку другого кластера (напр. клик по пулу)
   const cluster = TAB_TO_CLUSTER[id];

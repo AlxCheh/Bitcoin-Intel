@@ -49,9 +49,9 @@
     "entity_count": 18,
     "anchor_entity_share": 0.071,
     "is_minority_anchor": true,
-    "generated_at": "2026-08-15T17:40:16.184533+00:00",
+    "generated_at": "2026-08-16T01:23:11.337299+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260815_174016"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260816_012311"
   },
   "strategy_model_stress": {
     "tension": "Резерв пополняется исключительно дилюцией акций (2-я неделя подряд, $225 млн целевым траншем) vs BTC-резерв остаётся неприкосновенным несмотря на то, что неделей ранее компания уже продавала BTC ради тех же обязательств — двухнедельная выборка закрывает открытый вопрос предшественника в пользу дилюции",
@@ -71,7 +71,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-08-15T17:40:16.187783+00:00"
+      "detected_at": "2026-08-16T01:23:11.343222+00:00"
     },
     "rationale": "Tension from STR-2026-0720-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'что означает что'; confidence: 0.52; confidence_tier: high; signals_used: 20; ignored_duplicates: ['STR-2026-0622-004', 'STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -104,21 +104,21 @@
     "entity_count": 2,
     "anchor_entity_share": 0.85,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.188044+00:00",
+    "generated_at": "2026-08-16T01:23:11.343407+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_strategy_model_stress_20260815_174016"
+    "synthesis_id": "synthesis_strategy_model_stress_20260816_012311"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
     "narrative": "Конфигурация декабря 2022 повторяется: массовая капитуляция розницы при сохраняющемся институциональном спросе — что усугубляется тем что базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "takeaway": "Базель III создаёт скрытый chokepoint: не запрещая BTC явно, регулятор ценообразованием вытесняет его из банковского баланса — пока не изменится коэффициент риска 1250%, институциональный спрос через банки остаётся структурно заблокированным",
     "strength": "strong",
-    "confidence": 0.645,
+    "confidence": 0.642,
     "confidence_tier": "high",
     "alternative_scenario": "",
     "alternative_scenario_source_id": "",
     "phase": "tension",
-    "score": 172,
+    "score": 171,
     "signal_count": 21,
     "anchor_signal_id": "NAR-2026-0628-001",
     "phase_changed": true,
@@ -126,9 +126,9 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-08-15T17:40:16.190344+00:00"
+      "detected_at": "2026-08-16T01:23:11.345776+00:00"
     },
-    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'что усугубляется тем что'; confidence: 0.65; confidence_tier: high; signals_used: 21; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
+    "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'что усугубляется тем что'; confidence: 0.64; confidence_tier: high; signals_used: 21; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
     "signals_used": [
       "NAR-2026-0628-001",
       "STR-2026-0622-005",
@@ -159,9 +159,9 @@
     "entity_count": 12,
     "anchor_entity_share": 0.381,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.190569+00:00",
+    "generated_at": "2026-08-16T01:23:11.345965+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260815_174016"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260816_012311"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -192,9 +192,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.192479+00:00",
+    "generated_at": "2026-08-16T01:23:11.348052+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_supply_scarcity_20260815_174016"
+    "synthesis_id": "synthesis_supply_scarcity_20260816_012311"
   },
   "layer2_programmability": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -222,26 +222,26 @@
     "entity_count": 4,
     "anchor_entity_share": 0.25,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.194303+00:00",
+    "generated_at": "2026-08-16T01:23:11.349861+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_layer2_programmability_20260815_174016"
+    "synthesis_id": "synthesis_layer2_programmability_20260816_012311"
   },
   "lightning_payments": {
     "tension": "Публичная компания платит зарплату в BTC через Lightning, ни разу не коснувшись самого биткоина на балансе — vs решение остаётся нишевым экспериментом одной компании, не массовым паттерном найма",
     "narrative": "Lightning становится инфраструктурным слоем не только для платежей между людьми, но и для funding-рельсов финансовых платформ — конкурируя со стейблкоин-ончейн депозитами по скорости, но с оговоркой о степени доверия к оператору инфраструктуры — несмотря на то что появляется новая категория корпоративного использования BTC — не казначейский актив и не платёжный инструмент напрямую, а прозрачный расчётный рельс, полностью абстрагированный от волатильности и бухгалтерского учёта криптоактивов",
     "takeaway": "Появляется новая категория корпоративного использования BTC — не казначейский актив и не платёжный инструмент напрямую, а прозрачный расчётный рельс, полностью абстрагированный от волатильности и бухгалтерского учёта криптоактивов",
     "strength": "strong",
-    "confidence": 0.407,
+    "confidence": 0.393,
     "confidence_tier": "high",
     "alternative_scenario": "",
     "alternative_scenario_source_id": "",
     "phase": "tension",
-    "score": 56,
+    "score": 54,
     "signal_count": 10,
     "anchor_signal_id": "INF-2026-0730-002",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0730-002 (contradicts: 0, weight: primary); partA from INF-2026-0715-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.41; confidence_tier: high; signals_used: 10; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0730-002 (contradicts: 0, weight: primary); partA from INF-2026-0715-001; phase: tension; bridge: 'несмотря на то что'; confidence: 0.39; confidence_tier: high; signals_used: 10; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0730-002",
       "INF-2026-0722-002",
@@ -258,9 +258,9 @@
     "entity_count": 9,
     "anchor_entity_share": 0.1,
     "is_minority_anchor": true,
-    "generated_at": "2026-08-15T17:40:16.195946+00:00",
+    "generated_at": "2026-08-16T01:23:11.351483+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_lightning_payments_20260815_174016"
+    "synthesis_id": "synthesis_lightning_payments_20260816_012311"
   },
   "mining_ai_diversification": {
     "tension": "Майнеры диверсифицируются в AI как стратегию выживания vs продолжают продавать BTC-резервы для финансирования этой же диверсификации — именно то, что предсказывалось как риск в предыдущем сигнале",
@@ -294,9 +294,9 @@
     "entity_count": 10,
     "anchor_entity_share": 0.1,
     "is_minority_anchor": true,
-    "generated_at": "2026-08-15T17:40:16.197536+00:00",
+    "generated_at": "2026-08-16T01:23:11.353055+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_mining_ai_diversification_20260815_174016"
+    "synthesis_id": "synthesis_mining_ai_diversification_20260816_012311"
   },
   "mining_operations": {
     "tension": "Пулы контролируют состав блоков как единственная точка цензуры vs Stratum V2 впервые в production переносит этот контроль к майнеру",
@@ -325,9 +325,9 @@
     "entity_count": 4,
     "anchor_entity_share": 0.2,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.199028+00:00",
+    "generated_at": "2026-08-16T01:23:11.354532+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_mining_operations_20260815_174016"
+    "synthesis_id": "synthesis_mining_operations_20260816_012311"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -353,9 +353,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.200308+00:00",
+    "generated_at": "2026-08-16T01:23:11.356229+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260815_174016"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260816_012311"
   },
   "quantum_security": {
     "tension": "Девять институтов независимо финансируют безопасность Bitcoin на $15 млн за 3 года vs разработчики не согласовали единый путь пост-квантового перехода, а срок угрозы остаётся неопределённым",
@@ -382,9 +382,9 @@
     "entity_count": 3,
     "anchor_entity_share": 0.333,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.201566+00:00",
+    "generated_at": "2026-08-16T01:23:11.357502+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_quantum_security_20260815_174016"
+    "synthesis_id": "synthesis_quantum_security_20260816_012311"
   },
   "bitcoin_governance_debate": {
     "tension": "PhotoRec не находит изображений в данных ноды из-за XOR-обфускации Bitcoin Core vs Ordinals с 2023 года кладёт реальные файлы в witness-данные — этот путь эксперимент не проверял",
@@ -412,9 +412,9 @@
     "entity_count": 4,
     "anchor_entity_share": 0.25,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.202869+00:00",
+    "generated_at": "2026-08-16T01:23:11.358905+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_bitcoin_governance_debate_20260815_174016"
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260816_012311"
   },
   "wallet_security_incidents": {
     "tension": "Пятилетний RNG-баг в открытом коде Coldcard обошёл ревью сообщества и унёс ~1083 BTC за 41 минуту vs прозрачный ответ Coinkite и кросс-командная ончейн-экспертиза удержали ущерб от дальнейшего расползания",
@@ -439,9 +439,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.204066+00:00",
+    "generated_at": "2026-08-16T01:23:11.363747+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_wallet_security_incidents_20260815_174016"
+    "synthesis_id": "synthesis_wallet_security_incidents_20260816_012311"
   },
   "btc_payment_adoption": {
     "tension": "39,1% годового роста крипто-переводов в Сальвадоре — vs абсолютная доля всего 0,7%, вдвое меньше даже неформальных переводов наличными из рук в руки",
@@ -466,9 +466,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-08-15T17:40:16.205305+00:00",
+    "generated_at": "2026-08-16T01:23:11.365171+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_btc_payment_adoption_20260815_174016"
+    "synthesis_id": "synthesis_btc_payment_adoption_20260816_012311"
   },
   "_cross_cluster_entities": {
     "el_salvador": [

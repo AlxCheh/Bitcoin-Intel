@@ -3256,15 +3256,21 @@ function renderTOC(containerId, items) {
 }
 
 renderTOC('theory-toc', [
-  { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
-  { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
-  { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
-  { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
-  { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
-  { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' },
-  { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
-  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' },
-  { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
+  { group: 'ОСНОВЫ', items: [
+    { target: 'theory-money', title: 'Что такое деньги', subtitle: 'Функции, свойства, история от бартера до Bitcoin' },
+    { target: 'theory-network', title: 'Семь сетевых эффектов', subtitle: 'Почему Bitcoin побеждает структурно' },
+    { target: 'theory-governance', title: 'Bitcoin Governance', subtitle: 'Как принимаются решения без центральной власти' },
+    { target: 'theory-dca', title: 'Стратегия DCA', subtitle: 'Как накапливать без эмоций и таймирования' },
+    { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' }
+  ]},
+  { group: 'БЕЗОПАСНОСТЬ', items: [
+    { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
+    { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
+    { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' }
+  ]},
+  { group: 'МЕДИА', items: [
+    { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
+  ]}
 ]);
 
 renderTOC('macrocontext-toc', [

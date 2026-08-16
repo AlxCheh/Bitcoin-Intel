@@ -3218,7 +3218,8 @@ renderTOC('theory-toc', [
   { target: 'theory-passphrase', title: 'Насколько надёжна ваша парольная фраза?', subtitle: 'Diceware, математика взлома, Trezor Trusted Display' },
   { target: 'theory-hashrate-units', title: 'Хешрейт и сложность: единицы измерения', subtitle: 'TH/s vs T — почему их путают' },
   { target: 'theory-dice-seed', title: 'Сид на костях: как создать ключ, не доверяя генератору', subtitle: 'Энтропия костью вместо доверия закрытому генератору кошелька' },
-  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' }
+  { target: 'theory-quantum', title: 'Квантовая угроза: подготовка началась', subtitle: 'Подготовка к угрозе, которой формально ещё нет' },
+  { target: 'theory-saylor-series-mount', title: 'Saylor Series', subtitle: 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах и цивилизации' }
 ]);
 
 renderTOC('macrocontext-toc', [

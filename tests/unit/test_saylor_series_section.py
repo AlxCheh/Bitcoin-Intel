@@ -163,6 +163,34 @@ console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[1]) }));
         assert "Огонь, праща и Рим" in html, "Заголовок связанного эпизода должен подтягиваться по id из THEORY_TOPICS, не показывать голый id"
         assert "onclick=\"document.getElementById('saylor-series-01').scrollIntoView" in html
 
+    def test_related_episode_uses_established_badge_pattern(self, render_topic_source):
+        """
+        2026-08-16, найдено пользователем визуально ("оформлено криво"):
+        .crosslink-arrow/.crosslink-text/.crosslink-target — старый паттерн
+        БЕЗ единого правила CSS в текущей вёрстке (в index.html есть только
+        .crosslink/.crosslink-text-col/.crosslink-cta). Прецедент, выбранный
+        пользователем — .ep-fn-badge/-label/-cta (та же плашка, что
+        "СВЯЗАННЫЕ ПАНЕЛИ ТЕОРИИ"/"СВЯЗАННЫЕ ФУНКЦИИ" в попапе сущности,
+        js/app-main.js showEntityPopup()). Полный panel_title, без обрезки —
+        так же, как в этих двух прецедентах.
+        """
+        js = render_topic_source + """
+const THEORY_TOPICS = [
+  { id: 'saylor-series-01', panel_title: 'Огонь, праща и Рим', panel_tag: 'X', episode_number: 1 },
+  { id: 'saylor-series-02', panel_title: 'Империи, сталь и антибиотики', panel_tag: 'Y', related_episodes: ['saylor-series-01'] }
+];
+console.log(JSON.stringify({ html: renderTheoryTopic(THEORY_TOPICS[1]) }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        html = json.loads(result.stdout)["html"]
+        assert 'class="ep-fn-badge"' in html
+        assert 'class="ep-fn-badge-label">ЭПИЗОД 01<' in html
+        assert 'class="ep-fn-badge-cta">Огонь, праща и Рим →<' in html
+        assert "crosslink-arrow" not in html
+        assert "crosslink-text" not in html
+        assert "crosslink-target" not in html
+
     def test_related_episode_falls_back_to_raw_id_if_not_found(self, render_topic_source):
         """Не должно падать, если ссылка на ещё не существующий эпизод — просто некрасивый fallback, не краш."""
         js = render_topic_source + """

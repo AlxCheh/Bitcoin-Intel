@@ -44,7 +44,16 @@ def fetch_market_chart(days: int) -> dict:
 def build_volume_payload(raw: dict) -> dict:
     """Строит финальный JSON карточки из сырого ответа CoinGecko.
 
-    raw['total_volumes'] — список [timestamp_ms, volume_usd], по одному в день.
+    raw['total_volumes'] — список [timestamp_ms, volume_usd].
+
+    ⚠️ НЕ РОВНО «по одному в день», несмотря на interval=daily: обнаружено
+    2026-08-16 (аудит упавших workflow) — последняя точка ответа не всегда
+    выровнена на UTC-полночь, из-за чего два разных timestamp схлопывались
+    в одну календарную дату (data/volume.json содержал 31 запись на 30
+    уникальных дат). Дедуп по дате обязателен, не опция.
+
+    Точки идут в хронологическом порядке — при дубле даты оставляем
+    ПОСЛЕДНЮЮ (более свежий снимок объёма за форминг-день), не первую.
     """
     points = raw.get("total_volumes", [])
     if len(points) < 2:
@@ -52,13 +61,17 @@ def build_volume_payload(raw: dict) -> dict:
             f"CoinGecko вернул недостаточно точек объёма: {len(points)} (нужно ≥2)"
         )
 
-    history = [
-        {
-            "date": datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d"),
-            "volume_usd": round(volume, 2),
-        }
-        for ts_ms, volume in points
-    ]
+    by_date: dict[str, float] = {}
+    for ts_ms, volume in points:
+        date = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+        by_date[date] = round(volume, 2)  # последняя по времени точка перезаписывает предыдущую
+
+    history = [{"date": date, "volume_usd": volume} for date, volume in by_date.items()]
+    if len(history) < 2:
+        raise ValueError(
+            f"После дедупликации по дате осталось {len(history)} уникальных дат из "
+            f"{len(points)} точек — недостаточно для change_24h_pct"
+        )
 
     current = history[-1]
     previous = history[-2]

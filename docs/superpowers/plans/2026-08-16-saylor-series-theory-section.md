@@ -536,10 +536,12 @@ Expected: PASS
 Run: `PYTHONHASHSEED=0 python -m pytest -q`
 Expected: all passing
 
+> **Found during execution:** `tests/unit/test_site_map_sync.py` requires every literal `panel-title` in `js/app-main.js`/`index.html` to have a matching entry in `data/site_map.json` (per `docs/SITE_MAP.md`). The hardcoded `<span class="panel-title">Saylor Series</span>` in `renderSaylorSeriesSection()` needed a new manifest entry (`e111`, cluster `macro`/tab `theory`, grouped contiguously right after `e108` theory-quantum). Individual episode panel titles (`topic.panel_title`, data-driven, rendered through `sanitize(...)`) don't need their own entries — same pattern as `theory-dice-seed`/`theory-quantum`, which also only have one manifest entry each despite multi-item panels.
+
 - [ ] **Step 8: Commit**
 
 ```bash
-git add js/app-main.js index.html tests/unit/test_saylor_series_section.py
+git add js/app-main.js index.html data/site_map.json tests/unit/test_saylor_series_section.py
 git commit -m "feat: рендер индекса и панелей Saylor Series (renderSaylorSeriesSection)"
 ```
 

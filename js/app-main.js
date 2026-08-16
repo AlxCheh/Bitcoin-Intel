@@ -807,6 +807,45 @@ function renderTheoryTopics() {
   if (el && rest.length) el.innerHTML = rest.map(renderTheoryTopic).join('');
 }
 
+// ── SAYLOR SERIES — мини-раздел внутри ТЕОРИИ ───────────────────────────
+// Эпизоды — топики THEORY_TOPICS.json с target_group: 'saylor-series',
+// пропущенные generic-сканером renderTheoryTopics() (см. правку там же).
+// Индекс-карточки + полные панели эпизодов рендерятся сюда, в единственную
+// статичную точку монтирования theory-saylor-series-mount — без раздувания
+// theory-toc на 17 строк. Панель эпизода — тот же renderTheoryTopic(), что
+// у theory-dice-seed/theory-quantum, без дублирования кода.
+function renderSaylorSeriesSection() {
+  const el = document.getElementById('theory-saylor-series-mount');
+  if (!el) return;
+  const episodes = THEORY_TOPICS.filter(function(t) { return t.target_group === 'saylor-series'; });
+  if (!episodes.length) return;
+
+  let html = '<div class="panel" style="margin-top:12px">';
+  html += '<div class="panel-head"><span class="panel-title">Saylor Series</span>'
+    + '<span class="panel-tag">BREEDLOVE × SAYLOR</span></div>';
+  html += '<div style="padding:12px 14px;border-bottom:1px solid var(--line)">'
+    + '<div style="font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.6">'
+    + 'Роберт Бридлав и Майкл Сэйлор — 17 эпизодов о деньгах, энергии и цивилизации. Разбор по одному эпизоду за раз.'
+    + '</div></div>';
+
+  html += episodes.map(function(ep) {
+    const num = String(ep.episode_number || '').padStart(2, '0');
+    return '<div onclick="document.getElementById(\'' + sanitize(ep.id) + '\').scrollIntoView({behavior:\'smooth\'})" '
+      + 'style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" '
+      + 'onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">'
+      + '<span style="font-family:var(--mono);font-size:10px;color:var(--btc);min-width:20px">' + num + '</span>'
+      + '<div style="flex:1"><div style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;color:var(--ivory)">'
+      + sanitize(ep.panel_title) + '</div></div>'
+      + '<span style="color:var(--dim);font-size:14px">›</span>'
+      + '</div>';
+  }).join('');
+
+  html += '</div>';
+  html += episodes.map(renderTheoryTopic).join('');
+
+  el.innerHTML = html;
+}
+
 // ── СТОРОННИЕ ЭССЕ/МАТЕРИАЛЫ — доп. пункты аккордеона в уже существующих
 // панелях (не создают новых панелей). Реестр в THEORY_ESSAYS.json, не в
 // index.html — добавление нового материала = запись в файл, без правки HTML.
@@ -3018,7 +3057,7 @@ function triggerTabData(id) {
   }
   if (id === 'holders')   { renderHolders(); renderTreasuryHolders(); renderTopAddresses(); }
   if (id === 'lightning') renderTheoryTopics();
-  if (id === 'theory') { renderTheoryTopics(); renderTheoryEssays(); }
+  if (id === 'theory') { renderTheoryTopics(); renderSaylorSeriesSection(); renderTheoryEssays(); }
   if (id === 'macrocontext') { renderTheoryTopics(); renderRevenueEngines(); }
   if (id === 'tech') { renderEcosystem(); renderBitcoinFunctions(); }
   if (id === 'history')   { renderEmission(); fetchRemainingSupply(); renderHalvingBlock(); }

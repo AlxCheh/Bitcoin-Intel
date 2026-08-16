@@ -752,6 +752,27 @@ function renderTheoryTopic(topic) {
       + '<p style="margin:0;font-size:12px;color:var(--txt);line-height:1.6">' + sanitize(topic.conclusion) + '</p>'
       + '</div>';
   }
+  // 2026-08-16: related_episodes — связи между эпизодами Saylor Series
+  // (design doc 2026-08-16-saylor-series-theory-section-design.md).
+  // Намеренно отложено при инфраструктурной сессии до появления РЕАЛЬНОГО
+  // второго эпизода — та же дисциплина "честный тест на факте, не наперёд",
+  // что у context_chain сигналов. Заголовок связанного эпизода ищется по id
+  // в THEORY_TOPICS — тот же паттерн, что theory_refs на карточке сущности
+  // (js/app-main.js, ~строка 1278). Если id ещё не существует (ссылка на
+  // ещё не написанный эпизод) — сырой id как fallback, не крах рендера.
+  if (topic.related_episodes && topic.related_episodes.length) {
+    html += '<div style="padding:10px 14px;border-top:1px solid var(--line)">'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.05em;margin-bottom:6px">СВЯЗАННЫЕ ЭПИЗОДЫ</div>'
+      + topic.related_episodes.map(function(rid) {
+          const related = (THEORY_TOPICS || []).find(function(x) { return x.id === rid; });
+          const label = related ? related.panel_title : rid;
+          return '<div class="crosslink" onclick="document.getElementById(\'' + sanitize(rid) + '\').scrollIntoView({behavior:\'smooth\'})">'
+            + '<span class="crosslink-arrow">↳</span>'
+            + '<span class="crosslink-text">' + sanitize(label) + '</span>'
+            + '</div>';
+        }).join('')
+      + '</div>';
+  }
   // 2026-08-01: точка монтирования для THEORY_ESSAYS.json — найдено
   // пользователем на реальном скриншоте ("блок такой же скупой, как
   // раньше"): renderTheoryEssays() ищет document.getElementById(target_panel

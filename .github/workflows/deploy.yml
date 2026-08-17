@@ -118,6 +118,16 @@ jobs:
         # который никто не парсит. См. scripts/check_error_rate.py (MON07).
         run: ENVIRONMENT=production PYTHONHASHSEED=0 python3 scripts/synthesizer.py 2> /tmp/synth.log; cat /tmp/synth.log
 
+      - name: Prerender home page snapshot for crawlers (AEO)
+        # 2026-08-16: index.html целиком рендерится JS — краулер без его
+        # исполнения (историческая практика части AI-краулеров) видит пустые
+        # <div>. Дописывает статический текст топ-нарратива между маркерами
+        # PRERENDER:HOME:START/END, используя ТОЛЬКО ЧТО пересчитанный
+        # data/synthesis_cache.json выше — снимок никогда не расходится с
+        # реальным состоянием синтеза. Коммитится тем же sync-PR, что и
+        # synthesis_cache.json (см. шаг "Commit synthesis cache via PR" ниже).
+        run: python3 scripts/prerender_home.py
+
       - name: Error rate monitoring (MON07)
         run: python3 scripts/check_error_rate.py /tmp/synth.log
 
@@ -204,6 +214,10 @@ jobs:
           # выше не тронул файл (0 реально изменившихся кластеров, см. его докстринг) —
           # git add на неизменённый файл безопасен и ничего не коммитит.
           git add data/synthesis_history_count.json
+          # 2026-08-16: index.html — снимок для краулеров (prerender_home.py
+          # выше), меняется только между PRERENDER:HOME маркерами, тот же
+          # no-op-safe git add, что и для synthesis_history_count.json.
+          git add index.html
           BRANCH="bot/sync-synthesis-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update synthesis_cache.json"

@@ -2138,18 +2138,22 @@ header {
 <section class="section active" id="tab-home">
   <div class="page">
 
-    <!-- ══ БЛОК 0: СТАТУС ══ -->
-    <!-- ══ БЛОК 0: СТАТУС ══ -->
-    <div id="dash-status-bar" style="margin:12px 0;border:1px solid var(--btc);background:var(--bg2)">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap">
-        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--dim)">СТАТУС</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--line2)">·</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--btc)" id="dash-status-phase">—</span>
-        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)" id="dash-status-ratio">—</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--line2)">·</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--grn)" id="dash-status-pos">—↑</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)" id="dash-status-neg">—↓</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--dim)" id="dash-status-neu">—→</span>
+    <!-- ══ ОПРЕДЕЛЕНИЕ САЙТА (2026-08-16) ══ -->
+    <div id="dash-definition" style="margin:12px 0;border:1px solid var(--btc);background:var(--bg2);padding:10px 12px;font-family:var(--sans);font-size:11px;line-height:1.5;color:var(--dim)">
+      <b style="color:var(--txt)">Bitcoin Intel</b> — платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.
+    </div>
+
+    <!-- ══ ТИКЕР ЖИВЫХ ДАННЫХ (2026-08-16, ранее — БЛОК 0: СТАТУС) ══ -->
+    <div id="dash-status-bar" style="margin:0 0 12px;border:1px solid var(--line);background:var(--bg2)">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+        <span style="font-weight:700;color:var(--txt)" id="dash-status-price">—</span>
+        <span style="color:var(--line2)">·</span>
+        <span style="font-weight:700;color:var(--btc)" id="dash-status-phase">—</span>
+        <span style="color:var(--dim)" id="dash-status-ratio">—</span>
+        <span style="color:var(--line2)">·</span>
+        <span style="font-weight:700;color:var(--grn)" id="dash-status-pos">—↑</span>
+        <span style="font-weight:700;color:var(--red)" id="dash-status-neg">—↓</span>
+        <span style="font-weight:700;color:var(--dim)" id="dash-status-neu">—→</span>
       </div>
     </div>
 
@@ -4402,7 +4406,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=0c9dde3636"></script>
+<script src="js/app-main.js?v=b54c775a2c"></script>
 
 </div><!-- /.app-scroll -->
 

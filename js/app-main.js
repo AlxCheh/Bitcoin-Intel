@@ -6,6 +6,12 @@ function renderDashStatus() {
   // Фаза цикла — из переменных (данные уже загружены)
   const statusPhase = document.getElementById('dash-status-phase');
   const statusRatio = document.getElementById('dash-status-ratio');
+  // 2026-08-16: тикер на ОБЗОРЕ теперь показывает и цену — раньше цена
+  // была видна только в полном графике (перенесён на МЕТРИКИ, Task 1).
+  const statusPrice = document.getElementById('dash-status-price');
+  if (statusPrice && typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
+    statusPrice.textContent = '$' + dashBtcPrice.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
   if (statusPhase) {
     if (typeof dashBtcPrice !== 'undefined' && typeof dashProdCost !== 'undefined' && dashBtcPrice && dashProdCost) {
       const { phase } = calcCyclePhase(dashBtcPrice, dashProdCost);

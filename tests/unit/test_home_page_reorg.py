@@ -64,3 +64,53 @@ def test_trigger_tab_data_still_populates_relocated_panels():
         "график цены и фаза цикла теперь монтируются на этой вкладке"
     )
     assert "initPriceChart" in analytics_line
+
+
+def test_home_has_definition_banner():
+    html = INDEX_HTML.read_text(encoding="utf-8")
+    home_start, home_end = _section_range(html, "tab-home")
+    home_html = html[home_start:home_end]
+    assert 'id="dash-definition"' in home_html
+    assert "Bitcoin Intel" in home_html
+    assert "нарративного анализа" in home_html
+
+
+def test_ticker_has_price_span():
+    html = INDEX_HTML.read_text(encoding="utf-8")
+    assert 'id="dash-status-price"' in html
+
+
+def test_render_dash_status_updates_price_span():
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fn = extract_js_function(src, "renderDashStatus")
+    js = f"""
+{fn}
+var dashBtcPrice = 63224;
+var dashProdCost = 81000;
+const SIGNALS = [{{dir:'pos'}}, {{dir:'neg'}}];
+const registry = {{
+  'dash-status-phase': {{ textContent: '' }},
+  'dash-status-ratio': {{ textContent: '' }},
+  'dash-status-price': {{ textContent: '' }},
+  'dash-status-pos': {{ textContent: '' }},
+  'dash-status-neg': {{ textContent: '' }},
+  'dash-status-neu': {{ textContent: '' }},
+  'dash-phase': {{ textContent: '' }},
+  'dash-ratio': {{ textContent: '' }},
+  'dash-top3-list': {{ innerHTML: '' }}
+}};
+const document = {{ getElementById: function(id) {{ return registry[id] || null; }} }};
+function calcCyclePhase(price, cost) {{ return {{ phase: 'ДНО' }}; }}
+function renderDashTop3() {{}}
+renderDashStatus();
+console.log(JSON.stringify({{ price: registry['dash-status-price'].textContent }}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json_module.loads(result.stdout)
+    assert "63" in out["price"], "Тикер обязан показать текущую цену BTC из dashBtcPrice"

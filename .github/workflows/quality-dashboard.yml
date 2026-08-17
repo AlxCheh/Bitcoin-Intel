@@ -61,13 +61,26 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # gh_retry — 3 попытки с растущей паузой на транзиентный HTTP 503
+          # api.github.com/graphql, см. подробный комментарий в deploy.yml/synthesize.
+          gh_retry() {
+            local attempt
+            for attempt in 1 2 3; do
+              if "$@"; then return 0; fi
+              echo "⚠ '$*' упало (попытка $attempt/3), жду и повторяю..." >&2
+              sleep $((attempt * 10))
+            done
+            echo "✗ '$*' не удалось после 3 попыток" >&2
+            return 1
+          }
+
           git add docs/QUALITY_DASHBOARD.md
           BRANCH="bot/update-dashboard-${{ github.run_id }}-${{ github.run_attempt }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: update QUALITY_DASHBOARD.md"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
-          gh pr create --base main --head "$BRANCH" \
+          gh_retry gh pr create --base main --head "$BRANCH" \
             --title "chore: weekly quality dashboard update ($(date -u +%Y-%m-%d))" \
             --body "Автогенерация docs/QUALITY_DASHBOARD.md (MON05). Auto-merge после зелёного validate."
-          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+          gh_retry gh pr merge "$BRANCH" --auto --squash --delete-branch \
             || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

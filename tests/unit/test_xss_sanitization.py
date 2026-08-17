@@ -345,7 +345,10 @@ SANITIZE_RATCHET_BASELINE = {
     "(cl.neu||0)": 1,
     "(cl.pos||0)": 1,
     "(counts.neu||0.1)": 1,
-    "cl.signals.length": 2,
+    # cl.signals.length: 2 → 3 (2026-08-16) — новое вхождение в
+    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
+    # счётчик, что и в двух уже существующих местах
+    "cl.signals.length": 3,
     "rest.length": 1,
     "(dir.neg||0)": 1,
     "(dir.neu||0.1)": 1,
@@ -365,7 +368,10 @@ SANITIZE_RATCHET_BASELINE = {
     "score.freshness": 1,
     "score.roles": 1,
     "score.tension": 1,
-    "score.total": 3,
+    # score.total: 3 → 4 (2026-08-16) — новое вхождение в
+    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
+    # score.total, что уже используется в трёх других местах
+    "score.total": 4,
     "s.entity_count": 1,
     "c.blocks_counted": 1,
     "c.tip_height": 1,
@@ -385,6 +391,11 @@ SANITIZE_RATCHET_BASELINE = {
     "actorMeta.label": 1,
     "d.icon": 1,
     "d.label": 1,
+    # renderExploreTiles() (2026-08-16, ОБЗОР → "исследовать глубже") —
+    # tiles: массив-литерал, зашитый в функции, не данные из JSON/сигналов
+    "t.icon": 1,
+    "t.title": 1,
+    "t.sub": 1,
     "flowMeta.icon": 1,
     "flowMeta.label": 1,
     "link.label": 1,
@@ -425,7 +436,10 @@ SANITIZE_RATCHET_BASELINE = {
     # не-HTML контекст: сборка текстового промпта AI-анализатора
     # (snapshotText) — детектор не различает HTML/текст, sanitize здесь
     # был бы вреден (внёс бы &quot; в промпт)
-    "t.key": 1,
+    # t.key: 1 → 2 (2026-08-16) — второе вхождение в renderExploreTiles()
+    # (tiles: массив-литерал в коде, ключ кластера — не пользовательские
+    # данные), совпадение имени с t.key AI-анализатора выше случайно
+    "t.key": 2,
     "t.label": 2,
     "t.note": 1,
     "tab.label": 1,

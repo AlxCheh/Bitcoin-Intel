@@ -8,26 +8,11 @@
     "none": "методология/описание, живых данных нет",
     "tool": "интерактивный инструмент, не витрина данных"
   },
-  "generated_at": "2026-08-09",
+  "generated_at": "2026-08-17",
   "entries": [
     {
-      "id": "e001",
-      "title": "График BTC / USD",
-      "cluster": "live",
-      "cluster_label": "LIVE",
-      "tab": "home",
-      "tab_label": "ОБЗОР",
-      "source": "live",
-      "kind": "chart",
-      "keywords": [
-        "цена",
-        "price",
-        "терминал"
-      ]
-    },
-    {
       "id": "e002",
-      "title": "Главные нарративы",
+      "title": "Главная история",
       "cluster": "live",
       "cluster_label": "LIVE",
       "tab": "home",
@@ -55,37 +40,6 @@
       ]
     },
     {
-      "id": "e004",
-      "title": "Фаза цикла",
-      "cluster": "live",
-      "cluster_label": "LIVE",
-      "tab": "home",
-      "tab_label": "ОБЗОР",
-      "source": "live",
-      "kind": "widget",
-      "keywords": [
-        "production cost",
-        "себестоимость",
-        "цикл",
-        "накопление"
-      ]
-    },
-    {
-      "id": "e005",
-      "title": "Последние блоки",
-      "cluster": "live",
-      "cluster_label": "LIVE",
-      "tab": "home",
-      "tab_label": "ОБЗОР",
-      "source": "live",
-      "kind": "table",
-      "keywords": [
-        "блок",
-        "пул",
-        "mempool"
-      ]
-    },
-    {
       "id": "e006",
       "title": "Дайджест сигналов по кластерам",
       "cluster": "live",
@@ -100,6 +54,37 @@
         "дайджест"
       ],
       "dynamic": true
+    },
+    {
+      "id": "e001",
+      "title": "График BTC / USD",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "chart",
+      "keywords": [
+        "цена",
+        "price",
+        "терминал"
+      ]
+    },
+    {
+      "id": "e004",
+      "title": "Фаза цикла",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "analytics",
+      "tab_label": "МЕТРИКИ",
+      "source": "live",
+      "kind": "widget",
+      "keywords": [
+        "production cost",
+        "себестоимость",
+        "цикл",
+        "накопление"
+      ]
     },
     {
       "id": "e007",
@@ -289,6 +274,21 @@
         "пулы",
         "майнинг",
         "доля"
+      ]
+    },
+    {
+      "id": "e005",
+      "title": "Последние блоки",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "pools",
+      "tab_label": "ПУЛЫ",
+      "source": "live",
+      "kind": "table",
+      "keywords": [
+        "блок",
+        "пул",
+        "mempool"
       ]
     },
     {

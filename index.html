@@ -20,6 +20,20 @@
 // <head>, не app-early.js/app-main.js (внешние файлы ждут сетевой запрос).
 if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 </script>
+<!-- 2026-08-16: Schema.org-блок ниже — после скролл-скрипта, не до —
+     test_scroll_restoration_is_the_first_script_tag ищет буквально первый
+     <script> тег в документе без учёта его type, любой script-тег перед
+     этим блоком сдвинул бы позицию, которую тест проверяет -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Bitcoin Intel",
+  "url": "https://alxcheh.github.io/Bitcoin-Intel/",
+  "description": "Платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.",
+  "inLanguage": "ru"
+}
+</script>
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d659483fb69e44939c0af176880be238"}'></script>
 <!-- End Cloudflare Web Analytics -->
@@ -2138,43 +2152,44 @@ header {
 <section class="section active" id="tab-home">
   <div class="page">
 
-    <!-- ══ БЛОК 0: СТАТУС ══ -->
-    <!-- ══ БЛОК 0: СТАТУС ══ -->
-    <div id="dash-status-bar" style="margin:12px 0;border:1px solid var(--btc);background:var(--bg2)">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap">
-        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--dim)">СТАТУС</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--line2)">·</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--btc)" id="dash-status-phase">—</span>
-        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)" id="dash-status-ratio">—</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--line2)">·</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--grn)" id="dash-status-pos">—↑</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)" id="dash-status-neg">—↓</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--dim)" id="dash-status-neu">—→</span>
+    <!-- ══ ОПРЕДЕЛЕНИЕ САЙТА (2026-08-16) ══ -->
+    <div id="dash-definition" style="margin:12px 0;border:1px solid var(--btc);background:var(--bg2);padding:10px 12px;font-family:var(--sans);font-size:11px;line-height:1.5;color:var(--dim)">
+      <b style="color:var(--txt)">Bitcoin Intel</b> — платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.
+    </div>
+
+    <!-- ══ ТИКЕР ЖИВЫХ ДАННЫХ (2026-08-16, ранее — БЛОК 0: СТАТУС) ══ -->
+    <div id="dash-status-bar" style="margin:0 0 12px;border:1px solid var(--line);background:var(--bg2)">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+        <span style="font-weight:700;color:var(--txt)" id="dash-status-price">—</span>
+        <span style="color:var(--line2)">·</span>
+        <span style="font-weight:700;color:var(--btc)" id="dash-status-phase">—</span>
+        <span style="color:var(--dim)" id="dash-status-ratio">—</span>
+        <span style="color:var(--line2)">·</span>
+        <span style="font-weight:700;color:var(--grn)" id="dash-status-pos">—↑</span>
+        <span style="font-weight:700;color:var(--red)" id="dash-status-neg">—↓</span>
+        <span style="font-weight:700;color:var(--dim)" id="dash-status-neu">—→</span>
       </div>
     </div>
 
-    <!-- Ключевые метрики (Production Cost / Realized Price) перенесены на
-         вкладку МЕТРИКИ — здесь короткая ссылка + актуальный коэффициент -->
-    <div class="dash-sum-link" onclick="showTab('analytics', null)" style="margin:0 0 12px">
-      СЕБЕСТОИМОСТЬ И REALIZED PRICE → МЕТРИКИ <span>→</span>
-    </div>
-
-    <!-- ══ БЛОК 2.5: ГРАФИК ЦЕНЫ BTC ══ -->
-    <div id="price-chart-wrap" style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
-      <div class="panel-head" style="margin:0">
-        <span class="panel-title">График BTC / USD</span>
-        <span class="chart-meta">ЦЕНА · ИСТОРИЯ</span>
-      </div>
-      <div id="terminal-price-chart"></div>
-    </div>
-
-    <!-- ══ БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ ══ -->
+    <!-- ══ ГЛАВНАЯ ИСТОРИЯ (2026-08-16, ранее БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ) ══ -->
     <div class="dash-narratives" id="dash-narratives-wrap">
       <div class="panel-head" style="margin:0">
-        <span class="panel-title">Главные нарративы</span>
+        <span class="panel-title">Главная история</span>
         <span id="dash-narratives-total" class="chart-meta"></span>
       </div>
-      <div id="dash-narratives-list"></div>
+      <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><!-- PRERENDER:HOME:END --></div>
+    </div>
+
+    <!-- ══ ЕЩЁ НАРРАТИВЫ (2026-08-16) ══ -->
+    <div id="dash-narratives-mini-wrap" style="margin-top:12px">
+      <div id="dash-narratives-mini-label" style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px"></div>
+      <div id="dash-narratives-mini-list"></div>
+    </div>
+
+    <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ (2026-08-16) ══ -->
+    <div style="margin-top:16px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
+      <div id="dash-explore-tiles"></div>
     </div>
 
     <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
@@ -2192,56 +2207,6 @@ header {
       </div>
     </div>
 
-    <!-- ══ БЛОК 1: ЦИКЛОВОЙ ИНДИКАТОР ══ -->
-    <div class="dash-cycle">
-      <div class="panel-head" style="margin:-16px -16px 16px">
-        <span class="panel-title">Фаза цикла</span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span id="dash-ratio" style="font-family:var(--mono);font-size:9px;color:var(--btc)">—</span>
-          <span class="chart-meta">BITCOIN 2026</span>
-        </div>
-      </div>
-      <div style="display:flex;align-items:baseline;gap:10px">
-        <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
-      </div>
-      <div class="dash-cycle-sub" id="dash-phase-sub">Цена у себестоимости добычи. Исторически — зона долгосрочных покупок перед ростом.</div>
-      <div class="dash-cycle-track">
-        <div class="dct-seg done"></div>
-        <div class="dct-seg current"></div>
-        <div class="dct-seg"></div>
-        <div class="dct-seg"></div>
-      </div>
-      <div class="dash-cycle-labels">
-        <span>ДНО</span>
-        <span class="dct-active">▲ НАКОПЛЕНИЕ</span>
-        <span>РОСТ</span>
-        <span>ЭЙФОРИЯ</span>
-      </div>
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-family:var(--mono);font-size:8px;color:var(--dim);line-height:1.6">
-        <span id="dash-ratio-note">—</span> · Цена / Production Cost.
-        <span style="opacity:0.7">Ниже ×1.0 — добыча убыточна. ×0.5–0.8 — исторически зона дна. ×2.5+ — зона перегрева.</span>
-      </div>
-    </div>
-
-
-    <!-- ══ БЛОК 5: ПОСЛЕДНИЕ БЛОКИ ══ -->
-    <div class="terminal" id="latest-blocks-panel" style="margin:0 0 16px;border:1px solid var(--btc)">
-      <div class="panel-head" style="margin:-0px -0px 0px;border-bottom:none">
-        <span class="panel-title">Последние блоки</span>
-        <span class="terminal-title chart-meta" id="block-title">загрузка...</span>
-      </div>
-      <div class="terminal-body" style="padding:0">
-        <div class="blk-head">
-          <span>HEIGHT</span>
-          <span>POOL</span>
-          <span>TX</span>
-          <span>AGE</span>
-        </div>
-        <div id="blocks-list">
-          <div class="blk-row blk-loading">computing...</div>
-        </div>
-      </div>
-    </div>
 
   </div>
 </section>
@@ -3955,6 +3920,46 @@ header {
 <section class="section" id="tab-analytics">
   <div class="page">
 
+    <!-- ══ ГРАФИК ЦЕНЫ BTC (перенесено с ОБЗОРА, 2026-08-16) ══ -->
+    <div id="price-chart-wrap" style="margin:0 0 12px;border:1px solid var(--btc);overflow:hidden;display:none;">
+      <div class="panel-head" style="margin:0">
+        <span class="panel-title">График BTC / USD</span>
+        <span class="chart-meta">ЦЕНА · ИСТОРИЯ</span>
+      </div>
+      <div id="terminal-price-chart"></div>
+    </div>
+
+    <!-- ══ ЦИКЛОВОЙ ИНДИКАТОР (перенесено с ОБЗОРА, 2026-08-16) ══ -->
+    <div class="dash-cycle">
+      <div class="panel-head" style="margin:-16px -16px 16px">
+        <span class="panel-title">Фаза цикла</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="dash-ratio" style="font-family:var(--mono);font-size:9px;color:var(--btc)">—</span>
+          <span class="chart-meta">BITCOIN 2026</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div class="dash-cycle-phase" id="dash-phase">НАКОПЛЕНИЕ</div>
+      </div>
+      <div class="dash-cycle-sub" id="dash-phase-sub">Цена у себестоимости добычи. Исторически — зона долгосрочных покупок перед ростом.</div>
+      <div class="dash-cycle-track">
+        <div class="dct-seg done"></div>
+        <div class="dct-seg current"></div>
+        <div class="dct-seg"></div>
+        <div class="dct-seg"></div>
+      </div>
+      <div class="dash-cycle-labels">
+        <span>ДНО</span>
+        <span class="dct-active">▲ НАКОПЛЕНИЕ</span>
+        <span>РОСТ</span>
+        <span>ЭЙФОРИЯ</span>
+      </div>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-family:var(--mono);font-size:8px;color:var(--dim);line-height:1.6">
+        <span id="dash-ratio-note">—</span> · Цена / Production Cost.
+        <span style="opacity:0.7">Ниже ×1.0 — добыча убыточна. ×0.5–0.8 — исторически зона дна. ×2.5+ — зона перегрева.</span>
+      </div>
+    </div>
+
     <!-- VOLUME CHART — редизайн 2026-07-25: бары+AVG-линия заменены на тот
          же SVG-график оформления, что "Сложность сети" (градиентная заливка,
          линия var(--btc), точка на последнем значении, без баров/дашед-линии
@@ -4391,6 +4396,25 @@ header {
   <div class="page">
     <div id="pool-summary"></div>
     <div id="pool-detail"></div>
+
+    <!-- ══ ПОСЛЕДНИЕ БЛОКИ (перенесено с ОБЗОРА, 2026-08-16) ══ -->
+    <div class="terminal" id="latest-blocks-panel" style="margin:16px 0 0;border:1px solid var(--btc)">
+      <div class="panel-head" style="margin:-0px -0px 0px;border-bottom:none">
+        <span class="panel-title">Последние блоки</span>
+        <span class="terminal-title chart-meta" id="block-title">загрузка...</span>
+      </div>
+      <div class="terminal-body" style="padding:0">
+        <div class="blk-head">
+          <span>HEIGHT</span>
+          <span>POOL</span>
+          <span>TX</span>
+          <span>AGE</span>
+        </div>
+        <div id="blocks-list">
+          <div class="blk-row blk-loading">computing...</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -4408,7 +4432,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=db31e0fac4"></script>
+<script src="js/app-main.js?v=69227b48f0"></script>
 
 </div><!-- /.app-scroll -->
 

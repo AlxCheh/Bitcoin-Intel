@@ -6,6 +6,12 @@ function renderDashStatus() {
   // Фаза цикла — из переменных (данные уже загружены)
   const statusPhase = document.getElementById('dash-status-phase');
   const statusRatio = document.getElementById('dash-status-ratio');
+  // 2026-08-16: тикер на ОБЗОРЕ теперь показывает и цену — раньше цена
+  // была видна только в полном графике (перенесён на МЕТРИКИ, Task 1).
+  const statusPrice = document.getElementById('dash-status-price');
+  if (statusPrice && typeof dashBtcPrice === 'number' && dashBtcPrice > 0) {
+    statusPrice.textContent = '$' + dashBtcPrice.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
   if (statusPhase) {
     if (typeof dashBtcPrice !== 'undefined' && typeof dashProdCost !== 'undefined' && dashBtcPrice && dashProdCost) {
       const { phase } = calcCyclePhase(dashBtcPrice, dashProdCost);
@@ -2805,16 +2811,54 @@ function renderDashboard() {
     return item;
   }
 
+  // 2026-08-16: компактная строка для "ещё нарративы" на ОБЗОРЕ — только
+  // топ-1 (idx===0) идёт полной карточкой через renderNarrativeItem(),
+  // остальные сюда. Возвращает HTML-строку (не DOM-узел), тот же стиль,
+  // что у renderTOC()/renderTheoryTopic() в этом файле — не ради
+  // единообразия ради единообразия, а потому что клик вешается ПОСЛЕ
+  // вставки в DOM через querySelectorAll (см. вызов ниже), как и для
+  // остальных .innerHTML-based рендеров.
+  function renderNarrativeMiniRow(key, cl, score) {
+    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
+    const dotColor = dirCls === 'pos' ? 'var(--grn)' : dirCls === 'neg' ? 'var(--red)' : 'var(--dim)';
+    const label = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
+    return '<div class="dash-narrative-mini" data-cl="' + sanitize(key) + '" '
+      + 'style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:11px">'
+      + '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
+      + '<span style="flex:1;color:var(--txt)">' + label + '</span>'
+      + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim)">' + cl.signals.length + ' · ' + score.total + '</span>'
+      + '<span style="color:var(--dim);font-size:12px">›</span>'
+      + '</div>';
+  }
+
   // Путь 3: используем Python-синтез из synthesis_cache.json
   // Fallback на браузерный синтез если кеш недоступен или кластер не найден
+  const miniListEl = document.getElementById('dash-narratives-mini-list');
+  const miniLabelEl = document.getElementById('dash-narratives-mini-label');
+  let miniHtml = '';
   shown.forEach(({ key, cl, score, weak }, idx) => {
     const cached = SYNTHESIS_CACHE[key];
     const synthesis = (cached && cached.tension)
       ? cached
       : synthesizeNarrativeAdvanced(key, cl);
-    const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
-    listEl.appendChild(item);
+    if (idx === 0) {
+      const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
+      listEl.appendChild(item);
+    } else {
+      miniHtml += renderNarrativeMiniRow(key, cl, score);
+    }
   });
+  if (miniListEl) {
+    miniListEl.innerHTML = miniHtml;
+    if (miniHtml) {
+      if (miniLabelEl) miniLabelEl.textContent = 'ЕЩЁ НАРРАТИВЫ';
+      miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {
+        el.addEventListener('click', function() { goToDigest(this.dataset.cl); });
+      });
+    } else if (miniLabelEl) {
+      miniLabelEl.textContent = '';
+    }
+  }
 
   } // end if SIGNALS
 
@@ -2851,6 +2895,38 @@ function scrollAppToTop() {
   } else {
     window.scrollTo(0, 0);
   }
+}
+
+// 2026-08-16: плитки-порталы на ОБЗОРЕ — реальные 4 кластера навигации
+// (CLUSTERS ниже), не придуманная отдельная таксономия. Переиспользует
+// .toc-card-grid/.toc-card/.toc-card-title/.toc-card-subtitle — тот же
+// визуальный язык, что карточное оглавление ТЕОРИИ (эта же сессия,
+// 2026-08-16). Статична (не зависит от данных) — рендерится один раз.
+function renderExploreTiles() {
+  const tiles = [
+    { key: 'live', icon: '📡', title: 'LIVE', sub: 'Цена · Дайджест · Метрики · Пулы' },
+    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', sub: 'Технологии · Lightning · Инструменты' },
+    { key: 'macro', icon: '📖', title: 'Fundamental', sub: 'Теория · Макроконтекст · Эмиссия' },
+    { key: 'analysis', icon: '🔬', title: 'Analysis', sub: 'Анализатор · Холдеры · Все нарративы' }
+  ];
+  return '<div class="toc-card-grid">'
+    + tiles.map(function(t) {
+        return '<div class="toc-card" onclick="selectCluster(\'' + t.key + '\')">'
+          + '<span style="font-size:16px">' + t.icon + '</span>'
+          + '<div class="toc-card-title">' + t.title + '</div>'
+          + '<div class="toc-card-subtitle">' + t.sub + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+let exploreTilesRendered = false;
+function renderExploreTilesOnce() {
+  if (exploreTilesRendered) return;
+  const el = document.getElementById('dash-explore-tiles');
+  if (!el) return;
+  el.innerHTML = renderExploreTiles();
+  exploreTilesRendered = true;
 }
 
 function goToDigest(clusterKey) {
@@ -3110,8 +3186,13 @@ let LATEST_BLOCKS = [];
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
-  if (id === 'analytics') { initCharts(); renderBip110Signaling(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); renderExploreTilesOnce(); }
+  // 2026-08-16: price-chart-wrap/dash-cycle перенесены с ОБЗОРА сюда — эта
+  // вкладка теперь должна сама инициировать их данные, не полагаться на то,
+  // что пользователь сначала посетил ОБЗОР. dashBtcPrice — простой глобал
+  // без "уже гружу" guard, поэтому пропускаем повторный fetch если ОБЗОР
+  // уже его выставил (тот же паттерн, что !LATEST_BLOCKS.length у fetchBlocks).
+  if (id === 'analytics') { if (!dashBtcPrice) fetchProdCost(); initPriceChart(); initCharts(); renderBip110Signaling(); }
   if (id === 'market')    renderSignals();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');

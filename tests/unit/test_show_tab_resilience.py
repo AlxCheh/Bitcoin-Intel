@@ -86,8 +86,58 @@ function updateCrumb(id) {}
 // заглушка здесь, реальная логика этой функции покрыта отдельно
 // tests/unit/test_toc_fab.py, не предмет этого теста.
 function updateTocFabVisibility() {}
+// 2026-08-17: showTab() теперь вызывает scrollAppToTop() (см. новый тест
+// TestShowTabResetsScroll ниже, использующий реальную реализацию через
+// scroll_app_to_top_source) — здесь просто заглушка, эти тесты её не проверяют.
+function scrollAppToTop() {}
 const localStorage = { _store: {}, setItem: function(k, v) { this._store[k] = v; } };
 """
+
+# 2026-08-17: найдено пользователем на живом сайте — клик по плитке/нижней
+# панели кластеров (selectCluster()) и по обычной вкладке сверху оставляет
+# .app-scroll проскроленным туда же, где был предыдущий таб, и пользователь
+# приземляется в середине новой страницы вместо верха ("перекидывает на
+# середину страницы"). Корень: showTab() никогда не сбрасывает скролл сама
+# по себе — это исторически делали только 3 отдельных вызывающих места
+# (goToDigest(), клик/закрытие пула — см. scrollAppToTop(), 2026-08-03),
+# а selectCluster()/обычные .nav-btn/[data-goto]-клики такого вызова
+# никогда не имели.
+_APP_SCROLL_MOCK = """
+const appScrollMock = { scrollTop: 0, scrollTo: function(x, y) { this.scrollTop = y; } };
+"""
+
+
+@pytest.fixture(scope="module")
+def scroll_app_to_top_source() -> str:
+    src = APP_MAIN_JS.read_text(encoding="utf-8")
+    return extract_js_function(src, "scrollAppToTop")
+
+
+@pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")
+class TestShowTabResetsScroll:
+
+    def test_show_tab_resets_app_scroll_to_top(self, show_tab_source, scroll_app_to_top_source):
+        js = _APP_SCROLL_MOCK + _DOM_MOCK.replace(
+            "const document = {\n  getElementById: function(id) { return REGISTRY[id] || null; },",
+            "const document = {\n  querySelector: function(sel) { return sel === '.app-scroll' ? appScrollMock : null; },\n  getElementById: function(id) { return REGISTRY[id] || null; },",
+        ) + """
+let triggerCalledWith = null;
+function triggerTabData(id) { triggerCalledWith = id; }
+""" + scroll_app_to_top_source + show_tab_source + """
+appScrollMock.scrollTop = 600;
+showTab('theory', null);
+console.log(JSON.stringify({ scrollTopAfter: appScrollMock.scrollTop }));
+"""
+        result = run_node_js(js)
+        assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+        import json
+        out = json.loads(result.stdout)
+        assert out["scrollTopAfter"] == 0, (
+            "showTab() обязан сбрасывать .app-scroll в 0 при переключении вкладки — "
+            "иначе пользователь приземляется в середине новой страницы, если был "
+            "проскроллен на предыдущей (найдено на живом сайте, клик по плитке/"
+            "нижней панели кластеров)"
+        )
 
 
 @pytest.mark.skipif(not NODE_AVAILABLE, reason="Node.js не найден в PATH")

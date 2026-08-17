@@ -2060,7 +2060,23 @@ function initPriceChart() {
         const idx = Math.round((i / (xCount - 1)) * (data.length - 1));
         const sp = document.createElement('span');
         sp.textContent = fmtD(data[idx].ts, true).toUpperCase();
-        Object.assign(sp.style, { position: 'absolute', left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)', color: C.dim, fontSize: '10px', letterSpacing: '0.06em', whiteSpace: 'nowrap', fontFamily: C.mono });
+        // 2026-08-17: найдено пользователем на реальном телефоне — крайние
+        // метки (первая/последняя) центрировались на 0%/100% через
+        // translateX(-50%), поэтому половина текста уходила ЗА границу
+        // графика. На широких экранах это скрадывалось внешними отступами
+        // страницы, на узких (320px) текст реально вылезал за viewport —
+        // горизонтальный скролл всей страницы. Крайние метки теперь
+        // прижимаются к своему краю (left/transform:none, right/left:auto),
+        // средние остаются центрированными как раньше.
+        const style = { position: 'absolute', color: C.dim, fontSize: '10px', letterSpacing: '0.06em', whiteSpace: 'nowrap', fontFamily: C.mono };
+        if (i === 0) {
+          Object.assign(style, { left: '0', transform: 'none' });
+        } else if (i === xCount - 1) {
+          Object.assign(style, { left: 'auto', right: '0', transform: 'none' });
+        } else {
+          Object.assign(style, { left: (pts[idx].x / W * 100) + '%', transform: 'translateX(-50%)' });
+        }
+        Object.assign(sp.style, style);
         xAxis.appendChild(sp);
       });
       wrap.appendChild(xAxis);
@@ -3215,10 +3231,19 @@ function showTab(id, btn, keepCluster) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   currentTabId = id;
-  // 2026-08-16: переключение вкладки не сбрасывает scrollTop .app-scroll
-  // само по себе — кнопка «к содержанию» (js/app-early.js) должна
-  // пересчитаться сразу по currentTabId, не ждать следующего scroll-события
-  // (иначе может остаться видимой на вкладке без оглавления).
+  // 2026-08-17: найдено пользователем на живом сайте — без этого клик по
+  // плитке/нижней панели кластеров (selectCluster()) или по обычной вкладке
+  // сверху оставлял .app-scroll проскроленным туда же, где был предыдущий
+  // таб, приземляя на середине новой страницы. До этой правки сброс скролла
+  // делали только 3 отдельных вызывающих места (goToDigest(), клик/закрытие
+  // пула) — обычные переключения вкладок такого вызова не имели вообще.
+  // Специфичные сценарии (клик по карте сайта → скролл к конкретной панели,
+  // pendingScrollSignal → скролл к сигналу) сначала сбрасываются в 0 здесь,
+  // затем асинхронно докручиваются к цели своим кодом — порядок не ломается.
+  scrollAppToTop();
+  // 2026-08-16: кнопка «к содержанию» (js/app-early.js) должна пересчитаться
+  // сразу по currentTabId, не ждать следующего scroll-события (иначе может
+  // остаться видимой на вкладке без оглавления).
   updateTocFabVisibility();
 
   // синхронизировать кластер, если перешли на вкладку другого кластера (напр. клик по пулу)

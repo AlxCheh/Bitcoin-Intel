@@ -20,6 +20,20 @@
 // <head>, не app-early.js/app-main.js (внешние файлы ждут сетевой запрос).
 if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 </script>
+<!-- 2026-08-16: Schema.org-блок ниже — после скролл-скрипта, не до —
+     test_scroll_restoration_is_the_first_script_tag ищет буквально первый
+     <script> тег в документе без учёта его type, любой script-тег перед
+     этим блоком сдвинул бы позицию, которую тест проверяет -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Bitcoin Intel",
+  "url": "https://alxcheh.github.io/Bitcoin-Intel/",
+  "description": "Платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.",
+  "inLanguage": "ru"
+}
+</script>
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d659483fb69e44939c0af176880be238"}'></script>
 <!-- End Cloudflare Web Analytics -->

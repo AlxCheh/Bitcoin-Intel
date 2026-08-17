@@ -3110,8 +3110,13 @@ let LATEST_BLOCKS = [];
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); initPriceChart(); }
-  if (id === 'analytics') { initCharts(); renderBip110Signaling(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
+  // 2026-08-16: price-chart-wrap/dash-cycle перенесены с ОБЗОРА сюда — эта
+  // вкладка теперь должна сама инициировать их данные, не полагаться на то,
+  // что пользователь сначала посетил ОБЗОР. dashBtcPrice — простой глобал
+  // без "уже гружу" guard, поэтому пропускаем повторный fetch если ОБЗОР
+  // уже его выставил (тот же паттерн, что !LATEST_BLOCKS.length у fetchBlocks).
+  if (id === 'analytics') { if (!dashBtcPrice) fetchProdCost(); initPriceChart(); initCharts(); renderBip110Signaling(); }
   if (id === 'market')    renderSignals();
   if (id === 'pools') {
     const detail = document.getElementById('pool-detail');

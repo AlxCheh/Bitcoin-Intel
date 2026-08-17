@@ -345,7 +345,10 @@ SANITIZE_RATCHET_BASELINE = {
     "(cl.neu||0)": 1,
     "(cl.pos||0)": 1,
     "(counts.neu||0.1)": 1,
-    "cl.signals.length": 2,
+    # cl.signals.length: 2 → 3 (2026-08-16) — новое вхождение в
+    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
+    # счётчик, что и в двух уже существующих местах
+    "cl.signals.length": 3,
     "rest.length": 1,
     "(dir.neg||0)": 1,
     "(dir.neu||0.1)": 1,
@@ -365,7 +368,10 @@ SANITIZE_RATCHET_BASELINE = {
     "score.freshness": 1,
     "score.roles": 1,
     "score.tension": 1,
-    "score.total": 3,
+    # score.total: 3 → 4 (2026-08-16) — новое вхождение в
+    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
+    # score.total, что уже используется в трёх других местах
+    "score.total": 4,
     "s.entity_count": 1,
     "c.blocks_counted": 1,
     "c.tip_height": 1,

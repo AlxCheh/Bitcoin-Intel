@@ -2811,16 +2811,54 @@ function renderDashboard() {
     return item;
   }
 
+  // 2026-08-16: компактная строка для "ещё нарративы" на ОБЗОРЕ — только
+  // топ-1 (idx===0) идёт полной карточкой через renderNarrativeItem(),
+  // остальные сюда. Возвращает HTML-строку (не DOM-узел), тот же стиль,
+  // что у renderTOC()/renderTheoryTopic() в этом файле — не ради
+  // единообразия ради единообразия, а потому что клик вешается ПОСЛЕ
+  // вставки в DOM через querySelectorAll (см. вызов ниже), как и для
+  // остальных .innerHTML-based рендеров.
+  function renderNarrativeMiniRow(key, cl, score) {
+    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
+    const dotColor = dirCls === 'pos' ? 'var(--grn)' : dirCls === 'neg' ? 'var(--red)' : 'var(--dim)';
+    const label = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
+    return '<div class="dash-narrative-mini" data-cl="' + sanitize(key) + '" '
+      + 'style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:11px">'
+      + '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
+      + '<span style="flex:1;color:var(--txt)">' + label + '</span>'
+      + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim)">' + cl.signals.length + ' · ' + score.total + '</span>'
+      + '<span style="color:var(--dim);font-size:12px">›</span>'
+      + '</div>';
+  }
+
   // Путь 3: используем Python-синтез из synthesis_cache.json
   // Fallback на браузерный синтез если кеш недоступен или кластер не найден
+  const miniListEl = document.getElementById('dash-narratives-mini-list');
+  const miniLabelEl = document.getElementById('dash-narratives-mini-label');
+  let miniHtml = '';
   shown.forEach(({ key, cl, score, weak }, idx) => {
     const cached = SYNTHESIS_CACHE[key];
     const synthesis = (cached && cached.tension)
       ? cached
       : synthesizeNarrativeAdvanced(key, cl);
-    const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
-    listEl.appendChild(item);
+    if (idx === 0) {
+      const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
+      listEl.appendChild(item);
+    } else {
+      miniHtml += renderNarrativeMiniRow(key, cl, score);
+    }
   });
+  if (miniListEl) {
+    miniListEl.innerHTML = miniHtml;
+    if (miniHtml) {
+      if (miniLabelEl) miniLabelEl.textContent = 'ЕЩЁ НАРРАТИВЫ';
+      miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {
+        el.addEventListener('click', function() { goToDigest(this.dataset.cl); });
+      });
+    } else if (miniLabelEl) {
+      miniLabelEl.textContent = '';
+    }
+  }
 
   } // end if SIGNALS
 

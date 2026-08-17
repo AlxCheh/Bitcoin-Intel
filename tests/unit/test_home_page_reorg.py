@@ -114,3 +114,43 @@ console.log(JSON.stringify({{ price: registry['dash-status-price'].textContent }
     assert result.returncode == 0, f"Node failed:\n{result.stderr}"
     out = json_module.loads(result.stdout)
     assert "63" in out["price"], "Тикер обязан показать текущую цену BTC из dashBtcPrice"
+
+
+def test_mini_list_container_exists_in_home():
+    html = INDEX_HTML.read_text(encoding="utf-8")
+    home_start, home_end = _section_range(html, "tab-home")
+    home_html = html[home_start:home_end]
+    assert 'id="dash-narratives-mini-list"' in home_html
+
+
+def test_render_narrative_mini_row_returns_html_string(tmp_path):
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fn = extract_js_function(src, "renderNarrativeMiniRow")
+    js = f"""
+function sanitize(s) {{ return String(s == null ? '' : s); }}
+const CLUSTER_LABELS = {{ etf_institutional_flow: '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК' }};
+{fn}
+const cl = {{ signals: [1,2,3], pos: 2, neg: 1, neu: 0 }};
+const score = {{ total: 213 }};
+const html = renderNarrativeMiniRow('etf_institutional_flow', cl, score);
+console.log(JSON.stringify({{
+  isString: typeof html === 'string',
+  hasLabel: html.includes('ETF'),
+  hasScore: html.includes('213'),
+  hasCount: html.includes('3'),
+  hasDataCl: html.includes('data-cl=\\"etf_institutional_flow\\"')
+}}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json_module.loads(result.stdout)
+    assert out["isString"] is True
+    assert out["hasLabel"] is True
+    assert out["hasScore"] is True
+    assert out["hasCount"] is True
+    assert out["hasDataCl"] is True

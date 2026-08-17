@@ -154,3 +154,32 @@ console.log(JSON.stringify({{
     assert out["hasScore"] is True
     assert out["hasCount"] is True
     assert out["hasDataCl"] is True
+
+
+def test_explore_tiles_container_exists_in_home():
+    html = INDEX_HTML.read_text(encoding="utf-8")
+    home_start, home_end = _section_range(html, "tab-home")
+    assert 'id="dash-explore-tiles"' in html[home_start:home_end]
+
+
+def test_render_explore_tiles_covers_all_four_real_clusters():
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fn = extract_js_function(src, "renderExploreTiles")
+    js = f"""
+{fn}
+console.log(JSON.stringify({{ html: renderExploreTiles() }}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    html = json_module.loads(result.stdout)["html"]
+    for cluster_key in ["live", "knowledge", "macro", "analysis"]:
+        assert "selectCluster('" + cluster_key + "')" in html, (
+            f"Плитка для кластера '{cluster_key}' отсутствует или не вызывает selectCluster()"
+        )
+    assert "toc-card-grid" in html
+    assert "toc-card" in html

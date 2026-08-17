@@ -391,6 +391,11 @@ SANITIZE_RATCHET_BASELINE = {
     "actorMeta.label": 1,
     "d.icon": 1,
     "d.label": 1,
+    # renderExploreTiles() (2026-08-16, ОБЗОР → "исследовать глубже") —
+    # tiles: массив-литерал, зашитый в функции, не данные из JSON/сигналов
+    "t.icon": 1,
+    "t.title": 1,
+    "t.sub": 1,
     "flowMeta.icon": 1,
     "flowMeta.label": 1,
     "link.label": 1,
@@ -431,7 +436,10 @@ SANITIZE_RATCHET_BASELINE = {
     # не-HTML контекст: сборка текстового промпта AI-анализатора
     # (snapshotText) — детектор не различает HTML/текст, sanitize здесь
     # был бы вреден (внёс бы &quot; в промпт)
-    "t.key": 1,
+    # t.key: 1 → 2 (2026-08-16) — второе вхождение в renderExploreTiles()
+    # (tiles: массив-литерал в коде, ключ кластера — не пользовательские
+    # данные), совпадение имени с t.key AI-анализатора выше случайно
+    "t.key": 2,
     "t.label": 2,
     "t.note": 1,
     "tab.label": 1,

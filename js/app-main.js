@@ -2897,6 +2897,38 @@ function scrollAppToTop() {
   }
 }
 
+// 2026-08-16: плитки-порталы на ОБЗОРЕ — реальные 4 кластера навигации
+// (CLUSTERS ниже), не придуманная отдельная таксономия. Переиспользует
+// .toc-card-grid/.toc-card/.toc-card-title/.toc-card-subtitle — тот же
+// визуальный язык, что карточное оглавление ТЕОРИИ (эта же сессия,
+// 2026-08-16). Статична (не зависит от данных) — рендерится один раз.
+function renderExploreTiles() {
+  const tiles = [
+    { key: 'live', icon: '📡', title: 'LIVE', sub: 'Цена · Дайджест · Метрики · Пулы' },
+    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', sub: 'Технологии · Lightning · Инструменты' },
+    { key: 'macro', icon: '📖', title: 'Fundamental', sub: 'Теория · Макроконтекст · Эмиссия' },
+    { key: 'analysis', icon: '🔬', title: 'Analysis', sub: 'Анализатор · Холдеры · Все нарративы' }
+  ];
+  return '<div class="toc-card-grid">'
+    + tiles.map(function(t) {
+        return '<div class="toc-card" onclick="selectCluster(\'' + t.key + '\')">'
+          + '<span style="font-size:16px">' + t.icon + '</span>'
+          + '<div class="toc-card-title">' + t.title + '</div>'
+          + '<div class="toc-card-subtitle">' + t.sub + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+let exploreTilesRendered = false;
+function renderExploreTilesOnce() {
+  if (exploreTilesRendered) return;
+  const el = document.getElementById('dash-explore-tiles');
+  if (!el) return;
+  el.innerHTML = renderExploreTiles();
+  exploreTilesRendered = true;
+}
+
 function goToDigest(clusterKey) {
   sigFilter = clusterKey || 'all';
   showTab('market', null);
@@ -3154,7 +3186,7 @@ let LATEST_BLOCKS = [];
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); renderExploreTilesOnce(); }
   // 2026-08-16: price-chart-wrap/dash-cycle перенесены с ОБЗОРА сюда — эта
   // вкладка теперь должна сама инициировать их данные, не полагаться на то,
   // что пользователь сначала посетил ОБЗОР. dashBtcPrice — простой глобал

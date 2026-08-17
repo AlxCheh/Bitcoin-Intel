@@ -1,9 +1,9 @@
 {
-  "cluster_periods": 273,
-  "last_updated_at": "2026-08-16T01:23:11.588174+00:00",
+  "cluster_periods": 275,
+  "last_updated_at": "2026-08-17T01:20:52.409050+00:00",
   "last_run_changed_clusters": [
-    "etf_institutional_flow",
-    "lightning_payments"
+    "bitcoin_governance_debate",
+    "strategy_model_stress"
   ],
   "note": "Самоподдерживающийся счётчик кластеро-периодов (ADR-011). Обновляется scripts/update_synthesis_history.py на каждый прогон synthesizer.py в CI. НЕ редактировать руками — см. ADR-011, заметка 2026-07-31, для полной истории и метода backfill первоначального значения.",
   "backfill": {

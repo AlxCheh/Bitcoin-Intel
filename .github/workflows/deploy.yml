@@ -209,6 +209,27 @@ jobs:
             gh pr close "$old_pr" --delete-branch || true
           done
 
+          # 2026-08-17: gh pr create/merge периодически падают на транзиентном
+          # "HTTP 503: No server is currently available to service your
+          # request" от api.github.com/graphql (не специфично для этого
+          # репозитория — сбой на стороне GitHub, наблюдался и вручную в той
+          # же сессии, и в проде на update-bip110-signaling.yml, где привёл к
+          # осиротевшей ветке без PR — commit/push уже прошли, а
+          # `gh pr create` оборвал шаг из-за `set -e`). gh_retry — 3 попытки
+          # с растущей паузой (10/20/30с), тот же паттерн применён во всех
+          # workflow с этим PR-шагом (build-facts.yml, update-*.yml,
+          # quality-dashboard.yml) — см. там короткую отсылку сюда.
+          gh_retry() {
+            local attempt
+            for attempt in 1 2 3; do
+              if "$@"; then return 0; fi
+              echo "⚠ '$*' упало (попытка $attempt/3), жду и повторяю..." >&2
+              sleep $((attempt * 10))
+            done
+            echo "✗ '$*' не удалось после 3 попыток" >&2
+            return 1
+          }
+
           git add data/synthesis_cache.json
           # data/synthesis_history_count.json: no-op add если update_synthesis_history.py
           # выше не тронул файл (0 реально изменившихся кластеров, см. его докстринг) —
@@ -222,10 +243,10 @@ jobs:
           git checkout -b "$BRANCH"
           git commit -m "chore: update synthesis_cache.json"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
-          gh pr create --base main --head "$BRANCH" \
+          gh_retry gh pr create --base main --head "$BRANCH" \
             --title "chore: sync synthesis_cache.json ($(date -u +%Y-%m-%d))" \
             --body "Автосинтез после коммита ${{ github.sha }}. Auto-merge после зелёного validate."
-          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+          gh_retry gh pr merge "$BRANCH" --auto --squash --delete-branch \
             || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"
 
 

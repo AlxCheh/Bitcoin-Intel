@@ -27,13 +27,43 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Bitcoin Intel",
-  "url": "https://alxcheh.github.io/Bitcoin-Intel/",
-  "description": "Платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.",
-  "inLanguage": "ru"
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Bitcoin Intel",
+      "url": "https://alxcheh.github.io/Bitcoin-Intel/",
+      "description": "Платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.",
+      "inLanguage": "ru"
+    },
+    {
+      "@type": "Dataset",
+      "name": "Bitcoin Intel — корпус сигналов",
+      "description": "Полный корпус нарративных сигналов о Bitcoin: событие, контекст, оговорки, противоречия (tension), структурный вывод (macro_implication) — источник для карточек нарративов на сайте",
+      "inLanguage": "ru",
+      "distribution": [
+        {
+          "@type": "DataDownload",
+          "encodingFormat": "application/json",
+          "contentUrl": "https://alxcheh.github.io/Bitcoin-Intel/signals.json"
+        },
+        {
+          "@type": "DataDownload",
+          "encodingFormat": "text/markdown",
+          "contentUrl": "https://alxcheh.github.io/Bitcoin-Intel/SIGNALS.md"
+        }
+      ]
+    }
+  ]
 }
 </script>
+<!-- 2026-08-18: лента данных для AI-агентов (Подход 3 из брейнсторма "агент
+     должен видеть полную картину сайта") — autodiscovery-теги тем же
+     принципом, что у RSS/Atom-фидов, только для JSON/Markdown-версии
+     корпуса сигналов. signals.json/SIGNALS.md уже отдаются напрямую
+     (application/json · text/markdown · Access-Control-Allow-Origin: *,
+     проверено вручную) — здесь только явное указание, что они существуют. -->
+<link rel="alternate" type="application/json" href="signals.json" title="Bitcoin Intel — корпус сигналов (JSON)">
+<link rel="alternate" type="text/markdown" href="SIGNALS.md" title="Bitcoin Intel — корпус сигналов (Markdown)">
 <!-- Cloudflare Web Analytics -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d659483fb69e44939c0af176880be238"}'></script>
 <!-- End Cloudflare Web Analytics -->

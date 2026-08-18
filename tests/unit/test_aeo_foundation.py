@@ -31,13 +31,53 @@ def test_sitemap_xml_is_valid_xml_with_root_url():
     assert "alxcheh.github.io/Bitcoin-Intel" in urls[0].text
 
 
-def test_index_html_has_schema_org_website_jsonld():
+def _load_jsonld_graph():
     html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
     start = html.find('application/ld+json')
     assert start != -1, "Schema.org JSON-LD блок не найден в index.html"
     script_start = html.find(">", start) + 1
     script_end = html.find("</script>", script_start)
     payload = json.loads(html[script_start:script_end])
-    assert payload["@type"] == "WebSite"
-    assert payload["name"] == "Bitcoin Intel"
-    assert "url" in payload
+    assert "@graph" in payload, "JSON-LD обязан быть @graph (WebSite + Dataset), не одиночным объектом"
+    return payload["@graph"]
+
+
+def test_index_html_has_schema_org_website_jsonld():
+    graph = _load_jsonld_graph()
+    website = next((n for n in graph if n.get("@type") == "WebSite"), None)
+    assert website is not None, "WebSite-узел отсутствует в @graph"
+    assert website["name"] == "Bitcoin Intel"
+    assert "url" in website
+
+
+def test_index_html_has_schema_org_dataset_with_distribution():
+    """
+    2026-08-18: лента данных для AI-агентов (Подход 3 из брейнсторма
+    "агент должен видеть полную картину сайта") — Dataset-узел с
+    distribution на signals.json/SIGNALS.md, машиночитаемо указывает
+    агенту, где искать полный корпус сигналов, не полагаясь на то, что
+    краулер сам догадается зайти по этим путям.
+    """
+    graph = _load_jsonld_graph()
+    dataset = next((n for n in graph if n.get("@type") == "Dataset"), None)
+    assert dataset is not None, "Dataset-узел отсутствует в @graph"
+    assert "distribution" in dataset and len(dataset["distribution"]) >= 2
+
+    formats = {d["encodingFormat"]: d["contentUrl"] for d in dataset["distribution"]}
+    assert formats.get("application/json", "").endswith("signals.json")
+    assert formats.get("text/markdown", "").endswith("SIGNALS.md")
+    for d in dataset["distribution"]:
+        assert d["@type"] == "DataDownload"
+
+
+def test_index_html_has_alternate_link_autodiscovery_tags():
+    """
+    <link rel="alternate"> — тот же стандартный паттерн, что у RSS/Atom-
+    фидов, только для JSON/Markdown-версии корпуса сигналов. Не полагается
+    на то, что агент распарсит JSON-LD — обычный HTML-тег в <head>.
+    """
+    html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+    head_end = html.find("</head>")
+    head = html[:head_end]
+    assert 'rel="alternate"' in head and 'type="application/json"' in head and 'href="signals.json"' in head
+    assert 'rel="alternate"' in head and 'type="text/markdown"' in head and 'href="SIGNALS.md"' in head

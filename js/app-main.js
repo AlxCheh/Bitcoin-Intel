@@ -2934,32 +2934,45 @@ function scrollAppToTop() {
 // (CLUSTERS ниже), не придуманная отдельная таксономия. Переиспользует
 // .toc-card-grid/.toc-card/.toc-card-title/.toc-card-subtitle — тот же
 // визуальный язык, что карточное оглавление ТЕОРИИ (эта же сессия,
-// 2026-08-16). Статична (не зависит от данных) — рендерится один раз.
+// 2026-08-16).
+// 2026-08-18: Вариант 3 (описание вместо списка вкладок) + счётчик из
+// Варианта 4 — из 5 предложенных пользователю по запросу "не понятно что
+// внутри, не хочется переходить" (design-канвас). count — теперь функция,
+// не литерал: плитки больше НЕ статичны (были рендерятся один раз), так
+// как счётчик зависит от SIGNALS/ENTITIES/THEORY_TOPICS/computeAllClusterScores() —
+// см. refreshExploreTiles() ниже, почему это больше не "once".
 function renderExploreTiles() {
   const tiles = [
-    { key: 'live', icon: '📡', title: 'LIVE', sub: 'Цена · Дайджест · Метрики · Пулы' },
-    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', sub: 'Технологии · Lightning · Инструменты' },
-    { key: 'macro', icon: '📖', title: 'Fundamental', sub: 'Теория · Макроконтекст · Эмиссия' },
-    { key: 'analysis', icon: '🔬', title: 'Analysis', sub: 'Анализатор · Холдеры · Все нарративы' }
+    { key: 'live', icon: '📡', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
+    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
+    { key: 'macro', icon: '📖', title: 'Fundamental', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
+    { key: 'analysis', icon: '🔬', title: 'Analysis', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
   ];
   return '<div class="toc-card-grid">'
     + tiles.map(function(t) {
-        return '<div class="toc-card" onclick="selectCluster(\'' + t.key + '\')">'
+        const n = t.count();
+        return '<div class="toc-card" style="position:relative" onclick="selectCluster(\'' + t.key + '\')">'
+          + (n ? '<span class="toc-card-badge">' + n + '</span>' : '')
           + '<span style="font-size:16px">' + t.icon + '</span>'
           + '<div class="toc-card-title">' + t.title + '</div>'
-          + '<div class="toc-card-subtitle">' + t.sub + '</div>'
+          + '<div class="toc-card-subtitle">' + t.desc + '</div>'
           + '</div>';
       }).join('')
     + '</div>';
 }
 
-let exploreTilesRendered = false;
-function renderExploreTilesOnce() {
-  if (exploreTilesRendered) return;
+// 2026-08-18: было "once" — плитки были статичны (жёсткий список подвкладок).
+// Теперь показывают живой счётчик (SIGNALS/ENTITIES/THEORY_TOPICS), а
+// triggerTabData('home') срабатывает синхронно ДО завершения loadSignals()
+// (тот же race, что решён для остальных панелей ОБЗОРА, см. комментарий у
+// "if (currentTabId) triggerTabData(currentTabId);" в loadSignals()) —
+// без повторного рендера счётчики застыли бы на 0 навсегда. Переприсвоение
+// innerHTML безопасно повторять: клики навешаны через inline onclick, не
+// addEventListener — задвоения обработчиков нет.
+function refreshExploreTiles() {
   const el = document.getElementById('dash-explore-tiles');
   if (!el) return;
   el.innerHTML = renderExploreTiles();
-  exploreTilesRendered = true;
 }
 
 function goToDigest(clusterKey) {
@@ -3242,7 +3255,7 @@ let LATEST_BLOCKS = [];
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); renderExploreTilesOnce(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); refreshExploreTiles(); }
   // 2026-08-16: price-chart-wrap/dash-cycle перенесены с ОБЗОРА сюда — эта
   // вкладка теперь должна сама инициировать их данные, не полагаться на то,
   // что пользователь сначала посетил ОБЗОР. dashBtcPrice — простой глобал

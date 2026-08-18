@@ -439,7 +439,18 @@ header {
   border-top: 1px solid var(--line2);
 }
 .cbar-btn {
-  flex: 0 0 auto;
+  /* 2026-08-17: найдено пользователем на реальном телефоне — 4 кнопки с
+     flex:0 0 auto (жёсткая ширина по контенту) на самых узких экранах
+     (320px, iPhone SE/старые Android) суммарно чуть шире доступной
+     ширины .clusterbar — .cbar-analysis (самая длинная надпись) вылезал
+     за границу страницы на 4px. flex:1 1 0 — все 4 кнопки делят ширину
+     .clusterbar поровну, никогда не превышая её независимо от ширины
+     экрана; overflow-x/text-overflow — защита на случай ещё более узких
+     устройств, чем уже проверенные 320px. */
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 14px 12px;
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   background: transparent;
@@ -4432,7 +4443,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=69227b48f0"></script>
+<script src="js/app-main.js?v=67395f3142"></script>
 
 </div><!-- /.app-scroll -->
 

@@ -2834,16 +2834,30 @@ function renderDashboard() {
   // единообразия ради единообразия, а потому что клик вешается ПОСЛЕ
   // вставки в DOM через querySelectorAll (см. вызов ниже), как и для
   // остальных .innerHTML-based рендеров.
-  function renderNarrativeMiniRow(key, cl, score) {
+  // 2026-08-18: Вариант 2 из 5 предложенных пользователю (карточка с рамкой
+  // + двухстрочный тизер tension вместо голой строки-списка) — "по текущим
+  // не понятно, что внутри, не хочется переходить". Тот же формат tension
+  // (ensureSentencePunctuation + highlightVs + highlightEntities), что уже
+  // используют featured-карточки renderClusterFullAnalytics() — единый
+  // визуальный язык, не изобретение нового форматирования текста.
+  function renderNarrativeMiniRow(key, cl, score, synthesis) {
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
     const dotColor = dirCls === 'pos' ? 'var(--grn)' : dirCls === 'neg' ? 'var(--red)' : 'var(--dim)';
     const label = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
+    const tension = synthesis && synthesis.tension
+      ? ensureSentencePunctuation(synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1))
+      : '';
     return '<div class="dash-narrative-mini" data-cl="' + sanitize(key) + '" '
-      + 'style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:11px">'
-      + '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
-      + '<span style="flex:1;color:var(--txt)">' + label + '</span>'
-      + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim)">' + cl.signals.length + ' · ' + score.total + '</span>'
-      + '<span style="color:var(--dim);font-size:12px">›</span>'
+      + 'style="border:1px solid var(--line);background:var(--bg2);padding:12px 14px;margin-bottom:8px;cursor:pointer">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (tension ? '6px' : '0') + '">'
+      +   '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
+      +   '<span style="flex:1;color:var(--txt);font-size:12px;font-weight:600">' + label + '</span>'
+      +   '<span style="font-family:var(--mono);font-size:9px;color:var(--dim);flex-shrink:0">' + cl.signals.length + ' · ' + score.total + '</span>'
+      + '</div>'
+      + (tension
+          ? '<div style="font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + highlightVs(highlightEntities(tension)) + '</div>'
+          : '')
+      + '<div style="font-family:var(--mono);font-size:10px;color:var(--btc);letter-spacing:0.04em">→ НАРРАТИВ</div>'
       + '</div>';
   }
 
@@ -2861,15 +2875,18 @@ function renderDashboard() {
       const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
       listEl.appendChild(item);
     } else {
-      miniHtml += renderNarrativeMiniRow(key, cl, score);
+      miniHtml += renderNarrativeMiniRow(key, cl, score, synthesis);
     }
   });
   if (miniListEl) {
     miniListEl.innerHTML = miniHtml;
     if (miniHtml) {
       if (miniLabelEl) miniLabelEl.textContent = 'ЕЩЁ НАРРАТИВЫ';
+      // 2026-08-18: goToNarrative(), не goToDigest() — клик обязан вести к уже
+      // готовому синтезированному нарративу этого кластера (ВСЕ НАРРАТИВЫ),
+      // не к сырому списку сигналов (ДАЙДЖЕСТ), см. goToNarrative() выше.
       miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {
-        el.addEventListener('click', function() { goToDigest(this.dataset.cl); });
+        el.addEventListener('click', function() { goToNarrative(this.dataset.cl); });
       });
     } else if (miniLabelEl) {
       miniLabelEl.textContent = '';
@@ -2917,38 +2934,67 @@ function scrollAppToTop() {
 // (CLUSTERS ниже), не придуманная отдельная таксономия. Переиспользует
 // .toc-card-grid/.toc-card/.toc-card-title/.toc-card-subtitle — тот же
 // визуальный язык, что карточное оглавление ТЕОРИИ (эта же сессия,
-// 2026-08-16). Статична (не зависит от данных) — рендерится один раз.
+// 2026-08-16).
+// 2026-08-18: Вариант 3 (описание вместо списка вкладок) + счётчик из
+// Варианта 4 — из 5 предложенных пользователю по запросу "не понятно что
+// внутри, не хочется переходить" (design-канвас). count — теперь функция,
+// не литерал: плитки больше НЕ статичны (были рендерятся один раз), так
+// как счётчик зависит от SIGNALS/ENTITIES/THEORY_TOPICS/computeAllClusterScores() —
+// см. refreshExploreTiles() ниже, почему это больше не "once".
 function renderExploreTiles() {
   const tiles = [
-    { key: 'live', icon: '📡', title: 'LIVE', sub: 'Цена · Дайджест · Метрики · Пулы' },
-    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', sub: 'Технологии · Lightning · Инструменты' },
-    { key: 'macro', icon: '📖', title: 'Fundamental', sub: 'Теория · Макроконтекст · Эмиссия' },
-    { key: 'analysis', icon: '🔬', title: 'Analysis', sub: 'Анализатор · Холдеры · Все нарративы' }
+    { key: 'live', icon: '📡', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
+    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
+    { key: 'macro', icon: '📖', title: 'Fundamental', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
+    { key: 'analysis', icon: '🔬', title: 'Analysis', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
   ];
   return '<div class="toc-card-grid">'
     + tiles.map(function(t) {
-        return '<div class="toc-card" onclick="selectCluster(\'' + t.key + '\')">'
+        const n = t.count();
+        return '<div class="toc-card" style="position:relative" onclick="selectCluster(\'' + t.key + '\')">'
+          + (n ? '<span class="toc-card-badge">' + n + '</span>' : '')
           + '<span style="font-size:16px">' + t.icon + '</span>'
           + '<div class="toc-card-title">' + t.title + '</div>'
-          + '<div class="toc-card-subtitle">' + t.sub + '</div>'
+          + '<div class="toc-card-subtitle">' + t.desc + '</div>'
           + '</div>';
       }).join('')
     + '</div>';
 }
 
-let exploreTilesRendered = false;
-function renderExploreTilesOnce() {
-  if (exploreTilesRendered) return;
+// 2026-08-18: было "once" — плитки были статичны (жёсткий список подвкладок).
+// Теперь показывают живой счётчик (SIGNALS/ENTITIES/THEORY_TOPICS), а
+// triggerTabData('home') срабатывает синхронно ДО завершения loadSignals()
+// (тот же race, что решён для остальных панелей ОБЗОРА, см. комментарий у
+// "if (currentTabId) triggerTabData(currentTabId);" в loadSignals()) —
+// без повторного рендера счётчики застыли бы на 0 навсегда. Переприсвоение
+// innerHTML безопасно повторять: клики навешаны через inline onclick, не
+// addEventListener — задвоения обработчиков нет.
+function refreshExploreTiles() {
   const el = document.getElementById('dash-explore-tiles');
   if (!el) return;
   el.innerHTML = renderExploreTiles();
-  exploreTilesRendered = true;
 }
 
 function goToDigest(clusterKey) {
   sigFilter = clusterKey || 'all';
   showTab('market', null);
   scrollAppToTop();
+}
+
+// 2026-08-18: найдено пользователем — клик по свёрнутой строке "ещё
+// нарративы" на ОБЗОРЕ вёл в goToDigest() (ДАЙДЖЕСТ, сырой список сигналов
+// кластера — до 23+ штук), а не к уже готовому синтезированному нарративу
+// (tension/macro_implication), который для этого кластера УЖЕ существует
+// на вкладке ВСЕ НАРРАТИВЫ (renderClusterFullAnalytics()). Пользователю
+// приходилось листать сырые сигналы, чтобы вручную восстановить то, что
+// синтез уже сформулировал — противоречит самой цели механизма синтеза.
+// showTab('base', null) рендерит карточки СИНХРОННО (renderClusterFullAnalytics()
+// вызывается прямо внутри triggerTabData(), не асинхронно) — к моменту
+// возврата из showTab() нужная карточка уже в DOM, доп. задержка не нужна.
+function goToNarrative(clusterKey) {
+  showTab('base', null);
+  const card = document.querySelector('[data-cluster="' + clusterKey + '"]');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // 2026-07-28 (по запросу пользователя): «Главные нарративы» на ОБЗОРЕ
@@ -3051,6 +3097,10 @@ function renderClusterFullAnalytics() {
     const div = document.createElement('div');
     div.className = 'panel';
     div.style.marginBottom = '10px';
+    // 2026-08-18: data-cluster — цель для goToNarrative() (клик по свёрнутой
+    // строке "ещё нарративы" на ОБЗОРЕ), не связано с data-cl на кнопке
+    // "СМОТРЕТЬ В ДАЙДЖЕСТЕ" внутри карточки — разные назначения.
+    div.setAttribute('data-cluster', key);
     div.innerHTML =
         '<div class="panel-head"><span class="panel-title">' + sanitize(label) + '</span>'
       +   '<span class="panel-tag">' + cl.signals.length + ' СИГН. · score ' + score.total + '</span></div>'
@@ -3076,6 +3126,9 @@ function renderClusterFullAnalytics() {
 
       const row = document.createElement('div');
       row.style.cssText = 'padding:10px 14px;border-top:1px solid var(--line);cursor:pointer';
+      // 2026-08-18: data-cluster — та же цель для goToNarrative(), что и у
+      // featured-карточек выше, для кластеров за пределами топ-3.
+      row.setAttribute('data-cluster', key);
       row.innerHTML =
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
         +   '<span style="font-size:12px;color:var(--txt);font-weight:600">' + sanitize(label) + '</span>'
@@ -3202,7 +3255,7 @@ let LATEST_BLOCKS = [];
 // showTab() в отдельную функцию, чтобы её можно было вызвать ПОВТОРНО
 // после завершения loadSignals() (см. ниже, почему это нужно).
 function triggerTabData(id) {
-  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); renderExploreTilesOnce(); }
+  if (id === 'home')      { fetchProdCost(); if (!LATEST_BLOCKS.length) fetchBlocks(); refreshExploreTiles(); }
   // 2026-08-16: price-chart-wrap/dash-cycle перенесены с ОБЗОРА сюда — эта
   // вкладка теперь должна сама инициировать их данные, не полагаться на то,
   // что пользователь сначала посетил ОБЗОР. dashBtcPrice — простой глобал

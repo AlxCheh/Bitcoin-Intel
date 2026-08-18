@@ -156,6 +156,50 @@ console.log(JSON.stringify({{
     assert out["hasDataCl"] is True
 
 
+def test_render_narrative_mini_row_shows_tension_snippet_as_card(tmp_path):
+    """
+    2026-08-18: Вариант 2 из 5 предложенных пользователю ("не понятно, что
+    внутри, не хочется переходить") — строка стала карточкой с рамкой и
+    двухстрочным тизером tension, не голым счётчиком сигналов.
+    """
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fns = "\n".join(
+        extract_js_function(src, name)
+        for name in ("highlightEntities", "highlightVs", "ensureSentencePunctuation", "renderNarrativeMiniRow")
+    )
+    js = f"""
+function sanitize(s) {{ return String(s == null ? '' : s); }}
+const ENTITIES = [];
+const CLUSTER_LABELS = {{ etf_institutional_flow: '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК' }};
+{fns}
+const cl = {{ signals: [1,2,3], pos: 2, neg: 1, neu: 0 }};
+const score = {{ total: 213 }};
+const synthesis = {{ tension: 'банки получили право хранить BTC vs Базель III делает это невыгодным' }};
+const withTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, synthesis);
+const withoutTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, null);
+console.log(JSON.stringify({{
+  hasBorderCard: withTension.includes('border:1px solid var(--line)'),
+  hasTensionText: withTension.includes('Базель III'),
+  hasVsBadge: withTension.includes('tension-vs-badge'),
+  hasFooterLink: withTension.includes('НАРРАТИВ'),
+  noTensionStillValid: typeof withoutTension === 'string' && withoutTension.includes('ETF')
+}}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json_module.loads(result.stdout)
+    assert out["hasBorderCard"] is True
+    assert out["hasTensionText"] is True
+    assert out["hasVsBadge"] is True, "vs в tension обязан подсвечиваться бейджем, как в renderClusterFullAnalytics()"
+    assert out["hasFooterLink"] is True
+    assert out["noTensionStillValid"] is True, "отсутствие synthesis не должно ломать рендер (fallback-путь браузерного синтеза)"
+
+
 def test_explore_tiles_container_exists_in_home():
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")
@@ -163,6 +207,14 @@ def test_explore_tiles_container_exists_in_home():
 
 
 def test_render_explore_tiles_covers_all_four_real_clusters():
+    """
+    2026-08-18: Вариант 3 (описание) + счётчик из Варианта 4 — плитки
+    больше не статичны, зависят от SIGNALS/ENTITIES/THEORY_TOPICS/
+    computeAllClusterScores(), поэтому изолированный тест обязан
+    стабить их, иначе ReferenceError (см. класс проблемы —
+    docs/PLAN-next-session.md, "тестовые сниппеты не стабят всё, на что
+    замыкается функция").
+    """
     import shutil
     import json as json_module
     from tests.conftest import extract_js_function, run_node_js
@@ -171,6 +223,10 @@ def test_render_explore_tiles_covers_all_four_real_clusters():
     src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
     fn = extract_js_function(src, "renderExploreTiles")
     js = f"""
+const SIGNALS = [{{}}, {{}}, {{}}];
+const ENTITIES = [{{}}, {{}}];
+const THEORY_TOPICS = [{{}}];
+function computeAllClusterScores() {{ return [{{}}, {{}}, {{}}, {{}}, {{}}]; }}
 {fn}
 console.log(JSON.stringify({{ html: renderExploreTiles() }}));
 """
@@ -183,3 +239,31 @@ console.log(JSON.stringify({{ html: renderExploreTiles() }}));
         )
     assert "toc-card-grid" in html
     assert "toc-card" in html
+    assert "toc-card-badge" in html, "Счётчик (Вариант 4) обязан отображаться, когда данные непусты"
+    assert '>3<' in html, "Плитка LIVE обязана показывать реальный count SIGNALS.length (3 в фикстуре)"
+
+
+def test_render_explore_tiles_hides_badge_when_data_empty():
+    """Ранний рендер (до loadSignals()) — SIGNALS/ENTITIES/THEORY_TOPICS
+    ещё пустые массивы, бейдж с "0" не должен показываться (визуальный шум,
+    не ошибка) — refreshExploreTiles() перерисует с реальными числами
+    после загрузки данных, см. её докстринг."""
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fn = extract_js_function(src, "renderExploreTiles")
+    js = f"""
+const SIGNALS = [];
+const ENTITIES = [];
+const THEORY_TOPICS = [];
+function computeAllClusterScores() {{ return []; }}
+{fn}
+console.log(JSON.stringify({{ html: renderExploreTiles() }}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    html = json_module.loads(result.stdout)["html"]
+    assert "toc-card-badge" not in html

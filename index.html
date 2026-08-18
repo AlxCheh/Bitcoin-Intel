@@ -2000,6 +2000,13 @@ header {
 .dash-narrative-item + .dash-narrative-item {
   border-top: 1px solid var(--line);
 }
+/* 2026-08-18: "ещё нарративы" на ОБЗОРЕ — Вариант 2 из 5 предложенных
+   (карточка с рамкой вместо голой строки-списка), пользователь выбрал
+   этот вариант. Тот же hover-язык, что .toc-card. */
+.dash-narrative-mini:hover {
+  border-color: var(--btc);
+  background: var(--bg3);
+}
 .dash-narrative-cluster {
   margin-bottom: 8px;
 }
@@ -4443,7 +4450,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=f0e7ec5db1"></script>
+<script src="js/app-main.js?v=337215e953"></script>
 
 </div><!-- /.app-scroll -->
 

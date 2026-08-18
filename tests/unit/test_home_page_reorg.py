@@ -156,6 +156,50 @@ console.log(JSON.stringify({{
     assert out["hasDataCl"] is True
 
 
+def test_render_narrative_mini_row_shows_tension_snippet_as_card(tmp_path):
+    """
+    2026-08-18: Вариант 2 из 5 предложенных пользователю ("не понятно, что
+    внутри, не хочется переходить") — строка стала карточкой с рамкой и
+    двухстрочным тизером tension, не голым счётчиком сигналов.
+    """
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fns = "\n".join(
+        extract_js_function(src, name)
+        for name in ("highlightEntities", "highlightVs", "ensureSentencePunctuation", "renderNarrativeMiniRow")
+    )
+    js = f"""
+function sanitize(s) {{ return String(s == null ? '' : s); }}
+const ENTITIES = [];
+const CLUSTER_LABELS = {{ etf_institutional_flow: '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК' }};
+{fns}
+const cl = {{ signals: [1,2,3], pos: 2, neg: 1, neu: 0 }};
+const score = {{ total: 213 }};
+const synthesis = {{ tension: 'банки получили право хранить BTC vs Базель III делает это невыгодным' }};
+const withTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, synthesis);
+const withoutTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, null);
+console.log(JSON.stringify({{
+  hasBorderCard: withTension.includes('border:1px solid var(--line)'),
+  hasTensionText: withTension.includes('Базель III'),
+  hasVsBadge: withTension.includes('tension-vs-badge'),
+  hasFooterLink: withTension.includes('НАРРАТИВ'),
+  noTensionStillValid: typeof withoutTension === 'string' && withoutTension.includes('ETF')
+}}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json_module.loads(result.stdout)
+    assert out["hasBorderCard"] is True
+    assert out["hasTensionText"] is True
+    assert out["hasVsBadge"] is True, "vs в tension обязан подсвечиваться бейджем, как в renderClusterFullAnalytics()"
+    assert out["hasFooterLink"] is True
+    assert out["noTensionStillValid"] is True, "отсутствие synthesis не должно ломать рендер (fallback-путь браузерного синтеза)"
+
+
 def test_explore_tiles_container_exists_in_home():
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")

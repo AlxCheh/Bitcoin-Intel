@@ -2843,7 +2843,7 @@ function renderDashboard() {
       + '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
       + '<span style="flex:1;color:var(--txt)">' + label + '</span>'
       + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim)">' + cl.signals.length + ' · ' + score.total + '</span>'
-      + '<span style="color:var(--dim);font-size:12px">›</span>'
+      + '<span style="font-family:var(--mono);font-size:9px;color:var(--dim)">→ НАРРАТИВ</span>'
       + '</div>';
   }
 
@@ -2868,8 +2868,11 @@ function renderDashboard() {
     miniListEl.innerHTML = miniHtml;
     if (miniHtml) {
       if (miniLabelEl) miniLabelEl.textContent = 'ЕЩЁ НАРРАТИВЫ';
+      // 2026-08-18: goToNarrative(), не goToDigest() — клик обязан вести к уже
+      // готовому синтезированному нарративу этого кластера (ВСЕ НАРРАТИВЫ),
+      // не к сырому списку сигналов (ДАЙДЖЕСТ), см. goToNarrative() выше.
       miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {
-        el.addEventListener('click', function() { goToDigest(this.dataset.cl); });
+        el.addEventListener('click', function() { goToNarrative(this.dataset.cl); });
       });
     } else if (miniLabelEl) {
       miniLabelEl.textContent = '';
@@ -2949,6 +2952,22 @@ function goToDigest(clusterKey) {
   sigFilter = clusterKey || 'all';
   showTab('market', null);
   scrollAppToTop();
+}
+
+// 2026-08-18: найдено пользователем — клик по свёрнутой строке "ещё
+// нарративы" на ОБЗОРЕ вёл в goToDigest() (ДАЙДЖЕСТ, сырой список сигналов
+// кластера — до 23+ штук), а не к уже готовому синтезированному нарративу
+// (tension/macro_implication), который для этого кластера УЖЕ существует
+// на вкладке ВСЕ НАРРАТИВЫ (renderClusterFullAnalytics()). Пользователю
+// приходилось листать сырые сигналы, чтобы вручную восстановить то, что
+// синтез уже сформулировал — противоречит самой цели механизма синтеза.
+// showTab('base', null) рендерит карточки СИНХРОННО (renderClusterFullAnalytics()
+// вызывается прямо внутри triggerTabData(), не асинхронно) — к моменту
+// возврата из showTab() нужная карточка уже в DOM, доп. задержка не нужна.
+function goToNarrative(clusterKey) {
+  showTab('base', null);
+  const card = document.querySelector('[data-cluster="' + clusterKey + '"]');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // 2026-07-28 (по запросу пользователя): «Главные нарративы» на ОБЗОРЕ
@@ -3051,6 +3070,10 @@ function renderClusterFullAnalytics() {
     const div = document.createElement('div');
     div.className = 'panel';
     div.style.marginBottom = '10px';
+    // 2026-08-18: data-cluster — цель для goToNarrative() (клик по свёрнутой
+    // строке "ещё нарративы" на ОБЗОРЕ), не связано с data-cl на кнопке
+    // "СМОТРЕТЬ В ДАЙДЖЕСТЕ" внутри карточки — разные назначения.
+    div.setAttribute('data-cluster', key);
     div.innerHTML =
         '<div class="panel-head"><span class="panel-title">' + sanitize(label) + '</span>'
       +   '<span class="panel-tag">' + cl.signals.length + ' СИГН. · score ' + score.total + '</span></div>'
@@ -3076,6 +3099,9 @@ function renderClusterFullAnalytics() {
 
       const row = document.createElement('div');
       row.style.cssText = 'padding:10px 14px;border-top:1px solid var(--line);cursor:pointer';
+      // 2026-08-18: data-cluster — та же цель для goToNarrative(), что и у
+      // featured-карточек выше, для кластеров за пределами топ-3.
+      row.setAttribute('data-cluster', key);
       row.innerHTML =
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
         +   '<span style="font-size:12px;color:var(--txt);font-weight:600">' + sanitize(label) + '</span>'

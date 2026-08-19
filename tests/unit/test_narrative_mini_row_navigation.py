@@ -1,12 +1,13 @@
 """
 tests/unit/test_narrative_mini_row_navigation.py
-Bitcoin Intel — regression: клик по свёрнутой строке "ещё нарративы" на
-ОБЗОРЕ обязан вести к уже готовому синтезированному нарративу кластера
-(вкладка ВСЕ НАРРАТИВЫ, renderClusterFullAnalytics()), не к сырому списку
-сигналов (ДАЙДЖЕСТ) — 2026-08-18, найдено пользователем: "Переход приведет
-на весь кластер целиком, пользователь не увидит именно главный нарратив,
-ему придется листать все N сигналов" — противоречит самой цели механизма
-синтеза (одна карточка вместо ручной реконструкции из сырых сигналов).
+Bitcoin Intel — исходно regression-тест на клик по свёрнутой строке
+"ещё нарративы" на ОБЗОРЕ (2026-08-18, найдено пользователем: "Переход
+приведет на весь кластер целиком, пользователь не увидит именно главный
+нарратив"). 2026-08-19: редизайн терминала (Задача 3) убрал сам механизм
+"ещё нарративы" (renderNarrativeMiniRow и его клик-вайринг) — тест на этот
+конкретный обработчик удалён вместе с ним. Остальные тесты файла проверяют
+инфраструктуру, которая осталась (goToNarrative(), data-cluster атрибуты
+renderClusterFullAnalytics()) и годится для будущего переиспользования.
 """
 import shutil
 from pathlib import Path
@@ -69,28 +70,6 @@ console.log(JSON.stringify({{ shown }}));
     import json
     out = json.loads(result.stdout)
     assert out["shown"] == "base"
-
-
-def test_mini_row_click_wiring_uses_go_to_narrative_not_go_to_digest():
-    """
-    Структурная проверка исходника: обработчик клика на свёрнутых строках
-    "ещё нарративы" обязан вызывать goToNarrative(), не goToDigest() — сама
-    функция вызова живёт внутри renderDashboard() (замыкание), извлекать
-    целиком непрактично, поэтому проверяется прямо по исходнику рядом с
-    известным якорем (тем же принципом, что site_map/CLAUDE.md sync-тесты
-    в этом проекте).
-    """
-    src = APP_MAIN_JS.read_text(encoding="utf-8")
-    anchor = "miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {"
-    start = src.find(anchor)
-    assert start != -1, "Обработчик клика по мини-строкам не найден — переименован?"
-    end = src.find("});", start)
-    handler_body = src[start:end]
-    assert "goToNarrative(" in handler_body, (
-        "Клик по свёрнутой строке нарратива обязан вести к синтезированному "
-        "нарративу (goToNarrative), не к сырому списку сигналов (goToDigest)"
-    )
-    assert "goToDigest(" not in handler_body
 
 
 def test_render_cluster_full_analytics_cards_have_data_cluster_attribute():

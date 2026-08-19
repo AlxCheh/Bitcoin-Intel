@@ -2039,13 +2039,6 @@ header {
 .dash-narrative-item + .dash-narrative-item {
   border-top: 1px solid var(--line);
 }
-/* 2026-08-18: "ещё нарративы" на ОБЗОРЕ — Вариант 2 из 5 предложенных
-   (карточка с рамкой вместо голой строки-списка), пользователь выбрал
-   этот вариант. Тот же hover-язык, что .toc-card. */
-.dash-narrative-mini:hover {
-  border-color: var(--btc);
-  background: var(--bg3);
-}
 .dash-narrative-cluster {
   margin-bottom: 8px;
 }
@@ -2285,11 +2278,6 @@ header {
           <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><div class="dash-narrative-item"><div class="dash-narrative-tension">Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился</div><div class="dash-narrative-macro">BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично</div><div style="font-size:10px;color:var(--dim)">28 сигналов</div></div><!-- PRERENDER:HOME:END --></div>
         </div>
 
-        <!-- ══ ЕЩЁ НАРРАТИВЫ — упраздняется Задачей 3, контейнер временно остаётся ══ -->
-        <div id="dash-narratives-mini-wrap" style="margin-top:12px">
-          <div id="dash-narratives-mini-label" style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px"></div>
-          <div id="dash-narratives-mini-list"></div>
-        </div>
       </div>
 
       <div class="dash-side">
@@ -4568,7 +4556,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=b6ca558456"></script>
+<script src="js/app-main.js?v=9db7480ae0"></script>
 
 </div><!-- /.app-scroll -->
 

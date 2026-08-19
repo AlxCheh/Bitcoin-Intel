@@ -2209,6 +2209,13 @@ header {
   border-top: 1px solid var(--line);
 }
 
+.dash-philosophy-toggle {
+  display: none;
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--btc);
+  cursor: pointer; text-align: center;
+}
+
 /* ══════════════════════════════════
    ОБЗОР — 2-колоночная сетка (терминал)
 ══════════════════════════════════ */
@@ -2226,6 +2233,15 @@ header {
 @media (min-width: 960px) {
   #tab-home .page { max-width: 1180px; }
   .dash-grid { display: grid; grid-template-columns: 2.1fr 1fr; gap: 16px; align-items: start; }
+  .dash-side .dash-philosophy-body:not(.dpb-expanded) {
+    max-height: 70px; overflow: hidden; position: relative;
+  }
+  .dash-side .dash-philosophy-body:not(.dpb-expanded)::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 26px;
+    background: linear-gradient(to bottom, transparent, var(--bg2));
+  }
+  .dash-philosophy-toggle { display: block; }
 }
 </style>
 </head>
@@ -2350,6 +2366,7 @@ header {
               <li>не маскирует неуверенность уверенным тоном — уровень доверия виден рядом с выводом, а не растворён в нём.</li>
             </ul>
             <div class="dash-philosophy-footer">ТОЛЬКО BITCOIN. НИЧЕГО СВЕРХ ТОГО, ЧТО МОЖНО ПРОСЛЕДИТЬ ДО ИСТОЧНИКА.</div>
+            <div class="dash-philosophy-toggle" onclick="togglePhilosophy(this)">развернуть ▾</div>
           </div>
         </div>
       </div>
@@ -2794,7 +2811,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-early.js?v=1be783ea92"></script>
+<script src="js/app-early.js?v=9eb9a2926b"></script>
 
 <section class="section" id="tab-theory">
   <div class="page">

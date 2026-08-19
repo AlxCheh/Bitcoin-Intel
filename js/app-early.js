@@ -161,3 +161,10 @@ function toggleNav(id) {
   body.style.display = collapsed ? '' : 'none';
   if (arrow) arrow.style.transform = collapsed ? 'rotate(90deg)' : '';
 }
+
+function togglePhilosophy(el) {
+  const body = el.closest('.dash-philosophy-body');
+  if (!body) return;
+  const expanded = body.classList.toggle('dpb-expanded');
+  el.textContent = expanded ? 'свернуть ▴' : 'развернуть ▾';
+}

@@ -2168,6 +2168,30 @@ header {
   padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer;
 }
 .dash-sum-link:hover { color: var(--btc); }
+
+.dash-philosophy {
+  margin: 16px 0 0;
+  background: var(--bg2);
+  border: 1px solid var(--btc);
+  overflow: hidden;
+}
+.dash-philosophy-body {
+  padding: 14px 14px 12px;
+  font-family: var(--sans); font-size: 12px; line-height: 1.6;
+  color: var(--dim);
+}
+.dash-philosophy-body p { margin: 0 0 12px; }
+.dash-philosophy-body p:last-of-type { margin-bottom: 0; }
+.dash-philosophy-body b { color: var(--txt); }
+.dash-philosophy-body ul { margin: 0 0 4px; padding-left: 18px; }
+.dash-philosophy-body li { margin-bottom: 6px; }
+.dash-philosophy-lead { color: var(--txt); font-weight: 600; margin-bottom: 8px !important; }
+.dash-philosophy-footer {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--dim2); text-align: center;
+  padding-top: 12px; margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
 </style>
 </head>
 <body>
@@ -2244,7 +2268,7 @@ header {
     </div>
 
     <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ (2026-08-16) ══ -->
-    <div style="margin-top:16px">
+    <div style="margin:16px 0">
       <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
       <div id="dash-explore-tiles"></div>
     </div>
@@ -2264,6 +2288,24 @@ header {
       </div>
     </div>
 
+    <!-- ══ ФИЛОСОФИЯ ПРОЕКТА (2026-08-18) ══ -->
+    <div class="dash-philosophy">
+      <div class="panel-head">
+        <span class="panel-title">Философия проекта</span>
+      </div>
+      <div class="dash-philosophy-body">
+        <p><b>Bitcoin Intel</b> — личный intelligence-терминал автора. Не медиа, не агрегатор цен, не поток мнений.</p>
+        <p>Смысл сайта — превращать разрозненные наблюдения о Bitcoin в связный, объяснимый и проверяемый корпус знания. Каждый вывод здесь прослеживается до конкретного сигнала: утверждение без опоры на источник — домысел, а не аналитика, и такого на этом сайте нет.</p>
+        <p>Прежде чем принять интерпретацию, рассматривается минимум одна содержательная альтернатива и явно отклоняется — не соломенное чучело, а версия, объясняющая те же факты иначе. Рассуждение показывается до вывода, а не сворачивается в готовый результат постфактум.</p>
+        <p class="dash-philosophy-lead">Что сайт принципиально не делает:</p>
+        <ul>
+          <li>не прогнозирует цену и не занимается техническим анализом графиков — цена здесь наблюдаема, не предсказуема;</li>
+          <li>не рассматривает альткоины и крипторынок как самостоятельный предмет — только как канал влияния на BTC;</li>
+          <li>не маскирует неуверенность уверенным тоном — уровень доверия виден рядом с выводом, а не растворён в нём.</li>
+        </ul>
+        <div class="dash-philosophy-footer">ТОЛЬКО BITCOIN. НИЧЕГО СВЕРХ ТОГО, ЧТО МОЖНО ПРОСЛЕДИТЬ ДО ИСТОЧНИКА.</div>
+      </div>
+    </div>
 
   </div>
 </section>

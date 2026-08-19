@@ -2098,6 +2098,29 @@ header {
   line-height: 1.5;
   margin-bottom: 8px;
 }
+.dash-anchor-fields {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+  background: var(--line); border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.dash-anchor-field { background: var(--bg3); padding: 4px 6px; }
+.dash-anchor-field-label { font-family: var(--mono); font-size: 8px; color: var(--dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+.dash-anchor-field-value { font-family: var(--mono); font-size: 9.5px; font-weight: 700; color: var(--txt); }
+.dash-anchor-field-value.pos { color: var(--grn); }
+.dash-anchor-field-value.neg { color: var(--red); }
+.dash-anchor-field-value.neu { color: var(--dim); }
+.dash-anchor-field-value.amber { color: var(--btc); }
+
+.dash-anchor-links { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; }
+.dash-anchor-chip.confirms { border-color: var(--grn); color: var(--grn); }
+.dash-anchor-chip.contradicts { border-color: var(--red); color: var(--red); }
+.dash-anchor-chip.context { border-color: var(--line2); color: var(--dim); }
+
+.dash-anchor-entities { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.dash-anchor-entity { font-family: var(--mono); font-size: 9px; padding: 2px 7px; background: var(--bg3); color: var(--txt); border: 1px solid var(--line2); }
+
+.dash-anchor-source { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-bottom: 4px; }
 /* 2026-07-28: выделение "vs" в тензии — Вариант 2 (бейдж-капсула),
    утверждён пользователем после превью 5 вариантов. Используется и в
    "Главных нарративах" (ОБЗОР), и в "Все нарративы". */
@@ -4556,7 +4579,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=9db7480ae0"></script>
+<script src="js/app-main.js?v=12525b4b8c"></script>
 
 </div><!-- /.app-scroll -->
 

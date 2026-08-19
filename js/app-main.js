@@ -2747,8 +2747,64 @@ function renderDashboard() {
       + '</div>';
   }
 
+  // 2026-08-19: редизайн терминала — плотная строка полей анкорного
+  // сигнала кластера (DIR/HORIZON/WEIGHT/ROLE/ACTOR), как security-header
+  // в Bloomberg. Чистая функция (без DOM API) — тестируется через Node,
+  // см. tests/unit/test_home_terminal_redesign.py. anchor — сигнал из
+  // cl.signals с id === synthesis.anchor_signal_id, см. вызов ниже.
+  function renderAnchorFieldsHtml(anchor) {
+    if (!anchor) return '';
+    const dirCls = anchor.dir === 'neg' ? 'neg' : anchor.dir === 'pos' ? 'pos' : 'neu';
+    const cells = [
+      { label: 'DIR', value: (anchor.dir || '—').toUpperCase(), cls: dirCls },
+      { label: 'HORIZON', value: (anchor.horizon || '—').toUpperCase(), cls: '' },
+      { label: 'WEIGHT', value: (anchor.weight || '—').toUpperCase(), cls: '' },
+      { label: 'ROLE', value: (anchor.narrative_role || '—').toUpperCase(), cls: 'amber' },
+      { label: 'ACTOR', value: (anchor.actor || '—').toUpperCase(), cls: '' }
+    ];
+    return '<div class="dash-anchor-fields">'
+      + cells.map(function(c) {
+          return '<div class="dash-anchor-field"><div class="dash-anchor-field-label">' + c.label + '</div>'
+            + '<div class="dash-anchor-field-value' + (c.cls ? ' ' + c.cls : '') + '">' + sanitize(c.value) + '</div></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  // Чипы связей анкорного сигнала (confirms/contradicts/context_chain) —
+  // показываются только непустые типы, счётчик = длина массива.
+  function renderAnchorLinksHtml(anchor) {
+    if (!anchor || !anchor.links) return '';
+    const l = anchor.links;
+    const chips = [];
+    if (l.confirms && l.confirms.length) chips.push('<span class="dash-anchor-chip confirms">✓ ПОДТВЕРЖДАЕТ · ' + l.confirms.length + '</span>');
+    if (l.contradicts && l.contradicts.length) chips.push('<span class="dash-anchor-chip contradicts">✗ ПРОТИВОРЕЧИТ · ' + l.contradicts.length + '</span>');
+    if (l.context_chain && l.context_chain.length) chips.push('<span class="dash-anchor-chip context">↳ КОНТЕКСТ · ' + l.context_chain.length + '</span>');
+    if (!chips.length) return '';
+    return '<div class="dash-anchor-links">' + chips.join('') + '</div>';
+  }
+
+  // Теги сущностей ENTITIES.json, чей signal_refs содержит id анкорного
+  // сигнала — те же сущности, что уже ведутся Шагом 8 алгоритма обработки
+  // сигнала (CLAUDE.md, "База артефактов").
+  function renderAnchorEntitiesHtml(anchor) {
+    if (!anchor) return '';
+    const ents = (ENTITIES || []).filter(function(e) {
+      return e.signal_refs && e.signal_refs.indexOf(anchor.id) !== -1;
+    });
+    if (!ents.length) return '';
+    return '<div class="dash-anchor-entities">'
+      + ents.map(function(e) { return '<span class="dash-anchor-entity">' + sanitize(e.name) + '</span>'; }).join('')
+      + '</div>';
+  }
+
   function renderNarrativeItem(key, cl, score, weak, idx, synthesis) {
     const n      = cl.signals.length;
+    // 2026-08-19: анкорный сигнал — тот, с которого синтез взял tension
+    // (synthesis.anchor_signal_id, см. Python SynthesisResult и JS
+    // synthesizeNarrativeAdvanced() — оба поля называют одинаково).
+    // Ищем в cl.signals (сигналы этого кластера), не во всём SIGNALS —
+    // дешевле и всегда содержит нужный id, если синтез вообще валиден.
+    const anchor = cl.signals.find(function(s) { return s.id === synthesis.anchor_signal_id; }) || null;
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
     const isHot  = score.total >= SCORE_HOT;
     const bdId   = 'nbd-' + idx;
@@ -2793,10 +2849,14 @@ function renderDashboard() {
       +     '</span>'
       +   '</div>'
       + '</div>'
+      + renderAnchorFieldsHtml(anchor)
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
       + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightVs(highlightEntities(tension)) + '</div>' : '')
       + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
+      + renderAnchorLinksHtml(anchor)
+      + renderAnchorEntitiesHtml(anchor)
+      + (anchor && anchor.source ? '<div class="dash-anchor-source">' + sanitize(anchor.source) + '</div>' : '')
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
       + buildAltScenarioHtml(synthesis)
       + '<div class="dash-sum-counts" style="margin:5px 0">'

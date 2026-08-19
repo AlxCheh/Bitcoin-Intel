@@ -383,10 +383,20 @@ SANITIZE_RATCHET_BASELINE = {
     "groupItems.length": 1,
     "filteredCompact.length": 1,
     "v.pct": 1,
+    # 2026-08-19 — renderAnchorLinksHtml() (Задача 4, редизайн терминала):
+    # чипы confirms/contradicts/context_chain показывают только счётчик
+    # массива (l.confirms.length и т.п.) — заведомо числовой вывод.
+    "l.confirms.length": 1,
+    "l.contradicts.length": 1,
+    "l.context_chain.length": 1,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,
     "(freshness.stale ? 'var(--red)' : 'var(--dim)')": 1,
     "(item.open ? ' open' : '')": 1,
+    # renderAnchorFieldsHtml() (2026-08-19, Задача 4) — c.cls читается из
+    # массива-литерала cells внутри функции (значения '', 'neg', 'pos',
+    # 'neu', 'amber'), не из данных сигнала.
+    "c.cls : '')": 1,
     # ── словари-константы кода (значения — литералы в index.html) ──
     "actorMeta.label": 1,
     "d.icon": 1,
@@ -410,7 +420,10 @@ SANITIZE_RATCHET_BASELINE = {
     "(TREASURY_META.public_holders_count || '?')": 1,
     "(anchorObj.weight || '?')": 1,
     "(s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : safeTheoryRef.replace('theory-','').toUpperCase())": 1,
-    "c.label": 2,
+    # c.label: 2 → 3 (2026-08-19) — renderAnchorFieldsHtml() (Задача 4)
+    # добавляет третье вхождение; значение — литерал из cells (DIR/
+    # HORIZON/WEIGHT/ROLE/ACTOR), не данные сигнала.
+    "c.label": 3,
     "cluster.label": 1,
     "etfEx.as_of": 1,
     "fact.signal_id": 1,

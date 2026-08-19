@@ -2192,6 +2192,25 @@ header {
   padding-top: 12px; margin-top: 12px;
   border-top: 1px solid var(--line);
 }
+
+/* ══════════════════════════════════
+   ОБЗОР — 2-колоночная сетка (терминал)
+══════════════════════════════════ */
+.dash-grid { display: block; }
+.dash-side { display: block; }
+
+.dash-watchlist { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); overflow: hidden; }
+.dash-watch-row { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 10px; cursor: pointer; }
+.dash-watch-row:hover { background: var(--bg3); }
+.dash-watch-row + .dash-watch-row { border-top: 1px solid var(--line); }
+.dash-watch-label { flex: 1; min-width: 0; color: var(--txt); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-watch-bar { display: flex; height: 5px; width: 52px; overflow: hidden; gap: 1px; flex-shrink: 0; }
+.dash-watch-count { color: var(--dim); width: 22px; text-align: right; flex-shrink: 0; }
+
+@media (min-width: 960px) {
+  #tab-home .page { max-width: 1180px; }
+  .dash-grid { display: grid; grid-template-columns: 2.1fr 1fr; gap: 16px; align-items: start; }
+}
 </style>
 </head>
 <body>
@@ -2252,58 +2271,76 @@ header {
       </div>
     </div>
 
-    <!-- ══ ГЛАВНАЯ ИСТОРИЯ (2026-08-16, ранее БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ) ══ -->
-    <div class="dash-narratives" id="dash-narratives-wrap">
-      <div class="panel-head" style="margin:0">
-        <span class="panel-title">Главная история</span>
-        <span id="dash-narratives-total" class="chart-meta"></span>
-      </div>
-      <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><div class="dash-narrative-item"><div class="dash-narrative-tension">Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился</div><div class="dash-narrative-macro">BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично</div><div style="font-size:10px;color:var(--dim)">28 сигналов</div></div><!-- PRERENDER:HOME:END --></div>
-    </div>
+    <!-- ══ СЕТКА ОБЗОРА (2026-08-19) — лента слева, watchlist/сводки справа;
+         на экране < 960px .dash-grid схлопывается в блок, оба .dash-feed/
+         .dash-side стекают друг под другом в порядке DOM (лента → сайдбар) ══ -->
+    <div class="dash-grid">
+      <div class="dash-feed">
+        <!-- ══ ГЛАВНАЯ ИСТОРИЯ ══ -->
+        <div class="dash-narratives" id="dash-narratives-wrap">
+          <div class="panel-head" style="margin:0">
+            <span class="panel-title">Главная история</span>
+            <span id="dash-narratives-total" class="chart-meta"></span>
+          </div>
+          <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><div class="dash-narrative-item"><div class="dash-narrative-tension">Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился</div><div class="dash-narrative-macro">BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично</div><div style="font-size:10px;color:var(--dim)">28 сигналов</div></div><!-- PRERENDER:HOME:END --></div>
+        </div>
 
-    <!-- ══ ЕЩЁ НАРРАТИВЫ (2026-08-16) ══ -->
-    <div id="dash-narratives-mini-wrap" style="margin-top:12px">
-      <div id="dash-narratives-mini-label" style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px"></div>
-      <div id="dash-narratives-mini-list"></div>
-    </div>
-
-    <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ (2026-08-16) ══ -->
-    <div style="margin:16px 0">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
-      <div id="dash-explore-tiles"></div>
-    </div>
-
-    <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
-    <div class="dash-summary">
-      <div class="panel-head" style="margin:-16px -14px 12px">
-        <span class="panel-title">Общий фон</span>
-        <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
-      </div>
-      <div class="dash-summary-body">
-        <div class="dash-sum-bar" id="dash-sum-bar"></div>
-        <div class="dash-sum-counts" id="dash-sum-counts"></div>
-        <div class="dash-sum-link" onclick="showTab('market', null)">
-          ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+        <!-- ══ ЕЩЁ НАРРАТИВЫ — упраздняется Задачей 3, контейнер временно остаётся ══ -->
+        <div id="dash-narratives-mini-wrap" style="margin-top:12px">
+          <div id="dash-narratives-mini-label" style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px"></div>
+          <div id="dash-narratives-mini-list"></div>
         </div>
       </div>
-    </div>
 
-    <!-- ══ ФИЛОСОФИЯ ПРОЕКТА (2026-08-18) ══ -->
-    <div class="dash-philosophy">
-      <div class="panel-head">
-        <span class="panel-title">Философия проекта</span>
-      </div>
-      <div class="dash-philosophy-body">
-        <p><b>Bitcoin Intel</b> — личный intelligence-терминал автора. Не медиа, не агрегатор цен, не поток мнений.</p>
-        <p>Смысл сайта — превращать разрозненные наблюдения о Bitcoin в связный, объяснимый и проверяемый корпус знания. Каждый вывод здесь прослеживается до конкретного сигнала: утверждение без опоры на источник — домысел, а не аналитика, и такого на этом сайте нет.</p>
-        <p>Прежде чем принять интерпретацию, рассматривается минимум одна содержательная альтернатива и явно отклоняется — не соломенное чучело, а версия, объясняющая те же факты иначе. Рассуждение показывается до вывода, а не сворачивается в готовый результат постфактум.</p>
-        <p class="dash-philosophy-lead">Что сайт принципиально не делает:</p>
-        <ul>
-          <li>не прогнозирует цену и не занимается техническим анализом графиков — цена здесь наблюдаема, не предсказуема;</li>
-          <li>не рассматривает альткоины и крипторынок как самостоятельный предмет — только как канал влияния на BTC;</li>
-          <li>не маскирует неуверенность уверенным тоном — уровень доверия виден рядом с выводом, а не растворён в нём.</li>
-        </ul>
-        <div class="dash-philosophy-footer">ТОЛЬКО BITCOIN. НИЧЕГО СВЕРХ ТОГО, ЧТО МОЖНО ПРОСЛЕДИТЬ ДО ИСТОЧНИКА.</div>
+      <div class="dash-side">
+        <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
+        <div class="dash-summary">
+          <div class="panel-head" style="margin:-16px -14px 12px">
+            <span class="panel-title">Общий фон</span>
+            <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
+          </div>
+          <div class="dash-summary-body">
+            <div class="dash-sum-bar" id="dash-sum-bar"></div>
+            <div class="dash-sum-counts" id="dash-sum-counts"></div>
+            <div class="dash-sum-link" onclick="showTab('market', null)">
+              ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ WATCHLIST — все кластеры (2026-08-19) ══ -->
+        <div class="dash-watchlist">
+          <div class="panel-head">
+            <span class="panel-title">Watchlist</span>
+            <span class="chart-meta" id="dash-watchlist-total"></span>
+          </div>
+          <div id="dash-watchlist-list"></div>
+        </div>
+
+        <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ ══ -->
+        <div style="margin:16px 0">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
+          <div id="dash-explore-tiles"></div>
+        </div>
+
+        <!-- ══ ФИЛОСОФИЯ ПРОЕКТА ══ -->
+        <div class="dash-philosophy">
+          <div class="panel-head">
+            <span class="panel-title">Философия проекта</span>
+          </div>
+          <div class="dash-philosophy-body">
+            <p><b>Bitcoin Intel</b> — личный intelligence-терминал автора. Не медиа, не агрегатор цен, не поток мнений.</p>
+            <p>Смысл сайта — превращать разрозненные наблюдения о Bitcoin в связный, объяснимый и проверяемый корпус знания. Каждый вывод здесь прослеживается до конкретного сигнала: утверждение без опоры на источник — домысел, а не аналитика, и такого на этом сайте нет.</p>
+            <p>Прежде чем принять интерпретацию, рассматривается минимум одна содержательная альтернатива и явно отклоняется — не соломенное чучело, а версия, объясняющая те же факты иначе. Рассуждение показывается до вывода, а не сворачивается в готовый результат постфактум.</p>
+            <p class="dash-philosophy-lead">Что сайт принципиально не делает:</p>
+            <ul>
+              <li>не прогнозирует цену и не занимается техническим анализом графиков — цена здесь наблюдаема, не предсказуема;</li>
+              <li>не рассматривает альткоины и крипторынок как самостоятельный предмет — только как канал влияния на BTC;</li>
+              <li>не маскирует неуверенность уверенным тоном — уровень доверия виден рядом с выводом, а не растворён в нём.</li>
+            </ul>
+            <div class="dash-philosophy-footer">ТОЛЬКО BITCOIN. НИЧЕГО СВЕРХ ТОГО, ЧТО МОЖНО ПРОСЛЕДИТЬ ДО ИСТОЧНИКА.</div>
+          </div>
+        </div>
       </div>
     </div>
 

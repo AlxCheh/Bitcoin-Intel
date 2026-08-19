@@ -40,6 +40,21 @@
       ]
     },
     {
+      "id": "e113",
+      "title": "Watchlist",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "watchlist",
+        "кластеры",
+        "сигналы"
+      ]
+    },
+    {
       "id": "e112",
       "title": "Философия проекта",
       "cluster": "live",

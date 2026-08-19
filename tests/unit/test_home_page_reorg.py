@@ -67,12 +67,23 @@ def test_trigger_tab_data_still_populates_relocated_panels():
 
 
 def test_home_has_definition_banner():
+    """
+    2026-08-19: текст сменён с продуктового питча на нейтральную
+    техническую строку (редизайн под терминал, см.
+    docs/superpowers/specs/2026-08-19-homepage-terminal-redesign-design.md
+    §1) — «Философия проекта» внизу той же страницы теперь единственное
+    место, где сайт формулирует свой смысл.
+    """
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")
     home_html = html[home_start:home_end]
     assert 'id="dash-definition"' in home_html
-    assert "Bitcoin Intel" in home_html
-    assert "нарративного анализа" in home_html
+    assert "confirms/contradicts/context_chain" in home_html
+    assert "платформа" not in home_html.lower(), (
+        "dash-definition обязан оставаться нейтральной технической строкой, "
+        "не продуктовым питчем — эту роль теперь несёт только блок "
+        "«Философия проекта»"
+    )
 
 
 def test_ticker_has_price_span():

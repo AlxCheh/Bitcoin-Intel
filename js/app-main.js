@@ -2901,9 +2901,43 @@ function renderDashboard() {
     listEl.appendChild(item);
   });
 
+  // 2026-08-19: watchlist — ВСЕ кластеры (не только shown/MAX_SHOWN), с
+  // реальным соотношением pos/neg/neu, посчитанным по всем сигналам
+  // кластера (cl.pos/neg/neu уже агрегированы выше при сборке `clusters`)
+  // — не по dir одного анкорного сигнала. См. спеку §5.
+  function renderWatchlistRow(key, cl, score) {
+    const total = cl.signals.length;
+    const pos = cl.pos || 0, neg = cl.neg || 0, neu = cl.neu || 0;
+    const label = DIGEST_CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
+    return '<div class="dash-watch-row" data-cl="' + sanitize(key) + '">'
+      + '<span class="dash-watch-label" title="' + sanitize(label) + '">' + label + '</span>'
+      + '<div class="dash-watch-bar">'
+      +   (pos ? '<div style="flex:' + pos + ';background:var(--grn)"></div>' : '')
+      +   (neg ? '<div style="flex:' + neg + ';background:var(--red)"></div>' : '')
+      +   (neu ? '<div style="flex:' + neu + ';background:var(--dim2)"></div>' : '')
+      + '</div>'
+      + '<span class="dash-watch-count">' + total + '</span>'
+      + '</div>';
+  }
+
+  function renderWatchlist(scoredAll) {
+    const el = document.getElementById('dash-watchlist-list');
+    if (!el) return;
+    el.innerHTML = scoredAll.map(function(x) {
+      return renderWatchlistRow(x.key, x.cl, x.score);
+    }).join('');
+    const totalEl = document.getElementById('dash-watchlist-total');
+    if (totalEl) totalEl.textContent = scoredAll.length + ' КЛАСТЕРОВ';
+    // Клик по строке — к синтезированному нарративу кластера (как в
+    // ленте), не к сырому дайджесту — тот же goToNarrative(), что уже
+    // используется для карточек ленты.
+    el.querySelectorAll('[data-cl]').forEach(function(row) {
+      row.addEventListener('click', function() { goToNarrative(this.dataset.cl); });
+    });
+  }
+
   // Watchlist — все кластеры (не только shown), реальный pos/neg/neu.
-  // Реализация — Задача 5 этого плана.
-  // renderWatchlist(scored); // TODO(Задача 5): раскомментировать
+  renderWatchlist(scored);
 
   } // end if SIGNALS
 

@@ -110,3 +110,38 @@ console.log(JSON.stringify({{
     assert out["hasStrategy"] is False, "сущность без совпадения signal_refs не должна попадать в карточку другого сигнала"
     assert out["emptyWhenNoMatch"] is True
     assert out["emptyWhenNull"] is True
+
+
+def test_render_watchlist_row_shows_real_pos_neg_neu_ratio():
+    import shutil
+    import json as json_module
+    from tests.conftest import extract_js_function, run_node_js
+    if not shutil.which("node"):
+        return
+    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
+    fn = extract_js_function(src, "renderWatchlistRow")
+    js = f"""
+function sanitize(s) {{ return String(s == null ? '' : s); }}
+const DIGEST_CLUSTER_LABELS = {{ btc_treasury_competition: '💰 КАЗНАЧЕЙСТВА' }};
+{fn}
+const cl = {{ signals: new Array(28), pos: 15, neg: 5, neu: 8 }};
+const score = {{ total: 201 }};
+const html = renderWatchlistRow('btc_treasury_competition', cl, score);
+console.log(JSON.stringify({{
+  hasLabel: html.includes('КАЗНАЧЕЙСТВА'),
+  hasCount: html.includes('>28<'),
+  hasDataCl: html.includes('data-cl=\\"btc_treasury_competition\\"'),
+  hasPosSegment: html.includes('flex:15;background:var(--grn)'),
+  hasNegSegment: html.includes('flex:5;background:var(--red)'),
+  hasNeuSegment: html.includes('flex:8;background:var(--dim2)')
+}}));
+"""
+    result = run_node_js(js)
+    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
+    out = json_module.loads(result.stdout)
+    assert out["hasLabel"] is True
+    assert out["hasCount"] is True
+    assert out["hasDataCl"] is True
+    assert out["hasPosSegment"] is True
+    assert out["hasNegSegment"] is True
+    assert out["hasNeuSegment"] is True

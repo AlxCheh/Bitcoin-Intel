@@ -55,6 +55,21 @@
       ]
     },
     {
+      "id": "e114",
+      "title": "Исследовать глубже",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "none",
+      "kind": "widget",
+      "keywords": [
+        "навигация",
+        "кластеры",
+        "плитки"
+      ]
+    },
+    {
       "id": "e112",
       "title": "Философия проекта",
       "cluster": "live",

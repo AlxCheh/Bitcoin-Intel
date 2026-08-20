@@ -2989,17 +2989,16 @@ function scrollAppToTop() {
 // см. refreshExploreTiles() ниже, почему это больше не "once".
 function renderExploreTiles() {
   const tiles = [
-    { key: 'live', icon: '📡', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
-    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
-    { key: 'macro', icon: '📖', title: 'Fundamental', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
-    { key: 'analysis', icon: '🔬', title: 'Analysis', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
+    { key: 'live', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
+    { key: 'knowledge', title: 'ECOSYSTEM', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
+    { key: 'macro', title: 'FUNDAMENTAL', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
+    { key: 'analysis', title: 'ANALYSIS', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
   ];
   return '<div class="toc-card-grid">'
     + tiles.map(function(t) {
         const n = t.count();
         return '<div class="toc-card" style="position:relative" onclick="selectCluster(\'' + t.key + '\')">'
           + (n ? '<span class="toc-card-badge">' + n + '</span>' : '')
-          + '<span style="font-size:16px">' + t.icon + '</span>'
           + '<div class="toc-card-title">' + t.title + '</div>'
           + '<div class="toc-card-subtitle">' + t.desc + '</div>'
           + '</div>';

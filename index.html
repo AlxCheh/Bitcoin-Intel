@@ -1039,6 +1039,34 @@ header {
   letter-spacing: 0.08em; margin: 0 0 8px;
 }
 
+/* 2026-08-19: компактный список "Исследовать глубже" в сайдбаре ОБЗОРА —
+   один из 3 визуальных направлений, сравненных вживую после реализации
+   плана редизайна (docs/superpowers/plans/2026-08-19-home-terminal-
+   redesign.md). Тайтлы плиток переведены на var(--mono) uppercase (без
+   курсивного serif и без эмодзи-иконки) — плотнее рядом с текстовыми
+   панелями сайдбара (Watchlist/Общий фон), чем исходные плитки-порталы. */
+#dash-explore-tiles .toc-card-grid { grid-template-columns: 1fr; gap: 6px; margin-bottom: 0; }
+#dash-explore-tiles .toc-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; position: static; }
+#dash-explore-tiles .toc-card-title { font-family: var(--mono); font-style: normal; font-weight: 700; letter-spacing: 0.04em; color: var(--txt); font-size: 12px; margin-top: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#dash-explore-tiles .toc-card-subtitle { display: none; }
+#dash-explore-tiles .toc-card-badge { position: static; margin-left: auto; }
+
+/* 2026-08-19: убрать амбер-градиентную подсветку заголовков панелей
+   внутри сетки ОБЗОРА (.dash-grid) — на плотной ленте из 8 карточек
+   golden-полоса на КАЖДОМ panel-head перегружала страницу вниманием;
+   базовое правило .panel-head для остального сайта не трогается. */
+.dash-grid .panel-head { background: var(--bg3); }
+
+/* 2026-08-19: нейтральные (не амбер) рамки/заголовки у всех панелей
+   ОБЗОРА, включая «Главную историю» — amber остаётся только у
+   семантических элементов внутри карточек (VS-бейдж, tension, dir/
+   phase), не у структурных рамок панелей. Тот же принцип, что и выше:
+   амбер как акцент на смысле, не как декор каждого контейнера. */
+.dash-narratives .panel-head, .dash-summary .panel-head, .dash-watchlist .panel-head,
+.dash-explore .panel-head, .dash-philosophy .panel-head { border-bottom-color: var(--line2); }
+.dash-narratives .panel-title, .dash-summary .panel-title, .dash-watchlist .panel-title,
+.dash-explore .panel-title, .dash-philosophy .panel-title { color: var(--txt); }
+
 /* 2026-08-16: плавающая кнопка «к содержанию» — появляется после
    небольшого скролла на вкладках с оглавлением (ТЕОРИЯ/MACROCONTEXT/
    LIGHTNING), возвращает к соответствующему {tab}-toc. Логика показа —
@@ -2033,7 +2061,7 @@ header {
 
 .dash-narratives {
   margin: 0 0 12px;
-  background: var(--bg2); border: 1px solid var(--btc);
+  background: var(--bg2); border: 1px solid var(--line2);
   overflow: hidden;
 }
 .dash-narrative-item + .dash-narrative-item {
@@ -2168,7 +2196,7 @@ header {
   line-height: 1.5;
 }
 
-.dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); padding: 16px 14px 12px; overflow: hidden; }
+.dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--line2); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
 .dash-sum-bar { display: flex; height: 6px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
 .dsb-pos { background: var(--grn); }
@@ -2188,7 +2216,7 @@ header {
 .dash-philosophy {
   margin: 16px 0 0;
   background: var(--bg2);
-  border: 1px solid var(--btc);
+  border: 1px solid var(--line2);
   overflow: hidden;
 }
 .dash-philosophy-body {
@@ -2222,7 +2250,7 @@ header {
 .dash-grid { display: block; }
 .dash-side { display: block; }
 
-.dash-watchlist { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); overflow: hidden; }
+.dash-watchlist { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--line2); overflow: hidden; }
 .dash-watch-row { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 10px; cursor: pointer; }
 .dash-watch-row:hover { background: var(--bg3); }
 .dash-watch-row + .dash-watch-row { border-top: 1px solid var(--line); }
@@ -2345,9 +2373,11 @@ header {
         </div>
 
         <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ ══ -->
-        <div style="margin:16px 0">
-          <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
-          <div id="dash-explore-tiles"></div>
+        <div class="dash-explore" style="margin:16px 0 0;background:var(--bg2);border:1px solid var(--line2);overflow:hidden">
+          <div class="panel-head">
+            <span class="panel-title">Исследовать глубже</span>
+          </div>
+          <div id="dash-explore-tiles" style="padding:10px 14px 4px"></div>
         </div>
 
         <!-- ══ ФИЛОСОФИЯ ПРОЕКТА ══ -->
@@ -4598,7 +4628,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=5bf33c1d3c"></script>
+<script src="js/app-main.js?v=41bb32a879"></script>
 
 </div><!-- /.app-scroll -->
 

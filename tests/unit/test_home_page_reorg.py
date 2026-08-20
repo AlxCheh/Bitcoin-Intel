@@ -67,12 +67,23 @@ def test_trigger_tab_data_still_populates_relocated_panels():
 
 
 def test_home_has_definition_banner():
+    """
+    2026-08-19: текст сменён с продуктового питча на нейтральную
+    техническую строку (редизайн под терминал, см.
+    docs/superpowers/specs/2026-08-19-homepage-terminal-redesign-design.md
+    §1) — «Философия проекта» внизу той же страницы теперь единственное
+    место, где сайт формулирует свой смысл.
+    """
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")
     home_html = html[home_start:home_end]
     assert 'id="dash-definition"' in home_html
-    assert "Bitcoin Intel" in home_html
-    assert "нарративного анализа" in home_html
+    assert "confirms/contradicts/context_chain" in home_html
+    assert "платформа" not in home_html.lower(), (
+        "dash-definition обязан оставаться нейтральной технической строкой, "
+        "не продуктовым питчем — эту роль теперь несёт только блок "
+        "«Философия проекта»"
+    )
 
 
 def test_ticker_has_price_span():
@@ -116,88 +127,28 @@ console.log(JSON.stringify({{ price: registry['dash-status-price'].textContent }
     assert "63" in out["price"], "Тикер обязан показать текущую цену BTC из dashBtcPrice"
 
 
-def test_mini_list_container_exists_in_home():
+def test_mini_narrative_format_removed_from_home():
+    """
+    2026-08-19: лента ОБЗОРА объединена в одну однородную ленту подробных
+    карточек (редизайн терминала) — отдельный компактный список
+    "ещё нарративы" упразднён. См. docs/superpowers/specs/2026-08-19-
+    homepage-terminal-redesign-design.md §3.
+    """
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")
     home_html = html[home_start:home_end]
-    assert 'id="dash-narratives-mini-list"' in home_html
+    assert 'id="dash-narratives-mini-list"' not in home_html
+    assert 'id="dash-narratives-mini-wrap"' not in home_html
 
 
-def test_render_narrative_mini_row_returns_html_string(tmp_path):
-    import shutil
-    import json as json_module
-    from tests.conftest import extract_js_function, run_node_js
-    if not shutil.which("node"):
-        return
+def test_max_shown_raised_to_eight():
+    """Лента ОБЗОРА теперь показывает до 8 кластеров вместо 4 — терминалу
+    важнее полнота картины, чем куратор-выборка "главного"."""
+    import re
     src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
-    fn = extract_js_function(src, "renderNarrativeMiniRow")
-    js = f"""
-function sanitize(s) {{ return String(s == null ? '' : s); }}
-const CLUSTER_LABELS = {{ etf_institutional_flow: '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК' }};
-{fn}
-const cl = {{ signals: [1,2,3], pos: 2, neg: 1, neu: 0 }};
-const score = {{ total: 213 }};
-const html = renderNarrativeMiniRow('etf_institutional_flow', cl, score);
-console.log(JSON.stringify({{
-  isString: typeof html === 'string',
-  hasLabel: html.includes('ETF'),
-  hasScore: html.includes('213'),
-  hasCount: html.includes('3'),
-  hasDataCl: html.includes('data-cl=\\"etf_institutional_flow\\"')
-}}));
-"""
-    result = run_node_js(js)
-    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
-    out = json_module.loads(result.stdout)
-    assert out["isString"] is True
-    assert out["hasLabel"] is True
-    assert out["hasScore"] is True
-    assert out["hasCount"] is True
-    assert out["hasDataCl"] is True
-
-
-def test_render_narrative_mini_row_shows_tension_snippet_as_card(tmp_path):
-    """
-    2026-08-18: Вариант 2 из 5 предложенных пользователю ("не понятно, что
-    внутри, не хочется переходить") — строка стала карточкой с рамкой и
-    двухстрочным тизером tension, не голым счётчиком сигналов.
-    """
-    import shutil
-    import json as json_module
-    from tests.conftest import extract_js_function, run_node_js
-    if not shutil.which("node"):
-        return
-    src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
-    fns = "\n".join(
-        extract_js_function(src, name)
-        for name in ("highlightEntities", "highlightVs", "ensureSentencePunctuation", "renderNarrativeMiniRow")
-    )
-    js = f"""
-function sanitize(s) {{ return String(s == null ? '' : s); }}
-const ENTITIES = [];
-const CLUSTER_LABELS = {{ etf_institutional_flow: '📊 ETF: ИНСТИТУЦИОНАЛЬНЫЙ ПОТОК' }};
-{fns}
-const cl = {{ signals: [1,2,3], pos: 2, neg: 1, neu: 0 }};
-const score = {{ total: 213 }};
-const synthesis = {{ tension: 'банки получили право хранить BTC vs Базель III делает это невыгодным' }};
-const withTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, synthesis);
-const withoutTension = renderNarrativeMiniRow('etf_institutional_flow', cl, score, null);
-console.log(JSON.stringify({{
-  hasBorderCard: withTension.includes('border:1px solid var(--line)'),
-  hasTensionText: withTension.includes('Базель III'),
-  hasVsBadge: withTension.includes('tension-vs-badge'),
-  hasFooterLink: withTension.includes('НАРРАТИВ'),
-  noTensionStillValid: typeof withoutTension === 'string' && withoutTension.includes('ETF')
-}}));
-"""
-    result = run_node_js(js)
-    assert result.returncode == 0, f"Node failed:\n{result.stderr}"
-    out = json_module.loads(result.stdout)
-    assert out["hasBorderCard"] is True
-    assert out["hasTensionText"] is True
-    assert out["hasVsBadge"] is True, "vs в tension обязан подсвечиваться бейджем, как в renderClusterFullAnalytics()"
-    assert out["hasFooterLink"] is True
-    assert out["noTensionStillValid"] is True, "отсутствие synthesis не должно ломать рендер (fallback-путь браузерного синтеза)"
+    match = re.search(r"const MAX_SHOWN\s*=\s*(\d+);", src)
+    assert match, "Константа MAX_SHOWN не найдена в app-main.js"
+    assert match.group(1) == "8"
 
 
 def test_explore_tiles_container_exists_in_home():

@@ -2561,7 +2561,7 @@ function renderDashboard() {
   const ROLE_RANK   = { trigger: 4, complication: 3, resolution: 2, background: 0 };
   const SCORE_MIN   = 10;
   const SCORE_HOT   = 20;
-  const MAX_SHOWN   = 4;
+  const MAX_SHOWN   = 8;
 
   const CLUSTER_LABELS = {
     strategy_model_stress:    '🏦 STRATEGY: МОДЕЛЬ ПОД ДАВЛЕНИЕМ',
@@ -2747,8 +2747,64 @@ function renderDashboard() {
       + '</div>';
   }
 
+  // 2026-08-19: редизайн терминала — плотная строка полей анкорного
+  // сигнала кластера (DIR/HORIZON/WEIGHT/ROLE/ACTOR), как security-header
+  // в Bloomberg. Чистая функция (без DOM API) — тестируется через Node,
+  // см. tests/unit/test_home_terminal_redesign.py. anchor — сигнал из
+  // cl.signals с id === synthesis.anchor_signal_id, см. вызов ниже.
+  function renderAnchorFieldsHtml(anchor) {
+    if (!anchor) return '';
+    const dirCls = anchor.dir === 'neg' ? 'neg' : anchor.dir === 'pos' ? 'pos' : 'neu';
+    const cells = [
+      { label: 'DIR', value: (anchor.dir || '—').toUpperCase(), cls: dirCls },
+      { label: 'HORIZON', value: (anchor.horizon || '—').toUpperCase(), cls: '' },
+      { label: 'WEIGHT', value: (anchor.weight || '—').toUpperCase(), cls: '' },
+      { label: 'ROLE', value: (anchor.narrative_role || '—').toUpperCase(), cls: 'amber' },
+      { label: 'ACTOR', value: (anchor.actor || '—').toUpperCase(), cls: '' }
+    ];
+    return '<div class="dash-anchor-fields">'
+      + cells.map(function(c) {
+          return '<div class="dash-anchor-field"><div class="dash-anchor-field-label">' + c.label + '</div>'
+            + '<div class="dash-anchor-field-value' + (c.cls ? ' ' + c.cls : '') + '">' + sanitize(c.value) + '</div></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  // Чипы связей анкорного сигнала (confirms/contradicts/context_chain) —
+  // показываются только непустые типы, счётчик = длина массива.
+  function renderAnchorLinksHtml(anchor) {
+    if (!anchor || !anchor.links) return '';
+    const l = anchor.links;
+    const chips = [];
+    if (l.confirms && l.confirms.length) chips.push('<span class="dash-anchor-chip confirms">✓ ПОДТВЕРЖДАЕТ · ' + l.confirms.length + '</span>');
+    if (l.contradicts && l.contradicts.length) chips.push('<span class="dash-anchor-chip contradicts">✗ ПРОТИВОРЕЧИТ · ' + l.contradicts.length + '</span>');
+    if (l.context_chain && l.context_chain.length) chips.push('<span class="dash-anchor-chip context">↳ КОНТЕКСТ · ' + l.context_chain.length + '</span>');
+    if (!chips.length) return '';
+    return '<div class="dash-anchor-links">' + chips.join('') + '</div>';
+  }
+
+  // Теги сущностей ENTITIES.json, чей signal_refs содержит id анкорного
+  // сигнала — те же сущности, что уже ведутся Шагом 8 алгоритма обработки
+  // сигнала (CLAUDE.md, "База артефактов").
+  function renderAnchorEntitiesHtml(anchor) {
+    if (!anchor) return '';
+    const ents = (ENTITIES || []).filter(function(e) {
+      return e.signal_refs && e.signal_refs.indexOf(anchor.id) !== -1;
+    });
+    if (!ents.length) return '';
+    return '<div class="dash-anchor-entities">'
+      + ents.map(function(e) { return '<span class="dash-anchor-entity">' + sanitize(e.name) + '</span>'; }).join('')
+      + '</div>';
+  }
+
   function renderNarrativeItem(key, cl, score, weak, idx, synthesis) {
     const n      = cl.signals.length;
+    // 2026-08-19: анкорный сигнал — тот, с которого синтез взял tension
+    // (synthesis.anchor_signal_id, см. Python SynthesisResult и JS
+    // synthesizeNarrativeAdvanced() — оба поля называют одинаково).
+    // Ищем в cl.signals (сигналы этого кластера), не во всём SIGNALS —
+    // дешевле и всегда содержит нужный id, если синтез вообще валиден.
+    const anchor = cl.signals.find(function(s) { return s.id === synthesis.anchor_signal_id; }) || null;
     const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
     const isHot  = score.total >= SCORE_HOT;
     const bdId   = 'nbd-' + idx;
@@ -2793,10 +2849,14 @@ function renderDashboard() {
       +     '</span>'
       +   '</div>'
       + '</div>'
+      + renderAnchorFieldsHtml(anchor)
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
       + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightVs(highlightEntities(tension)) + '</div>' : '')
       + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
+      + renderAnchorLinksHtml(anchor)
+      + renderAnchorEntitiesHtml(anchor)
+      + (anchor && anchor.source ? '<div class="dash-anchor-source">' + sanitize(anchor.source) + '</div>' : '')
       + (synthesis.takeaway ? '<div class="dash-narrative-takeaway">→ ' + sanitize(synthesis.takeaway) + '</div>' : '')
       + buildAltScenarioHtml(synthesis)
       + '<div class="dash-sum-counts" style="margin:5px 0">'
@@ -2827,71 +2887,57 @@ function renderDashboard() {
     return item;
   }
 
-  // 2026-08-16: компактная строка для "ещё нарративы" на ОБЗОРЕ — только
-  // топ-1 (idx===0) идёт полной карточкой через renderNarrativeItem(),
-  // остальные сюда. Возвращает HTML-строку (не DOM-узел), тот же стиль,
-  // что у renderTOC()/renderTheoryTopic() в этом файле — не ради
-  // единообразия ради единообразия, а потому что клик вешается ПОСЛЕ
-  // вставки в DOM через querySelectorAll (см. вызов ниже), как и для
-  // остальных .innerHTML-based рендеров.
-  // 2026-08-18: Вариант 2 из 5 предложенных пользователю (карточка с рамкой
-  // + двухстрочный тизер tension вместо голой строки-списка) — "по текущим
-  // не понятно, что внутри, не хочется переходить". Тот же формат tension
-  // (ensureSentencePunctuation + highlightVs + highlightEntities), что уже
-  // используют featured-карточки renderClusterFullAnalytics() — единый
-  // визуальный язык, не изобретение нового форматирования текста.
-  function renderNarrativeMiniRow(key, cl, score, synthesis) {
-    const dirCls = cl.neg > cl.pos ? 'neg' : cl.pos > cl.neg ? 'pos' : 'neu';
-    const dotColor = dirCls === 'pos' ? 'var(--grn)' : dirCls === 'neg' ? 'var(--red)' : 'var(--dim)';
-    const label = CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
-    const tension = synthesis && synthesis.tension
-      ? ensureSentencePunctuation(synthesis.tension.charAt(0).toUpperCase() + synthesis.tension.slice(1))
-      : '';
-    return '<div class="dash-narrative-mini" data-cl="' + sanitize(key) + '" '
-      + 'style="border:1px solid var(--line);background:var(--bg2);padding:12px 14px;margin-bottom:8px;cursor:pointer">'
-      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (tension ? '6px' : '0') + '">'
-      +   '<span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:' + dotColor + '"></span>'
-      +   '<span style="flex:1;color:var(--txt);font-size:12px;font-weight:600">' + label + '</span>'
-      +   '<span style="font-family:var(--mono);font-size:9px;color:var(--dim);flex-shrink:0">' + cl.signals.length + ' · ' + score.total + '</span>'
-      + '</div>'
-      + (tension
-          ? '<div style="font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + highlightVs(highlightEntities(tension)) + '</div>'
-          : '')
-      + '<div style="font-family:var(--mono);font-size:10px;color:var(--btc);letter-spacing:0.04em">→ НАРРАТИВ</div>'
-      + '</div>';
-  }
-
-  // Путь 3: используем Python-синтез из synthesis_cache.json
-  // Fallback на браузерный синтез если кеш недоступен или кластер не найден
-  const miniListEl = document.getElementById('dash-narratives-mini-list');
-  const miniLabelEl = document.getElementById('dash-narratives-mini-label');
-  let miniHtml = '';
+  // 2026-08-19: редизайн терминала — единая лента, все `shown` (до
+  // MAX_SHOWN=8) рендерятся полной карточкой renderNarrativeItem(),
+  // деления на "главная" (idx 0) + компактные "ещё нарративы" (idx>0)
+  // больше нет. См. docs/superpowers/specs/2026-08-19-homepage-
+  // terminal-redesign-design.md §3.
   shown.forEach(({ key, cl, score, weak }, idx) => {
     const cached = SYNTHESIS_CACHE[key];
     const synthesis = (cached && cached.tension)
       ? cached
       : synthesizeNarrativeAdvanced(key, cl);
-    if (idx === 0) {
-      const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
-      listEl.appendChild(item);
-    } else {
-      miniHtml += renderNarrativeMiniRow(key, cl, score, synthesis);
-    }
+    const item = renderNarrativeItem(key, cl, score, weak, idx, synthesis);
+    listEl.appendChild(item);
   });
-  if (miniListEl) {
-    miniListEl.innerHTML = miniHtml;
-    if (miniHtml) {
-      if (miniLabelEl) miniLabelEl.textContent = 'ЕЩЁ НАРРАТИВЫ';
-      // 2026-08-18: goToNarrative(), не goToDigest() — клик обязан вести к уже
-      // готовому синтезированному нарративу этого кластера (ВСЕ НАРРАТИВЫ),
-      // не к сырому списку сигналов (ДАЙДЖЕСТ), см. goToNarrative() выше.
-      miniListEl.querySelectorAll('[data-cl]').forEach(function(el) {
-        el.addEventListener('click', function() { goToNarrative(this.dataset.cl); });
-      });
-    } else if (miniLabelEl) {
-      miniLabelEl.textContent = '';
-    }
+
+  // 2026-08-19: watchlist — ВСЕ кластеры (не только shown/MAX_SHOWN), с
+  // реальным соотношением pos/neg/neu, посчитанным по всем сигналам
+  // кластера (cl.pos/neg/neu уже агрегированы выше при сборке `clusters`)
+  // — не по dir одного анкорного сигнала. См. спеку §5.
+  function renderWatchlistRow(key, cl, score) {
+    const total = cl.signals.length;
+    const pos = cl.pos || 0, neg = cl.neg || 0, neu = cl.neu || 0;
+    const label = DIGEST_CLUSTER_LABELS[key] || sanitize(key).toUpperCase();
+    return '<div class="dash-watch-row" data-cl="' + sanitize(key) + '">'
+      + '<span class="dash-watch-label" title="' + sanitize(label) + '">' + label + '</span>'
+      + '<div class="dash-watch-bar">'
+      +   (pos ? '<div style="flex:' + pos + ';background:var(--grn)"></div>' : '')
+      +   (neg ? '<div style="flex:' + neg + ';background:var(--red)"></div>' : '')
+      +   (neu ? '<div style="flex:' + neu + ';background:var(--dim2)"></div>' : '')
+      + '</div>'
+      + '<span class="dash-watch-count">' + total + '</span>'
+      + '</div>';
   }
+
+  function renderWatchlist(scoredAll) {
+    const el = document.getElementById('dash-watchlist-list');
+    if (!el) return;
+    el.innerHTML = scoredAll.map(function(x) {
+      return renderWatchlistRow(x.key, x.cl, x.score);
+    }).join('');
+    const totalEl = document.getElementById('dash-watchlist-total');
+    if (totalEl) totalEl.textContent = scoredAll.length + ' КЛАСТЕРОВ';
+    // Клик по строке — к синтезированному нарративу кластера (как в
+    // ленте), не к сырому дайджесту — тот же goToNarrative(), что уже
+    // используется для карточек ленты.
+    el.querySelectorAll('[data-cl]').forEach(function(row) {
+      row.addEventListener('click', function() { goToNarrative(this.dataset.cl); });
+    });
+  }
+
+  // Watchlist — все кластеры (не только shown), реальный pos/neg/neu.
+  renderWatchlist(scored);
 
   } // end if SIGNALS
 
@@ -2943,17 +2989,16 @@ function scrollAppToTop() {
 // см. refreshExploreTiles() ниже, почему это больше не "once".
 function renderExploreTiles() {
   const tiles = [
-    { key: 'live', icon: '📡', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
-    { key: 'knowledge', icon: '⚙️', title: 'Ecosystem', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
-    { key: 'macro', icon: '📖', title: 'Fundamental', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
-    { key: 'analysis', icon: '🔬', title: 'Analysis', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
+    { key: 'live', title: 'LIVE', desc: 'Цена, потоки капитала и состояние сети прямо сейчас', count: function () { return (SIGNALS || []).length; } },
+    { key: 'knowledge', title: 'ECOSYSTEM', desc: 'Протоколы, Lightning и инструменты — как всё это устроено', count: function () { return (ENTITIES || []).length; } },
+    { key: 'macro', title: 'FUNDAMENTAL', desc: 'Теория денег, макроконтекст и разбор тезисов Сэйлора', count: function () { return (THEORY_TOPICS || []).length; } },
+    { key: 'analysis', title: 'ANALYSIS', desc: 'Синтез всех нарративов и AI-разбор любого сигнала', count: function () { return computeAllClusterScores().length; } }
   ];
   return '<div class="toc-card-grid">'
     + tiles.map(function(t) {
         const n = t.count();
         return '<div class="toc-card" style="position:relative" onclick="selectCluster(\'' + t.key + '\')">'
           + (n ? '<span class="toc-card-badge">' + n + '</span>' : '')
-          + '<span style="font-size:16px">' + t.icon + '</span>'
           + '<div class="toc-card-title">' + t.title + '</div>'
           + '<div class="toc-card-subtitle">' + t.desc + '</div>'
           + '</div>';

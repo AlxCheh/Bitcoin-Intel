@@ -1039,6 +1039,34 @@ header {
   letter-spacing: 0.08em; margin: 0 0 8px;
 }
 
+/* 2026-08-19: компактный список "Исследовать глубже" в сайдбаре ОБЗОРА —
+   один из 3 визуальных направлений, сравненных вживую после реализации
+   плана редизайна (docs/superpowers/plans/2026-08-19-home-terminal-
+   redesign.md). Тайтлы плиток переведены на var(--mono) uppercase (без
+   курсивного serif и без эмодзи-иконки) — плотнее рядом с текстовыми
+   панелями сайдбара (Watchlist/Общий фон), чем исходные плитки-порталы. */
+#dash-explore-tiles .toc-card-grid { grid-template-columns: 1fr; gap: 6px; margin-bottom: 0; }
+#dash-explore-tiles .toc-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; position: static; }
+#dash-explore-tiles .toc-card-title { font-family: var(--mono); font-style: normal; font-weight: 700; letter-spacing: 0.04em; color: var(--txt); font-size: 12px; margin-top: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#dash-explore-tiles .toc-card-subtitle { display: none; }
+#dash-explore-tiles .toc-card-badge { position: static; margin-left: auto; }
+
+/* 2026-08-19: убрать амбер-градиентную подсветку заголовков панелей
+   внутри сетки ОБЗОРА (.dash-grid) — на плотной ленте из 8 карточек
+   golden-полоса на КАЖДОМ panel-head перегружала страницу вниманием;
+   базовое правило .panel-head для остального сайта не трогается. */
+.dash-grid .panel-head { background: var(--bg3); }
+
+/* 2026-08-19: нейтральные (не амбер) рамки/заголовки у всех панелей
+   ОБЗОРА, включая «Главную историю» — amber остаётся только у
+   семантических элементов внутри карточек (VS-бейдж, tension, dir/
+   phase), не у структурных рамок панелей. Тот же принцип, что и выше:
+   амбер как акцент на смысле, не как декор каждого контейнера. */
+.dash-narratives .panel-head, .dash-summary .panel-head, .dash-watchlist .panel-head,
+.dash-explore .panel-head, .dash-philosophy .panel-head { border-bottom-color: var(--line2); }
+.dash-narratives .panel-title, .dash-summary .panel-title, .dash-watchlist .panel-title,
+.dash-explore .panel-title, .dash-philosophy .panel-title { color: var(--txt); }
+
 /* 2026-08-16: плавающая кнопка «к содержанию» — появляется после
    небольшого скролла на вкладках с оглавлением (ТЕОРИЯ/MACROCONTEXT/
    LIGHTNING), возвращает к соответствующему {tab}-toc. Логика показа —
@@ -2033,18 +2061,11 @@ header {
 
 .dash-narratives {
   margin: 0 0 12px;
-  background: var(--bg2); border: 1px solid var(--btc);
+  background: var(--bg2); border: 1px solid var(--line2);
   overflow: hidden;
 }
 .dash-narrative-item + .dash-narrative-item {
   border-top: 1px solid var(--line);
-}
-/* 2026-08-18: "ещё нарративы" на ОБЗОРЕ — Вариант 2 из 5 предложенных
-   (карточка с рамкой вместо голой строки-списка), пользователь выбрал
-   этот вариант. Тот же hover-язык, что .toc-card. */
-.dash-narrative-mini:hover {
-  border-color: var(--btc);
-  background: var(--bg3);
 }
 .dash-narrative-cluster {
   margin-bottom: 8px;
@@ -2105,6 +2126,29 @@ header {
   line-height: 1.5;
   margin-bottom: 8px;
 }
+.dash-anchor-fields {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+  background: var(--line); border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.dash-anchor-field { background: var(--bg3); padding: 4px 6px; }
+.dash-anchor-field-label { font-family: var(--mono); font-size: 8px; color: var(--dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+.dash-anchor-field-value { font-family: var(--mono); font-size: 9.5px; font-weight: 700; color: var(--txt); }
+.dash-anchor-field-value.pos { color: var(--grn); }
+.dash-anchor-field-value.neg { color: var(--red); }
+.dash-anchor-field-value.neu { color: var(--dim); }
+.dash-anchor-field-value.amber { color: var(--btc); }
+
+.dash-anchor-links { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; }
+.dash-anchor-chip.confirms { border-color: var(--grn); color: var(--grn); }
+.dash-anchor-chip.contradicts { border-color: var(--red); color: var(--red); }
+.dash-anchor-chip.context { border-color: var(--line2); color: var(--dim); }
+
+.dash-anchor-entities { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.dash-anchor-entity { font-family: var(--mono); font-size: 9px; padding: 2px 7px; background: var(--bg3); color: var(--txt); border: 1px solid var(--line2); }
+
+.dash-anchor-source { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-bottom: 4px; }
 /* 2026-07-28: выделение "vs" в тензии — Вариант 2 (бейдж-капсула),
    утверждён пользователем после превью 5 вариантов. Используется и в
    "Главных нарративах" (ОБЗОР), и в "Все нарративы". */
@@ -2152,7 +2196,7 @@ header {
   line-height: 1.5;
 }
 
-.dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--btc); padding: 16px 14px 12px; overflow: hidden; }
+.dash-summary { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--line2); padding: 16px 14px 12px; overflow: hidden; }
 .dash-sum-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 6px; }
 .dash-sum-bar { display: flex; height: 6px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
 .dsb-pos { background: var(--grn); }
@@ -2168,6 +2212,65 @@ header {
   padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer;
 }
 .dash-sum-link:hover { color: var(--btc); }
+
+.dash-philosophy {
+  margin: 16px 0 0;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  overflow: hidden;
+}
+.dash-philosophy-body {
+  padding: 14px 14px 12px;
+  font-family: var(--sans); font-size: 12px; line-height: 1.6;
+  color: var(--dim);
+}
+.dash-philosophy-body p { margin: 0 0 12px; }
+.dash-philosophy-body p:last-of-type { margin-bottom: 0; }
+.dash-philosophy-body b { color: var(--txt); }
+.dash-philosophy-body ul { margin: 0 0 4px; padding-left: 18px; }
+.dash-philosophy-body li { margin-bottom: 6px; }
+.dash-philosophy-lead { color: var(--txt); font-weight: 600; margin-bottom: 8px !important; }
+.dash-philosophy-footer {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--dim2); text-align: center;
+  padding-top: 12px; margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.dash-philosophy-toggle {
+  display: none;
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--btc);
+  cursor: pointer; text-align: center;
+}
+
+/* ══════════════════════════════════
+   ОБЗОР — 2-колоночная сетка (терминал)
+══════════════════════════════════ */
+.dash-grid { display: block; }
+.dash-side { display: block; }
+
+.dash-watchlist { margin: 0 0 16px; background: var(--bg2); border: 1px solid var(--line2); overflow: hidden; }
+.dash-watch-row { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 10px; cursor: pointer; }
+.dash-watch-row:hover { background: var(--bg3); }
+.dash-watch-row + .dash-watch-row { border-top: 1px solid var(--line); }
+.dash-watch-label { flex: 1; min-width: 0; color: var(--txt); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-watch-bar { display: flex; height: 5px; width: 52px; overflow: hidden; gap: 1px; flex-shrink: 0; }
+.dash-watch-count { color: var(--dim); width: 22px; text-align: right; flex-shrink: 0; }
+
+@media (min-width: 960px) {
+  #tab-home .page { max-width: 1180px; }
+  .dash-grid { display: grid; grid-template-columns: 2.1fr 1fr; gap: 16px; align-items: start; }
+  .dash-side .dash-philosophy-body:not(.dpb-expanded) .dash-philosophy-clip {
+    max-height: 70px; overflow: hidden; position: relative;
+  }
+  .dash-side .dash-philosophy-body:not(.dpb-expanded) .dash-philosophy-clip::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 26px;
+    background: linear-gradient(to bottom, transparent, var(--bg2));
+  }
+  .dash-philosophy-toggle { display: block; }
+}
 </style>
 </head>
 <body>
@@ -2209,9 +2312,9 @@ header {
 <section class="section active" id="tab-home">
   <div class="page">
 
-    <!-- ══ ОПРЕДЕЛЕНИЕ САЙТА (2026-08-16) ══ -->
+    <!-- ══ ТЕХНИЧЕСКИЙ СКОУП ДАННЫХ (2026-08-19, ранее — питч "ОПРЕДЕЛЕНИЕ САЙТА") ══ -->
     <div id="dash-definition" style="margin:12px 0;border:1px solid var(--btc);background:var(--bg2);padding:10px 12px;font-family:var(--sans);font-size:11px;line-height:1.5;color:var(--dim)">
-      <b style="color:var(--txt)">Bitcoin Intel</b> — платформа нарративного анализа Bitcoin: сталкивает противоречивые сигналы рынка и институтов, показывает где правда ещё не решена.
+      Сигналы Bitcoin — on-chain, рыночные, институциональные, макро; у каждого источник и связи confirms/contradicts/context_chain.
     </div>
 
     <!-- ══ ТИКЕР ЖИВЫХ ДАННЫХ (2026-08-16, ранее — БЛОК 0: СТАТУС) ══ -->
@@ -2228,42 +2331,78 @@ header {
       </div>
     </div>
 
-    <!-- ══ ГЛАВНАЯ ИСТОРИЯ (2026-08-16, ранее БЛОК 3: ГЛАВНЫЕ НАРРАТИВЫ) ══ -->
-    <div class="dash-narratives" id="dash-narratives-wrap">
-      <div class="panel-head" style="margin:0">
-        <span class="panel-title">Главная история</span>
-        <span id="dash-narratives-total" class="chart-meta"></span>
+    <!-- ══ СЕТКА ОБЗОРА (2026-08-19) — лента слева, watchlist/сводки справа;
+         на экране < 960px .dash-grid схлопывается в блок, оба .dash-feed/
+         .dash-side стекают друг под другом в порядке DOM (лента → сайдбар) ══ -->
+    <div class="dash-grid">
+      <div class="dash-feed">
+        <!-- ══ ГЛАВНАЯ ИСТОРИЯ ══ -->
+        <div class="dash-narratives" id="dash-narratives-wrap">
+          <div class="panel-head" style="margin:0">
+            <span class="panel-title">Главная история</span>
+            <span id="dash-narratives-total" class="chart-meta"></span>
+          </div>
+          <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><div class="dash-narrative-item"><div class="dash-narrative-tension">Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился</div><div class="dash-narrative-macro">BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично</div><div style="font-size:10px;color:var(--dim)">28 сигналов</div></div><!-- PRERENDER:HOME:END --></div>
+        </div>
+
       </div>
-      <div id="dash-narratives-list"><!-- PRERENDER:HOME:START --><div class="dash-narrative-item"><div class="dash-narrative-tension">Официальный трекер bitcoin.gob.sv показывает непрерывный рост баланса до 7700 BTC vs представитель МВФ Julie Kozack публично заявляет, что рост отражает консолидацию кошельков, а не net-new покупки — общий объём BTC под контролем правительства не увеличился</div><div class="dash-narrative-macro">BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично</div><div style="font-size:10px;color:var(--dim)">28 сигналов</div></div><!-- PRERENDER:HOME:END --></div>
-    </div>
 
-    <!-- ══ ЕЩЁ НАРРАТИВЫ (2026-08-16) ══ -->
-    <div id="dash-narratives-mini-wrap" style="margin-top:12px">
-      <div id="dash-narratives-mini-label" style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px"></div>
-      <div id="dash-narratives-mini-list"></div>
-    </div>
+      <div class="dash-side">
+        <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
+        <div class="dash-summary">
+          <div class="panel-head" style="margin:-16px -14px 12px">
+            <span class="panel-title">Общий фон</span>
+            <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
+          </div>
+          <div class="dash-summary-body">
+            <div class="dash-sum-bar" id="dash-sum-bar"></div>
+            <div class="dash-sum-counts" id="dash-sum-counts"></div>
+            <div class="dash-sum-link" onclick="showTab('market', null)">
+              ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+            </div>
+          </div>
+        </div>
 
-    <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ (2026-08-16) ══ -->
-    <div style="margin-top:16px">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--dim2);letter-spacing:0.1em;margin-bottom:6px">ИССЛЕДОВАТЬ ГЛУБЖЕ</div>
-      <div id="dash-explore-tiles"></div>
-    </div>
+        <!-- ══ WATCHLIST — все кластеры (2026-08-19) ══ -->
+        <div class="dash-watchlist">
+          <div class="panel-head">
+            <span class="panel-title">Watchlist</span>
+            <span class="chart-meta" id="dash-watchlist-total"></span>
+          </div>
+          <div id="dash-watchlist-list"></div>
+        </div>
 
-    <!-- ══ БЛОК 4: СВОДКА СИГНАЛОВ ══ -->
-    <div class="dash-summary">
-      <div class="panel-head" style="margin:-16px -14px 12px">
-        <span class="panel-title">Общий фон</span>
-        <span class="chart-meta" id="dash-sum-label">СИГНАЛЫ</span>
-      </div>
-      <div class="dash-summary-body">
-        <div class="dash-sum-bar" id="dash-sum-bar"></div>
-        <div class="dash-sum-counts" id="dash-sum-counts"></div>
-        <div class="dash-sum-link" onclick="showTab('market', null)">
-          ВСЕ СИГНАЛЫ → ДАЙДЖЕСТ <span>→</span>
+        <!-- ══ ИССЛЕДОВАТЬ ГЛУБЖЕ ══ -->
+        <div class="dash-explore" style="margin:16px 0 0;background:var(--bg2);border:1px solid var(--line2);overflow:hidden">
+          <div class="panel-head">
+            <span class="panel-title">Исследовать глубже</span>
+          </div>
+          <div id="dash-explore-tiles" style="padding:10px 14px 4px"></div>
+        </div>
+
+        <!-- ══ ФИЛОСОФИЯ ПРОЕКТА ══ -->
+        <div class="dash-philosophy">
+          <div class="panel-head">
+            <span class="panel-title">Философия проекта</span>
+          </div>
+          <div class="dash-philosophy-body">
+            <div class="dash-philosophy-clip">
+              <p><b>Bitcoin Intel</b> — личный intelligence-терминал автора. Не медиа, не агрегатор цен, не поток мнений.</p>
+              <p>Смысл сайта — превращать разрозненные наблюдения о Bitcoin в связный, объяснимый и проверяемый корпус знания. Каждый вывод здесь прослеживается до конкретного сигнала: утверждение без опоры на источник — домысел, а не аналитика, и такого на этом сайте нет.</p>
+              <p>Прежде чем принять интерпретацию, рассматривается минимум одна содержательная альтернатива и явно отклоняется — не соломенное чучело, а версия, объясняющая те же факты иначе. Рассуждение показывается до вывода, а не сворачивается в готовый результат постфактум.</p>
+              <p class="dash-philosophy-lead">Что сайт принципиально не делает:</p>
+              <ul>
+                <li>не прогнозирует цену и не занимается техническим анализом графиков — цена здесь наблюдаема, не предсказуема;</li>
+                <li>не рассматривает альткоины и крипторынок как самостоятельный предмет — только как канал влияния на BTC;</li>
+                <li>не маскирует неуверенность уверенным тоном — уровень доверия виден рядом с выводом, а не растворён в нём.</li>
+              </ul>
+              <div class="dash-philosophy-footer">ТОЛЬКО BITCOIN. НИЧЕГО СВЕРХ ТОГО, ЧТО МОЖНО ПРОСЛЕДИТЬ ДО ИСТОЧНИКА.</div>
+            </div>
+            <div class="dash-philosophy-toggle" onclick="togglePhilosophy(this)">развернуть ▾</div>
+          </div>
         </div>
       </div>
     </div>
-
 
   </div>
 </section>
@@ -2704,7 +2843,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-early.js?v=1be783ea92"></script>
+<script src="js/app-early.js?v=9eb9a2926b"></script>
 
 <section class="section" id="tab-theory">
   <div class="page">
@@ -4489,7 +4628,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=b6ca558456"></script>
+<script src="js/app-main.js?v=41bb32a879"></script>
 
 </div><!-- /.app-scroll -->
 

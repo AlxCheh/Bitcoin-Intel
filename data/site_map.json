@@ -40,6 +40,52 @@
       ]
     },
     {
+      "id": "e113",
+      "title": "Watchlist",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "signals",
+      "kind": "text",
+      "keywords": [
+        "watchlist",
+        "кластеры",
+        "сигналы"
+      ]
+    },
+    {
+      "id": "e114",
+      "title": "Исследовать глубже",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "none",
+      "kind": "widget",
+      "keywords": [
+        "навигация",
+        "кластеры",
+        "плитки"
+      ]
+    },
+    {
+      "id": "e112",
+      "title": "Философия проекта",
+      "cluster": "live",
+      "cluster_label": "LIVE",
+      "tab": "home",
+      "tab_label": "ОБЗОР",
+      "source": "none",
+      "kind": "text",
+      "keywords": [
+        "философия",
+        "манифест",
+        "терминал",
+        "о проекте"
+      ]
+    },
+    {
       "id": "e006",
       "title": "Дайджест сигналов по кластерам",
       "cluster": "live",

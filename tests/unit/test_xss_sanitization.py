@@ -345,10 +345,10 @@ SANITIZE_RATCHET_BASELINE = {
     "(cl.neu||0)": 1,
     "(cl.pos||0)": 1,
     "(counts.neu||0.1)": 1,
-    # cl.signals.length: 2 → 3 (2026-08-16) — новое вхождение в
-    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
-    # счётчик, что и в двух уже существующих местах
-    "cl.signals.length": 3,
+    # cl.signals.length: 3 → 2 (2026-08-19) — renderNarrativeMiniRow()
+    # (ОБЗОР, "ещё нарративы") удалена редизайном терминала (Задача 3),
+    # вместе с ней ушло её вхождение этого числового счётчика
+    "cl.signals.length": 2,
     "rest.length": 1,
     "(dir.neg||0)": 1,
     "(dir.neu||0.1)": 1,
@@ -368,10 +368,10 @@ SANITIZE_RATCHET_BASELINE = {
     "score.freshness": 1,
     "score.roles": 1,
     "score.tension": 1,
-    # score.total: 3 → 4 (2026-08-16) — новое вхождение в
-    # renderNarrativeMiniRow() (ОБЗОР, "ещё нарративы"), тот же числовой
-    # score.total, что уже используется в трёх других местах
-    "score.total": 4,
+    # score.total: 4 → 3 (2026-08-19) — renderNarrativeMiniRow()
+    # (ОБЗОР, "ещё нарративы") удалена редизайном терминала (Задача 3),
+    # вместе с ней ушло её вхождение этого числового счётчика
+    "score.total": 3,
     "s.entity_count": 1,
     "c.blocks_counted": 1,
     "c.tip_height": 1,
@@ -383,10 +383,20 @@ SANITIZE_RATCHET_BASELINE = {
     "groupItems.length": 1,
     "filteredCompact.length": 1,
     "v.pct": 1,
+    # 2026-08-19 — renderAnchorLinksHtml() (Задача 4, редизайн терминала):
+    # чипы confirms/contradicts/context_chain показывают только счётчик
+    # массива (l.confirms.length и т.п.) — заведомо числовой вывод.
+    "l.confirms.length": 1,
+    "l.contradicts.length": 1,
+    "l.context_chain.length": 1,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,
     "(freshness.stale ? 'var(--red)' : 'var(--dim)')": 1,
     "(item.open ? ' open' : '')": 1,
+    # renderAnchorFieldsHtml() (2026-08-19, Задача 4) — c.cls читается из
+    # массива-литерала cells внутри функции (значения '', 'neg', 'pos',
+    # 'neu', 'amber'), не из данных сигнала.
+    "c.cls : '')": 1,
     # ── словари-константы кода (значения — литералы в index.html) ──
     "actorMeta.label": 1,
     "d.icon": 1,
@@ -394,8 +404,9 @@ SANITIZE_RATCHET_BASELINE = {
     # renderExploreTiles() (2026-08-16, ОБЗОР → "исследовать глубже") —
     # tiles: массив-литерал, зашитый в функции, не данные из JSON/сигналов.
     # t.sub → t.desc (2026-08-18, Вариант 3 — описание вместо списка вкладок,
-    # то же поле, только переименовано и текст длиннее)
-    "t.icon": 1,
+    # то же поле, только переименовано и текст длиннее).
+    # t.icon удалён (2026-08-19, редизайн терминала) — компактный список
+    # "Исследовать глубже" в сайдбаре ушёл от эмодзи-иконок к mono-заголовкам.
     "t.title": 1,
     "t.desc": 1,
     "flowMeta.icon": 1,
@@ -410,7 +421,10 @@ SANITIZE_RATCHET_BASELINE = {
     "(TREASURY_META.public_holders_count || '?')": 1,
     "(anchorObj.weight || '?')": 1,
     "(s.theory_ref === 'theory-network' ? 'СЕМЬ СЕТЕВЫХ ЭФФЕКТОВ' : safeTheoryRef.replace('theory-','').toUpperCase())": 1,
-    "c.label": 2,
+    # c.label: 2 → 3 (2026-08-19) — renderAnchorFieldsHtml() (Задача 4)
+    # добавляет третье вхождение; значение — литерал из cells (DIR/
+    # HORIZON/WEIGHT/ROLE/ACTOR), не данные сигнала.
+    "c.label": 3,
     "cluster.label": 1,
     "etfEx.as_of": 1,
     "fact.signal_id": 1,

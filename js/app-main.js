@@ -2833,7 +2833,6 @@ function renderDashboard() {
     const item = document.createElement('div');
     item.className = 'dash-narrative-item ' + dirCls;
     item.dataset.clusterKey = key;
-    if (idx > 0) item.style.borderTop = '1px solid var(--line)';
 
     item.innerHTML =
         '<div class="dash-narrative-cluster">'
@@ -2865,7 +2864,10 @@ function renderDashboard() {
       +   '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>'
       + '</div>'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
-      +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '<div style="display:flex;align-items:center;gap:8px">'
+      +     '<span class="dash-narrative-rank">#' + String(idx + 1).padStart(2, '0') + '</span>'
+      +     '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '</div>'
       +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" data-bd="' + bdId + '">'
       +     '<span class="dash-narrative-strength strength-' + sanitize(synthesis.strength||'moderate') + '">' + sanitize((synthesis.strength||'').toUpperCase()) + '</span>'
       +     (isHot ? '🔥 ' : '') + 'score: ' + score.total + ' ▾'

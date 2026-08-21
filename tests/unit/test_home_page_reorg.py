@@ -71,18 +71,24 @@ def test_home_has_definition_banner():
     2026-08-19: текст сменён с продуктового питча на нейтральную
     техническую строку (редизайн под терминал, см.
     docs/superpowers/specs/2026-08-19-homepage-terminal-redesign-design.md
-    §1) — «Философия проекта» внизу той же страницы теперь единственное
-    место, где сайт формулирует свой смысл.
+    §1). 2026-08-21: пользователь нашёл ту нейтральную строку бессмысленным
+    набором слов («шлак») — заменена на формулировку, сознательно
+    перекликающуюся с «Философией проекта» (intelligence-терминал,
+    трассировка вывода до источника), не дублирующую её дословно.
+    confirms/contradicts/context_chain в тексте больше нет — это была
+    механика поля links, не то, что должно быть в первом впечатлении.
     """
     html = INDEX_HTML.read_text(encoding="utf-8")
     home_start, home_end = _section_range(html, "tab-home")
     home_html = html[home_start:home_end]
     assert 'id="dash-definition"' in home_html
-    assert "confirms/contradicts/context_chain" in home_html
+    assert "intelligence-терминал" in home_html, (
+        "dash-definition должен перекликаться с фреймингом «Философии "
+        "проекта» — intelligence-терминал, не сухой список категорий сигналов"
+    )
     assert "платформа" not in home_html.lower(), (
-        "dash-definition обязан оставаться нейтральной технической строкой, "
-        "не продуктовым питчем — эту роль теперь несёт только блок "
-        "«Философия проекта»"
+        "dash-definition не должен звучать как продуктовый питч со словом "
+        "«платформа» — эту роль несёт «Философия проекта»"
     )
 
 

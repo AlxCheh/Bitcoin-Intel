@@ -58,15 +58,19 @@ def test_render_anchor_links_html_shows_only_nonempty_link_types():
     src = (REPO_ROOT / "js" / "app-main.js").read_text(encoding="utf-8")
     fn = extract_js_function(src, "renderAnchorLinksHtml")
     js = f"""
+function sanitize(s) {{ return String(s == null ? '' : s); }}
 {fn}
-const anchor = {{ links: {{ confirms: ['A-1','A-2'], contradicts: [], context_chain: ['B-1'] }} }};
+const links = {{ confirms: ['A-1','A-2'], contradicts: [], context_chain: ['B-1'] }};
+const anchor = {{ narrative_role: 'complication', links }};
 const html = renderAnchorLinksHtml(anchor);
+const resolutionAnchor = {{ narrative_role: 'resolution', links: {{ confirms: ['A-1','A-2'], contradicts: ['C-1'], context_chain: ['B-1'] }} }};
 console.log(JSON.stringify({{
   hasConfirms: html.includes('ПОДТВЕРЖДАЕТ') && html.includes('2'),
   hasContext: html.includes('КОНТЕКСТ') && html.includes('1'),
   hasContradicts: html.includes('ПРОТИВОРЕЧИТ'),
   emptyWhenNoLinks: renderAnchorLinksHtml({{}}) === '',
-  emptyWhenNull: renderAnchorLinksHtml(null) === ''
+  emptyWhenNull: renderAnchorLinksHtml(null) === '',
+  emptyWhenResolution: renderAnchorLinksHtml(resolutionAnchor) === ''
 }}));
 """
     result = run_node_js(js)
@@ -77,6 +81,11 @@ console.log(JSON.stringify({{
     assert out["hasContradicts"] is False, "contradicts пуст — чип не должен рендериться"
     assert out["emptyWhenNoLinks"] is True
     assert out["emptyWhenNull"] is True
+    assert out["emptyWhenResolution"] is True, (
+        "role=resolution побеждает tension безусловно (Priority 1, "
+        "_select_tension_source()) — число contradicts не имеет отношения "
+        "к победе, чипы вводят в заблуждение и не должны рендериться"
+    )
 
 
 def test_render_anchor_entities_html_filters_by_signal_refs():

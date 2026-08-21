@@ -942,7 +942,7 @@ header {
 /* ══ ADVANCED NARRATIVE ══ */
 .dash-narrative-takeaway {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 9.5px;
   color: var(--btc);
   letter-spacing: 0.06em;
   margin: 6px 0 4px;
@@ -2061,11 +2061,11 @@ header {
 
 .dash-narratives {
   margin: 0 0 12px;
-  background: var(--bg2); border: 1px solid var(--line2);
-  overflow: hidden;
+  background: transparent; border: none;
+  overflow: visible;
 }
 .dash-narrative-item + .dash-narrative-item {
-  border-top: 1px solid var(--line);
+  margin-top: 10px;
 }
 .dash-narrative-cluster {
   margin-bottom: 8px;
@@ -2107,10 +2107,20 @@ header {
 }
 .dash-narrative-item {
   padding: 14px 14px 10px;
+  background: var(--bg2); border: 1px solid var(--line2);
+  border-top-width: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+.dash-narrative-item.pos { border-top-color: var(--grn); }
+.dash-narrative-item.neg { border-top-color: var(--red); }
+.dash-narrative-item.neu { border-top-color: var(--line2); }
+.dash-narrative-rank {
+  font-family: var(--mono); font-size: 8px; color: var(--dim2);
+  letter-spacing: 0.05em;
 }
 .dash-narrative-tension {
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--txt);
   line-height: 1.45;
@@ -2121,7 +2131,7 @@ header {
 }
 .dash-narrative-macro {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--dim);
   line-height: 1.5;
   margin-bottom: 8px;
@@ -2133,22 +2143,36 @@ header {
 }
 .dash-anchor-field { background: var(--bg3); padding: 4px 6px; }
 .dash-anchor-field-label { font-family: var(--mono); font-size: 8px; color: var(--dim); letter-spacing: 0.06em; margin-bottom: 2px; }
-.dash-anchor-field-value { font-family: var(--mono); font-size: 9.5px; font-weight: 700; color: var(--txt); }
+.dash-anchor-field-value { font-family: var(--mono); font-size: 9.5px; font-weight: 300; color: var(--txt); }
 .dash-anchor-field-value.pos { color: var(--grn); }
 .dash-anchor-field-value.neg { color: var(--red); }
 .dash-anchor-field-value.neu { color: var(--dim); }
 .dash-anchor-field-value.amber { color: var(--btc); }
 
 .dash-anchor-links { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; }
+.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; cursor: pointer; transition: background 0.12s; }
+.dash-anchor-chip:hover { background: var(--bg3); }
 .dash-anchor-chip.confirms { border-color: var(--grn); color: var(--grn); }
 .dash-anchor-chip.contradicts { border-color: var(--red); color: var(--red); }
 .dash-anchor-chip.context { border-color: var(--line2); color: var(--dim); }
 
-.dash-anchor-entities { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-.dash-anchor-entity { font-family: var(--mono); font-size: 9px; padding: 2px 7px; background: var(--bg3); color: var(--txt); border: 1px solid var(--line2); }
+.sig-id-filter-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 11px; color: var(--txt);
+  background: var(--bg2); border: 1px solid var(--btc);
+  padding: 8px 12px; margin-bottom: 10px;
+}
+.sig-id-filter-banner button {
+  font-family: var(--mono); font-size: 10px; color: var(--dim);
+  background: none; border: 1px solid var(--line2); padding: 3px 8px;
+  cursor: pointer;
+}
+.sig-id-filter-banner button:hover { color: var(--txt); border-color: var(--dim); }
 
-.dash-anchor-source { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-bottom: 4px; }
+.dash-anchor-entities { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.dash-anchor-entity { font-family: var(--mono); font-size: 9.5px; padding: 2px 7px; background: var(--bg3); color: var(--txt); border: 1px solid var(--line2); }
+
+.dash-anchor-source { font-family: var(--mono); font-size: 9.5px; color: var(--dim); margin-bottom: 4px; }
 /* 2026-07-28: выделение "vs" в тензии — Вариант 2 (бейдж-капсула),
    утверждён пользователем после превью 5 вариантов. Используется и в
    "Главных нарративах" (ОБЗОР), и в "Все нарративы". */
@@ -2165,16 +2189,6 @@ header {
   vertical-align: middle;
   margin: 0 2px;
 }
-.dash-narrative-minority-anchor {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-style: italic;
-  color: var(--amber);
-  line-height: 1.4;
-  margin: -3px 0 8px;
-  cursor: help;
-}
-
 /* AD-4 / BAMS Р8: альтернативный сценарий — показывается только когда
    confidence_tier != 'high'. Приглушённый намеренно: это оговорка к
    основному нарративу, не конкурент tension за внимание читателя. */
@@ -4628,7 +4642,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=41bb32a879"></script>
+<script src="js/app-main.js?v=28cbda21cf"></script>
 
 </div><!-- /.app-scroll -->
 

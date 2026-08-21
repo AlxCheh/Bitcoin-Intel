@@ -2235,6 +2235,13 @@ let sigFilter = 'all';
 let pendingScrollSignal = null;
 let sigActorFilter = 'all';
 let sigMode = 'date'; // 'date' | 'theme'
+// Точечный фильтр ДАЙДЖЕСТА по явному списку id — независим от sigFilter
+// (тот матчит один кластер/dir/тему; этот — произвольный набор конкретных
+// сигналов, напр. из чипов confirms/contradicts/context_chain карточки
+// нарратива). Активен, когда не null; переопределяет обычную фильтрацию
+// в renderSignals(), см. ниже.
+let sigIdFilter = null;
+let sigIdFilterLabel = '';
 
 const THEME_META = {
   supply:              { label: '⬛ ПРЕДЛОЖЕНИЕ',       order: 0 },
@@ -2268,82 +2275,81 @@ function renderSignals() {
   const feed = document.getElementById('sig-feed');
   if (!feed) return;
 
-  // сводка по направлению
-  const counts = { neg: 0, pos: 0, neu: 0 };
-  SIGNALS.forEach(s => counts[s.dir]++);
-  const activeSum = ['pos','neg','neu'].includes(sigFilter) ? sigFilter : '';
-  sumWrap.innerHTML =
-    '<div class="sig-summary">'
-    + '<div class="sig-sum-cell neg' + (activeSum==='neg'?' active':'') + '" onclick="setSigFilter(\'neg\')""><div class="sig-sum-n">' + counts.neg + '</div><div class="sig-sum-l">🔴 НЕГАТИВ</div></div>'
-    + '<div class="sig-sum-cell pos' + (activeSum==='pos'?' active':'') + '" onclick="setSigFilter(\'pos\')""><div class="sig-sum-n">' + counts.pos + '</div><div class="sig-sum-l">🟢 ПОЗИТИВ</div></div>'
-    + '<div class="sig-sum-cell neu' + (activeSum==='neu'?' active':'') + '" onclick="setSigFilter(\'neu\')""><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
-    + '</div>';
+  // Точечный фильтр по id (клик по чипе связи на карточке нарратива) —
+  // произвольный набор id не выражается через один sigFilter, поэтому
+  // вместо обычной сводки/фильтров — баннер с кнопкой сброса.
+  if (sigIdFilter) {
+    sumWrap.innerHTML = '';
+    filWrap.innerHTML = '<div class="sig-id-filter-banner">'
+      + '<span>🔗 ' + sanitize(sigIdFilterLabel) + ' — показано ' + sigIdFilter.length + '</span>'
+      + '<button onclick="clearSigIdFilter()">✕ Сбросить фильтр</button>'
+      + '</div>';
+  } else {
+    // сводка по направлению
+    const counts = { neg: 0, pos: 0, neu: 0 };
+    SIGNALS.forEach(s => counts[s.dir]++);
+    const activeSum = ['pos','neg','neu'].includes(sigFilter) ? sigFilter : '';
+    sumWrap.innerHTML =
+      '<div class="sig-summary">'
+      + '<div class="sig-sum-cell neg' + (activeSum==='neg'?' active':'') + '" onclick="setSigFilter(\'neg\')""><div class="sig-sum-n">' + counts.neg + '</div><div class="sig-sum-l">🔴 НЕГАТИВ</div></div>'
+      + '<div class="sig-sum-cell pos' + (activeSum==='pos'?' active':'') + '" onclick="setSigFilter(\'pos\')""><div class="sig-sum-n">' + counts.pos + '</div><div class="sig-sum-l">🟢 ПОЗИТИВ</div></div>'
+      + '<div class="sig-sum-cell neu' + (activeSum==='neu'?' active':'') + '" onclick="setSigFilter(\'neu\')""><div class="sig-sum-n">' + counts.neu + '</div><div class="sig-sum-l">⚪ НЕЙТРАЛ</div></div>'
+      + '</div>';
 
-  // переключатель режима
-  let fhtml =
-    '<div style="display:flex;gap:8px;margin-bottom:10px">'
-    + '<button class="sig-fbtn' + (sigMode==='date'?' active':'') + '" onclick="setSigMode(\'date\')">📅 ПО ДАТЕ</button>'
-    + '<button class="sig-fbtn' + (sigMode==='theme'?' active':'') + '" onclick="setSigMode(\'theme\')">🗂 ПО ТЕМЕ</button>'
-    + '</div>';
+    // переключатель режима
+    let fhtml =
+      '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button class="sig-fbtn' + (sigMode==='date'?' active':'') + '" onclick="setSigMode(\'date\')">📅 ПО ДАТЕ</button>'
+      + '<button class="sig-fbtn' + (sigMode==='theme'?' active':'') + '" onclick="setSigMode(\'theme\')">🗂 ПО ТЕМЕ</button>'
+      + '</div>';
 
-  // фильтры по кластеру (DIGEST_CLUSTER_LABELS теперь на уровне модуля —
-  // см. рядом с CLUSTER_LABELS_AI выше по файлу; вынесено 2026-07-28,
-  // понадобилось из localAnalyzeSignal() для короткого бейджа "Найдено")
-  const cats = {};
-  const catCounts = {};
-  const catDir = {};
-  SIGNALS.forEach(s => {
-    const cl = s.cluster || s.theme || s.cat;
-    cats[cl] = DIGEST_CLUSTER_LABELS[cl] || sanitize(cl).toUpperCase();
-    catCounts[cl] = (catCounts[cl] || 0) + 1;
-    if (!catDir[cl]) catDir[cl] = { pos: 0, neg: 0, neu: 0 };
-    catDir[cl][s.dir] = (catDir[cl][s.dir] || 0) + 1;
-  });
+    // фильтры по кластеру (DIGEST_CLUSTER_LABELS теперь на уровне модуля —
+    // см. рядом с CLUSTER_LABELS_AI выше по файлу; вынесено 2026-07-28,
+    // понадобилось из localAnalyzeSignal() для короткого бейджа "Найдено")
+    const cats = {};
+    const catCounts = {};
+    const catDir = {};
+    SIGNALS.forEach(s => {
+      const cl = s.cluster || s.theme || s.cat;
+      cats[cl] = DIGEST_CLUSTER_LABELS[cl] || sanitize(cl).toUpperCase();
+      catCounts[cl] = (catCounts[cl] || 0) + 1;
+      if (!catDir[cl]) catDir[cl] = { pos: 0, neg: 0, neu: 0 };
+      catDir[cl][s.dir] = (catDir[cl][s.dir] || 0) + 1;
+    });
 
-  function makeBar(dir, total) {
-    if (!dir || !total) return '';
-    return '<span class="sig-fbtn-bar">'
-      + '<span class="sig-fbtn-bar-pos" style="flex:' + (dir.pos||0) + '"></span>'
-      + '<span class="sig-fbtn-bar-neg" style="flex:' + (dir.neg||0) + '"></span>'
-      + '<span class="sig-fbtn-bar-neu" style="flex:' + (dir.neu||0.1) + '"></span>'
-      + '</span>';
+    fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
+      + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ'
+      + '<span class="sig-fbtn-count">' + SIGNALS.length + '</span>'
+      + '</button>';
+
+    Object.keys(cats).forEach(c => {
+      const n = catCounts[c] || 0;
+      fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">'
+        + cats[c]
+        + '<span class="sig-fbtn-count">' + n + '</span>'
+        + '</button>';
+    });
+    fhtml += '</div>';
+
+    // фильтры по actor — только те акторы что есть в данных
+    const actors = {};
+    SIGNALS.forEach(s => { if (s.actor) actors[s.actor] = true; });
+    fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid #1A1F2A">'
+      + '<button class="sig-fbtn' + (sigActorFilter==='all'?' active':'') + '" onclick="setSigActorFilter(\'all\')" style="font-size:10px">ВСЕ АКТОРЫ</button>';
+    Object.keys(actors).forEach(a => {
+      const meta = ACTOR_META[a] || { label: sanitize(a).toUpperCase() };
+      fhtml += '<button class="sig-fbtn' + (sigActorFilter===a?' active':'') + '" onclick="setSigActorFilter(\'' + sanitize(a) + '\')" style="font-size:10px">' + meta.label + '</button>';
+    });
+    fhtml += '</div>';
+
+    filWrap.innerHTML = fhtml;
   }
 
-  const allDir = { pos: 0, neg: 0, neu: 0 };
-  SIGNALS.forEach(s => { allDir[s.dir] = (allDir[s.dir]||0) + 1; });
-
-  fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
-    + '<button class="sig-fbtn' + (sigFilter==='all'?' active':'') + '" onclick="setSigFilter(\'all\')">ВСЕ'
-    + '<span class="sig-fbtn-count">' + SIGNALS.length + '</span>'
-    + '</button>';
-
-  Object.keys(cats).forEach(c => {
-    const n = catCounts[c] || 0;
-    fhtml += '<button class="sig-fbtn' + (sigFilter===c?' active':'') + '" onclick="setSigFilter(\'' + c + '\')">'
-      + cats[c]
-      + '<span class="sig-fbtn-count">' + n + '</span>'
-      + '</button>';
-  });
-  fhtml += '</div>';
-
-  // фильтры по actor — только те акторы что есть в данных
-  const actors = {};
-  SIGNALS.forEach(s => { if (s.actor) actors[s.actor] = true; });
-  fhtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid #1A1F2A">'
-    + '<button class="sig-fbtn' + (sigActorFilter==='all'?' active':'') + '" onclick="setSigActorFilter(\'all\')" style="font-size:10px">ВСЕ АКТОРЫ</button>';
-  Object.keys(actors).forEach(a => {
-    const meta = ACTOR_META[a] || { label: sanitize(a).toUpperCase() };
-    fhtml += '<button class="sig-fbtn' + (sigActorFilter===a?' active':'') + '" onclick="setSigActorFilter(\'' + sanitize(a) + '\')" style="font-size:10px">' + meta.label + '</button>';
-  });
-  fhtml += '</div>';
-
-  filWrap.innerHTML = fhtml;
-
-  // фильтрация — категория/dir + actor
+  // фильтрация — id-фильтр (см. выше) переопределяет категорию/dir/actor
   const dirKeys = ['pos', 'neg', 'neu'];
   const items = SIGNALS
-    .filter(s => sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : (s.cluster || s.theme || s.cat) === sigFilter))
-    .filter(s => sigActorFilter === 'all' || s.actor === sigActorFilter)
+    .filter(s => sigIdFilter ? sigIdFilter.includes(s.id) : (sigFilter === 'all' || (dirKeys.includes(sigFilter) ? s.dir === sigFilter : (s.cluster || s.theme || s.cat) === sigFilter)))
+    .filter(s => sigIdFilter || sigActorFilter === 'all' || s.actor === sigActorFilter)
     .slice().sort((a, b) => b.date.localeCompare(a.date));
 
   function cardHTML(s) {
@@ -2772,13 +2778,22 @@ function renderDashboard() {
 
   // Чипы связей анкорного сигнала (confirms/contradicts/context_chain) —
   // показываются только непустые типы, счётчик = длина массива.
+  // 2026-08-21: для role=resolution число contradicts не имеет отношения к
+  // тому, почему сигнал стал анкором (Priority 1 в _select_tension_source()
+  // безусловно отдаёт анкор resolution-сигналу вне зависимости от чипов) —
+  // показывать их на таких карточках вводит в заблуждение, см. обсуждение
+  // с пользователем (карточка Strategy: анкор с 0 confirms/0 contradicts).
   function renderAnchorLinksHtml(anchor) {
-    if (!anchor || !anchor.links) return '';
+    if (!anchor || !anchor.links || anchor.narrative_role === 'resolution') return '';
     const l = anchor.links;
     const chips = [];
-    if (l.confirms && l.confirms.length) chips.push('<span class="dash-anchor-chip confirms">✓ ПОДТВЕРЖДАЕТ · ' + l.confirms.length + '</span>');
-    if (l.contradicts && l.contradicts.length) chips.push('<span class="dash-anchor-chip contradicts">✗ ПРОТИВОРЕЧИТ · ' + l.contradicts.length + '</span>');
-    if (l.context_chain && l.context_chain.length) chips.push('<span class="dash-anchor-chip context">↳ КОНТЕКСТ · ' + l.context_chain.length + '</span>');
+    function chip(ids, cls, text) {
+      if (!ids || !ids.length) return;
+      chips.push('<span class="dash-anchor-chip ' + cls + '" data-ids="' + sanitize(JSON.stringify(ids)) + '" data-label="' + sanitize(text) + '">' + text + ' · ' + ids.length + '</span>');
+    }
+    chip(l.confirms, 'confirms', '✓ ПОДТВЕРЖДАЕТ');
+    chip(l.contradicts, 'contradicts', '✗ ПРОТИВОРЕЧИТ');
+    chip(l.context_chain, 'context', '↳ КОНТЕКСТ');
     if (!chips.length) return '';
     return '<div class="dash-anchor-links">' + chips.join('') + '</div>';
   }
@@ -2824,16 +2839,15 @@ function renderDashboard() {
     // отсутствие uncertainty ошибкой.
     const uncertainty = synthesis.uncertainty || {};
     const warnings = buildUncertaintyWarnings(uncertainty).map(sanitize);
-    const minorityWarning = buildMinorityAnchorWarning(synthesis);
-    const minorityWarningHtml = minorityWarning
-      ? '<div class="dash-narrative-minority-anchor" title="Победивший tension определяется по числу contradicts-связей одного сигнала, не по доле сущностей в кластере — см. CLAUDE.md, раздел Нарративный синтез">'
-        + sanitize(minorityWarning) + '</div>'
-      : '';
+    // 2026-08-21: строка «Якорь — периферийная сущность» снята с карточки
+    // по решению пользователя (decluttering) — buildMinorityAnchorWarning()
+    // и данные is_minority_anchor/anchor_entity_share остаются нетронутыми
+    // (ADR-017, scripts/synthesizer.py) для будущих мест использования,
+    // просто больше не рендерятся здесь.
 
     const item = document.createElement('div');
     item.className = 'dash-narrative-item ' + dirCls;
     item.dataset.clusterKey = key;
-    if (idx > 0) item.style.borderTop = '1px solid var(--line)';
 
     item.innerHTML =
         '<div class="dash-narrative-cluster">'
@@ -2852,7 +2866,6 @@ function renderDashboard() {
       + renderAnchorFieldsHtml(anchor)
       + (warnings.length ? '<div style="color:var(--red);font-size:10px;font-weight:600;margin-bottom:6px">' + warnings.join(' · ') + '</div>' : '')
       + (tension ? '<div class="dash-narrative-tension" style="border-left-color:' + phaseInfo.color + '">' + highlightVs(highlightEntities(tension)) + '</div>' : '')
-      + minorityWarningHtml
       + '<div class="dash-narrative-macro">' + highlightEntities(macroText) + '</div>'
       + renderAnchorLinksHtml(anchor)
       + renderAnchorEntitiesHtml(anchor)
@@ -2865,7 +2878,10 @@ function renderDashboard() {
       +   '<span class="dsc-neu">⚪ ' + (cl.neu||0) + '</span>'
       + '</div>'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)">'
-      +   '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '<div style="display:flex;align-items:center;gap:8px">'
+      +     '<span class="dash-narrative-rank">#' + String(idx + 1).padStart(2, '0') + '</span>'
+      +     '<div class="dash-narrative-link" style="margin:0;padding:0;border:none" data-cl="' + key + '">СМОТРЕТЬ В ДАЙДЖЕСТЕ <span>→</span></div>'
+      +   '</div>'
       +   '<div class="dash-narrative-score' + (isHot ? ' hot' : '') + '" data-bd="' + bdId + '">'
       +     '<span class="dash-narrative-strength strength-' + sanitize(synthesis.strength||'moderate') + '">' + sanitize((synthesis.strength||'').toUpperCase()) + '</span>'
       +     (isHot ? '🔥 ' : '') + 'score: ' + score.total + ' ▾'
@@ -2884,6 +2900,11 @@ function renderDashboard() {
 
     item.querySelector('[data-cl]').addEventListener('click', function() { goToDigest(this.dataset.cl); });
     item.querySelector('[data-bd]').addEventListener('click', function() { document.getElementById(this.dataset.bd).classList.toggle('open'); });
+    item.querySelectorAll('.dash-anchor-chip[data-ids]').forEach(function(chipEl) {
+      chipEl.addEventListener('click', function() {
+        filterDigestByIds(JSON.parse(this.dataset.ids), this.dataset.label + ' · ' + anchor.id);
+      });
+    });
     return item;
   }
 
@@ -3021,9 +3042,26 @@ function refreshExploreTiles() {
 }
 
 function goToDigest(clusterKey) {
+  sigIdFilter = null;
   sigFilter = clusterKey || 'all';
   showTab('market', null);
   scrollAppToTop();
+}
+
+// Клик по чипе связи (confirms/contradicts/context_chain) на карточке
+// нарратива ОБЗОРА — ведёт в ДАЙДЖЕСТ, но фильтрует не по кластеру
+// (goToDigest()), а по явному списку id из links.*, см. renderAnchorLinksHtml().
+function filterDigestByIds(ids, label) {
+  sigIdFilter = ids || [];
+  sigIdFilterLabel = label || '';
+  showTab('market', null);
+  scrollAppToTop();
+}
+
+function clearSigIdFilter() {
+  sigIdFilter = null;
+  sigIdFilterLabel = '';
+  renderSignals();
 }
 
 // 2026-08-18: найдено пользователем — клик по свёрнутой строке "ещё

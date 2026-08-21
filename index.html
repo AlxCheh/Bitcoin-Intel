@@ -2150,10 +2150,24 @@ header {
 .dash-anchor-field-value.amber { color: var(--btc); }
 
 .dash-anchor-links { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; }
+.dash-anchor-chip { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; letter-spacing: 0.03em; cursor: pointer; transition: background 0.12s; }
+.dash-anchor-chip:hover { background: var(--bg3); }
 .dash-anchor-chip.confirms { border-color: var(--grn); color: var(--grn); }
 .dash-anchor-chip.contradicts { border-color: var(--red); color: var(--red); }
 .dash-anchor-chip.context { border-color: var(--line2); color: var(--dim); }
+
+.sig-id-filter-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 11px; color: var(--txt);
+  background: var(--bg2); border: 1px solid var(--btc);
+  padding: 8px 12px; margin-bottom: 10px;
+}
+.sig-id-filter-banner button {
+  font-family: var(--mono); font-size: 10px; color: var(--dim);
+  background: none; border: 1px solid var(--line2); padding: 3px 8px;
+  cursor: pointer;
+}
+.sig-id-filter-banner button:hover { color: var(--txt); border-color: var(--dim); }
 
 .dash-anchor-entities { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
 .dash-anchor-entity { font-family: var(--mono); font-size: 9.5px; padding: 2px 7px; background: var(--bg3); color: var(--txt); border: 1px solid var(--line2); }
@@ -2175,16 +2189,6 @@ header {
   vertical-align: middle;
   margin: 0 2px;
 }
-.dash-narrative-minority-anchor {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-style: italic;
-  color: var(--amber);
-  line-height: 1.4;
-  margin: -3px 0 8px;
-  cursor: help;
-}
-
 /* AD-4 / BAMS Р8: альтернативный сценарий — показывается только когда
    confidence_tier != 'high'. Приглушённый намеренно: это оговорка к
    основному нарративу, не конкурент tension за внимание читателя. */
@@ -4638,7 +4642,7 @@ header {
   </div>
 </section>
 
-<script src="js/app-main.js?v=953ad6703b"></script>
+<script src="js/app-main.js?v=28cbda21cf"></script>
 
 </div><!-- /.app-scroll -->
 

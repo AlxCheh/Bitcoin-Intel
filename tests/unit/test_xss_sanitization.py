@@ -350,9 +350,9 @@ SANITIZE_RATCHET_BASELINE = {
     # вместе с ней ушло её вхождение этого числового счётчика
     "cl.signals.length": 2,
     "rest.length": 1,
-    "(dir.neg||0)": 1,
-    "(dir.neu||0.1)": 1,
-    "(dir.pos||0)": 1,
+    # (dir.neg||0)/(dir.neu||0.1)/(dir.pos||0): удалены 2026-08-21 — были
+    # только в мёртвой функции makeBar() (renderSignals()), нигде не
+    # вызывавшейся; убрана при рефакторинге под id-фильтр ДАЙДЖЕСТА
     "SIGNALS.length": 1,
     "counts.neg": 3,
     "counts.neu": 2,
@@ -361,7 +361,13 @@ SANITIZE_RATCHET_BASELINE = {
     "filteredClosed.length": 1,
     "first.cat.pct": 3,
     "h.rank": 1,
-    "ids.length": 1,
+    # ids.length: 1 → 2 (2026-08-21) — новое вхождение в renderAnchorLinksHtml()
+    # (счётчик чипы confirms/contradicts/context_chain, кликабельной для
+    # фильтрации ДАЙДЖЕСТА по id) — число, sanitize избыточен
+    "ids.length": 2,
+    # sigIdFilter.length (2026-08-21) — баннер точечного id-фильтра ДАЙДЖЕСТА
+    # (renderSignals()), длина массива id — число
+    "sigIdFilter.length": 1,
     "last.cat.pct": 2,
     "peak.cat.pct": 1,
     "r.n": 1,
@@ -383,12 +389,6 @@ SANITIZE_RATCHET_BASELINE = {
     "groupItems.length": 1,
     "filteredCompact.length": 1,
     "v.pct": 1,
-    # 2026-08-19 — renderAnchorLinksHtml() (Задача 4, редизайн терминала):
-    # чипы confirms/contradicts/context_chain показывают только счётчик
-    # массива (l.confirms.length и т.п.) — заведомо числовой вывод.
-    "l.confirms.length": 1,
-    "l.contradicts.length": 1,
-    "l.context_chain.length": 1,
     # ── тернарники с литеральными исходами (оба исхода — строки в коде) ──
     "(freshness.stale ? 'rgba(194,96,96,.4)' : 'rgba(122,139,160,.35)')": 1,
     "(freshness.stale ? 'var(--red)' : 'var(--dim)')": 1,

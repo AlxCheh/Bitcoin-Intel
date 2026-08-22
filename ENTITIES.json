@@ -2110,7 +2110,10 @@
       "signal_refs": [
         "INF-2021-0804-001"
       ],
-      "last_updated": "2026-08-22"
+      "last_updated": "2026-08-22",
+      "theory_refs": [
+        "theory-chain-privacy"
+      ]
     }
   ]
 }

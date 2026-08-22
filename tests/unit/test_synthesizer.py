@@ -649,6 +649,7 @@ def test_velocity_aware_staleness_on_real_clusters_matches_empirical_finding(mon
     # исключён из проверки.
     naturally_aged_since_test_written = {
         "layer2_programmability",  # найдено 2026-08-06, tension winner 61+ дней без новых сигналов в кластере
+        "lightning_payments",  # найдено 2026-08-22, tension winner (INF-2026-0715-001) 61+ дней без новых сигналов в кластере
     }
 
     for cluster, group in by_cluster.items():

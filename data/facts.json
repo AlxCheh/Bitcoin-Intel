@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-08-18",
+  "generated_at": "2026-08-22",
   "facts": {
     "bita_fund.aum": {
       "value": 59240000,
@@ -64,10 +64,10 @@
       "signal_id": "STR-2026-0707-002"
     },
     "strategy.btc_holdings": {
-      "value": 842138,
+      "value": 840447,
       "unit": "BTC",
-      "as_of": "2026-07-31",
-      "signal_id": "STR-2026-0731-002"
+      "as_of": "2026-08-21",
+      "signal_id": "STR-2026-0821-001"
     },
     "strategy.btc_yield_ytd": {
       "value": 3.5,

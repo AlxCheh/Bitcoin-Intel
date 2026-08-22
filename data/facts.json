@@ -105,6 +105,12 @@
       "as_of": "2026-07-03",
       "signal_id": "STR-2026-0703-001"
     },
+    "trump_media.btc_holdings": {
+      "value": 14139,
+      "unit": "BTC",
+      "as_of": "2026-07-31",
+      "signal_id": "STR-2026-0811-001"
+    },
     "twenty_one_capital.btc_holdings": {
       "value": 43514,
       "unit": "BTC",

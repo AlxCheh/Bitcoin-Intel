@@ -54,6 +54,7 @@ TREASURY_NAME_TO_FACT_KEY = {
     "Strive": "strive.btc_holdings",
     "OranjeBTC": "oranjebtc.btc_holdings",
     "SpaceX": "spacex.btc_holdings",
+    "Trump Media & Technology Group Corp.": "trump_media.btc_holdings",
 }
 
 

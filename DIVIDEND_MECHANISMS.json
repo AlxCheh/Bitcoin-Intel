@@ -1,0 +1,177 @@
+{
+  "meta": {
+    "description": "Структурный справочник дивидендных/доходных механизмов ценных бумаг, выпущенных корпоративными держателями BTC под свой резерв. Дополняет REVENUE_ENGINES.json (там — эволюция и нарратив одного механизма во времени, здесь — снимок условий по каждой бумаге сразу, удобный для сверки старшинства/ставок между собой).",
+    "source_note": "Каждый факт восходит к signal_refs в signals.json — не заполняется из общих знаний. Где факт выведен из сопоставления нескольких полей источника (напр. численный seniority_rank из качественных формулировок 'высший приоритет'/'второй по старшинству'), это явно помечено в derivation_note.",
+    "last_updated": "2026-08-22",
+    "cross_references": {
+      "REVENUE_ENGINES.json": ["strategy_strc"],
+      "ENTITIES.json": ["strategy"]
+    }
+  },
+  "entities": [
+    {
+      "entity_id": "strategy",
+      "entity_name": "Strategy (MSTR)",
+      "securities": [
+        {
+          "ticker": "MSTR",
+          "security_type": "common_stock",
+          "dividend": {
+            "pays_dividend": false
+          },
+          "par_value": null,
+          "perpetual": null,
+          "convertible_into": null,
+          "direct_btc_claim": false,
+          "seniority_rank": 6,
+          "seniority_note": "низший приоритет — остаточные claims после долга и всех привилегированных выпусков",
+          "notes": "Волатильность-амплификатор: на просадке 25 июня падала быстрее BTC (−36.5% за месяц против −18.5% у BTC за тот же период) — специфический риск модели, не только цена BTC.",
+          "signal_refs": ["STR-2026-0625-001", "STR-2026-0820-001"]
+        },
+        {
+          "ticker": "STRC",
+          "full_name": "Variable Rate Series A Perpetual Stretch Preferred Stock",
+          "security_type": "preferred_stock",
+          "dividend": {
+            "pays_dividend": true,
+            "current_rate_pct": 12.0,
+            "structure": "variable",
+            "cumulative": true,
+            "payment_frequency": "ежемесячно",
+            "rate_adjustment_note": "ставка пересматривается советом директоров с целью удержания цены акции около номинала",
+            "rate_history": [
+              { "rate_pct": 11.5, "as_of": "2026-06-18", "signal_ref": "STR-2026-0618-001" },
+              { "rate_pct": 12.0, "effective_from": "2026-07-01", "signal_ref": "STR-2026-0629-001" }
+            ]
+          },
+          "par_value": { "value": 100, "currency": "USD" },
+          "perpetual": true,
+          "convertible_into": null,
+          "direct_btc_claim": false,
+          "seniority_rank": 1,
+          "seniority_note": "высший приоритет среди привилегированных выпусков",
+          "collateral_note": "Описывалась как обеспеченная BTC-залогом 4-5x от суммы эмиссии и кэш-резервом на 2-3 года выплат (STR-2026-0622-007). Официальный дисклеймер компании от 20 августа (STR-2026-0820-001) уточняет: юридически это unsecured equity — BTC не заложен под конкретных держателей, доступен для покрытия претензий по всей структуре.",
+          "buyback_program": {
+            "authorized_usd": 1000000000,
+            "policy": "Регулярные покупки на открытом рынке, пока цена ниже номинала $100; темп растёт при более глубоком дисконте, снижается по мере приближения к номиналу. Новые выпуски ниже $100 не производятся.",
+            "executed": [
+              { "date": "2026-07-27", "shares": 288930, "amount_usd": 25000000, "avg_price_usd": 86.52, "signal_ref": "STR-2026-0727-001" },
+              { "date": "2026-07-31", "amount_usd": 81000000, "signal_ref": "STR-2026-0731-002" }
+            ]
+          },
+          "notes": "Токенизирована в DeFi (Saturn Credit, Apyx/apxUSD, Buck — на базе Pendle) как прозрачный RWA-инструмент (STR-2026-0622-006). Не использовалась для накопления BTC с середины мая (STR-2026-0628-001).",
+          "signal_refs": [
+            "STR-2026-0618-001", "STR-2026-0622-003", "STR-2026-0622-006", "STR-2026-0622-007",
+            "STR-2026-0625-001", "STR-2026-0628-001", "STR-2026-0629-001", "STR-2026-0706-001",
+            "STR-2026-0727-001", "STR-2026-0731-002", "STR-2026-0805-001", "STR-2026-0820-001"
+          ]
+        },
+        {
+          "ticker": "STRF",
+          "security_type": "preferred_stock",
+          "dividend": {
+            "pays_dividend": true,
+            "current_rate_pct": 10.0,
+            "structure": "fixed",
+            "cumulative": true,
+            "payment_frequency": "ежеквартально"
+          },
+          "par_value": { "value": 100, "currency": "USD" },
+          "perpetual": true,
+          "convertible_into": null,
+          "direct_btc_claim": false,
+          "seniority_rank": 2,
+          "seniority_note": "второй по старшинству — ниже STRC, выше STRK/STRD",
+          "signal_refs": ["STR-2026-0706-001", "STR-2026-0820-001"]
+        },
+        {
+          "ticker": "STRK",
+          "security_type": "preferred_stock",
+          "dividend": {
+            "pays_dividend": true,
+            "current_rate_pct": 8.0,
+            "structure": "fixed",
+            "cumulative": true,
+            "payment_frequency": "ежеквартально"
+          },
+          "par_value": null,
+          "perpetual": true,
+          "convertible_into": { "target": "MSTR", "ratio": "0.1 акции MSTR за 1 акцию STRK" },
+          "direct_btc_claim": false,
+          "seniority_rank": 3,
+          "seniority_note": "ниже STRF; единственный конвертируемый выпуск",
+          "derivation_note": "Собственный ранг STRK не назван явно в data STR-2026-0820-001 — выведен из caveat/disputed_facts того же сигнала (STRE указывается relativно STRK), в сочетании с общим порядком STRC>STRF>...>STRD.",
+          "signal_refs": ["STR-2026-0706-001", "STR-2026-0820-001"]
+        },
+        {
+          "ticker": "STRD",
+          "security_type": "preferred_stock",
+          "dividend": {
+            "pays_dividend": true,
+            "current_rate_pct": 10.0,
+            "structure": "fixed",
+            "cumulative": false,
+            "payment_frequency": "ежеквартально",
+            "non_cumulative_note": "пропущенные выплаты не накапливаются как arrears — в отличие от STRC/STRF/STRK/STRE"
+          },
+          "par_value": null,
+          "perpetual": true,
+          "convertible_into": null,
+          "direct_btc_claim": false,
+          "seniority_rank": 5,
+          "seniority_note": "низший приоритет среди привилегированных выпусков",
+          "signal_refs": ["STR-2026-0706-001", "STR-2026-0820-001"]
+        },
+        {
+          "ticker": "STRE",
+          "security_type": "preferred_stock",
+          "dividend": {
+            "pays_dividend": true,
+            "current_rate_pct": 10.0,
+            "structure": "fixed",
+            "cumulative": true,
+            "payment_frequency": "ежеквартально"
+          },
+          "par_value": { "value": 100, "currency": "EUR" },
+          "perpetual": true,
+          "convertible_into": null,
+          "direct_btc_claim": false,
+          "seniority_rank": null,
+          "seniority_note": "СПОРНО между источниками — см. disputed_facts ниже. Единственный не-долларовый выпуск.",
+          "signal_refs": ["STR-2026-0706-001", "STR-2026-0820-001"]
+        }
+      ]
+    }
+  ],
+  "capital_stack_order": {
+    "description": "Реконструированный порядок старшинства сверху вниз (1 = высший приоритет claims). Ранг 4 намеренно пропущен в seniority_rank остальных бумаг — это место либо занимает STRE (variant_cryptonews_net), либо остаётся не более чем зазором (variant_news_bitcoin_com, где STRE делит ранг 2 со STRF). STRE не имеет однозначного места — см. disputed_facts.",
+    "undisputed_order": ["STRC", "STRF", "STRK", "STRD"],
+    "MSTR_position": "ниже всех привилегированных выпусков (residual claims)",
+    "STRE_variants": {
+      "variant_news_bitcoin_com": "наравне со STRF (между STRC и STRK)",
+      "variant_cryptonews_net": "между STRK и STRD"
+    }
+  },
+  "disputed_facts": [
+    {
+      "entity_id": "strategy",
+      "ticker": "STRE",
+      "claim": "место STRE в иерархии старшинства привилегированных выпусков",
+      "sources": [
+        { "source": "news.bitcoin.com", "value": "наравне со STRF, выше STRK/STRD" },
+        { "source": "cryptonews.net", "value": "между STRK и STRD" }
+      ],
+      "signal_ref": "STR-2026-0820-001"
+    }
+  ],
+  "common_disclosure": {
+    "source": "Инвесторские материалы Strategy, 20 августа 2026",
+    "direct_quote": "None gives holders direct ownership of Strategy's bitcoin",
+    "key_risks": [
+      "Привилегированные акции — unsecured equity, BTC доступен для покрытия претензий по всей структуре, не заложен под конкретных держателей",
+      "Выплаты зависят от решения совета директоров и наличия legally available funds — не гарантированы контрактно",
+      "BTC не генерирует денежный поток — дивиденды финансируются из USD-резерва, продаж BTC или дилюции акций"
+    ],
+    "signal_ref": "STR-2026-0820-001"
+  }
+}

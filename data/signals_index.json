@@ -94,6 +94,15 @@
       "tension": "Провал self-custody даёт институциональному лагерю именной повод звать инвесторов в ETF (ARK, Amicus) vs производители кошельков (Tangem) настаивают: дело в инженерии Coldcard, не в идее self-custody"
     },
     {
+      "id": "INF-2026-0731-001",
+      "date": "2026-07-31",
+      "cluster": "mining_operations",
+      "dir": "neg",
+      "narrative_role": "complication",
+      "signal": "SBI Crypto полностью закрыла биткоин-пул 31 июля — Foundry, AntPool и F2Pool держат свыше 60% сети третью неделю подряд, судьба ушедшего хешрейта SBI не прослеживается",
+      "tension": "Foundry, AntPool и F2Pool держат свыше 60% блоков сети третью неделю подряд, не разовый снимок vs куда переместился хешрейт закрывшегося пула SBI, данные не показывают"
+    },
+    {
       "id": "STR-2026-0730-001",
       "date": "2026-07-30",
       "cluster": "btc_treasury_competition",

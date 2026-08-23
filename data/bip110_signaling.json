@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-08-23T03:50:36Z",
+  "updated_at": "2026-08-23T06:40:52Z",
   "source": "mempool.space (посчитано самостоятельно из nVersion, не сторонний агрегатор)",
   "current": {
     "period": 478,
-    "tip_height": 963669,
+    "tip_height": 963692,
     "period_start_height": 963648,
-    "blocks_counted": 22,
+    "blocks_counted": 45,
     "period_size": 2016,
     "signaling_blocks": 0,
     "signal_pct": 0.0,

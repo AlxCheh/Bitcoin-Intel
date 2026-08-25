@@ -5884,7 +5884,8 @@
           "unit": "USD",
           "as_of": "2026-08-24"
         }
-      ]
+      ],
+      "preset_question": "Какой USD Reserve у Strategy?"
     }
   ]
 }

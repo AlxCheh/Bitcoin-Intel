@@ -5027,22 +5027,53 @@ function levenshtein(a, b) {
   return prev[n];
 }
 
+// Чистые легально-корпоративные суффиксы — не несут различительной силы для
+// сопоставления сущности (в отличие от 'wallet'/'platforms'/'holdings',
+// которые часто часть бренда и остаются в наборе токенов кандидата).
+const ENTITY_MATCH_BOILERPLATE = new Set(['corp', 'inc', 'ltd', 'llc', 'co']);
+
+// Разбивает строку кандидата (id или name) на набор различительных токенов
+// для матчинга по множеству, а не по одному токену ввода против ВСЕЙ строки
+// целиком (см. docs/BACKLOG.md, «findMatchingEntity() не матчит многословные
+// имена сущностей» — 5 подтверждённых случаев: mara_holdings,
+// twenty_one_capital, trump_media, samourai_wallet, riot_platforms).
+function entityMatchTokens(candidateStr) {
+  return (candidateStr || '')
+    .toLowerCase()
+    .split(/[^a-zа-яё0-9]+/)
+    .filter(t => t.length > 1 && !ENTITY_MATCH_BOILERPLATE.has(t));
+}
+
 function findMatchingEntity(inputTokens) {
-  let best = null, bestDist = Infinity;
+  let best = null, bestRatio = 0, bestMatchedCount = 0, bestDist = Infinity;
+  const MIN_RATIO = 0.5; // минимум половина различительных токенов кандидата должна найтись во вводе
   for (const e of (ENTITIES || [])) {
-    const candidates = [
+    const candidateStrings = [
       (e.id || '').toLowerCase(),
       (e.name || '').replace(/\s*\(.*?\)\s*/g, '').toLowerCase()
     ].filter(Boolean);
-    for (const token of inputTokens) {
-      for (const cand of candidates) {
-        if (Math.abs(token.length - cand.length) > 3) continue; // дёшево отсекаем заведомо далёкие пары
-        const dist = levenshtein(token, cand);
-        const threshold = Math.max(1, Math.floor(cand.length * 0.25)); // терпимость ~25% длины слова
-        if (dist <= threshold && dist < bestDist) {
-          bestDist = dist;
-          best = e;
+    for (const candStr of candidateStrings) {
+      const candTokens = entityMatchTokens(candStr);
+      if (candTokens.length === 0) continue; // защита от деления на 0 / пустого совпадения
+      let matched = 0, sumDist = 0;
+      for (const candToken of candTokens) {
+        let tokenBestDist = Infinity;
+        for (const inputToken of inputTokens) {
+          if (Math.abs(inputToken.length - candToken.length) > 3) continue; // дёшево отсекаем заведомо далёкие пары
+          const dist = levenshtein(inputToken, candToken);
+          const threshold = Math.max(1, Math.floor(candToken.length * 0.25)); // терпимость ~25% длины слова
+          if (dist <= threshold && dist < tokenBestDist) tokenBestDist = dist;
         }
+        if (tokenBestDist < Infinity) { matched++; sumDist += tokenBestDist; }
+      }
+      const ratio = matched / candTokens.length;
+      if (ratio < MIN_RATIO) continue;
+      // Лучший кандидат: выше ratio → больше абсолютных совпадений → меньше суммарной дистанции.
+      const better = ratio > bestRatio
+        || (ratio === bestRatio && matched > bestMatchedCount)
+        || (ratio === bestRatio && matched === bestMatchedCount && sumDist < bestDist);
+      if (better) {
+        best = e; bestRatio = ratio; bestMatchedCount = matched; bestDist = sumDist;
       }
     }
   }

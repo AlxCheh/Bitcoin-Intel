@@ -81,11 +81,17 @@
       "as_of": "2026-08-09",
       "signal_id": "STR-2026-0809-001"
     },
-    "strategy.usd_reserve": {
-      "value": 4000000000,
+    "strategy.usd_cash": {
+      "value": 1590000000,
       "unit": "USD",
-      "as_of": "2026-07-31",
-      "signal_id": "STR-2026-0731-002"
+      "as_of": "2026-08-24",
+      "signal_id": "STR-2026-0824-001"
+    },
+    "strategy.usd_reserve": {
+      "value": 5100000000,
+      "unit": "USD",
+      "as_of": "2026-08-24",
+      "signal_id": "STR-2026-0824-001"
     },
     "strive.btc_holdings": {
       "value": 20000,

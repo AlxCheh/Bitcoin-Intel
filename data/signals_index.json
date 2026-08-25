@@ -4,6 +4,15 @@
   "_purpose": "Панорамное чтение корпуса целиком без риска исчерпать контекст; для точечной работы по конкретному сигналу использовать grep по signals.json",
   "signals": [
     {
+      "id": "STR-2026-0824-001",
+      "date": "2026-08-24",
+      "cluster": "strategy_model_stress",
+      "dir": "pos",
+      "narrative_role": "complication",
+      "signal": "Strategy: $1,59 млрд из свежего MSTR-размещения пошли не в USD Reserve (+$300 млн, до $5,1 млрд), а в новый резервный пул USD Cash",
+      "tension": "Итоговая цифра USD Reserve $5,1 млрд верна vs $1,59 млрд из той же выручки MSTR пошли не в него, а в новый отдельный пул USD Cash, впервые учреждённый тем же 8-K"
+    },
+    {
       "id": "STR-2026-0822-001",
       "date": "2026-08-22",
       "cluster": "btc_treasury_competition",

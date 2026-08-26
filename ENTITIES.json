@@ -2140,6 +2140,28 @@
         "STR-2026-0803-001"
       ],
       "last_updated": "2026-08-22"
+    },
+    {
+      "id": "lombard_finance",
+      "name": "Lombard Finance",
+      "type": "protocol",
+      "status": "active",
+      "summary": "Крупнейший по доле рынка эмитент доходного BTC-токена LBTC — доходность перевели с Babylon-стейкинга на покрытые коллы под управлением Bitwise.",
+      "profile": {
+        "what": "BTC-финансовый протокол (осн. 2024): LBTC (доходный BTC), BTC.b, Bitcoin Smart Accounts, Bitcoin Earn.",
+        "metrics": [
+          "70%+ доли рынка среди доходных BTC-инструментов; $800 млн+ BTC под управлением (vs заявленных ранее $3 млрд+ исторически заведённых — разрыв не объяснён)",
+          "LBTC: цель 2,5% чистой годовой доходности в BTC, покрытые коллы Bitwise Investment Manager с 17 августа 2026 (было — Babylon-стейкинг)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Партнёрство с Bitwise по Bitcoin Smart Accounts с марта 2026 — переход LBTC на опционную доходность продолжает, не начинает это сотрудничество."
+      },
+      "signal_refs": [
+        "INF-2026-0817-001"
+      ],
+      "last_updated": "2026-08-25"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26T07:37:53Z",
+  "updated_at": "2026-08-27T17:58:45Z",
   "source": "blockchain.info/balance (балансы) + data/known_addresses.json (состав выборки)",
   "labels_source": "data/known_addresses.json (курируется вручную)",
   "caveat": "ВЫБОРКА ОГРАНИЧЕНА КУРИРУЕМЫМ СПИСКОМ: это крупнейшие среди 38 отслеживаемых адресов, а НЕ рейтинг богатейших адресов сети — адрес, не попавший в data/known_addresses.json, здесь не появится, каким бы крупным он ни был. Кроме того это сырые адреса, не сущности: один держатель может владеть несколькими адресами; биржевой холодный кошелёк считается наравне с частным китом.",
@@ -10,7 +10,7 @@
       "address": "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo",
       "label": "Binance-coldwallet",
       "category": "exchange",
-      "balance_btc": 248597.59222062,
+      "balance_btc": 248597.59222608,
       "pct_of_supply": 1.183798
     },
     {
@@ -18,7 +18,7 @@
       "address": "3M219KR5vEneNb47ewrPfWyb5jQ2DjxRP6",
       "label": "Binance-coldwallet",
       "category": "exchange",
-      "balance_btc": 214225.45805974,
+      "balance_btc": 214225.45807066,
       "pct_of_supply": 1.020121
     },
     {
@@ -66,8 +66,8 @@
       "address": "1Ay8vMC7R1UbyCCZRVULMV7iQpHSAbguJP",
       "label": "Mr.100",
       "category": "unknown",
-      "balance_btc": 73681.38570244,
-      "pct_of_supply": 0.350864
+      "balance_btc": 73706.46650491,
+      "pct_of_supply": 0.350983
     },
     {
       "rank": 9,

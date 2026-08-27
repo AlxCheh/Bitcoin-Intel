@@ -1246,6 +1246,15 @@
       "tension": "BIP9-порог сигналинга майнеров застрял на ~30% почти год при пороге 95% (Bitmain держал против SegWit) vs угроза UASF BIP148 без снижения самого порога вынудила Bitmain засигналить за дни до дедлайна"
     },
     {
+      "id": "INF-2017-0824-001",
+      "date": "2017-08-24",
+      "cluster": "lightning_payments",
+      "dir": "pos",
+      "narrative_role": "background",
+      "signal": "Первая SegWit-транзакция: исправление transaction malleability дало Bitcoin техническую базу для Lightning Network — на годы раньше, чем сеть реально заработала",
+      "tension": "SegWit сам по себе дал скромный и медленный прирост пропускной способности и снижение комиссий vs его главная выгода — исправление transaction malleability, техническое условие для Lightning — реализовалась только годы спустя"
+    },
+    {
       "id": "NAR-2026-0720-001",
       "date": "2015-08-15",
       "cluster": "bitcoin_governance_debate",

@@ -253,12 +253,17 @@ def test_trezor_entity_and_connections_referentially_intact():
     (исторический факт основания 29 июля 2014) - закрывает пробел,
     найденный при курировании audit_keywords (theory-passphrase уже
     ссылалась на "Model T" по имени, но сущности не существовало).
-    Не из сигнала - signal_refs пустой намеренно, честно.
+    На момент создания - не из сигнала, signal_refs был пустой намеренно, честно.
+
+    2026-08-26: INF-2026-0817-002 (утечка данных заказов Trezor через
+    ShipMonk, август 2026) стал первым реальным signal_ref сущности —
+    легитимная эволюция, не регрессия найденного выше факта: сущность
+    может начать жизнь без сигнала и получить его позже.
     """
     entities = {e["id"]: e for e in json.loads((REPO_ROOT / "ENTITIES.json").read_text(encoding="utf-8"))["entities"]}
     assert "trezor" in entities
     trezor = entities["trezor"]
-    assert trezor["signal_refs"] == []  # не из сигнала, честно пусто, не забыто
+    assert trezor["signal_refs"] == ["INF-2026-0817-002"]  # первый реальный signal_ref, не забыт и не пуст
     assert "theory-passphrase" in trezor["theory_refs"]
     assert "psbt-partially-signed-bitcoin-transaction" in trezor["function_refs"]
 

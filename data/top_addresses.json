@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27T17:58:45Z",
+  "updated_at": "2026-08-28T19:08:59Z",
   "source": "blockchain.info/balance (балансы) + data/known_addresses.json (состав выборки)",
   "labels_source": "data/known_addresses.json (курируется вручную)",
   "caveat": "ВЫБОРКА ОГРАНИЧЕНА КУРИРУЕМЫМ СПИСКОМ: это крупнейшие среди 38 отслеживаемых адресов, а НЕ рейтинг богатейших адресов сети — адрес, не попавший в data/known_addresses.json, здесь не появится, каким бы крупным он ни был. Кроме того это сырые адреса, не сущности: один держатель может владеть несколькими адресами; биржевой холодный кошелёк считается наравне с частным китом.",
@@ -34,7 +34,7 @@
       "address": "bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8tlqmgrpmv24sq90ecnvqqjwvw97",
       "label": "Bitfinex-coldwallet",
       "category": "exchange",
-      "balance_btc": 130010.07902736,
+      "balance_btc": 130010.07903066,
       "pct_of_supply": 0.619096
     },
     {
@@ -42,7 +42,7 @@
       "address": "bc1qjasf9z3h7w3jspkhtgatgpyvvzgpa2wwd2lr0eh5tx44reyn2k7sfc27a4",
       "label": "Tether",
       "category": "exchange",
-      "balance_btc": 96932.4068271,
+      "balance_btc": 96932.4068304,
       "pct_of_supply": 0.461583
     },
     {
@@ -58,7 +58,7 @@
       "address": "1FeexV6bAHb8ybZjqQMjJrcCrHGW9sb6uF",
       "label": "MtGox-Hack",
       "category": "lost_confiscated",
-      "balance_btc": 79957.26868453,
+      "balance_btc": 79957.26868999,
       "pct_of_supply": 0.380749
     },
     {
@@ -66,15 +66,15 @@
       "address": "1Ay8vMC7R1UbyCCZRVULMV7iQpHSAbguJP",
       "label": "Mr.100",
       "category": "unknown",
-      "balance_btc": 73706.46650491,
-      "pct_of_supply": 0.350983
+      "balance_btc": 73945.2720338,
+      "pct_of_supply": 0.35212
     },
     {
       "rank": 9,
       "address": "bc1qa5wkgaew2dkv56kfvj49j0av5nml45x9ek9hz6",
       "label": "SilkRoad-FBI-Confiscated",
       "category": "lost_confiscated",
-      "balance_btc": 69370.1845866,
+      "balance_btc": 69370.1845899,
       "pct_of_supply": 0.330334
     },
     {
@@ -82,7 +82,7 @@
       "address": "3LYJfcfHPXYJreMsASk2jkn69LWEYKzexb",
       "label": "Binance-BTCB-Reserve",
       "category": "exchange",
-      "balance_btc": 68200.00689471,
+      "balance_btc": 68200.00690011,
       "pct_of_supply": 0.324762
     }
   ]

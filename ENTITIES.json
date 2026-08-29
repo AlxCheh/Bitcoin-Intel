@@ -1556,22 +1556,24 @@
       "name": "Blockstream",
       "type": "infrastructure",
       "status": "active",
-      "summary": "Разработчик Liquid Network и Bitcoin-инфраструктуры — учредитель Bitcoin Security Consortium",
+      "summary": "Разработчик Liquid Network, Blockstream App/Jade и другой Bitcoin-инфраструктуры — учредитель Bitcoin Security Consortium.",
       "profile": {
         "what": "Компания-разработчик, стоящая за Liquid Network (федеративный сайдчейн) и другой Bitcoin-инфраструктурой",
         "metrics": [
-          "Соучредитель Bitcoin Security Consortium (июль 2026)"
+          "Соучредитель Bitcoin Security Consortium (июль 2026)",
+          "24 авг. 2026: Blockstream App 3.5.0 (десктоп) — Lightning в бете, Jade QR Connect (полностью офлайн-подпись), host-энтропия как доп. слой защиты RNG"
         ],
         "links_to": [
           "bitcoin",
           "liquid_network"
         ],
-        "notable": "Ранее (INF-2026-0722-002) запустила 0-conf API для видимости мемпула Liquid — отдельная сущность liquid_network охватывает сам протокол, эта — компанию-разработчика"
+        "notable": "Ранее (INF-2026-0722-002) запустила 0-conf API для видимости мемпула Liquid — отдельная сущность liquid_network охватывает сам протокол, эта — компанию-разработчика Также владеет продуктовой линейкой Blockstream App (софт-кошелёк) и Jade (аппаратный кошелёк) — INF-2026-0824-002."
       },
       "signal_refs": [
-        "INF-2026-0723-002"
+        "INF-2026-0723-002",
+        "INF-2026-0824-002"
       ],
-      "last_updated": "2026-07-23"
+      "last_updated": "2026-08-27"
     },
     {
       "id": "fidelity_digital_assets",

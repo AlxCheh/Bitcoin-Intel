@@ -1,0 +1,77 @@
+{
+  "_generated_by": "РУЧНОЙ ФАЙЛ — правила курируются человеком, не генерируются скриптом",
+  "_purpose": "Декларативные правила для scripts/detect_pipeline_events.py: какие пороги в live-пайплайнах стоит замечать. Детектор НЕ создаёт сигналы — он только помечает, что произошло нечто, заслуживающее разбора по Шагам 1-8. См. docs/ADR-019.",
+  "_schema": {
+    "id": "уникальный snake_case идентификатор правила",
+    "source_file": "путь к JSON-файлу пайплайна от корня репозитория",
+    "value_path": "точечный путь к отслеживаемому числу внутри этого файла",
+    "condition": "crosses_above | crosses_below | pct_change_exceeds | changes_by_at_least",
+    "threshold": "число — константа для сравнения (взаимоисключимо с threshold_path)",
+    "threshold_path": "точечный путь к другому полю ТОГО ЖЕ файла — для порогов, которые сами меняются",
+    "description": "что именно означает срабатывание, человеческим языком",
+    "why_it_matters": "почему это заслуживает разбора — контекст для того, кто будет читать событие",
+    "suggested_cluster": "подсказка кластера; НЕ обязательство — кластер определяется Шагом 4 как обычно"
+  },
+  "rules": [
+    {
+      "id": "bip110_voluntary_deadline_passed",
+      "source_file": "data/bip110_signaling.json",
+      "value_path": "current.tip_height",
+      "condition": "crosses_above",
+      "threshold_path": "current.deadline_block",
+      "description": "Высота цепи превысила deadline_block BIP-110 — добровольное окно сигналинга закрыто",
+      "why_it_matters": "NAR-2026-0803-001 прямо предсказывал переход в обязательную фазу version-бита при недостаточной поддержке; факт прохождения дедлайна — это тот самый исход, который сигнал называл ожидаемым, и его стоит зафиксировать отдельно",
+      "suggested_cluster": "bitcoin_governance_debate"
+    },
+    {
+      "id": "bip110_signaling_reaches_activation_threshold",
+      "source_file": "data/bip110_signaling.json",
+      "value_path": "current.signal_pct",
+      "condition": "crosses_above",
+      "threshold_path": "current.threshold_pct",
+      "description": "Сигналинг BIP-110 впервые достиг порога активации (55%)",
+      "why_it_matters": "Обратный исход к NAR-2026-0803-001: поддержка майнеров, стоявшая на 0,89%, дошла до порога обычной активации. Это событие потенциально закрывающее (narrative_role: resolution) для tension кластера, а не очередное усложнение",
+      "suggested_cluster": "bitcoin_governance_debate"
+    },
+    {
+      "id": "bip110_signaling_becomes_nonzero",
+      "source_file": "data/bip110_signaling.json",
+      "value_path": "current.signal_pct",
+      "condition": "crosses_above",
+      "threshold": 0.0,
+      "description": "Сигналинг BIP-110 перестал быть нулевым",
+      "why_it_matters": "После прохождения дедлайна сигналинг упал до 0. Любое возобновление означает, что кто-то из майнеров снова сигналит — смена расклада, задокументированного в NAR-2026-0717-002/NAR-2026-0803-001",
+      "suggested_cluster": "bitcoin_governance_debate"
+    },
+    {
+      "id": "btc_daily_volume_spike",
+      "source_file": "data/volume.json",
+      "value_path": "current.change_24h_pct",
+      "condition": "crosses_above",
+      "threshold": 75.0,
+      "description": "Суточный объём торгов вырос более чем на 75% за сутки",
+      "why_it_matters": "Резкий скачок объёма обычно сопровождает событие, о котором стоит узнать раньше, чем о нём напишут — но сам по себе объём не является сигналом, это только повод посмотреть, что произошло",
+      "suggested_cluster": "leverage_deleveraging_cycle"
+    },
+    {
+      "id": "btc_daily_volume_collapse",
+      "source_file": "data/volume.json",
+      "value_path": "current.change_24h_pct",
+      "condition": "crosses_below",
+      "threshold": -60.0,
+      "description": "Суточный объём торгов упал более чем на 60% за сутки",
+      "why_it_matters": "Обвал ликвидности — обратная сторона того же класса событий, что и скачок; может указывать на уход маркетмейкеров или сбой на крупной площадке",
+      "suggested_cluster": "leverage_deleveraging_cycle"
+    },
+    {
+      "id": "largest_known_address_major_move",
+      "source_file": "data/top_addresses.json",
+      "value_path": "entries.0.balance_btc",
+      "condition": "changes_by_at_least",
+      "threshold": 10000.0,
+      "description": "Баланс крупнейшего отслеживаемого адреса изменился более чем на 10 000 BTC",
+      "why_it_matters": "Движение такого размера на известном (атрибутированном) адресе — проверяемый ончейн-факт, а не проприетарная аналитика: попадает под weight: onchain по обновлённому определению. ВАЖНО: выборка ограничена 38 курируемыми адресами (см. caveat в самом файле), это не рейтинг сети",
+      "suggested_cluster": "btc_treasury_competition"
+    }
+  ]
+}

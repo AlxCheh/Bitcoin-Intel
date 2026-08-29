@@ -1,0 +1,62 @@
+{
+  "_generated_by": "scripts/detect_pipeline_events.py",
+  "_note": "ПРОИЗВОДНЫЙ ФАЙЛ — не редактировать руками, кроме поля reviewed. События НЕ являются сигналами: это пометка, что порог пересечён и стоит разобрать материал по Шагам 1-8.",
+  "generated_at": "2026-08-29T17:49:13Z",
+  "rules_evaluated": 6,
+  "rules_skipped": [],
+  "unreviewed_count": 1,
+  "events": [
+    {
+      "rule_id": "bip110_voluntary_deadline_passed",
+      "kind": "true_at_baseline",
+      "detected_at": "2026-08-29T17:49:13Z",
+      "value": 964581,
+      "previous_value": null,
+      "threshold": 961632,
+      "condition": "crosses_above",
+      "source_file": "data/bip110_signaling.json",
+      "description": "Высота цепи превысила deadline_block BIP-110 — добровольное окно сигналинга закрыто",
+      "why_it_matters": "NAR-2026-0803-001 прямо предсказывал переход в обязательную фазу version-бита при недостаточной поддержке; факт прохождения дедлайна — это тот самый исход, который сигнал называл ожидаемым, и его стоит зафиксировать отдельно",
+      "suggested_cluster": "bitcoin_governance_debate",
+      "reviewed": false
+    }
+  ],
+  "state": {
+    "bip110_voluntary_deadline_passed": {
+      "value": 964581,
+      "threshold": 961632,
+      "condition_true": true,
+      "observed_at": "2026-08-29T17:49:13Z"
+    },
+    "bip110_signaling_reaches_activation_threshold": {
+      "value": 0.0,
+      "threshold": 55.0,
+      "condition_true": false,
+      "observed_at": "2026-08-29T17:49:13Z"
+    },
+    "bip110_signaling_becomes_nonzero": {
+      "value": 0.0,
+      "threshold": 0.0,
+      "condition_true": false,
+      "observed_at": "2026-08-29T17:49:13Z"
+    },
+    "btc_daily_volume_spike": {
+      "value": -13.87,
+      "threshold": 75.0,
+      "condition_true": false,
+      "observed_at": "2026-08-29T17:49:13Z"
+    },
+    "btc_daily_volume_collapse": {
+      "value": -13.87,
+      "threshold": -60.0,
+      "condition_true": false,
+      "observed_at": "2026-08-29T17:49:13Z"
+    },
+    "largest_known_address_major_move": {
+      "value": 248597.59222608,
+      "threshold": 10000.0,
+      "condition_true": false,
+      "observed_at": "2026-08-29T17:49:13Z"
+    }
+  }
+}

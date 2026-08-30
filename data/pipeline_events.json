@@ -4,7 +4,7 @@
   "generated_at": "2026-08-30T07:49:36Z",
   "rules_evaluated": 6,
   "rules_skipped": [],
-  "unreviewed_count": 1,
+  "unreviewed_count": 0,
   "events": [
     {
       "rule_id": "bip110_voluntary_deadline_passed",
@@ -18,7 +18,7 @@
       "description": "Высота цепи превысила deadline_block BIP-110 — добровольное окно сигналинга закрыто",
       "why_it_matters": "NAR-2026-0803-001 прямо предсказывал переход в обязательную фазу version-бита при недостаточной поддержке; факт прохождения дедлайна — это тот самый исход, который сигнал называл ожидаемым, и его стоит зафиксировать отдельно",
       "suggested_cluster": "bitcoin_governance_debate",
-      "reviewed": false
+      "reviewed": true
     }
   ],
   "state": {

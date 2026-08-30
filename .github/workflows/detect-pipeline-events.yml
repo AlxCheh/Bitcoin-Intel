@@ -1,0 +1,121 @@
+name: Detect Pipeline Events
+
+# Общий детектор порогов в live-пайплайнах (см. docs/ADR-019).
+# НЕ создаёт сигналы — только фиксирует, что порог пересечён, чтобы событие
+# не осталось незамеченным до тех пор, пока о нём не напишут СМИ.
+#
+# Запускается ПОСЛЕ обновлений пайплайнов: сам по себе он ничего не тянет из
+# сети, а читает уже закоммиченные data/*.json. Ежедневного прогона хватает —
+# события, которые он ловит, это пересечения порогов, а не тик-по-тику
+# изменения; более частый прогон только увеличил бы число PR без новой
+# информации.
+
+on:
+  schedule:
+    # 08:15 UTC — после update-volume (06:00) и update-top-addresses (07:00),
+    # чтобы читать уже обновлённые за сегодня данные, а не вчерашние.
+    - cron: "15 8 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  detect-pipeline-events:
+    name: Detect threshold events in live pipelines
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Detect pipeline events
+        run: python3 scripts/detect_pipeline_events.py
+
+      - name: Validate data/pipeline_events.json
+        run: python3 -m json.tool data/pipeline_events.json > /dev/null && echo "OK data/pipeline_events.json"
+
+      - name: Check for changes
+        id: diffcheck
+        run: |
+          git add data/pipeline_events.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report unreviewed events in the run summary
+        if: steps.diffcheck.outputs.changed == 'true'
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("data/pipeline_events.json"))
+          unreviewed = [e for e in d["events"] if not e.get("reviewed")]
+          print(f"## Событий без разбора: {len(unreviewed)}\n")
+          for e in unreviewed[:20]:
+              kind = "пересечение" if e["kind"] == "crossed" else "уже верно на базовой линии"
+              print(f"- **{e['rule_id']}** ({kind}) — {e['description']}")
+              print(f"  - значение `{e['value']}`, порог `{e['threshold']}`, источник `{e['source_file']}`")
+              print(f"  - почему важно: {e['why_it_matters']}")
+              if e.get("suggested_cluster"):
+                  print(f"  - вероятный кластер: `{e['suggested_cluster']}` (подсказка, кластер определяется Шагом 4)")
+          print("\n> События — НЕ сигналы. Каждое требует разбора по Шагам 1-8 CLAUDE.md.")
+          PY
+
+      - name: Commit pipeline events via PR (not direct push to main)
+        if: steps.diffcheck.outputs.changed == 'true'
+        # Тот же паттерн, что update-volume.yml/update-bip110-signaling.yml:
+        # main защищён Branch Protection → ветка → PR → auto-merge после
+        # зелёного validate. SYNTHESIS_BOT_TOKEN, а не GITHUB_TOKEN — иначе
+        # PR от штатного токена не порождает новый workflow run и auto-merge
+        # зависает в ожидании статуса, который никогда не придёт.
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Устаревшие PR этого типа закрываем: файл полностью регенерируем
+          # из текущих пайплайнов, держать несколько открытых снимков вредно
+          # (смерженный старый отбросил бы более новое состояние).
+          for old_pr in $(gh pr list --state open --search "head:bot/pipeline-events-" --json number --jq '.[] | .number'); do
+            echo "Закрываю устаревший PR событий #$old_pr"
+            gh pr close "$old_pr" --delete-branch || true
+          done
+
+          # gh_retry — 3 попытки на транзиентный HTTP 503 api.github.com/graphql.
+          # См. подробный комментарий в deploy.yml/synthesize: без этого
+          # `set -e` обрывал шаг уже ПОСЛЕ успешного push, оставляя
+          # осиротевшую ветку без PR.
+          gh_retry() {
+            local attempt
+            for attempt in 1 2 3; do
+              if "$@"; then return 0; fi
+              echo "⚠ '$*' упало (попытка $attempt/3), жду и повторяю..." >&2
+              sleep $((attempt * 10))
+            done
+            echo "✗ '$*' не удалось после 3 попыток" >&2
+            return 1
+          }
+
+          BRANCH="bot/pipeline-events-${{ github.run_id }}-${{ github.run_attempt }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update pipeline threshold events"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/$BRANCH"
+          gh_retry gh pr create --base main --head "$BRANCH" \
+            --title "chore: pipeline threshold events ($(date -u +%Y-%m-%d))" \
+            --body "Автообновление data/pipeline_events.json (scripts/detect_pipeline_events.py).
+
+          **События — не сигналы.** Каждое означает только, что порог в live-пайплайне пересечён и материал стоит разобрать по Шагам 1-8 CLAUDE.md. Разобранные события помечаются \`reviewed: true\` вручную тем же PR, что и созданный по ним сигнал.
+
+          Подробности сработавших правил — в Summary прогона. Auto-merge после зелёного validate." \
+            --label "pipeline-events" || gh_retry gh pr create --base main --head "$BRANCH" \
+            --title "chore: pipeline threshold events ($(date -u +%Y-%m-%d))" \
+            --body "Автообновление data/pipeline_events.json. События — не сигналы, требуют разбора по Шагам 1-8."
+          gh_retry gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "⚠ auto-merge не удалось поставить в очередь — PR создан, требуется ручной merge: $BRANCH"

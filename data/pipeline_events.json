@@ -1,11 +1,25 @@
 {
   "_generated_by": "scripts/detect_pipeline_events.py",
   "_note": "ПРОИЗВОДНЫЙ ФАЙЛ — не редактировать руками, кроме поля reviewed. События НЕ являются сигналами: это пометка, что порог пересечён и стоит разобрать материал по Шагам 1-8.",
-  "generated_at": "2026-08-30T07:49:36Z",
+  "generated_at": "2026-08-30T13:46:58Z",
   "rules_evaluated": 6,
   "rules_skipped": [],
-  "unreviewed_count": 0,
+  "unreviewed_count": 1,
   "events": [
+    {
+      "rule_id": "btc_daily_volume_collapse",
+      "kind": "crossed",
+      "detected_at": "2026-08-30T13:46:58Z",
+      "value": -64.28,
+      "previous_value": -13.87,
+      "threshold": -60.0,
+      "condition": "crosses_below",
+      "source_file": "data/volume.json",
+      "description": "Суточный объём торгов упал более чем на 60% за сутки",
+      "why_it_matters": "Обвал ликвидности — обратная сторона того же класса событий, что и скачок; может указывать на уход маркетмейкеров или сбой на крупной площадке",
+      "suggested_cluster": "leverage_deleveraging_cycle",
+      "reviewed": false
+    },
     {
       "rule_id": "bip110_voluntary_deadline_passed",
       "kind": "true_at_baseline",
@@ -23,40 +37,40 @@
   ],
   "state": {
     "bip110_voluntary_deadline_passed": {
-      "value": 964678,
+      "value": 964721,
       "threshold": 961632,
       "condition_true": true,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "observed_at": "2026-08-30T13:46:58Z"
     },
     "bip110_signaling_reaches_activation_threshold": {
       "value": 0.0,
       "threshold": 55.0,
       "condition_true": false,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "observed_at": "2026-08-30T13:46:58Z"
     },
     "bip110_signaling_becomes_nonzero": {
       "value": 0.0,
       "threshold": 0.0,
       "condition_true": false,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "observed_at": "2026-08-30T13:46:58Z"
     },
     "btc_daily_volume_spike": {
-      "value": -13.87,
+      "value": -64.28,
       "threshold": 75.0,
       "condition_true": false,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "observed_at": "2026-08-30T13:46:58Z"
     },
     "btc_daily_volume_collapse": {
-      "value": -13.87,
+      "value": -64.28,
       "threshold": -60.0,
-      "condition_true": false,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "condition_true": true,
+      "observed_at": "2026-08-30T13:46:58Z"
     },
     "largest_known_address_major_move": {
-      "value": 248597.59222608,
+      "value": 248597.59225756,
       "threshold": 10000.0,
       "condition_true": false,
-      "observed_at": "2026-08-30T07:49:36Z"
+      "observed_at": "2026-08-30T13:46:58Z"
     }
   }
 }

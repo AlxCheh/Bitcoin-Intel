@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-08-29",
+  "generated_at": "2026-08-30",
   "facts": {
     "bita_fund.aum": {
       "value": 59240000,
@@ -50,6 +50,30 @@
       "unit": "x",
       "as_of": "2026-08-09",
       "signal_id": "STR-2026-0809-001"
+    },
+    "network.difficulty": {
+      "value": 127.17,
+      "unit": "T",
+      "as_of": "2026-07-11",
+      "signal_id": "INF-2026-0711-001"
+    },
+    "network.lth_supply": {
+      "value": 14850000,
+      "unit": "BTC",
+      "as_of": "2026-07-19",
+      "signal_id": "SUP-2026-0719-001"
+    },
+    "network.realized_pnl_gap_ytd": {
+      "value": 54000000000,
+      "unit": "USD",
+      "as_of": "2026-06-15",
+      "signal_id": "MAC-2026-0618-001"
+    },
+    "network.top3_pool_share": {
+      "value": 60.01,
+      "unit": "pct",
+      "as_of": "2026-07-31",
+      "signal_id": "INF-2026-0731-001"
     },
     "oranjebtc.btc_holdings": {
       "value": 3904,

@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.57 · **Обновлено:** 2026-08-29
+> **Версия:** v8.58 · **Обновлено:** 2026-08-29
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -578,7 +578,7 @@ narrative_role   → приоритет при выборе anchor-сигнал�
 
 ### Текущий охват
 
-Сущности с fact-трекингом (`entity_id.btc_holdings`; `strategy` дополнительно даёт `usd_reserve`): `strategy`, `metaplanet`, `twenty_one_capital`, `mara_holdings`, `bstr`, `strive`, `oranjebtc`, `el_salvador`, `spacex`, `tether`, `trump_media`. Плюс агрегатные категории без отдельной сущности в ENTITIES.json: `top100_public_companies`, `etf_exchanges`, `bita_fund`.
+Сущности с fact-трекингом (`entity_id.btc_holdings`; `strategy` дополнительно даёт `usd_reserve`): `strategy`, `metaplanet`, `twenty_one_capital`, `mara_holdings`, `bstr`, `strive`, `oranjebtc`, `el_salvador`, `spacex`, `tether`, `trump_media`. Плюс агрегатные категории без отдельной сущности в ENTITIES.json: `top100_public_companies`, `etf_exchanges`, `bita_fund`, `network` (`network.difficulty`, `network.top3_pool_share`, `network.lth_supply`, `network.realized_pnl_gap_ytd` — сетевые/ончейн-метрики, добавлены 2026-08-29 из уже существующих сигналов, где метрика была в `data[]`, но не в `facts[]`; `network.lth_supply` — только по методологии Glassnode, CoinGlass даёт для той же даты иное значение из-за иной entity-кластеризации, см. caveat SUP-2026-0719-001, не смешивается).
 
 С 2026-08-09 у `strategy` и `metaplanet` дополнительно отслеживаются `mnav` и `btc_yield_ytd` (панель mNAV — механика BTC-казначейств, вкладка MACROCONTEXT), у `twenty_one_capital` — `mnav` — не входят в предложение выше по формату (там фиксированный якорь для теста-стража), но входят в `data/facts.json` наравне с остальными.
 

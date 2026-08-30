@@ -109,6 +109,47 @@ def test_resolve_path(path, expected):
     assert resolve_path(data, path) == expected
 
 
+@pytest.mark.parametrize("path,expected", [
+    ("entries.label=MtGox-Hack.balance_btc", 79957.27),   # находит по метке, не по позиции
+    ("entries.label=Binance-coldwallet.balance_btc", 248597.59),  # первое совпадение при дублях меток
+    ("entries.label=NoSuchLabel.balance_btc", None),      # метка не найдена — None, не падение
+    ("entries.rank=7.balance_btc", 79957.27),             # фильтр работает и на числовом поле (строковое сравнение)
+])
+def test_resolve_path_label_filter(path, expected):
+    """
+    Регрессия на главную причину фильтра: entries отсортирован по balance_btc
+    и переставляется при каждом обновлении top_addresses.json — числовой
+    индекс 'entries.6' сегодня и через неделю может указывать на разные
+    адреса. Фильтр 'label=значение' привязывается к сущности, не к позиции.
+    """
+    data = {"entries": [
+        {"rank": 1, "label": "Binance-coldwallet", "balance_btc": 248597.59},
+        {"rank": 2, "label": "Binance-coldwallet", "balance_btc": 214225.46},
+        {"rank": 7, "label": "MtGox-Hack", "balance_btc": 79957.27},
+    ]}
+    assert resolve_path(data, path) == expected
+
+
+def test_resolve_path_label_filter_survives_reordering():
+    """
+    Прямая демонстрация проблемы, которую решает фильтр: тот же адрес на
+    другой позиции после пересортировки — числовой путь сломался бы,
+    путь по метке — нет.
+    """
+    before = {"entries": [
+        {"label": "MtGox-Hack", "balance_btc": 79957.27},
+        {"label": "Binance-coldwallet", "balance_btc": 248597.59},
+    ]}
+    after = {"entries": [
+        {"label": "Binance-coldwallet", "balance_btc": 260000.0},
+        {"label": "MtGox-Hack", "balance_btc": 79957.27},
+    ]}
+    assert resolve_path(before, "entries.0.balance_btc") == 79957.27
+    assert resolve_path(after, "entries.0.balance_btc") == 260000.0  # другой адрес на той же позиции!
+    assert resolve_path(before, "entries.label=MtGox-Hack.balance_btc") == 79957.27
+    assert resolve_path(after, "entries.label=MtGox-Hack.balance_btc") == 79957.27  # тот же адрес, обе позиции
+
+
 # ─────────────────── 2. Валидность реального конфига ───────────────────
 
 def _rules():

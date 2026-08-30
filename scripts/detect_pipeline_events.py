@@ -31,6 +31,14 @@ CLAUDE.md — «Claude не наполняет сигналы из собств�
     результат (ровно случай BIP-110 — дедлайн прошёл до появления детектора).
   - если не выполнено → просто запоминаем базовую линию, событий нет.
 
+ПУТИ К ЗНАЧЕНИЯМ
+-----------------
+value_path/threshold_path — точечные пути ('current.signal_pct'). Сегмент
+может быть числовым индексом списка ('entries.0') или фильтром 'поле=значение'
+('entries.label=MtGox-Hack') — последнее нужно, когда позиция элемента в
+списке не стабильна между прогонами (top_addresses.json пересортировывает
+по balance_btc), а конкретная сущность стабильна по метке.
+
 Использование:
     python3 scripts/detect_pipeline_events.py
     python3 scripts/detect_pipeline_events.py --rules … --out … --repo-root …
@@ -57,16 +65,29 @@ MAX_EVENT_LOG = 100  # держим лог событий ограниченны
 def resolve_path(data, dotted: str):
     """
     Достаёт значение по точечному пути ('current.signal_pct', 'entries.0.balance_btc').
-    Числовой сегмент трактуется как индекс списка. Возвращает None, если путь
-    не разрешается — отсутствующее поле не должно ронять весь прогон,
-    пайплайны меняют формат независимо от этого скрипта.
+    Числовой сегмент трактуется как индекс списка. Сегмент вида 'поле=значение'
+    (например 'label=MtGox-Hack') трактуется как фильтр по списку — находит
+    первый элемент, где data[поле] == значение (строковое сравнение). Это
+    нужно там, где позиция в списке не стабильна между обновлениями пайплайна
+    (data/top_addresses.json пересортировывает по balance_btc при каждом
+    прогоне — 'entries.6' сегодня и через неделю может быть совсем другим
+    адресом), а конкретная сущность (метка адреса) — стабильна.
+    Возвращает None, если путь не разрешается — отсутствующее поле не должно
+    ронять весь прогон, пайплайны меняют формат независимо от этого скрипта.
     """
     cur = data
     for seg in dotted.split("."):
         if isinstance(cur, list):
-            if not seg.isdigit() or int(seg) >= len(cur):
+            if "=" in seg:
+                field, _, value = seg.partition("=")
+                match = next((item for item in cur if isinstance(item, dict) and str(item.get(field)) == value), None)
+                if match is None:
+                    return None
+                cur = match
+            elif seg.isdigit() and int(seg) < len(cur):
+                cur = cur[int(seg)]
+            else:
                 return None
-            cur = cur[int(seg)]
         elif isinstance(cur, dict):
             if seg not in cur:
                 return None

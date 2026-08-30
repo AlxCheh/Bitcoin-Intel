@@ -1,0 +1,24 @@
+{
+  "_bootstrap_note": "Ручной bootstrap-сид (2026-08-30), не результат scripts/fetch_pool_share.py — bash-песочница сессии не имеет сетевого доступа к mempool.space (см. network_configuration), поэтому первый реальный прогон скрипта состоится в CI после добавления workflow. Цифры ниже — hashrateindex.com (1Y timeframe, независимая перепроверка через web_fetch, не mempool.space), временно, чтобы новое правило детектора имело на чём разрешиться (test_every_rule_path_resolves_against_real_pipeline_data) и не пропускалось молча. Первый прогон scripts/fetch_pool_share.py перезапишет этот файл целиком реальными данными mempool.space/1w — методология и таймфрейм отличаются, числа изменятся, это ожидаемо.",
+  "updated_at": "2026-08-30T18:42:29Z",
+  "source": "hashrateindex.com (bootstrap, 1Y) — ВРЕМЕННО, заменится mempool.space/1w при первом прогоне scripts/fetch_pool_share.py",
+  "current": {
+    "period": "1y",
+    "pools_reported": 11,
+    "top_pools": [
+      {
+        "name": "Foundry USA",
+        "share_pct": 22.07
+      },
+      {
+        "name": "AntPool",
+        "share_pct": 20.5
+      },
+      {
+        "name": "F2Pool",
+        "share_pct": 14.86
+      }
+    ],
+    "top3_share_pct": 57.43
+  }
+}

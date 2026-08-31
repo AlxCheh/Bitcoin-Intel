@@ -2,9 +2,9 @@
 
 > Автогенерируется еженедельно из `scripts/quality_report.py` (MON05). Не редактировать вручную — правки затрутся следующим запуском `.github/workflows/quality-dashboard.yml`.
 
-**Сгенерировано:** 2026-08-24 · **Сигналов:** 135
+**Сгенерировано:** 2026-08-31 · **Сигналов:** 148
 
-## 🟢 Health Score: 85.0/100 (Grade A)
+## 🟢 Health Score: 84.4/100 (Grade A)
 
 ### Покрытие полей
 
@@ -19,27 +19,27 @@
 
 | Период | Доля |
 |--------|------|
-| last_30_days | `████░░░░░░░░░░░░░░░░` 18% |
-| last_90_days | `███████████████████░` 96% |
+| last_30_days | `███░░░░░░░░░░░░░░░░░` 15% |
+| last_90_days | `███████████████████░` 95% |
 
 ### Качество
 
 | Метрика | Доля |
 |---------|------|
-| tension_formula_valid | `████████████████████` 98% |
+| tension_formula_valid | `████████████████████` 99% |
 | signals_with_links | `█████████████████░░░` 87% |
 
 ### Распределение
 
-**По направлению (dir):** neg: 44, neu: 30, pos: 61
+**По направлению (dir):** neg: 49, neu: 32, pos: 67
 
-**По кластеру:** bitcoin_governance_debate: 7, btc_payment_adoption: 1, btc_treasury_competition: 30, etf_institutional_flow: 25, layer2_programmability: 5, leverage_deleveraging_cycle: 2, lightning_payments: 10, mining_ai_diversification: 10, mining_operations: 6, quantum_security: 4, strategy_model_stress: 25, supply_scarcity: 7, wallet_security_incidents: 3
+**По кластеру:** bitcoin_governance_debate: 8, btc_payment_adoption: 2, btc_treasury_competition: 32, etf_institutional_flow: 25, layer2_programmability: 6, leverage_deleveraging_cycle: 2, lightning_payments: 12, mining_ai_diversification: 11, mining_operations: 6, quantum_security: 4, strategy_model_stress: 26, supply_scarcity: 7, wallet_security_incidents: 7
 
-**По весу источника (weight):** market: 22, media: 12, onchain: 9, primary: 92
+**По весу источника (weight):** market: 22, media: 14, onchain: 10, primary: 102
 
-**По роли (narrative_role):** background: 21, complication: 83, resolution: 5, trigger: 26
+**По роли (narrative_role):** background: 23, complication: 89, resolution: 6, trigger: 30
 
 ### Calibration Readiness (ADR-011)
 
-301/30 синтезов (✅ готово)
+330/30 синтезов (✅ готово)
 

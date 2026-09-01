@@ -1,25 +1,11 @@
 {
   "_generated_by": "scripts/detect_pipeline_events.py",
   "_note": "ПРОИЗВОДНЫЙ ФАЙЛ — не редактировать руками, кроме поля reviewed. События НЕ являются сигналами: это пометка, что порог пересечён и стоит разобрать материал по Шагам 1-8.",
-  "generated_at": "2026-08-31T16:08:32Z",
+  "generated_at": "2026-09-01T13:02:02Z",
   "rules_evaluated": 11,
   "rules_skipped": [],
-  "unreviewed_count": 2,
+  "unreviewed_count": 0,
   "events": [
-    {
-      "rule_id": "btc_daily_volume_spike",
-      "kind": "crossed",
-      "detected_at": "2026-08-31T16:08:32Z",
-      "value": 79.58,
-      "previous_value": -64.28,
-      "threshold": 75.0,
-      "condition": "crosses_above",
-      "source_file": "data/volume.json",
-      "description": "Суточный объём торгов вырос более чем на 75% за сутки",
-      "why_it_matters": "Резкий скачок объёма обычно сопровождает событие, о котором стоит узнать раньше, чем о нём напишут — но сам по себе объём не является сигналом, это только повод посмотреть, что произошло",
-      "suggested_cluster": "leverage_deleveraging_cycle",
-      "reviewed": false
-    },
     {
       "rule_id": "btc_daily_volume_collapse",
       "kind": "crossed",
@@ -32,7 +18,8 @@
       "description": "Суточный объём торгов упал более чем на 60% за сутки",
       "why_it_matters": "Обвал ликвидности — обратная сторона того же класса событий, что и скачок; может указывать на уход маркетмейкеров или сбой на крупной площадке",
       "suggested_cluster": "leverage_deleveraging_cycle",
-      "reviewed": false
+      "reviewed": true,
+      "review_note": "Ложное срабатывание. Независимая проверка (Coinbase: $14,394 млрд/24ч; news.bitcoin.com: $13,1-13,9 млрд; CoinGecko через Stonksmaster: $14,43 млрд) показывает НОРМАЛЬНЫЙ объём на 30 августа — рынок в консолидации, цена растёт (+1,5-1,8%). «Обвал» — статистический артефакт: 29 августа был необычно ВЫСОКИМ ($36,3 млрд), возврат к типичному уровню ($13 млрд, совпадает со многими другими днями месяца) дал ложные -64,3%. Порог пересмотрен с -60% на -75% в том же PR."
     },
     {
       "rule_id": "bip110_voluntary_deadline_passed",
@@ -51,70 +38,70 @@
   ],
   "state": {
     "bip110_voluntary_deadline_passed": {
-      "value": 964878,
+      "value": 965005,
       "threshold": 961632,
       "condition_true": true,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "bip110_signaling_reaches_activation_threshold": {
       "value": 0.0,
       "threshold": 55.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "bip110_signaling_becomes_nonzero": {
       "value": 0.0,
       "threshold": 0.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "btc_daily_volume_spike": {
-      "value": 79.58,
+      "value": 56.18,
       "threshold": 75.0,
-      "condition_true": true,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "condition_true": false,
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "btc_daily_volume_collapse": {
-      "value": 79.58,
-      "threshold": -60.0,
+      "value": 56.18,
+      "threshold": -75.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "largest_known_address_major_move": {
       "value": 248597.59225756,
       "threshold": 10000.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "dormant_address_mtgox_hack_moves": {
       "value": 79957.26868999,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "dormant_address_silkroad_fbi_moves": {
       "value": 69370.1845899,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "dormant_address_bitfinex_hack_recovery_moves": {
       "value": 94643.48825519,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "btc_daily_volume_absolute_floor": {
-      "value": 27087044703.07,
+      "value": 29562412004.59,
       "threshold": 7000000000.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     },
     "top3_mining_pools_exceed_60pct": {
       "value": 57.43,
       "threshold": 60.0,
       "condition_true": false,
-      "observed_at": "2026-08-31T16:08:32Z"
+      "observed_at": "2026-09-01T13:02:02Z"
     }
   }
 }

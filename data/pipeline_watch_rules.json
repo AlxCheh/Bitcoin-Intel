@@ -4,7 +4,7 @@
   "_schema": {
     "id": "уникальный snake_case идентификатор правила",
     "source_file": "путь к JSON-файлу пайплайна от корня репозитория",
-    "value_path": "точечный путь к отслеживаемому числу внутри этого файла",
+    "value_path": "точечный путь к отслеживаемому числу внутри этого файла. Сегмент может быть числовым индексом списка ('entries.0') или фильтром 'поле=значение' ('entries.label=MtGox-Hack') — фильтр нужен, когда позиция элемента в списке не стабильна между прогонами (top_addresses.json пересортировывает по balance_btc при каждом обновлении), а сама сущность (метка) стабильна",
     "condition": "crosses_above | crosses_below | pct_change_exceeds | changes_by_at_least",
     "threshold": "число — константа для сравнения (взаимоисключимо с threshold_path)",
     "threshold_path": "точечный путь к другому полю ТОГО ЖЕ файла — для порогов, которые сами меняются",
@@ -71,6 +71,56 @@
       "threshold": 10000.0,
       "description": "Баланс крупнейшего отслеживаемого адреса изменился более чем на 10 000 BTC",
       "why_it_matters": "Движение такого размера на известном (атрибутированном) адресе — проверяемый ончейн-факт, а не проприетарная аналитика: попадает под weight: onchain по обновлённому определению. ВАЖНО: выборка ограничена 38 курируемыми адресами (см. caveat в самом файле), это не рейтинг сети",
+      "suggested_cluster": "btc_treasury_competition"
+    },
+    {
+      "id": "dormant_address_mtgox_hack_moves",
+      "source_file": "data/top_addresses.json",
+      "value_path": "entries.label=MtGox-Hack.balance_btc",
+      "condition": "changes_by_at_least",
+      "threshold": 1.0,
+      "description": "Баланс адреса MtGox-Hack изменился хотя бы на 1 BTC",
+      "why_it_matters": "Исторически спящий, известный по конфискации адрес — любое движение самостоятельно значимо, независимо от размера. Прямая параллель уже записанному в базе SUP-2026-0726-001 (Galaxy: активность спящих монет на 4-летнем минимуме) — только это собственное наблюдение, а не пересказ чужой аналитики, честно заслуживает weight: onchain по норме Шага 2",
+      "suggested_cluster": "supply_scarcity"
+    },
+    {
+      "id": "dormant_address_silkroad_fbi_moves",
+      "source_file": "data/top_addresses.json",
+      "value_path": "entries.label=SilkRoad-FBI-Confiscated.balance_btc",
+      "condition": "changes_by_at_least",
+      "threshold": 1.0,
+      "description": "Баланс адреса SilkRoad-FBI-Confiscated изменился хотя бы на 1 BTC",
+      "why_it_matters": "Государственная конфискация — любое движение означает решение о распоряжении резервом (продажа, перевод на хранение и т.п.), самостоятельно значимо для supply-side наблюдения",
+      "suggested_cluster": "supply_scarcity"
+    },
+    {
+      "id": "dormant_address_bitfinex_hack_recovery_moves",
+      "source_file": "data/top_addresses.json",
+      "value_path": "entries.label=Bitfinex-Hack-Recovery.balance_btc",
+      "condition": "changes_by_at_least",
+      "threshold": 1.0,
+      "description": "Баланс адреса Bitfinex-Hack-Recovery изменился хотя бы на 1 BTC",
+      "why_it_matters": "Тот же класс события, что MtGox-Hack/SilkRoad — известный по инциденту, обычно неактивный адрес; движение — самостоятельная новость по supply-side, не по цене",
+      "suggested_cluster": "supply_scarcity"
+    },
+    {
+      "id": "btc_daily_volume_absolute_floor",
+      "source_file": "data/volume.json",
+      "value_path": "current.volume_usd",
+      "condition": "crosses_below",
+      "threshold": 7000000000.0,
+      "description": "Суточный объём торгов BTC упал ниже $7 млрд в абсолютном выражении",
+      "why_it_matters": "day-over-day % (btc_daily_volume_collapse) не видит медленное сползание вниз — серия небольших снижений подряд никогда не даст один день с -75%, но по сумме может быть той же историей о слабеющей ликвидности. Порог ниже самого низкого наблюдённого значения за август 2026 ($9,66 млрд, 17 августа) — не должен был бы сработать на обычном шуме месяца",
+      "suggested_cluster": "leverage_deleveraging_cycle"
+    },
+    {
+      "id": "top3_mining_pools_exceed_60pct",
+      "source_file": "data/pool_share.json",
+      "value_path": "current.top3_share_pct",
+      "condition": "crosses_above",
+      "threshold": 60.0,
+      "description": "Совокупная доля топ-3 майнинг-пулов по хешрейту превысила 60%",
+      "why_it_matters": "Порог не произвольный — тот же уровень, что уже задокументирован в INF-2026-0731-001 (60,01% на 31 июля, независимо перепроверено 59,91% на 22 августа) как устойчивое, не разовое состояние сети. Пул, участвующий здесь (Foundry), — тот же, что формализовал хешрейт-взвешенное голосование по BIP-110 (NAR-2026-0717-002/NAR-2026-0803-001) — прямая связь с уже отслеживаемым governance-треком.",
       "suggested_cluster": "btc_treasury_competition"
     }
   ]

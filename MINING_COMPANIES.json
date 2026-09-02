@@ -200,10 +200,12 @@
       "ticker": "BTDR",
       "exchange": "Nasdaq",
       "btc_treasury_policy": "unknown",
-      "ai_hpc_diversification": "unknown",
-      "notable": "Найдена при сверке состава WGMI (2026-07-26) — 5,85% активов WGMI на 27 марта 2026. Операционные факты отдельно не проверялись.",
-      "signal_refs": [],
-      "last_updated": "2026-07-26"
+      "ai_hpc_diversification": "major",
+      "notable": "Найдена при сверке состава WGMI (2026-07-26). 25 августа 2026: co-mining сделка с Soluna (+1,93 EH/s) подтверждает major AI-диверсификацию БЕЗ сокращения BTC-хешрейта — расширяет оба направления одновременно (INF-2026-0825-001). btc_treasury_policy остаётся unknown — сигнал про хешрейт-инфраструктуру, не про корпоративный BTC-резерв.",
+      "signal_refs": [
+        "INF-2026-0825-001"
+      ],
+      "last_updated": "2026-08-25"
     },
     {
       "id": "hut8",

@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/detect_pipeline_events.py",
   "_note": "ПРОИЗВОДНЫЙ ФАЙЛ — не редактировать руками, кроме поля reviewed. События НЕ являются сигналами: это пометка, что порог пересечён и стоит разобрать материал по Шагам 1-8.",
-  "generated_at": "2026-09-01T13:28:51Z",
+  "generated_at": "2026-09-02T12:45:21Z",
   "rules_evaluated": 11,
   "rules_skipped": [],
   "unreviewed_count": 0,
@@ -38,70 +38,70 @@
   ],
   "state": {
     "bip110_voluntary_deadline_passed": {
-      "value": 965005,
+      "value": 965158,
       "threshold": 961632,
       "condition_true": true,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "bip110_signaling_reaches_activation_threshold": {
       "value": 0.0,
       "threshold": 55.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "bip110_signaling_becomes_nonzero": {
       "value": 0.0,
       "threshold": 0.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "btc_daily_volume_spike": {
-      "value": 56.18,
+      "value": -1.66,
       "threshold": 75.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "btc_daily_volume_collapse": {
-      "value": 56.18,
+      "value": -1.66,
       "threshold": -75.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "largest_known_address_major_move": {
-      "value": 248597.59225756,
+      "value": 248597.59226456,
       "threshold": 10000.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "dormant_address_mtgox_hack_moves": {
       "value": 79957.26868999,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "dormant_address_silkroad_fbi_moves": {
       "value": 69370.1845899,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "dormant_address_bitfinex_hack_recovery_moves": {
       "value": 94643.48825519,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "btc_daily_volume_absolute_floor": {
-      "value": 29562412004.59,
+      "value": 29231788109.03,
       "threshold": 7000000000.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     },
     "top3_mining_pools_exceed_60pct": {
       "value": 57.43,
       "threshold": 60.0,
       "condition_true": false,
-      "observed_at": "2026-09-01T13:28:51Z"
+      "observed_at": "2026-09-02T12:45:21Z"
     }
   }
 }

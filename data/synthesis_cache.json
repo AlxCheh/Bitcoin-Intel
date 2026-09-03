@@ -4,12 +4,12 @@
     "narrative": "BTC-казначейство эволюционирует от пассивного баланса к операционному движку: коллатерал → лицензия → продукты → комиссионный доход — при этом впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "takeaway": "Впервые независимый институциональный арбитр публично оспорил саму интерпретацию публичного трекера как признака суверенного накопления BTC — если верна версия МВФ, самый растиражированный нарратив «государство покупает биткоин каждый день» статистически не подтверждён и держится на выборе того, какой кошелёк показывать публично",
     "strength": "strong",
-    "confidence": 0.528,
+    "confidence": 0.526,
     "confidence_tier": "high",
     "alternative_scenario": "",
     "alternative_scenario_source_id": "",
     "phase": "active",
-    "score": 222,
+    "score": 221,
     "signal_count": 32,
     "anchor_signal_id": "STR-2026-0701-002",
     "phase_changed": false,
@@ -23,8 +23,8 @@
       "STR-2026-0624-003",
       "STR-2026-0623-002",
       "STR-2026-0821-002",
-      "STR-2026-0803-001",
       "STR-2026-0811-001",
+      "STR-2026-0803-001",
       "STR-2026-0731-003",
       "STR-2026-0730-001",
       "STR-2026-0809-002",
@@ -53,9 +53,9 @@
     "entity_count": 21,
     "anchor_entity_share": 0.062,
     "is_minority_anchor": true,
-    "generated_at": "2026-09-02T19:27:02.501260+00:00",
+    "generated_at": "2026-09-03T03:24:24.690798+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_btc_treasury_competition_20260902_192702"
+    "synthesis_id": "synthesis_btc_treasury_competition_20260903_032424"
   },
   "strategy_model_stress": {
     "tension": "Резерв пополняется исключительно дилюцией акций (2-я неделя подряд, $225 млн целевым траншем) vs BTC-резерв остаётся неприкосновенным несмотря на то, что неделей ранее компания уже продавала BTC ради тех же обязательств — двухнедельная выборка закрывает открытый вопрос предшественника в пользу дилюции",
@@ -75,7 +75,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "resolution",
-      "detected_at": "2026-09-02T19:27:02.504492+00:00"
+      "detected_at": "2026-09-03T03:24:24.693901+00:00"
     },
     "rationale": "Tension from STR-2026-0720-001 (contradicts: 0, weight: primary); partA from STR-2026-0618-001; phase: resolution; bridge: 'что означает что'; confidence: 0.50; confidence_tier: high; signals_used: 23; ignored_duplicates: ['STR-2026-0622-004', 'STR-2026-0622-007', 'STR-2026-0622-003']",
     "signals_used": [
@@ -111,9 +111,9 @@
     "entity_count": 2,
     "anchor_entity_share": 0.826,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.504720+00:00",
+    "generated_at": "2026-09-03T03:24:24.694215+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_strategy_model_stress_20260902_192702"
+    "synthesis_id": "synthesis_strategy_model_stress_20260903_032424"
   },
   "etf_institutional_flow": {
     "tension": "Банки получили юридическое право хранить BTC — но Базель III требует $19.6 млн резервов на каждые $1.57 млн BTC, делая хранение экономически невозможным при нулевой доходности на резервный капитал",
@@ -133,7 +133,7 @@
       "detected": true,
       "from_phase": "active",
       "to_phase": "tension",
-      "detected_at": "2026-09-02T19:27:02.506990+00:00"
+      "detected_at": "2026-09-03T03:24:24.696621+00:00"
     },
     "rationale": "Tension from NAR-2026-0628-001 (contradicts: 2, weight: primary); partA from MAC-2026-0618-001; phase: tension; bridge: 'вопреки тому что'; confidence: 0.61; confidence_tier: high; signals_used: 23; ignored_duplicates: ['STR-2026-0618-002', 'STR-2026-0624-004']",
     "signals_used": [
@@ -168,9 +168,9 @@
     "entity_count": 12,
     "anchor_entity_share": 0.391,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.507243+00:00",
+    "generated_at": "2026-09-03T03:24:24.696861+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_etf_institutional_flow_20260902_192702"
+    "synthesis_id": "synthesis_etf_institutional_flow_20260903_032424"
   },
   "supply_scarcity": {
     "tension": "LTH держат рекордные 14.8 млн BTC несмотря на 5.58 млн в убытке — vs рынок в режиме медвежьего дна с 10.83 млн BTC в потерях по всем когортам",
@@ -201,9 +201,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.509077+00:00",
+    "generated_at": "2026-09-03T03:24:24.698788+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_supply_scarcity_20260902_192702"
+    "synthesis_id": "synthesis_supply_scarcity_20260903_032424"
   },
   "layer2_programmability": {
     "tension": "BTC закрепляет полный стек регулируемой инфраструктуры в США (perps, Lightning, майнинг) — vs банковский уровень остаётся структурно заблокированным Базелем III при нулевой экономике хранения",
@@ -232,9 +232,9 @@
     "entity_count": 5,
     "anchor_entity_share": 0.2,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.510902+00:00",
+    "generated_at": "2026-09-03T03:24:24.700529+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_layer2_programmability_20260902_192702"
+    "synthesis_id": "synthesis_layer2_programmability_20260903_032424"
   },
   "lightning_payments": {
     "tension": "Jade впервые подписывает полностью офлайн через QR Connect и получает энтропию с компьютера-хоста в дополнение к своей vs именно единая точка отказа RNG устройства без такой подстраховки уже привела к реальной краже BTC у Coldcard",
@@ -269,9 +269,9 @@
     "entity_count": 10,
     "anchor_entity_share": 0.091,
     "is_minority_anchor": true,
-    "generated_at": "2026-09-02T19:27:02.512565+00:00",
+    "generated_at": "2026-09-03T03:24:24.702199+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_lightning_payments_20260902_192702"
+    "synthesis_id": "synthesis_lightning_payments_20260903_032424"
   },
   "mining_ai_diversification": {
     "tension": "Майнеры диверсифицируются в AI как стратегию выживания vs продолжают продавать BTC-резервы для финансирования этой же диверсификации — именно то, что предсказывалось как риск в предыдущем сигнале",
@@ -307,9 +307,9 @@
     "entity_count": 12,
     "anchor_entity_share": 0.083,
     "is_minority_anchor": true,
-    "generated_at": "2026-09-02T19:27:02.514151+00:00",
+    "generated_at": "2026-09-03T03:24:24.703727+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_mining_ai_diversification_20260902_192702"
+    "synthesis_id": "synthesis_mining_ai_diversification_20260903_032424"
   },
   "mining_operations": {
     "tension": "Пулы контролируют состав блоков как единственная точка цензуры vs Stratum V2 впервые в production переносит этот контроль к майнеру",
@@ -339,9 +339,9 @@
     "entity_count": 5,
     "anchor_entity_share": 0.167,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.515619+00:00",
+    "generated_at": "2026-09-03T03:24:24.705253+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_mining_operations_20260902_192702"
+    "synthesis_id": "synthesis_mining_operations_20260903_032424"
   },
   "leverage_deleveraging_cycle": {
     "tension": "Модель указывает на самое глубокое отклонение от тренда с 2010 года vs сам автор явно отказывается трактовать это как гарантию — выборка в 5 точек мала для статистического вывода",
@@ -367,9 +367,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.516943+00:00",
+    "generated_at": "2026-09-03T03:24:24.706485+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260902_192702"
+    "synthesis_id": "synthesis_leverage_deleveraging_cycle_20260903_032424"
   },
   "quantum_security": {
     "tension": "Девять институтов независимо финансируют безопасность Bitcoin на $15 млн за 3 года vs разработчики не согласовали единый путь пост-квантового перехода, а срок угрозы остаётся неопределённым",
@@ -396,30 +396,30 @@
     "entity_count": 3,
     "anchor_entity_share": 0.333,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.518199+00:00",
+    "generated_at": "2026-09-03T03:24:24.708178+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_quantum_security_20260902_192702"
+    "synthesis_id": "synthesis_quantum_security_20260903_032424"
   },
   "bitcoin_governance_debate": {
     "tension": "Обязательная фаза BIP-110 действительно расколола сеть на два блока vs альтернативная цепь тут же встала намертво из-за унаследованной полной сложности при ничтожном хешрейте — реального раскола не случилось",
     "narrative": "Институциональный лагерь Bitcoin впервые формализует явную позицию по вопросу протокольного управления как таковому: снижение порога консенсусной активации (95%→55%) само по себе — прецедентный риск независимо от исхода конкретного BIP — институциональные держатели теперь публично защищают neutrality механизма изменения правил, не только сами правила — после чего способность Bitcoin вести протокольное управление проверяется не одним спорным форком, а параллельной нагрузкой сразу нескольких независимых координационных задач — антиспам, устранение известных уязвимостей, новые криптографические примитивы, квантовая миграция; затягивание любой из них накапливает технический долг и сжимает и без того ограниченное окно для остальных",
     "takeaway": "Способность Bitcoin вести протокольное управление проверяется не одним спорным форком, а параллельной нагрузкой сразу нескольких независимых координационных задач — антиспам, устранение известных уязвимостей, новые криптографические примитивы, квантовая миграция; затягивание любой из них накапливает технический долг и сжимает и без того ограниченное окно для остальных",
     "strength": "strong",
-    "confidence": 0.436,
+    "confidence": 0.424,
     "confidence_tier": "high",
     "alternative_scenario": "",
     "alternative_scenario_source_id": "",
     "phase": "resolution",
-    "score": 36,
+    "score": 35,
     "signal_count": 6,
     "anchor_signal_id": "NAR-2026-0808-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from NAR-2026-0808-001 (contradicts: 0, weight: onchain); partA from NAR-2026-0711-001; phase: resolution; bridge: 'после чего'; confidence: 0.44; confidence_tier: high; signals_used: 6; ignored_duplicates: []",
+    "rationale": "Tension from NAR-2026-0808-001 (contradicts: 0, weight: onchain); partA from NAR-2026-0711-001; phase: resolution; bridge: 'после чего'; confidence: 0.42; confidence_tier: high; signals_used: 6; ignored_duplicates: []",
     "signals_used": [
       "NAR-2026-0808-001",
-      "NAR-2026-0803-001",
       "NAR-2026-0711-001",
+      "NAR-2026-0803-001",
       "NAR-2026-0717-002",
       "NAR-2026-0717-003",
       "NAR-2026-0728-001"
@@ -428,30 +428,30 @@
     "entity_count": 5,
     "anchor_entity_share": 0.333,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.519456+00:00",
+    "generated_at": "2026-09-03T03:24:24.709510+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_bitcoin_governance_debate_20260902_192702"
+    "synthesis_id": "synthesis_bitcoin_governance_debate_20260903_032424"
   },
   "wallet_security_incidents": {
     "tension": "Подписанные бинарии 26.06.7 позволяют обновиться прямо сейчас vs полная независимая проверка на воспроизводимость станет возможна только 11 сентября — 14 дней доверия подписи команды без верификации",
     "narrative": "Периметр угрозы для держателей аппаратных кошельков сместился с самого устройства на экосистему вокруг него — логистику, e-commerce-плагины, службы поддержки; производитель может гарантировать безопасность собственной прошивки, но не безопасность каждого стороннего звена цепочки поставок, а утечка физического адреса превращает цифровую угрозу в потенциально физическую — однако модель ответственного раскрытия для open-source инфраструктуры вводит временный, осознанно принятый компромисс между прозрачностью и безопасностью: снижение риска эксплуатации во время эмбарго покупается ценой невозможности независимой верификации кода в это же самое окно — тот же временный разрыв между «доверием подписи» и «проверкой кода», который уже станет предметом самопроверки индустрии, когда 11 сентября исходники откроются",
     "takeaway": "Модель ответственного раскрытия для open-source инфраструктуры вводит временный, осознанно принятый компромисс между прозрачностью и безопасностью: снижение риска эксплуатации во время эмбарго покупается ценой невозможности независимой верификации кода в это же самое окно — тот же временный разрыв между «доверием подписи» и «проверкой кода», который уже станет предметом самопроверки индустрии, когда 11 сентября исходники откроются",
     "strength": "strong",
-    "confidence": 0.567,
+    "confidence": 0.538,
     "confidence_tier": "high",
     "alternative_scenario": "",
     "alternative_scenario_source_id": "",
     "phase": "active",
-    "score": 39,
+    "score": 37,
     "signal_count": 5,
     "anchor_signal_id": "INF-2026-0828-001",
     "phase_changed": false,
     "structural_change": {},
-    "rationale": "Tension from INF-2026-0828-001 (contradicts: 0, weight: primary); partA from INF-2026-0817-002; phase: active; bridge: 'однако'; confidence: 0.57; confidence_tier: high; signals_used: 5; ignored_duplicates: []",
+    "rationale": "Tension from INF-2026-0828-001 (contradicts: 0, weight: primary); partA from INF-2026-0817-002; phase: active; bridge: 'однако'; confidence: 0.54; confidence_tier: high; signals_used: 5; ignored_duplicates: []",
     "signals_used": [
       "INF-2026-0828-001",
-      "INF-2026-0826-001",
       "INF-2026-0817-002",
+      "INF-2026-0826-001",
       "INF-2026-0730-001",
       "INF-2026-0801-001"
     ],
@@ -459,9 +459,9 @@
     "entity_count": 3,
     "anchor_entity_share": 0.4,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.520607+00:00",
+    "generated_at": "2026-09-03T03:24:24.710885+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_wallet_security_incidents_20260902_192702"
+    "synthesis_id": "synthesis_wallet_security_incidents_20260903_032424"
   },
   "btc_payment_adoption": {
     "tension": "39,1% годового роста крипто-переводов в Сальвадоре — vs абсолютная доля всего 0,7%, вдвое меньше даже неформальных переводов наличными из рук в руки",
@@ -487,9 +487,9 @@
     "entity_count": 1,
     "anchor_entity_share": 1.0,
     "is_minority_anchor": false,
-    "generated_at": "2026-09-02T19:27:02.521810+00:00",
+    "generated_at": "2026-09-03T03:24:24.712182+00:00",
     "algorithm_version": "2.2.0",
-    "synthesis_id": "synthesis_btc_payment_adoption_20260902_192702"
+    "synthesis_id": "synthesis_btc_payment_adoption_20260903_032424"
   },
   "_cross_cluster_entities": {
     "el_salvador": [

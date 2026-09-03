@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02T11:52:26Z",
+  "updated_at": "2026-09-03T11:50:32Z",
   "source": "blockchain.info/balance (балансы) + data/known_addresses.json (состав выборки)",
   "labels_source": "data/known_addresses.json (курируется вручную)",
   "caveat": "ВЫБОРКА ОГРАНИЧЕНА КУРИРУЕМЫМ СПИСКОМ: это крупнейшие среди 38 отслеживаемых адресов, а НЕ рейтинг богатейших адресов сети — адрес, не попавший в data/known_addresses.json, здесь не появится, каким бы крупным он ни был. Кроме того это сырые адреса, не сущности: один держатель может владеть несколькими адресами; биржевой холодный кошелёк считается наравне с частным китом.",
@@ -10,7 +10,7 @@
       "address": "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo",
       "label": "Binance-coldwallet",
       "category": "exchange",
-      "balance_btc": 248597.59226456,
+      "balance_btc": 248597.59236303,
       "pct_of_supply": 1.183798
     },
     {
@@ -18,8 +18,8 @@
       "address": "3M219KR5vEneNb47ewrPfWyb5jQ2DjxRP6",
       "label": "Binance-coldwallet",
       "category": "exchange",
-      "balance_btc": 214225.45807766,
-      "pct_of_supply": 1.020121
+      "balance_btc": 219059.94207766,
+      "pct_of_supply": 1.043143
     },
     {
       "rank": 3,
@@ -58,7 +58,7 @@
       "address": "1FeexV6bAHb8ybZjqQMjJrcCrHGW9sb6uF",
       "label": "MtGox-Hack",
       "category": "lost_confiscated",
-      "balance_btc": 79957.26868999,
+      "balance_btc": 79957.26869699,
       "pct_of_supply": 0.380749
     },
     {
@@ -66,8 +66,8 @@
       "address": "1Ay8vMC7R1UbyCCZRVULMV7iQpHSAbguJP",
       "label": "Mr.100",
       "category": "unknown",
-      "balance_btc": 74056.69984372,
-      "pct_of_supply": 0.352651
+      "balance_btc": 73917.06623933,
+      "pct_of_supply": 0.351986
     },
     {
       "rank": 9,

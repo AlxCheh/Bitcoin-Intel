@@ -2303,6 +2303,31 @@
         "INF-2026-0825-001"
       ],
       "last_updated": "2026-08-25"
+    },
+    {
+      "id": "bitbox",
+      "name": "BitBox (Shift Crypto)",
+      "type": "infrastructure",
+      "status": "active",
+      "summary": "Швейцарский производитель аппаратных кошельков BitBox02 — конкурент Coinkite/Coldcard и Tangem на рынке self-custody устройств",
+      "profile": {
+        "what": "Аппаратные кошельки холодного хранения (BitBox02, BitBox02 Nova), 100% open-source прошивка, доступна Bitcoin-only редакция",
+        "metrics": [
+          "Дизайн энтропии — 5 независимых источников: TRNG на MCU + TRNG на secure chip + рандомность хоста + пароль пользователя + заводская случайность (bitbox.swiss)",
+          "Dual-chip secure element архитектура — компрометация требует взлома обоих чипов одновременно",
+          "17 августа 2026: прошивка 9.26.5 (обновление Dixence) закрыла 3 уязвимости — memory corruption в Multi-редакции (Bitcoin-only не затронута), риск блокировки средств через Silent Payments, bootloader-флаw (пофикшен ещё в 9.26.2 в июле)"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Сотрудник компании Лука Джулиани ранее уже комментировал для Atlas21 важность энтропии в контексте RNG-бага Coldcard (INF-2026-0730-001) — прямая параллель с позицией Tangem по тому же инциденту (см. tangem, STR-2026-0731-001). Создана напрямую по запросу пользователя на верифицированных фактах (bitbox.swiss, независимые обзоры) — без привязки к конкретному сигналу: первоисточник (профайл Луки Джулиани, atlas21.com) не удалось найти ни поиском, ни прямым обходом страниц сайта."
+      },
+      "signal_refs": [],
+      "last_updated": "2026-09-05",
+      "function_refs": [
+        "multisig-2of3",
+        "psbt-partially-signed-bitcoin-transaction"
+      ]
     }
   ]
 }

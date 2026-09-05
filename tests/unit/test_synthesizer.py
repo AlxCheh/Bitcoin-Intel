@@ -652,6 +652,7 @@ def test_velocity_aware_staleness_on_real_clusters_matches_empirical_finding(mon
         "lightning_payments",  # найдено 2026-08-22, tension winner (INF-2026-0715-001) 61+ дней без новых сигналов в кластере
         "supply_scarcity",  # найдено 2026-08-25, tension winner (SUP-2026-0625-001) 61+ дней без новых сигналов в кластере — последний сигнал кластера SUP-2026-0726-001 (26 июля), новых с тех пор не было
         "mining_operations",  # найдено 2026-08-25, tension winner (INF-2026-0625-001) 61+ дней без новых сигналов в кластере — последний сигнал кластера INF-2026-0731-001 (31 июля), новых с тех пор не было
+        "leverage_deleveraging_cycle",  # найдено 2026-09-05, tension winner (MAC-2026-0706-001) 61+ дней без новых сигналов в кластере
     }
 
     for cluster, group in by_cluster.items():

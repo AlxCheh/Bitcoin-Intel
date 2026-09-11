@@ -1,8 +1,12 @@
 {
-  "cluster_periods": 346,
-  "last_updated_at": "2026-09-05T13:40:41.141875+00:00",
+  "cluster_periods": 351,
+  "last_updated_at": "2026-09-11T10:56:04.428118+00:00",
   "last_run_changed_clusters": [
-    "quantum_security"
+    "bitcoin_governance_debate",
+    "btc_treasury_competition",
+    "layer2_programmability",
+    "post_subsidy_security_budget",
+    "strategy_model_stress"
   ],
   "note": "Самоподдерживающийся счётчик кластеро-периодов (ADR-011). Обновляется scripts/update_synthesis_history.py на каждый прогон synthesizer.py в CI. НЕ редактировать руками — см. ADR-011, заметка 2026-07-31, для полной истории и метода backfill первоначального значения.",
   "backfill": {

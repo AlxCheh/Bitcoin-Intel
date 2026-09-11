@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-07T13:08:52Z",
+  "updated_at": "2026-09-11T11:57:01Z",
   "source": "blockchain.info/balance (балансы) + data/known_addresses.json (состав выборки)",
   "labels_source": "data/known_addresses.json (курируется вручную)",
   "caveat": "ВЫБОРКА ОГРАНИЧЕНА КУРИРУЕМЫМ СПИСКОМ: это крупнейшие среди 38 отслеживаемых адресов, а НЕ рейтинг богатейших адресов сети — адрес, не попавший в data/known_addresses.json, здесь не появится, каким бы крупным он ни был. Кроме того это сырые адреса, не сущности: один держатель может владеть несколькими адресами; биржевой холодный кошелёк считается наравне с частным китом.",
@@ -26,7 +26,7 @@
       "address": "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2",
       "label": "Robinhood-coldwallet",
       "category": "exchange",
-      "balance_btc": 140849.98539108,
+      "balance_btc": 140849.98539402,
       "pct_of_supply": 0.670714
     },
     {
@@ -50,7 +50,7 @@
       "address": "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt",
       "label": "Bitfinex-Hack-Recovery",
       "category": "lost_confiscated",
-      "balance_btc": 94643.48825519,
+      "balance_btc": 94643.48825813,
       "pct_of_supply": 0.450683
     },
     {
@@ -66,15 +66,15 @@
       "address": "1Ay8vMC7R1UbyCCZRVULMV7iQpHSAbguJP",
       "label": "Mr.100",
       "category": "unknown",
-      "balance_btc": 74479.53543163,
-      "pct_of_supply": 0.354664
+      "balance_btc": 74729.03139399,
+      "pct_of_supply": 0.355853
     },
     {
       "rank": 9,
       "address": "bc1qa5wkgaew2dkv56kfvj49j0av5nml45x9ek9hz6",
       "label": "SilkRoad-FBI-Confiscated",
       "category": "lost_confiscated",
-      "balance_btc": 69370.18461556,
+      "balance_btc": 69370.1846185,
       "pct_of_supply": 0.330334
     },
     {

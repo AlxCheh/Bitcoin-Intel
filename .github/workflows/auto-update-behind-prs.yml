@@ -1,0 +1,47 @@
+name: Auto-update behind PRs
+
+# Реагирует на каждый push в main — это событие, которое делает другие
+# открытые auto-merge PR отставшими (mergeStateStatus: BEHIND), потому
+# что required_status_checks.strict=true требует актуальности ветки
+# перед мерджем, а ничего не обновляет её автоматически. Без этого
+# workflow каждый такой случай требует ручного update-branch (см.
+# docs/superpowers/specs/2026-09-13-merge-queue-automation-design.md).
+#
+# SYNTHESIS_BOT_TOKEN, не GITHUB_TOKEN — тот же паттерн, что и в
+# update-bip110-signaling.yml и аналогичных: update-branch от штатного
+# GITHUB_TOKEN не порождает новый workflow run на PR, обязательный чек
+# "Validate and Test" не перезапустится, PR зависнет по другой причине.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-behind:
+    name: Update branch for behind auto-merge PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update branches of behind auto-merge PRs
+        env:
+          GH_TOKEN: ${{ secrets.SYNTHESIS_BOT_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Небольшая пауза — GitHub пересчитывает mergeStateStatus не
+          # синхронно с push, сразу после события список может быть
+          # ещё не актуален.
+          sleep 10
+
+          BEHIND_PRS=$(gh pr list --repo "$REPO" --state open \
+            --json number,autoMergeRequest,mergeStateStatus \
+            -q '.[] | select(.autoMergeRequest != null and .mergeStateStatus == "BEHIND") | .number')
+
+          if [ -z "$BEHIND_PRS" ]; then
+            echo "Нет отставших auto-merge PR."
+            exit 0
+          fi
+
+          echo "$BEHIND_PRS" | while read -r pr; do
+            echo "Обновляю ветку PR #$pr (behind + auto-merge включён)"
+            gh api --method PUT "repos/$REPO/pulls/$pr/update-branch" \
+              || echo "⚠ update-branch для #$pr не удался — не блокирует обработку остальных PR"
+          done

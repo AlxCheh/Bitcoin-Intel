@@ -56,6 +56,7 @@ import json
 import re
 import shutil
 from collections import defaultdict
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
@@ -102,11 +103,32 @@ def js_synthesize_source() -> str:
 
 @pytest.fixture(scope="module")
 def golden_clusters() -> dict:
-    """Golden Dataset, сгруппированный по cluster — {cluster_key: [signals]}."""
+    """
+    Golden Dataset, сгруппированный по cluster — {cluster_key: [signals]}.
+
+    Даты сигналов во фикстуре — календарные (записаны как 2026-06-хх), а не
+    относительные. По мере течения реального времени они неизбежно пересекают
+    WINDOW_DAYS_DEFAULT (90 дней, config/settings.py) и EmptyClusterError
+    вместо синтеза — обнаружено 2026-09-13, когда btc_infrastructure_growth/
+    etf_institutional_flow/supply_scarcity (97-104 дня) уже выпали, а
+    оставшиеся не-test_stale кластеры были в 5-7 днях от того же (83-85 дней).
+    Сдвигаем все не-test_stale даты к текущей дате при каждом запуске,
+    сохраняя интервалы между ними, — тот же приём, что уже используется в
+    tests/integration/test_narrative_regression.py. test_stale — намеренное
+    исключение (KNOWN_GAP_CLUSTERS): должен оставаться старше окна.
+    """
     if not GOLDEN.exists():
         pytest.skip("golden_signals.json not found")
     data = json.loads(GOLDEN.read_text(encoding="utf-8"))
     signals = data.get("signals", data) if isinstance(data, dict) else data
+
+    movable = [s for s in signals if s.get("cluster") not in KNOWN_GAP_CLUSTERS]
+    if movable:
+        newest = max(date.fromisoformat(s["date"]) for s in movable)
+        shift = (date.today() - timedelta(days=7)) - newest
+        for s in movable:
+            s["date"] = (date.fromisoformat(s["date"]) + shift).isoformat()
+
     by_cluster: dict = defaultdict(list)
     for s in signals:
         by_cluster[s["cluster"]].append(s)

@@ -1516,6 +1516,7 @@ const DIGEST_CLUSTER_LABELS = {
   mining_ai_diversification: '🤖 МАЙНИНГ И AI',
   lightning_payments:       '⚡ LIGHTNING',
   freedom_tech_funding:     '🕊️ FREEDOM TECH',
+  post_subsidy_security_budget: '🛡️ SECURITY BUDGET',
 };
 
 // 2026-07-26: перенесено сюда с исходного места (рядом с analyzeSignal()),
@@ -1568,7 +1569,8 @@ const CLUSTER_LABELS_AI = {
   layer2_programmability:      '🔗 L2: программируемость Bitcoin',
   mining_ai_diversification:   '🤖 Майнинг и AI: гибридная модель',
   lightning_payments:          '⚡ Lightning: платежи и расчёты',
-  freedom_tech_funding:        '🕊️ Freedom tech: финансирование'
+  freedom_tech_funding:        '🕊️ Freedom tech: финансирование',
+  post_subsidy_security_budget: '🛡️ Security budget: экономика после субсидии'
 };
 
 // M3 ARR v3: единый источник истины для порогов freshness-скоринга —
@@ -2586,6 +2588,7 @@ function renderDashboard() {
     mining_ai_diversification: '🤖 МАЙНИНГ И AI: ГИБРИДНАЯ МОДЕЛЬ',
     lightning_payments:       '⚡ LIGHTNING: ПЛАТЕЖИ И РАСЧЁТЫ',
     freedom_tech_funding:     '🕊️ FREEDOM TECH: ФИНАНСИРОВАНИЕ',
+    post_subsidy_security_budget: '🛡️ SECURITY BUDGET: ЭКОНОМИКА ПОСЛЕ СУБСИДИИ',
   };
 
   // Собираем кластеры

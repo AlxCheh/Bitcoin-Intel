@@ -15,6 +15,16 @@ name: Auto-update behind PRs
 on:
   push:
     branches: [main]
+  workflow_dispatch: {}
+
+# Ни один шаг не использует штатный GITHUB_TOKEN — каждый мутирующий
+# вызов gh явно переопределяет GH_TOKEN на SYNTHESIS_BOT_TOKEN (см. выше),
+# поэтому дефолтному токену никакие права не нужны.
+permissions: {}
+
+concurrency:
+  group: auto-update-behind-prs
+  cancel-in-progress: false
 
 jobs:
   update-behind:
@@ -31,7 +41,7 @@ jobs:
           # ещё не актуален.
           sleep 10
 
-          BEHIND_PRS=$(gh pr list --repo "$REPO" --state open \
+          BEHIND_PRS=$(gh pr list --repo "$REPO" --state open --limit 100 \
             --json number,autoMergeRequest,mergeStateStatus \
             -q '.[] | select(.autoMergeRequest != null and .mergeStateStatus == "BEHIND") | .number')
 
@@ -43,5 +53,5 @@ jobs:
           echo "$BEHIND_PRS" | while read -r pr; do
             echo "Обновляю ветку PR #$pr (behind + auto-merge включён)"
             gh api --method PUT "repos/$REPO/pulls/$pr/update-branch" \
-              || echo "⚠ update-branch для #$pr не удался — не блокирует обработку остальных PR"
+              || echo "::warning::update-branch не удался для PR #$pr — не блокирует обработку остальных PR"
           done

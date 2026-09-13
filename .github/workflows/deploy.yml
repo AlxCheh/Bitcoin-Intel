@@ -5,6 +5,12 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  # Задел для варианта A (нативный GitHub Merge Queue) — сейчас неактивен,
+  # очередь недоступна на текущем тарифе аккаунта (личный, не Organization,
+  # подтверждено 422 от Rulesets API). Фактическое решение — свой workflow
+  # .github/workflows/auto-update-behind-prs.yml. См.
+  # docs/superpowers/specs/2026-09-13-merge-queue-automation-design.md,
+  # раздел "Обновление 2026-09-13".
   merge_group:
 
 env:

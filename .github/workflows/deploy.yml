@@ -2,9 +2,9 @@ name: Validate, Synthesize and Deploy
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   # Задел для варианта A (нативный GitHub Merge Queue) — сейчас неактивен,
   # очередь недоступна на текущем тарифе аккаунта (личный, не Organization,
   # подтверждено 422 от Rulesets API). Фактическое решение — свой workflow

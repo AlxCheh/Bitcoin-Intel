@@ -2333,6 +2333,31 @@
         "multisig-2of3",
         "psbt-partially-signed-bitcoin-transaction"
       ]
+    },
+    {
+      "id": "morgan_stanley",
+      "name": "Morgan Stanley",
+      "type": "fund",
+      "status": "active",
+      "summary": "Крупный банк со статусом G-SIB — первый банк со спотовым Bitcoin ETP (MSBT), формализованный allocation framework 0-4% для клиентских портфелей",
+      "profile": {
+        "what": "Спотовый Bitcoin ETP (MSBT, NYSE Arca, запущен 8 апреля 2026) + Global Investment Committee allocation framework 0-4% по риск-профилям клиентов — институциональная дистрибуция BTC через сеть финансовых советников",
+        "metrics": [
+          "MSBT AUM: ~$609 млн (14 сентября 2026), рост с ~$274 млн (19 июня 2026)",
+          "Expense ratio 0,14% — на 11 б.п. дешевле iShares Bitcoin Trust ETF",
+          "Allocation framework: 0-4% BTC по трём риск-профилям клиентов (действует с октября 2025)",
+          "Резерв через MSBT: 4 348 BTC на 19 июня 2026"
+        ],
+        "links_to": [
+          "bitcoin"
+        ],
+        "notable": "Первый спотовый BTC-ETP от банка со статусом глобально системно значимого (G-SIB). Head of Digital Assets — Amy Oldenburg (с января 2026), 26-летний ветеран банка"
+      },
+      "signal_refs": [
+        "STR-2026-0623-005",
+        "STR-2026-0914-002"
+      ],
+      "last_updated": "2026-09-14"
     }
   ]
 }

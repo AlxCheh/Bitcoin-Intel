@@ -2358,6 +2358,28 @@
         "STR-2026-0914-002"
       ],
       "last_updated": "2026-09-14"
+    },
+    {
+      "id": "strike",
+      "name": "Strike",
+      "type": "corporate",
+      "status": "active",
+      "summary": "Bitcoin-платёжная компания под руководством Jack Mallers — озвучивает философское обоснование твёрдых денег как возврата людям времени и труда, теперь с ИИ-углом",
+      "profile": {
+        "what": "Платёжное приложение и инфраструктура на Lightning/Bitcoin; CEO Jack Mallers — публичный голос индустрии по монетарной философии Bitcoin",
+        "metrics": [
+          "Jack Mallers сфокусировался на Strike после ухода с поста CEO Twenty One Capital 20 июля 2026"
+        ],
+        "links_to": [
+          "bitcoin",
+          "twenty_one_capital"
+        ],
+        "notable": "14 сентября 2026 — дебютный эфир ТВ-шоу Bitcoin Magazine: тезис «деньги — абстрагированное время труда», твёрдые деньги + ИИ возвращают людям время"
+      },
+      "signal_refs": [
+        "NAR-2026-0914-001"
+      ],
+      "last_updated": "2026-09-14"
     }
   ]
 }

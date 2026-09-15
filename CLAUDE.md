@@ -1,6 +1,6 @@
 # CLAUDE.md — Инструкции для работы с проектом
 
-> **Версия:** v8.60 · **Обновлено:** 2026-09-11
+> **Версия:** v8.61 · **Обновлено:** 2026-09-15
 > История версий → [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -598,7 +598,7 @@ Live-пайплайны (`bip110_signaling` каждые 3 часа, `volume`/`t
 
 `scripts/detect_pipeline_events.py` читает правила и пишет события в `data/pipeline_events.json`.
 
-> ⚠️ **Автоматизация пока не подключена.** Workflow `.github/workflows/detect-pipeline-events.yml` подготовлен, но не закоммичен: токен сессии не имел scope `workflow`, GitHub отклонил push. До его добавления детектор запускается вручную (`python3 scripts/detect_pipeline_events.py`). Сам скрипт, правила и тесты работают и не зависят от workflow.
+Workflow `.github/workflows/detect-pipeline-events.yml` закоммичен и работает по расписанию (после `update-volume`/`update-top-addresses`/`bip110_signaling`) с 2026-08-30 ([PR #1123](https://github.com/AlxCheh/Bitcoin-Intel/pull/1123)) — ручной запуск (`python3 scripts/detect_pipeline_events.py`) больше не обязателен, но остаётся рабочим способом прогнать детектор вне расписания.
 
 **Событие — это не сигнал и не черновик сигнала.** Оно означает ровно одно: порог пересечён, материал стоит разобрать по Шагам 1–8 как любой другой. Детектор намеренно не генерирует записи в `signals.json` — это обошло бы Шаги 2–7 (исследование первоисточника, отклонение содержательной альтернативы, честный тест связей) и наполнило бы корпус записями, которых никто не разбирал. Та же ниша, что у `find_similar_signals.py` и `contradiction_detector.py`: предложить кандидата, не сделать вывод.
 

@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/build_facts.py — не редактировать руками",
   "_source": "signals.json (facts[] по каждому сигналу)",
-  "generated_at": "2026-09-13",
+  "generated_at": "2026-09-15",
   "facts": {
     "bita_fund.aum": {
       "value": 59240000,
@@ -118,10 +118,10 @@
       "signal_id": "STR-2026-0824-001"
     },
     "strive.btc_holdings": {
-      "value": 20000,
+      "value": 25000,
       "unit": "BTC",
-      "as_of": "2026-07-24",
-      "signal_id": "STR-2026-0727-002"
+      "as_of": "2026-09-11",
+      "signal_id": "STR-2026-0914-001"
     },
     "tether.btc_holdings": {
       "value": 98933,

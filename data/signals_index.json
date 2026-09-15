@@ -4,6 +4,24 @@
   "_purpose": "Панорамное чтение корпуса целиком без риска исчерпать контекст; для точечной работы по конкретному сигналу использовать grep по signals.json",
   "signals": [
     {
+      "id": "STR-2026-0914-002",
+      "date": "2026-09-14",
+      "cluster": "etf_institutional_flow",
+      "dir": "pos",
+      "narrative_role": "complication",
+      "signal": "Эми Олденбург (Morgan Stanley) объяснила логику рекомендации BTC — MSBT пересёк $600 млн AUM",
+      "tension": "Morgan Stanley продаёт биткоин клиентам как «цифровое золото» — дефицитный несуверенный актив vs собственная методология банка признаёт три разных корреляционных режима BTC, не один стабильный профиль"
+    },
+    {
+      "id": "STR-2026-0914-001",
+      "date": "2026-09-14",
+      "cluster": "btc_treasury_competition",
+      "dir": "pos",
+      "narrative_role": "complication",
+      "signal": "Strive докупила биткоин, резерв достиг 25 000 BTC",
+      "tension": "Strive резко ускорила темп покупок и открыто нацелилась обогнать Metaplanet и Twenty One до конца года vs остаётся лишь пятой по резервам, а сам CEO называет эту цель не базовым сценарием"
+    },
+    {
       "id": "INF-2026-0828-001",
       "date": "2026-08-28",
       "cluster": "wallet_security_incidents",

@@ -58,6 +58,7 @@ VALID_CONDITIONS = {
     "crosses_below",
     "pct_change_exceeds",
     "changes_by_at_least",
+    "stays_at_for_periods",
 }
 MAX_EVENT_LOG = 100  # держим лог событий ограниченным, чтобы файл не рос бесконечно
 
@@ -139,6 +140,27 @@ def evaluate(condition: str, value: float, threshold: float, previous):
     raise ValueError(f"Unknown condition: {condition}")
 
 
+def evaluate_stays_at_for_periods(value: float, threshold: float, min_periods: int, previous_streak):
+    """
+    Отдельная функция, не ветка evaluate() — нужен персистентный счётчик
+    последовательных прогонов, а не просто предыдущее значение метрики,
+    и это меняет форму состояния (state[rid] получает поле 'streak'),
+    которое остальные условия не используют.
+
+    Возвращает (is_true_now, is_event, kind, new_streak).
+
+    is_event — не «выполнено сейчас» (это было бы шумом на каждом прогоне
+    после первого достижения N), а ровно момент, когда счётчик ВПЕРВЫЕ
+    достиг min_periods — аналог crosses_above, только по числу
+    подряд идущих периодов с value == threshold, а не по самому значению.
+    """
+    streak = (previous_streak or 0) + 1 if value == threshold else 0
+    is_true_now = streak >= min_periods
+    is_event = streak == min_periods
+    kind = "crossed" if is_event else None
+    return is_true_now, is_event, kind, streak
+
+
 def load_previous_state(out_path: Path) -> dict:
     if not out_path.exists():
         return {}
@@ -203,7 +225,17 @@ def run(rules_path: Path, out_path: Path, repo_root: Path) -> int:
             raise ValueError(f"[{rid}] нужен threshold или threshold_path")
 
         previous = state.get(rid, {}).get("value")
-        is_true_now, is_event, kind = evaluate(condition, value, threshold, previous)
+        streak = None
+        if condition == "stays_at_for_periods":
+            min_periods = rule.get("min_periods")
+            if not isinstance(min_periods, int) or min_periods < 1:
+                raise ValueError(f"[{rid}] stays_at_for_periods требует целочисленный min_periods >= 1")
+            previous_streak = state.get(rid, {}).get("streak", 0)
+            is_true_now, is_event, kind, streak = evaluate_stays_at_for_periods(
+                value, threshold, min_periods, previous_streak
+            )
+        else:
+            is_true_now, is_event, kind = evaluate(condition, value, threshold, previous)
 
         new_state[rid] = {
             "value": value,
@@ -211,9 +243,11 @@ def run(rules_path: Path, out_path: Path, repo_root: Path) -> int:
             "condition_true": bool(is_true_now),
             "observed_at": now_iso,
         }
+        if streak is not None:
+            new_state[rid]["streak"] = streak
 
         if is_event:
-            new_events.append({
+            event = {
                 "rule_id": rid,
                 "kind": kind,
                 "detected_at": now_iso,
@@ -226,7 +260,10 @@ def run(rules_path: Path, out_path: Path, repo_root: Path) -> int:
                 "why_it_matters": rule.get("why_it_matters", ""),
                 "suggested_cluster": rule.get("suggested_cluster"),
                 "reviewed": False,
-            })
+            }
+            if streak is not None:
+                event["consecutive_periods"] = streak
+            new_events.append(event)
 
     # Новые события — в начало, лог обрезается по MAX_EVENT_LOG.
     all_events = (new_events + events)[:MAX_EVENT_LOG]

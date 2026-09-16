@@ -24,6 +24,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from detect_pipeline_events import (  # noqa: E402
     VALID_CONDITIONS,
     evaluate,
+    evaluate_stays_at_for_periods,
     resolve_path,
     run,
 )
@@ -90,6 +91,43 @@ def test_pct_change_handles_zero_previous_without_dividing_by_zero():
 def test_unknown_condition_raises():
     with pytest.raises(ValueError):
         evaluate("nonsense", 1.0, 1.0, previous=None)
+
+
+def test_stays_at_for_periods_fires_exactly_once_at_target_streak():
+    """Событие — ровно на прогоне, где счётчик впервые достиг min_periods, не раньше и не после."""
+    streak = 0
+    for _ in range(2):
+        _, is_event, kind, streak = evaluate_stays_at_for_periods(0.0, 0.0, 3, streak)
+        assert not is_event, "ещё не достигли min_periods"
+    is_true_now, is_event, kind, streak = evaluate_stays_at_for_periods(0.0, 0.0, 3, streak)
+    assert streak == 3
+    assert is_true_now and is_event and kind == "crossed"
+
+    # Ещё один прогон на том же значении — счётчик растёт дальше, но повторного события нет.
+    _, is_event_again, _, streak = evaluate_stays_at_for_periods(0.0, 0.0, 3, streak)
+    assert streak == 4
+    assert not is_event_again, "уже сработало на streak==3 — streak==4 не должен сигналить повторно"
+
+
+def test_stays_at_for_periods_resets_on_change():
+    """Значение сдвинулось — счётчик сбрасывается, серия начинается заново."""
+    _, _, _, streak = evaluate_stays_at_for_periods(0.0, 0.0, 5, previous_streak=4)
+    assert streak == 5
+    _, is_event, kind, streak_after_change = evaluate_stays_at_for_periods(0.1, 0.0, 5, previous_streak=streak)
+    assert streak_after_change == 0
+    assert not is_event and kind is None
+
+
+def test_stays_at_for_periods_without_previous_streak_starts_at_one():
+    is_true_now, is_event, kind, streak = evaluate_stays_at_for_periods(0.0, 0.0, 1, previous_streak=None)
+    assert streak == 1
+    assert is_true_now and is_event and kind == "crossed", "min_periods=1 должен сработать сразу на первом наблюдении"
+
+
+def test_unknown_condition_raises_via_evaluate_not_stays_at():
+    """stays_at_for_periods обрабатывается отдельной функцией, не через evaluate() — эта ветка её не знает."""
+    with pytest.raises(ValueError):
+        evaluate("stays_at_for_periods", 0.0, 0.0, previous=None)
 
 
 # ─────────────────────────── resolve_path ───────────────────────────
@@ -186,6 +224,14 @@ def test_every_rule_path_resolves_against_real_pipeline_data():
                 f"{r['id']}: threshold_path '{r['threshold_path']}' не разрешается в число"
 
 
+def test_every_stays_at_rule_has_valid_min_periods():
+    """stays_at_for_periods без min_periods (или с мусорным значением) молча никогда не сработает как задумано."""
+    for r in _rules():
+        if r["condition"] == "stays_at_for_periods":
+            assert isinstance(r.get("min_periods"), int) and r["min_periods"] >= 1, \
+                f"{r['id']}: min_periods должен быть целым числом >= 1"
+
+
 def test_suggested_clusters_exist_in_ontology():
     """suggested_cluster — подсказка, но подсказывать несуществующий кластер нельзя."""
     ontology = json.loads((REPO_ROOT / "ontology.json").read_text(encoding="utf-8"))
@@ -247,6 +293,34 @@ def test_state_persists_so_second_run_does_not_refire(tmp_path):
     doc = json.loads(out.read_text(encoding="utf-8"))
     assert len(doc["events"]) == 1
     assert doc["events"][0]["kind"] == "true_at_baseline"
+
+
+def test_run_persists_streak_across_invocations_for_stays_at(tmp_path):
+    """
+    Сквозной тест через run()/файл состояния (не только evaluate_stays_at_for_periods
+    напрямую): streak должен накапливаться между отдельными прогонами процесса,
+    событие — сработать ровно на min_periods-м прогоне, не раньше.
+    """
+    (tmp_path / "data").mkdir(exist_ok=True)
+    src = tmp_path / "data" / "p.json"
+    src.write_text(json.dumps({"current": {"v": 0.0}}), encoding="utf-8")
+    rules_file = tmp_path / "rules.json"
+    rules_file.write_text(json.dumps({"rules": [
+        {"id": "r", "source_file": "data/p.json", "value_path": "current.v",
+         "condition": "stays_at_for_periods", "threshold": 0.0, "min_periods": 3,
+         "description": "d", "why_it_matters": "w"}
+    ]}), encoding="utf-8")
+    out = tmp_path / "events.json"
+
+    assert run(rules_file, out, tmp_path) == 0, "прогон 1: streak=1, ещё не достигли 3"
+    assert run(rules_file, out, tmp_path) == 0, "прогон 2: streak=2"
+    assert run(rules_file, out, tmp_path) == 1, "прогон 3: streak=3 — событие"
+    assert run(rules_file, out, tmp_path) == 0, "прогон 4: streak=4 — уже сработало, повтора нет"
+
+    doc = json.loads(out.read_text(encoding="utf-8"))
+    assert doc["state"]["r"]["streak"] == 4
+    assert len(doc["events"]) == 1
+    assert doc["events"][0]["consecutive_periods"] == 3
 
 
 def test_real_run_is_reproducible_and_flags_bip110_deadline(tmp_path):

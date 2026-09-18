@@ -1,12 +1,10 @@
 {
-  "cluster_periods": 364,
-  "last_updated_at": "2026-09-17T04:56:21.868919+00:00",
+  "cluster_periods": 367,
+  "last_updated_at": "2026-09-18T10:56:10.078243+00:00",
   "last_run_changed_clusters": [
-    "btc_treasury_competition",
     "etf_institutional_flow",
-    "layer2_programmability",
-    "strategy_model_stress",
-    "wallet_security_incidents"
+    "lightning_payments",
+    "mining_operations"
   ],
   "note": "Самоподдерживающийся счётчик кластеро-периодов (ADR-011). Обновляется scripts/update_synthesis_history.py на каждый прогон synthesizer.py в CI. НЕ редактировать руками — см. ADR-011, заметка 2026-07-31, для полной истории и метода backfill первоначального значения.",
   "backfill": {

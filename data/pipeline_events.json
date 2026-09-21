@@ -1,11 +1,25 @@
 {
   "_generated_by": "scripts/detect_pipeline_events.py",
   "_note": "ПРОИЗВОДНЫЙ ФАЙЛ — не редактировать руками, кроме поля reviewed. События НЕ являются сигналами: это пометка, что порог пересечён и стоит разобрать материал по Шагам 1-8.",
-  "generated_at": "2026-09-20T13:02:00Z",
+  "generated_at": "2026-09-21T15:04:59Z",
   "rules_evaluated": 12,
   "rules_skipped": [],
-  "unreviewed_count": 0,
+  "unreviewed_count": 1,
   "events": [
+    {
+      "rule_id": "btc_daily_volume_spike",
+      "kind": "crossed",
+      "detected_at": "2026-09-21T15:04:59Z",
+      "value": 76.22,
+      "previous_value": -46.52,
+      "threshold": 75.0,
+      "condition": "crosses_above",
+      "source_file": "data/volume.json",
+      "description": "Суточный объём торгов вырос более чем на 75% за сутки",
+      "why_it_matters": "Резкий скачок объёма обычно сопровождает событие, о котором стоит узнать раньше, чем о нём напишут — но сам по себе объём не является сигналом, это только повод посмотреть, что произошло",
+      "suggested_cluster": "leverage_deleveraging_cycle",
+      "reviewed": false
+    },
     {
       "rule_id": "btc_daily_volume_spike",
       "kind": "crossed",
@@ -53,77 +67,77 @@
   ],
   "state": {
     "bip110_voluntary_deadline_passed": {
-      "value": 967828,
+      "value": 968001,
       "threshold": 961632,
       "condition_true": true,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "bip110_signaling_reaches_activation_threshold": {
       "value": 0.0,
       "threshold": 55.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "bip110_signaling_becomes_nonzero": {
       "value": 0.0,
       "threshold": 0.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "bip110_signaling_stays_zero_for_long": {
       "value": 0.0,
       "threshold": 0.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z",
-      "streak": 5
+      "observed_at": "2026-09-21T15:04:59Z",
+      "streak": 6
     },
     "btc_daily_volume_spike": {
-      "value": -46.52,
+      "value": 76.22,
       "threshold": 75.0,
-      "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "condition_true": true,
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "btc_daily_volume_collapse": {
-      "value": -46.52,
+      "value": 76.22,
       "threshold": -75.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "largest_known_address_major_move": {
       "value": 248597.59262947,
       "threshold": 10000.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "dormant_address_mtgox_hack_moves": {
       "value": 79957.26869699,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "dormant_address_silkroad_fbi_moves": {
       "value": 69370.1846185,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "dormant_address_bitfinex_hack_recovery_moves": {
       "value": 94643.48825813,
       "threshold": 1.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "btc_daily_volume_absolute_floor": {
-      "value": 23924329076.64,
+      "value": 42391976457.93,
       "threshold": 7000000000.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     },
     "top3_mining_pools_exceed_60pct": {
       "value": 57.43,
       "threshold": 60.0,
       "condition_true": false,
-      "observed_at": "2026-09-20T13:02:00Z"
+      "observed_at": "2026-09-21T15:04:59Z"
     }
   }
 }

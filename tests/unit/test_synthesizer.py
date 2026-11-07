@@ -384,13 +384,13 @@ def test_synthesize_cluster_flags_minority_anchor_for_multi_entity_cluster():
     from scripts.synthesizer import synthesize_cluster
 
     signals = [
-        _minimal_signal("SIG-MINORITY", "2026-07-01", "complication"),
-        _minimal_signal("SIG-B", "2026-07-02", "trigger"),
-        _minimal_signal("SIG-C", "2026-07-03", "complication"),
-        _minimal_signal("SIG-D", "2026-07-04", "complication"),
-        _minimal_signal("SIG-E", "2026-07-05", "complication"),
-        _minimal_signal("SIG-F", "2026-07-06", "complication"),
-        _minimal_signal("SIG-G", "2026-07-07", "complication"),  # 7 сигналов, 1 minority
+        _minimal_signal("SIG-MINORITY", "2026-10-01", "complication"),
+        _minimal_signal("SIG-B", "2026-10-02", "trigger"),
+        _minimal_signal("SIG-C", "2026-10-03", "complication"),
+        _minimal_signal("SIG-D", "2026-10-04", "complication"),
+        _minimal_signal("SIG-E", "2026-10-05", "complication"),
+        _minimal_signal("SIG-F", "2026-10-06", "complication"),
+        _minimal_signal("SIG-G", "2026-10-07", "complication"),  # 7 сигналов, 1 minority
     ]
     signal_entity_map = {
         "SIG-MINORITY": "entity_minority",
@@ -424,9 +424,9 @@ def test_synthesize_cluster_no_minority_flag_below_entity_threshold():
     from scripts.synthesizer import synthesize_cluster
 
     signals = [
-        _minimal_signal("SIG-1", "2026-07-01", "complication", contradicts=["SIG-2"]),
-        _minimal_signal("SIG-2", "2026-07-02", "trigger"),
-        _minimal_signal("SIG-3", "2026-07-03", "complication"),
+        _minimal_signal("SIG-1", "2026-10-01", "complication", contradicts=["SIG-2"]),
+        _minimal_signal("SIG-2", "2026-10-02", "trigger"),
+        _minimal_signal("SIG-3", "2026-10-03", "complication"),
     ]
     signal_entity_map = {"SIG-1": "entity_a", "SIG-2": "entity_a", "SIG-3": "entity_b"}
 
@@ -444,8 +444,8 @@ def test_synthesize_cluster_entity_fields_default_safely_without_map():
     from scripts.synthesizer import synthesize_cluster
 
     signals = [
-        _minimal_signal("SIG-1", "2026-07-01", "trigger"),
-        _minimal_signal("SIG-2", "2026-07-02", "complication"),
+        _minimal_signal("SIG-1", "2026-10-01", "trigger"),
+        _minimal_signal("SIG-2", "2026-10-02", "complication"),
     ]
     result = synthesize_cluster("test_multi_entity_cluster", signals)
 
@@ -657,6 +657,7 @@ def test_velocity_aware_staleness_on_real_clusters_matches_empirical_finding(mon
         "bitcoin_governance_debate",  # найдено 2026-09-11, tension winner (NAR-2026-0711-001) 62 дня, 5 новых сигналов в кластере, reason:'age' — последний сигнал кластера NAR-2026-0808-001 (8 авг), новых с тех пор не было
         "post_subsidy_security_budget",  # найдено 2026-09-13, tension winner (INF-2026-0713-002) 62 дня, 0 новых сигналов в кластере, reason:'age' — единственный сигнал кластера, новых с момента создания не было
         "btc_payment_adoption",  # найдено 2026-09-28, tension winner (NAR-2026-0726-001) 64 дня, 1 новый сигнал в кластере, reason:'age' — календарный дрейф, не баг механизма
+        "wallet_security_incidents",  # найдено 2026-11-07, tension winner 100+ дней, reason:'age' — календарный дрейф, не баг механизма
     }
 
     for cluster, group in by_cluster.items():

@@ -658,6 +658,7 @@ def test_velocity_aware_staleness_on_real_clusters_matches_empirical_finding(mon
         "post_subsidy_security_budget",  # найдено 2026-09-13, tension winner (INF-2026-0713-002) 62 дня, 0 новых сигналов в кластере, reason:'age' — единственный сигнал кластера, новых с момента создания не было
         "btc_payment_adoption",  # найдено 2026-09-28, tension winner (NAR-2026-0726-001) 64 дня, 1 новый сигнал в кластере, reason:'age' — календарный дрейф, не баг механизма
         "wallet_security_incidents",  # найдено 2026-11-07, tension winner 100+ дней, reason:'age' — календарный дрейф, не баг механизма
+        "freedom_tech_funding",  # найдено 2026-11-07, tension winner 74 дня, reason:'age
     }
 
     for cluster, group in by_cluster.items():

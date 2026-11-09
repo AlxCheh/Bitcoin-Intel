@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08T13:57:54Z",
+  "updated_at": "2026-11-09T16:58:53Z",
   "source": "blockchain.info/balance (балансы) + data/known_addresses.json (состав выборки)",
   "labels_source": "data/known_addresses.json (курируется вручную)",
   "caveat": "ВЫБОРКА ОГРАНИЧЕНА КУРИРУЕМЫМ СПИСКОМ: это крупнейшие среди 38 отслеживаемых адресов, а НЕ рейтинг богатейших адресов сети — адрес, не попавший в data/known_addresses.json, здесь не появится, каким бы крупным он ни был. Кроме того это сырые адреса, не сущности: один держатель может владеть несколькими адресами; биржевой холодный кошелёк считается наравне с частным китом.",
@@ -18,8 +18,8 @@
       "address": "3M219KR5vEneNb47ewrPfWyb5jQ2DjxRP6",
       "label": "Binance-coldwallet",
       "category": "exchange",
-      "balance_btc": 164820.36242059,
-      "pct_of_supply": 0.784859
+      "balance_btc": 167401.64442059,
+      "pct_of_supply": 0.797151
     },
     {
       "rank": 3,
@@ -74,7 +74,7 @@
       "address": "bc1qa5wkgaew2dkv56kfvj49j0av5nml45x9ek9hz6",
       "label": "SilkRoad-FBI-Confiscated",
       "category": "lost_confiscated",
-      "balance_btc": 69370.18475203,
+      "balance_btc": 69370.18475749,
       "pct_of_supply": 0.330334
     },
     {

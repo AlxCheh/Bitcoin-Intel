@@ -1,16 +1,12 @@
 {
-  "updated_at": "2026-11-09T15:43:01Z",
+  "updated_at": "2026-11-10T14:36:57Z",
   "source": "CoinGecko market_chart (daily)",
   "current": {
-    "date": "2026-11-09",
-    "volume_usd": 33204309704.4,
-    "change_24h_pct": 203.33
+    "date": "2026-11-10",
+    "volume_usd": 23552289086.41,
+    "change_24h_pct": 42.42
   },
   "history": [
-    {
-      "date": "2026-10-11",
-      "volume_usd": 14844875004.31
-    },
     {
       "date": "2026-10-12",
       "volume_usd": 15154188868.08
@@ -125,7 +121,11 @@
     },
     {
       "date": "2026-11-09",
-      "volume_usd": 33204309704.4
+      "volume_usd": 16536876570.04
+    },
+    {
+      "date": "2026-11-10",
+      "volume_usd": 23552289086.41
     }
   ]
 }
